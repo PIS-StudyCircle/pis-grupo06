@@ -1,0 +1,86 @@
+
+plugins:
+  - rubocop-performance
+  - rubocop-rails
+
+inherit_mode:
+  merge:
+    - Exclude
+
+AllCops:
+  DisabledByDefault: true
+  SuggestExtensions: false
+  NewCops: disable
+  Exclude:
+    - "bin/*"
+    - "db/schema.rb"
+    - "tmp/**/*"
+    - "config/environments/*"
+
+Bundler:
+  Enabled: true
+
+Gemspec:
+  Enabled: true
+
+Layout:
+  Enabled: true
+
+Lint:
+  Enabled: true
+
+Lint/MissingSuper:
+  Exclude:
+    - "app/components/*"
+
+Layout/LineLength:
+  Max: 120
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+
+Naming:
+  Enabled: true
+
+Performance:
+  Enabled: true
+
+Rails:
+  Enabled: true
+
+Security:
+  Enabled: true
+
+Rails/BulkChangeTable:
+  Exclude:
+    - 'db/migrate/20190321140119_add_validations.rb'
+
+Rails/LexicallyScopedActionFilter:
+  Enabled: false
+
+Style/RedundantBegin:
+  Enabled: true
+
+Style/RedundantConditional:
+  Enabled: true
+
+Style/RedundantException:
+  Enabled: true
+
+Style/RedundantFreeze:
+  Enabled: true
+
+Style/RedundantParentheses:
+  Enabled: true
+
+Style/RedundantReturn:
+  Enabled: true
+
+Style/RedundantSelf:
+  Enabled: true
+
+Style/DefWithParentheses:
+  Enabled: true
+
+Style/MethodCallWithoutArgsParentheses:
+  Enabled: true
