@@ -1,0 +1,10 @@
+// Este archivo es para que VScode entienda los imports con el @. Cuando pones @/... traduce el @ por ./src
+
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    }
+  }
+}
