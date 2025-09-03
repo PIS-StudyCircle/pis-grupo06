@@ -49,3 +49,9 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 end
+
+# Production only (Heroku)
+group :production do
+  gem "pg", "~> 1.1"
+  gem "puma", ">= 5.0"
+end
