@@ -1,7 +1,0 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  scheduled_at: 2025-09-02 20:35:26
-
-two:
-  scheduled_at: 2025-09-02 20:35:26
