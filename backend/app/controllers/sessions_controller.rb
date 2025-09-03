@@ -9,5 +9,17 @@ class SessionsController < ApplicationController
     session[:user_id] = user.id
     redirect_to root_path, notice: "Logged in as #{user.name}"
   end
+
+  def omniauth
+    auth = request.env["omniauth.auth"] # hash con info de Google
+    user = User.from_google_oauth(auth)
+    reset_session
+    session[:user_id] = user.id
+    redirect_to "http://localhost:5173/me"
+  end
+
+  def failure
+    render json: { error: params[:message] || "oauth_failed" }, status: :unauthorized
+  end
 end
 
