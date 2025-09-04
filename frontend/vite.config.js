@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite'
-import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
+import path from 'path' // <-- 1. Importa el módulo 'path'
 
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react()],
+  // 2. Añade esta sección para configurar el alias
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'), // Esto es para que quede mas prolijo el ruteo, en el doc de drive (Documentacion/Configuracion/Proyecto) esta explicado
+      '@': path.resolve(__dirname, './src'),
     },
   },
 })
