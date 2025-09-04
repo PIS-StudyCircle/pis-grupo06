@@ -7,10 +7,13 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins ENV["FRONTEND_ORIGIN"].to_s
+    # En Heroku se usa la variable FRONTEND_ORIGIN.
+    # En local, si no está definida (o sea NO hay que defnir la var), usa http://localhost:5173 como fallback.
+    origins ENV.fetch("FRONTEND_ORIGIN", "http://localhost:5173")
 
     resource "*",
-             headers: :any,
-             methods: [:get, :post, :put, :patch, :delete, :options, :head]
+      headers: :any,
+      methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      expose: ["Authorization"] # opcional: para tokens JWT en headers
   end
 end
