@@ -17,5 +17,5 @@ Rails.application.routes.draw do
     end
   end
 
-   get "/ping", to: "api#ping"
+  get "/ping", to: "api#ping"
 end
