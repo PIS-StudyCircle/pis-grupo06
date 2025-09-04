@@ -1,0 +1,3 @@
+#!/bin/sh
+# Desactivar migraciones automáticas en Heroku
+exit 0
