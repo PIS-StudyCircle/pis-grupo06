@@ -15,7 +15,7 @@ class SessionsController < ApplicationController
     user = User.from_google_oauth(auth)
     reset_session
     session[:user_id] = user.id
-    redirect_to "http://localhost:5173/me"
+    redirect_to "http://localhost:5173/"
   end
 
   def failure
