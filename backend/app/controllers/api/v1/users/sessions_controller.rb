@@ -3,7 +3,6 @@ module Api
   module V1
     class Users::SessionsController < Devise::SessionsController
       respond_to :json
-      rotect_from_forgery with: :null_session if respond_to?(:protect_from_forgery)
 
       private
 
