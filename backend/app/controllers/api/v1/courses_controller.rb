@@ -6,7 +6,7 @@ module Api
         render json: @courses
       end
 
-      #este metodo no va a estar disponible para el usuario
+      # este metodo no va a estar disponible para el usuario
       def create
         @course = Course.new(course_params)
         if @course.save
@@ -17,6 +17,7 @@ module Api
       end
 
       private
+
       def course_params
         params.require(:course).permit(:name, :faculty)
       end
