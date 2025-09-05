@@ -20,10 +20,10 @@ export default function CoursePage() {
             {courses.length === 0 ? (
               <div>No hay materias disponibles</div>
             ) : (
-                courses.map((course) => (
-                  <CourseCard key={course.id} course={course} />
-                ))
-              )}
+              courses.map((course) => (
+                <CourseCard key={course.codigo || course.nombre} course={course} />
+              ))
+            )}
           </div>
           <div className="w-1/4 h-4/5 bg-white rounded-lg shadow-md">
           </div>
