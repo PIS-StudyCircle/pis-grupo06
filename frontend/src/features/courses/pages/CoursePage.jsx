@@ -31,7 +31,7 @@ export default function CoursePage() {
     return (
         <>
           <NavBar />
-          <div className="flex justify-center min-h-screen bg-[#eff6f5] p-4">
+          <div className="flex justify-center min-h-screen bg-[#f3f8f9] p-4">
             <div className="flex flex-col gap-4 items-center container">
               {courses.length === 0 ? (
                 <div>No hay materias disponibles</div>
