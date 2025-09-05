@@ -1,32 +1,12 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import NavBar from "@components/NavBar";
 import CourseCard from "../components/CourseCard";
-import NavBar from "../components/NavBar";
+import { useCourses } from "../hooks/useCourses";
 
 export default function CoursePage() {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { courses, loading, error } = useCourses();
 
-  useEffect(() =>{
-    const fetchCourses = async () => {
-        try{
-          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/courses`);
-          const data = await response.json();
-          console.log(data);
-          setCourses(data);
-        }catch(error){
-          //mostrar mensaje de error de alguna forma
-          console.error("Error fetching courses:", error);
-        }finally{
-          setLoading(false);
-        }
-    };
-    fetchCourses();
-  }, []);
-
-  if(loading){
-    return <div>Cargando materias...</div>;
-  }
+  if (loading) return <div>Cargando materias...</div>;
+  if (error) return <div>Error al cargar las materias 😢</div>;
 
   return (
    <>
