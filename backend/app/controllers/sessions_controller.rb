@@ -15,7 +15,7 @@ class SessionsController < ApplicationController
     user = User.from_google_oauth(auth)
     reset_session
     session[:user_id] = user.id
-    redirect_to "http://localhost:5173/"
+    redirect_to ENV.fetch("FRONTEND_ORIGIN") # esto tendría que llevar al home del usuario después
   end
 
   def failure
