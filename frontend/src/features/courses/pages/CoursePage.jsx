@@ -32,14 +32,21 @@ export default function CoursePage() {
         <>
           <NavBar />
           <div className="flex justify-center min-h-screen bg-[#f3f8f9] p-4">
-            <div className="flex flex-col gap-4 items-center container">
-              {courses.length === 0 ? (
-                <div>No hay materias disponibles</div>
-              ) : (
-                  courses.map((course) => (
-                    <CourseCard key={course.id} course={course} />
-                  ))
-                )}
+            <div className="flex w-full container gap-4">
+              <div className= "w-1/4 h-4/5 bg-white rounded-lg shadow-md">
+              </div>
+              <div className="justify-start w-3/4 px-6 container">
+                <h1 className="flex text-2xl font-bold p-2 mb-4 text-black">Materias Disponibles</h1>
+                {courses.length === 0 ? (
+                  <div>No hay materias disponibles</div>
+                ) : (
+                    courses.map((course) => (
+                      <CourseCard key={course.id} course={course} />
+                    ))
+                  )}
+              </div>
+              <div className="w-1/4 h-4/5 bg-white rounded-lg shadow-md">
+              </div>
             </div>
           </div>
         </>
