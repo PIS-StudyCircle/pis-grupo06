@@ -1,4 +1,4 @@
-import NavBar from "@components/NavBar";
+import NavBar from "../../../shared/components/NavBar";
 import CourseCard from "../components/CourseCard";
 import { useCourses } from "../hooks/useCourses";
 import ReactPaginate from "react-paginate";
