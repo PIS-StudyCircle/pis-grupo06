@@ -21,7 +21,7 @@ export default function CoursePage() {
               <div>No hay materias disponibles</div>
             ) : (
               courses.map((course) => (
-                <CourseCard key={course.codigo || course.nombre} course={course} />
+                <CourseCard key={course.id} course={course} />
               ))
             )}
           </div>

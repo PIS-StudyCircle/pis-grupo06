@@ -1,17 +1,17 @@
 export default function CourseCard({ course }) {
   return (
     <div className="h-auto bg-white rounded-lg shadow p-4 my-4 w-full flex flex-col justify-between cursor-pointer hover:shadow-lg transition-shadow">
-      <h2 className="text-black font-semibold text-lg">{course.nombre}</h2>
+      <h2 className="text-black font-semibold text-lg">{course.name}</h2>
 
-      {course.codigo && (
+      {course.code && (
         <p className="text-gray-700 text-sm">
-          <strong>Código:</strong> {course.codigo}
+          <strong>Código:</strong> {course.code}
         </p>
       )}
 
-      {course.instituto && (
+      {course.institute && (
         <p className="text-gray-600 text-sm">
-          <strong>Instituto:</strong> {course.instituto}
+          <strong>Instituto:</strong> {course.institute}
         </p>
       )}
     </div>
