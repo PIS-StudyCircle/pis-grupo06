@@ -1,4 +1,15 @@
+import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import CreateUserForm from './createuser';
+
+beforeEach(() => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ message: "Usuario creado" }),
+    })
+  );
+});
 
 describe('Integración Frontend-Backend', () => {
   test('Crea un usuario real en el backend', async () => {
