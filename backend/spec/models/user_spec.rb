@@ -18,7 +18,7 @@ RSpec.describe User, type: :model do
       )
 
       expect(user_duplicado.valid?).to eq(false)
-      expect(user_duplicado.errors[:email]).to include("usuario duplicado")
+      expect(user_duplicado.errors[:email]).to include("has already been taken")
     end
 
     it "requiere al menos 8 caracteres en la contraseña" do
@@ -30,7 +30,7 @@ RSpec.describe User, type: :model do
       )
   
       expect(user.valid?).to eq(false)
-      expect(user.errors[:password]).to include("es demasiado corta")
+      expect(user.errors[:password]).to include("is too short (minimum is 8 characters)")
     end
     
   end
