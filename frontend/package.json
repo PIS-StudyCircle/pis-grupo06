@@ -7,7 +7,20 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "jest"
+  },
+   "jest": {
+    "testEnvironment": "jsdom",
+    "transform": {
+      "^.+\\.[jt]sx?$": "babel-jest"
+    }
+  },
+   "babel": {
+    "presets": [
+      ["@babel/preset-env", { "targets": { "node": "current" } }],
+      ["@babel/preset-react", { "runtime": "automatic" }]
+    ]
   },
   "dependencies": {
     "react": "^19.1.1",
