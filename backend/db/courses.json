@@ -270,11 +270,6 @@
     "instituto": "DISI"
   },
   {
-    "nombre": "Ciencia, Tecnología y Sociedad (Agrimensura)",
-    "codigo": "1228",
-    "instituto": "DISI"
-  },
-  {
     "nombre": "Circuitos de Radiofrecuencia",
     "codigo": null,
     "instituto": "IIE"
@@ -808,11 +803,6 @@
     "nombre": "Funciones de Variable Compleja",
     "codigo": null,
     "instituto": "IMERL"
-  },
-  {
-    "nombre": "Fundamentos celulares de circuitos neurales",
-    "codigo": "1235",
-    "instituto": "IIE"
   },
   {
     "nombre": "Fundamentos celulares de circuitos neurales",
@@ -1965,11 +1955,6 @@
     "instituto": "IIE"
   },
   {
-    "nombre": "Pasantía (Tecnólogo en Cartografía)",
-    "codigo": "tci26",
-    "instituto": "IA"
-  },
-  {
     "nombre": "Pasantía (Tecnólogo en Telecomunicaciones)",
     "codigo": null,
     "instituto": ""
@@ -2711,11 +2696,6 @@
   },
   {
     "nombre": "Taller de genexus avanzado",
-    "codigo": "TI48",
-    "instituto": "Otras"
-  },
-  {
-    "nombre": "TALLER DE GENEXUS AVANZADO",
     "codigo": "TI48",
     "instituto": "Otras"
   },

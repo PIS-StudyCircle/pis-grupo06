@@ -21,7 +21,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_06_124033) do
     t.bigint "faculty_id"
     t.string "code"
     t.string "institute"
-    t.index ["code"], name: "index_courses_on_code", unique: true
+    t.index ["code"], name: "index_courses_on_code"
     t.index ["faculty_id"], name: "index_courses_on_faculty_id"
   end
 
