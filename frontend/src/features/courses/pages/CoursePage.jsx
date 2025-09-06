@@ -3,7 +3,8 @@ import CourseCard from "../components/CourseCard";
 import { useCourses } from "../hooks/useCourses";
 
 export default function CoursePage() {
-  const { courses, loading, error } = useCourses();
+  const { courses, loading, error, pagination, page, setPage } = useCourses();
+  const totalPages = pagination.last; // or compute: Math.ceil(pagination.count / perPage)
 
   if (loading) return <div>Cargando materias...</div>;
   if (error) return <div>Error al cargar las materias 😢</div>;
@@ -25,6 +26,19 @@ export default function CoursePage() {
               ))
             )}
           </div>
+          {totalPages > 1 && (
+            <ReactPaginate
+              forcePage={pagination.page - 1}
+              pageCount={totalPages}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={5}
+              onPageChange={({ selected }) => setPage(selected + 1)}
+              previousLabel="<"
+              nextLabel=">"
+              containerClassName="pagination"
+              activeClassName="active"
+            />
+          )}
           <div className="w-1/4 h-4/5 bg-white rounded-lg shadow-md">
           </div>
         </div>
