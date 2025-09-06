@@ -1,9 +1,11 @@
 module Api
   module V1
     class CoursesController < ApplicationController
+      include Pagy::Backend
+
       def index
-        @courses = Course.all.limit(30)
-        render json: @courses
+        @pagy, @courses = pagy(Course.order(:name), items: 20)
+        render json: { courses: @courses, pagination: pagy_metadata(@pagy) }
       end
 
       # este metodo no va a estar disponible para el usuario
