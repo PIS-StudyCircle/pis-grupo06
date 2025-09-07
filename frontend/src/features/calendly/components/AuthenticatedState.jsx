@@ -57,7 +57,83 @@ const formatScheduleRules = (rules) => {
   });
 };
 
-const AuthenticatedState = ({ user, availability, loading, onGetAvailability, onDisconnect }) => {
+const formatEvents = (events) => {
+  if (!events || events.length === 0) return (
+    <div className="text-sm text-gray-500 italic">
+      No hay eventos programados esta semana
+    </div>
+  );
+
+  const dayNames = {
+    0: 'Domingo',
+    1: 'Lunes', 
+    2: 'Martes',
+    3: 'Miércoles',
+    4: 'Jueves',
+    5: 'Viernes',
+    6: 'Sábado'
+  };
+
+  const monthNames = {
+    0: 'Enero', 1: 'Febrero', 2: 'Marzo', 3: 'Abril', 4: 'Mayo', 5: 'Junio',
+    6: 'Julio', 7: 'Agosto', 8: 'Septiembre', 9: 'Octubre', 10: 'Noviembre', 11: 'Diciembre'
+  };
+
+  return events.map((event, index) => {
+    const startTime = new Date(event.start_time);
+    const endTime = new Date(event.end_time);
+    
+    // Obtener la zona horaria local del usuario
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
+    const dayName = dayNames[startTime.getDay()];
+    const day = startTime.getDate();
+    const month = monthNames[startTime.getMonth()];
+    const year = startTime.getFullYear();
+    
+    const startTimeStr = startTime.toLocaleTimeString('es-ES', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false,
+      timeZone: timeZone
+    });
+    const endTimeStr = endTime.toLocaleTimeString('es-ES', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false,
+      timeZone: timeZone
+    });
+
+    return (
+      <div key={event.uri || index} className="text-sm bg-blue-50 border border-blue-200 p-3 rounded-lg mt-2">
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-semibold text-blue-800 text-base">
+            {dayName}, {day} de {month} de {year}
+          </span>
+          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+            {event.status || 'Programado'}
+          </span>
+        </div>
+        
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-green-600 font-mono font-semibold">
+              {startTimeStr}
+            </span>
+            <span className="text-gray-400">→</span>
+            <span className="text-red-600 font-mono font-semibold">
+              {endTimeStr}
+            </span>
+          </div>
+          
+          
+        </div>
+      </div>
+    );
+  });
+};
+
+const AuthenticatedState = ({ user, availability, events, loading, eventsLoading, onGetAvailability, onGetEvents, onDisconnect }) => {
   return (
     <div className="p-6">
       <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -77,13 +153,20 @@ const AuthenticatedState = ({ user, availability, loading, onGetAvailability, on
         </button>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 flex gap-3">
         <button
           onClick={onGetAvailability}
           disabled={loading}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
           {loading ? '⏳ Cargando...' : '📅 Obtener Disponibilidad Real'}
+        </button>
+        <button
+          onClick={onGetEvents}
+          disabled={eventsLoading}
+          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+        >
+          {eventsLoading ? '⏳ Cargando...' : '📋 Ver Eventos de la Semana'}
         </button>
       </div>
 
@@ -120,6 +203,23 @@ const AuthenticatedState = ({ user, availability, loading, onGetAvailability, on
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="text-yellow-700">
             Haz clic en "Obtener Disponibilidad Real" para cargar tus horarios
+          </p>
+        </div>
+      )}
+
+      {events.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-lg p-4 mt-6">
+          <h3 className="text-lg font-semibold mb-4">📋 Eventos de esta Semana:</h3>
+          <div className="space-y-4">
+            {formatEvents(events)}
+          </div>
+        </div>
+      )}
+
+      {events.length === 0 && !eventsLoading && (
+        <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg mt-6">
+          <p className="text-gray-700">
+            Haz clic en "Ver Eventos de la Semana" para cargar tus eventos programados
           </p>
         </div>
       )}

@@ -124,6 +124,54 @@ export const getAvailability = async (accessToken, user) => {
   }
 };
 
+export const getEvents = async (accessToken, user) => {
+  if (!accessToken || !user) {
+    throw new Error('No hay token de acceso o usuario');
+  }
+
+  // Obtener fechas de inicio y fin de la semana actual
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay()); // Domingo
+  startOfWeek.setHours(0, 0, 0, 0);
+  
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6); // Sábado
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  const startTime = startOfWeek.toISOString();
+  const endTime = endOfWeek.toISOString();
+
+  console.log('Obteniendo eventos para usuario:', user.uri);
+  console.log('Rango de fechas:', startTime, 'a', endTime);
+  
+  const url = `https://api.calendly.com/scheduled_events?user=${encodeURIComponent(user.uri)}&min_start_time=${startTime}&max_start_time=${endTime}`;
+  
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Error response:', response.status, errorText);
+    throw new Error(`Error ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+  console.log('Datos de eventos recibidos:', data);
+  
+  if (data && data.collection) {
+    console.log('Eventos encontrados:', data.collection.length);
+    return data.collection;
+  } else {
+    console.log('No se encontraron eventos en la respuesta');
+    return [];
+  }
+};
+
 export const clearOAuthData = () => {
   sessionStorage.removeItem('used_oauth_code');
   sessionStorage.removeItem('oauth_state');

@@ -9,10 +9,13 @@ export default function CalendlyPage() {
     step,
     user,
     availability,
+    events,
     loading,
+    eventsLoading,
     error,
     handleConnect,
     handleGetAvailability,
+    handleGetEvents,
     handleDisconnect,
     setError,
   } = useCalendlyOAuth();
@@ -34,8 +37,11 @@ export default function CalendlyPage() {
           <AuthenticatedState
             user={user}
             availability={availability}
+            events={events}
             loading={loading}
+            eventsLoading={eventsLoading}
             onGetAvailability={handleGetAvailability}
+            onGetEvents={handleGetEvents}
             onDisconnect={handleDisconnect}
           />
         );

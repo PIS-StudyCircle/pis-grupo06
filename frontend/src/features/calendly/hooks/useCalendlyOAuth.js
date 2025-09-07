@@ -5,6 +5,7 @@ import {
   exchangeCodeForToken,
   getCurrentUser,
   getAvailability,
+  getEvents,
   clearOAuthData,
 } from "../services/calendly";
 
@@ -12,9 +13,11 @@ export default function useCalendlyOAuth() {
   const [step, setStep] = useState("connect");
   const [user, setUser] = useState(null);
   const [availability, setAvailability] = useState([]);
+  const [events, setEvents] = useState([]);
   const [accessToken, setAccessToken] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [eventsLoading, setEventsLoading] = useState(false);
 
   useEffect(() => {
     const { code, error } = initializeOAuth();
@@ -97,10 +100,27 @@ export default function useCalendlyOAuth() {
     }
   };
 
+  const handleGetEvents = async () => {
+    setEventsLoading(true);
+    setError(null);
+
+    try {
+      const eventsData = await getEvents(accessToken, user);
+      setEvents(eventsData);
+    } catch (err) {
+      console.error("💥 Error obteniendo eventos:", err);
+      setError("Error obteniendo eventos: " + err.message);
+      setEvents([]);
+    } finally {
+      setEventsLoading(false);
+    }
+  };
+
   const handleDisconnect = () => {
     setAccessToken(null);
     setUser(null);
     setAvailability([]);
+    setEvents([]);
     setStep("connect");
     setError(null);
     clearOAuthData();
@@ -110,11 +130,14 @@ export default function useCalendlyOAuth() {
     step,
     user,
     availability,
+    events,
     accessToken,
     error,
     loading,
+    eventsLoading,
     handleConnect,
     handleGetAvailability,
+    handleGetEvents,
     handleDisconnect,
     setError,
   };
