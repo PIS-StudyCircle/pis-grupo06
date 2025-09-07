@@ -168,6 +168,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.9-x64-mingw-ucrt)
       racc (~> 1.4)
+    nokogiri (1.18.9-x86_64-darwin)
+      racc (~> 1.4)
     nokogiri (1.18.9-x86_64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.18.9-x86_64-linux-musl)
@@ -346,11 +348,8 @@ PLATFORMS
   aarch64-linux-musl
   arm-linux-gnu
   arm-linux-musl
-<<<<<<< HEAD
-  x86_64-darwin-24
-=======
   x64-mingw-ucrt
->>>>>>> ac5da38 (Tests iniciales)
+  x86_64-darwin-24
   x86_64-linux
   x86_64-linux-gnu
   x86_64-linux-musl
