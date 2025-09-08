@@ -8,7 +8,7 @@ import Pagination from "@components/Pagination";
 
 export default function CoursePage() {
   const { courses, loading, error, pagination, page, setPage, search, setSearch } = useCourses();
-  const totalPages = pagination.pages || 1;
+  const totalPages = pagination.last || 1;
 
   const [query, setQuery] = useState(search);
 
