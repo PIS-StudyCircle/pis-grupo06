@@ -1,5 +1,16 @@
-export const getCourses = async (page = 1, perPage = 20) => {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/courses?page=${page}&per_page=${perPage}`);
-  if (!res.ok) throw new Error("Failed to fetch courses");
-  return res.json(); // should return { courses: [...], pagination: {...} }
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+export const getCourses = async (page = 1, perPage = 20, search = "") => {
+  const params = new URLSearchParams({
+    page,
+    per_page: perPage,
+  });
+
+  if (search) {
+    params.append("search", search);
+  }
+
+  const response = await fetch(`${API_URL}/api/v1/courses?${params}`);
+  if (!response.ok) throw new Error("Error fetching courses");
+  return await response.json();
 };

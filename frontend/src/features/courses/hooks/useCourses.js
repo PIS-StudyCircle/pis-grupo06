@@ -7,13 +7,14 @@ export const useCourses = (initialPage = 1, perPage = 20) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(initialPage);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const response = await getCourses(page, perPage);
-        setCourses(response.courses);
+        const response = await getCourses(page, perPage, search); 
+        setCourses(response.courses);   
         setPagination(response.pagination);
       } catch (err) {
         console.error("Error fetching courses:", err);
@@ -24,7 +25,7 @@ export const useCourses = (initialPage = 1, perPage = 20) => {
     };
 
     fetchCourses();
-  }, [page, perPage]);
+  }, [page, perPage, search]);
 
-  return { courses, loading, error, pagination, page, setPage };
+  return { courses, loading, error, pagination, page, setPage, search, setSearch };
 };
