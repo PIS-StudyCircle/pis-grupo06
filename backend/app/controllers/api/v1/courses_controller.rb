@@ -4,8 +4,17 @@ module Api
       include Pagy::Backend
 
       def index
-        @pagy, @courses = pagy(Course.order(:name), items: 20)
-        render json: { courses: @courses, pagination: pagy_metadata(@pagy) }
+        courses = Course.order(:name)
+
+        # Filtro de búsqueda por nombre
+        courses = courses.where("unaccent(name) ILIKE unaccent(?)", "%#{params[:search]}%") if params[:search].present?
+
+        @pagy, @courses = pagy(courses, items: params[:per_page] || 20)
+
+        render json: { 
+          courses: @courses, 
+          pagination: pagy_metadata(@pagy) 
+        }
       end
 
       # este metodo no va a estar disponible para el usuario
