@@ -10,15 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_04_011542) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_08_233415) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "unaccent"
 
   create_table "courses", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "faculty_id"
+    t.string "code"
+    t.string "institute"
+    t.index ["code"], name: "index_courses_on_code"
     t.index ["faculty_id"], name: "index_courses_on_faculty_id"
   end
 
