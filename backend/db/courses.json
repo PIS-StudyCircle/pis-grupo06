@@ -1,0 +1,3087 @@
+[
+  {
+    "nombre": "Actividad Integradora A",
+    "codigo": "1862",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Actividad Integradora B",
+    "codigo": "1863",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Administración de Infraestructuras",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Administración de Infraestructuras 2",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Administración de Operaciones",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Administración General para Ingenieros",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Administración y Seguridad de Sistemas",
+    "codigo": "1918",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Agrimensura Legal 1",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Agrimensura Legal 2",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Agrimensura Legal 3",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Agrimensura Legal 4",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Álgebra lineal numérica",
+    "codigo": "5914",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Algoritmos Evolutivos",
+    "codigo": "1637",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Alimentos en Polvo: Propiedades Físicas, Procesamiento y Funcionalidad",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Alistamiento Naval",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Análisis de Fallas",
+    "codigo": null,
+    "instituto": "SSAA"
+  },
+  {
+    "nombre": "Análisis Espacial con Modelos Digitales de Elevación",
+    "codigo": "1881",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Análisis y control de sistemas no lineales",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Antenas y Propagación",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Aplicaciones del Álgebra Lineal",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Aprender y Gestionar una Empresa",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Aprendizaje automático",
+    "codigo": "1866",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Aprendizaje profundo para el análisis de imágenes biomédicas",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Aprendizaje profundo para visisión artificial",
+    "codigo": "1463",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Arquitectura de Computadoras",
+    "codigo": "1466",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Arquitectura de Computadoras",
+    "codigo": null,
+    "instituto": "Otras"
+  },
+  {
+    "nombre": "Autómatas programables",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Autómatas Programables",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Avaluaciones 1",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Avaluaciones 2",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Avaluaciones 3",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Base de datos no relacionales",
+    "codigo": "1949",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Bases de Datos 1",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Bases de Datos 2",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Bases de datos para Ingeniería",
+    "codigo": "1892",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Baterías aplicadas a la movilidad eléctrica",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Baterías Recargables y Celdas de Combustible",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Butiá - Robótica Educativa",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Cálculo Diferencial e Integral en una variable",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Cálculo Diferencial e Integral en varias variables",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Cálculo Vectorial",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Cálculo y ajuste de las observaciones",
+    "codigo": "1895",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Calidad de Aguas",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Calidad de Datos",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Calidad de datos e información",
+    "codigo": "1890",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Caminos y Calles 1",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Caminos y Calles 2",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Captura de Datos por Percepción Remota",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Cartografía Matemática",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Cartografía Matemática",
+    "codigo": "1480",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Cartografía Temática",
+    "codigo": "1882",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Catastro",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Ciencia, Tecnología y Sociedad",
+    "codigo": "1223",
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Ciencia, Tecnología y Sociedad (Agrimensura / Ing. en Agrimensura)",
+    "codigo": "1228",
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Circuitos de Radiofrecuencia",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "CIUDADANIA EN ENTORNOS DIGITALES",
+    "codigo": "1271",
+    "instituto": "Otras"
+  },
+  {
+    "nombre": "Códigos para corrección de errores",
+    "codigo": "2415",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Comercialización",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Competencias robóticas - IEEE SEK (Tec. en Inf.)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Complemento de Temas Avanzados en Sistemas Inalámbricos",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Comportamiento Mecánico de los Materiales",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Comportamiento Mecanico de Materiales 1",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Comportamiento Mecánico de Materiales 2",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Computación 1",
+    "codigo": "1411",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Computación de Alta Performance",
+    "codigo": "1434",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Computación gráfica avanzada",
+    "codigo": "1349",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Comunicación Oral y Escrita",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Comunicaciones Digitales",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Comunicaciones Inalámbricas",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Conceptos de lenguajes de programación",
+    "codigo": "1374",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Contabilidad",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Control de Calidad",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Control de Corrosión",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Control Numérico 1",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Control Numérico 2",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Control Numérico Computacional 1",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Control Numérico Computacional 2",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Controladores Lógicos Programables",
+    "codigo": "5920",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Coordenadas y sistemas de referencia en geodesia",
+    "codigo": "TCI30",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Costos",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Costos para Ingeniería",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Costos para Ingeniería",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Costos para ingeniería",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Desarrollo de Aplicaciones Basadas en Tecnologías Genexus",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Desarrollo de Sitios Web con PHP",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Didáctica de Algoritmos y Estructuras de Datos",
+    "codigo": "1353",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Digitalización y Codificación Multimedia",
+    "codigo": "5864",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Dinámica de Máquinas y Vibraciones",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Dinámica y Control de Procesos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Diseño asistido por computador",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Diseño Asistido por Computador",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Diseño Catastral",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Diseño de Circuitos Integrados",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Diseño de Procesos Electroquímicos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Diseño de Procesos Químicos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Diseño de Redes de Conducción en Ingeniería Sanitaria",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Diseño de Redes Inalámbricas de Clase Empresarial",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Diseño de Sistemas Médicos Implantables Activos",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Diseño Hidrológico",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Diseño Lógico",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Diseño Lógico 2",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Diseño y cálculo de redes geodésicas",
+    "codigo": "1896",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Diseño y Montaje de las Industrias de Procesos",
+    "codigo": "1219",
+    "instituto": ""
+  },
+  {
+    "nombre": "Distribución y Aplicaciones Multimedia",
+    "codigo": "5863",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Economía",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Ejercicios de Ingeniería Sanitaria",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Elasticidad",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Electromagnetismo",
+    "codigo": null,
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Electrónica Avanzada 1",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Electrónica Avanzada 2",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Electrónica Avanzada 2",
+    "codigo": "5717",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Electrónica de Potencia",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Electrónica Fundamental",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Electrotecnia 2",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Electrotécnica (Ing. eléctrica)",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Electrotécnica I",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Electrotécnica II",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Elementos de Gestión Logística",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Elementos de Ingeniería Ambiental",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Elementos de máquinas",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Elementos de Máquinas",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Elementos de Máquinas",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Elementos de Mecánica de los Fluidos",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Elementos de Topografía",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Elementos Finitos",
+    "codigo": "1884",
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Energía 1 - Combustión",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Energía 2: Generación de Energía con plantas de vapor y gas",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Energía Aplicada a la Industria",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Ensayos Eléctricos y Equipamiento de Media Tensión",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Envases poliméricos para la industria alimenticia",
+    "codigo": "Q106",
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Estabilidad de Sistemas Eléctricos de Potencia",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Estadística Aplicada en Ingeniería Hidráulica y Ambiental",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Estadística y Geoestadística (Tec. en Cartografía)",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Estimación y Predicción en Series Temporales",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Estructura de Buques",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Estructuras de Acero",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Estructuras de Datos y Algoritmos",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Estructuras de Madera",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "ESTRUCTURAS LAMINARES",
+    "codigo": "1878",
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Estudio del Trabajo",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "ESTUDIOS GEOTECNICOS DE CAMPO",
+    "codigo": "2420",
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Evaluación de Recursos Naturales e Impacto Ambiental",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Evaluación Económica y Financiera de Proyectos de Inversión",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Fenómenos de Transporte en Ingeniería de Procesos",
+    "codigo": "Q22B",
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Física 1",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Física 1",
+    "codigo": null,
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Física 1 (Tecnólogo Mecánico)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Física 2",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Física 2",
+    "codigo": null,
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Física 3",
+    "codigo": "1153",
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Física del Sistema Climático",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Física Experimental 1",
+    "codigo": "1154",
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Física Experimental 2",
+    "codigo": null,
+    "instituto": "IF"
+  },
+  {
+    "nombre": "FISICA EXPERIMENTAL 3",
+    "codigo": "1156",
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Física I",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Física II",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Física Térmica",
+    "codigo": null,
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Fluidodinámica",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Formación de Tutorías entre pares Universidad de la República Programa de Respaldo al Aprendizaje PROGRESA TEP1 Y TEP2",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Fotogrametría",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Funciones de Variable Compleja",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Fundamentos celulares de circuitos neurales",
+    "codigo": "1235",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Fundamentos de Aprendizaje Automático y Reconocimiento de Patrones",
+    "codigo": "5852",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Fundamentos de bases de datos",
+    "codigo": "1911",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Fundamentos de Ingeniería de Software",
+    "codigo": "3334",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Fundamentos de la producción de celulosa y papel",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Fundamentos de la programación entera",
+    "codigo": "1631",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Fundamentos de la Robótica Autónoma",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Fundamentos de la Robótica Autónoma",
+    "codigo": "1857",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Fundamentos de la Seguridad Informática",
+    "codigo": "5916",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Fundamentos de la Tecnología de la Leche",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Fundamentos de la web semántica",
+    "codigo": "1942",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "FUNDAMENTOS DE OPTIMIZACION",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Fundamentos de Robótica Industrial",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Generación de energía eléctrica",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Generación de energía eléctrica",
+    "codigo": "5630",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Generadores de Vapor",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Generadores de Vapor",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Geodesia Astronómica",
+    "codigo": "1648",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Geodesia física",
+    "codigo": "1468",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Geodesia geométrica",
+    "codigo": "1464",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Geodesia satelital",
+    "codigo": "1467",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Geoestadística Aplicada",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Geología de Ingeniería",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Geometría y Álgebra Lineal 1",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Geometría y Álgebra Lineal 2",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Gestión de Calidad",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Gestión de Calidad Ambiental",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Gestión de los Procesos en la Industria",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Gestión de los Recursos Humanos en la Producción de Bienes y Servicios",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Gestión de Mantenimiento",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Gestión de Organizaciones",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Gestión del mantenimiento",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Gestión del Mantenimiento",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Gestión Integrada de Redes y Servicios (GIRST)",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Gestión Integral de Empresas con Enfoque a Procesos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Herramientas de representación tiempo-frecuencia",
+    "codigo": "5908",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Hidráulica Fluvial y Marítima",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Hidráulica Marítima y Costera",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Hidráulica y Neumática",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Hidrodinámica Naval",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Hidrógeno Verde: producción y usos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Hidrología (Tec. en Cartografía)",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Hidrología Avanzada I",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Hidrología Avanzada II",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Hidrología e Hidráulica Aplicadas",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Hidrometría",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Higiene y Servicios de Plantas Procesadoras de Alimentos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Hormigón 2",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Hormigón Estructural 1",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "HORMIGÓN ESTRUCTURAL 2",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Hormigón Estructural 3",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Hormigón Pretensado",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Imágenes Médicas: Adquisición, Instrumentación y Gestión",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Industria Cárnica",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Informatización de Organizaciones de Salud",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "INGENIERIA AMBIENTAL PARA LA INDUSTRIA DE PROCESOS",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Ingeniería Biomédica",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Ingeniería Bioquímica",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Ingeniería Clínica",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Ingeniería clínica",
+    "codigo": "5718",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Ingeniería de las Reacciones Químicas 1",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Ingeniería de las Reacciones Químicas 2",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Ingeniería de los Procesos Electroquímicos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Ingeniería de ontologías",
+    "codigo": null,
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Ingeniería de Software",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Ingeniería Legal",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Inglés Conversacional",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Inglés I",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Inglés Técnico",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Inglés Técnico (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Inglés Técnico 1",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Iniciación a la Producción Audiovisual y Multimedia",
+    "codigo": "2040",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "INICIACION AL ENTORNO DE PROGRAMACION R PARA INGENIERIA (IRPI)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Instalaciones Eléctricas",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Instalaciones Eléctricas",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Instalaciones Generales de Gases Combustibles",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Instrumentación Industrial",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Instrumentación y Control",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Instrumentación y control",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Int. a la Física Moderna",
+    "codigo": "1159",
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Intalaciones generales de gases combustibles",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Integración de datos",
+    "codigo": "1941",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Internado de Ingeniería Biomédica",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Internado de ingeniería biomédica",
+    "codigo": "5712",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Introducción a bases de datos",
+    "codigo": "2413",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Introducción a la Administración de Operaciones",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Introducción a la Ciencia de los Materiales",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a la ciencia de los materiales (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a la Ciencia de Materiales",
+    "codigo": "1723",
+    "instituto": "IEM"
+  },
+  {
+    "nombre": "Introducción a la Combustión",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a la Computación Científica",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Introducción a la Computación Gráfica",
+    "codigo": "1316",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Introducción a la Construcción",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Introducción a la Corrosión del Hormigón Armado",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Introducción a la electrotecnia",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a la Electrotécnica",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a la Evalauación de la Calidad de la Información Geográfica",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Introducción a la Evaluación y Gestión Ambiental",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Introducción a la Ingeniería Bioquímica",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Introducción a la Ingeniería de Alimentos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Introducción a la Ingeniería de Alimentos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Introducción a la Ingeniería de Procesos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Introducción a la Ingeniería de producción",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Introducción a la Ingeniería Naval",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Introducción a la Ingeniería Química",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Introducción a la Ingeniería Química y de Procesos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Introducción a la Ingeniería Sanitaria",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Introducción a la Ingeniería Sanitaria",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Introducción a la Investigación de Operaciones",
+    "codigo": "1650",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Introducción a la Mecánica de los Fluidos (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a la mecánica de los fluidos (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a la Mecánica de los Fluídos (Tecnólogo Mecánico plan 94)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a la Mecánica de Suelos",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Introducción a la Prevención de Riesgos Laborales",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Introducción a la Teoría de la Información",
+    "codigo": "1450",
+    "instituto": "IIE, INCO"
+  },
+  {
+    "nombre": "Introducción a la Termodinámica (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a la termodinámica (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a la Termodinámica (Tecnólogo Mecánico)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a las Ecuaciones Diferenciales",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Introducción a los Microprocesadores",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Introducción a los Sistemas de Control",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción a los sistemas de información geográfica",
+    "codigo": "1926",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Introducción a los Sistemas de Protección de los Sistemas Eléctricos de Potencia",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Introducción al Análisis Rural",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Introducción al Control Industrial",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Introducción al Derecho",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Introducción al Desarrollo de Juegos",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción al negocio de software",
+    "codigo": "1543",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Introducción al Sistema Climático",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Introducción al Testing Funcional",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Introducción al Testing Funcional",
+    "codigo": null,
+    "instituto": "Otras"
+  },
+  {
+    "nombre": "Introducción al Transporte",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Introdución al procesamiento de lenguaje natural",
+    "codigo": "1828",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Investigación de operaciones y gestión de riesgos",
+    "codigo": "1779",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Laboratorio de Calidad de Aguas",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Laboratorio de Mecánica de Suelos",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Laboratorio de Resistencia de Materiales",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Laboratorio de Tecnología del Hormigón",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Legislacion territorial",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Legislación y Relaciones Industriales",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Lógica",
+    "codigo": "1027",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Mampostería Estructural",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Mantenimiento de Buques",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Maquinaria Naval",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Máquinas Eléctricas",
+    "codigo": "5602",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Máquinas eléctricas (Tecnólogo Industrial Mecánico)",
+    "codigo": "TIM71",
+    "instituto": ""
+  },
+  {
+    "nombre": "Máquinas para fluidos (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Máquinas para Fluídos I",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Máquinas para Fluidos II",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Máquinas y Equipos para Transporte",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Matemática",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática 1 (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática 1 (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática 1 (Tecnólogo Mecánico 94)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática 2",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática 2 (Mat2)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática 2 (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática 3",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática 3",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática 3 (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática Discreta 1",
+    "codigo": "1023",
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Matemática Discreta 2",
+    "codigo": "1026",
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Matemática Discreta y Lógica 1",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática Discreta y Lógica 2",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática I",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática II",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Matemática III",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "MATEMÁTICA INICIAL",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Materiales Compuestos",
+    "codigo": "1727",
+    "instituto": "IEM"
+  },
+  {
+    "nombre": "Materiales y Ensayos",
+    "codigo": null,
+    "instituto": "IEM"
+  },
+  {
+    "nombre": "Mecánica Aplicada",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Mecánica de los Fluídos",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "MECANICA DEL TRANSPORTE DE SEDIMENTOS",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Mecánica Estructural",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Mecánica Newtoniana",
+    "codigo": null,
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Medidas Eléctricas",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Medidas Eléctricas en Ingeniería de Procesos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Metalurgia de Transformación",
+    "codigo": "1724B",
+    "instituto": "IEM"
+  },
+  {
+    "nombre": "Metalurgia de Transformación",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Metalurgia de transformación",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Metalurgia Física",
+    "codigo": null,
+    "instituto": "IEM"
+  },
+  {
+    "nombre": "Metalurgia física (Tecnólogo industrial mecánico 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Métodos Computacionales Aplicados al Cálculo Estructural",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Métodos de Montecarlo",
+    "codigo": "1057",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Métodos eficientes de simulación parala estimación de confiabilidad de redes",
+    "codigo": "1897",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Métodos matemáticos aplicados a Ing. Química",
+    "codigo": null,
+    "instituto": "IIQ, IMERL"
+  },
+  {
+    "nombre": "Métodos Numéricos",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Modelado de Sistemas Mecánicos Empleando el Método de los Elementos Finitos",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Modelado y Optimización",
+    "codigo": "1624",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Modelado, Simulación y Optimización de Procesos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "MODELOS ESTADISTICOS PARA CLASIFICACION Y REGRESION",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "MODELOS PROBABILISTICOS EN INGENIERIA",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Modulación y Procesamiento de Señales",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Módulo de Extensión",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Módulo de Extensión",
+    "codigo": null,
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Módulo de Extensión (IIE)",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Módulo de Extensión (Ingeniería Civil)",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Módulo de extensión (opcional)",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Módulo de Extensión (Tecnólogo Industrial Mecánico)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Módulo de Extensión - Ingeniería Mecánica",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Módulo de Investigación. (Opcional)",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Modulo de Taller",
+    "codigo": null,
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Módulo de Taller (IIE)",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Módulo de Taller - Ingeniería Mecánica",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "MODULO EXTENSION IFM",
+    "codigo": "PERSONALIZ",
+    "instituto": ""
+  },
+  {
+    "nombre": "Módulo Práctico en Ingeniería Química",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Módulo Taller de Extensión en Ingeniería Ambiental",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Módulo Taller en Ingeniería Sanitaria",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "MODULO TALLER IFM",
+    "codigo": "PERSONALIZ",
+    "instituto": ""
+  },
+  {
+    "nombre": "Monografía en Medidas Eléctricas",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "MORFODINAMICA DE SISTEMAS FLUVIALES Y COSTEROS",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Motores de Combustión Interna",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Motores de combustión interna y turbinas de gas",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Multimedia sobre IP",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Nuevos Procesos para Esterilizar Alimentos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Obras Hidráulicas",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "OPTICA",
+    "codigo": "1129",
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Optimizacion de problemas de produccion",
+    "codigo": "2037",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Ordenamiento Territorial 1",
+    "codigo": "2388",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Ordenamiento Territorial 2",
+    "codigo": "2412",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Pasantía",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Pasantía (Agrimensura)",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "PASANTIA (CIVIL)",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Pasantía (Civil-IET)",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Pasantía (Civil-IMFIA)",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Pasantía (Computación)",
+    "codigo": "1731",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Pasantía (eléctrica)",
+    "codigo": "2011",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Pasantía (Mecánica)",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Pasantía (Producción)",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Pasantía (Sistemas de Comunicación)",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Pasantía (Tecnólogo en Telecomunicaciones)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Pasantía - Trabajo Experimental Módulo 1 Básico",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Pasantía - Trabajo Experimental Módulo 2",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Pasantía - Trabajo Experimental Módulo 3",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Pasantía -Trabajo Práctico de Grado Módulo 1",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "PASANTIA INGENIERIA FÍSICO-MATEMATICA",
+    "codigo": "18887",
+    "instituto": "Otras"
+  },
+  {
+    "nombre": "Pasantía Laboral",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Pasantía Trabajo Experimental (módulo básico)",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Patología de las Estructuras",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Planeamiento Estratégico y Estrategia Competitiva",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "PLANIFICACIÓN DE CLASES:DISEÑO DE UNIDADES DIDÁCTICAS (DUD)",
+    "codigo": "1213",
+    "instituto": "UEFI"
+  },
+  {
+    "nombre": "Políticas Científicas en Informática y Computación",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Porcesado de Termoplásticos",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Potabilización de Aguas",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Práctica de Administración para Ingenieros",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Práctica topográfica 1",
+    "codigo": "1599",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Práctica topográfica 2",
+    "codigo": "1699",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Principios de Programación",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Principios de Química General",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Principios del Láser",
+    "codigo": null,
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Principios y Fudamentos del Proceso Personal de Software",
+    "codigo": "1767",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Probabilidad y Estadística",
+    "codigo": null,
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Probabilidad y Estadística (Tecnólogo en Informática)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Procedimientos de Construcción para Estructuras",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Procedimientos de Construcción para Obras Viales y Suelos",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Procesamiento Cuántico de la Información",
+    "codigo": "1158",
+    "instituto": ""
+  },
+  {
+    "nombre": "Procesamiento de imágenes para biología y medicina",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Procesamiento de Imágenes para Biología y Medicina",
+    "codigo": "5847",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Procesamiento Digital de Señales de Audio",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Producción Cartográfica",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Profesión en Ingeniería de Software",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Programación 1",
+    "codigo": "1373",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Programación 2",
+    "codigo": "1321",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Programación 3",
+    "codigo": "1323",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Programación 4",
+    "codigo": "1324",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Programación Avanzada",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Programación de Aplicaciones",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Programación I",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Programación II",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Programación Lógica",
+    "codigo": "1340",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Programación masivamente paralela en procesadores gráficos",
+    "codigo": "1898",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Programación para Ingeniería Eléctrica",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Propagación en Entornos Urbanos",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Propiedades Físicas de los Alimentos",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "PROPIEDADES ÓPTICAS DE MATERIALES",
+    "codigo": "1257",
+    "instituto": "IF"
+  },
+  {
+    "nombre": "PROYECTO (2) ING SIST COMUNICACION",
+    "codigo": "2062",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Proyecto (Agrimensura)",
+    "codigo": "2110",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Proyecto (Eléctrica)",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Proyecto (Mecánica)",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Proyecto (Naval)",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Proyecto (Producción)",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Proyecto (Tec. en Cartografía)",
+    "codigo": "TCI26",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Proyecto (Tecnólogo en Telecomunicaciones)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Proyecto de Grado",
+    "codigo": "1730",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Proyecto de Grado (1) (Sistemas de Comunicación)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Proyecto de Ingeniería de Software",
+    "codigo": "1721",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Proyecto de Ingeniería Mecánica",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Proyecto de Instalaciones Eléctricas",
+    "codigo": "5504",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Proyecto de Instalaciones Eléctricas de baja y media tensión",
+    "codigo": "5511",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Proyecto de inversión",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Proyecto de Inversión",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Proyecto de investigación e innovación en Ingeniería Estructural",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "PROYECTO DE TRANSPORTE 1",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "PROYECTO DE TRANSPORTE 2",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Proyecto Estructural 1",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Proyecto Estructural 2",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "PROYECTO ESTRUCTURAL ANUAL",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Proyecto Hidraulica-Ambiental",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "PROYECTO IFM",
+    "codigo": "1885",
+    "instituto": "Otras"
+  },
+  {
+    "nombre": "Proyecto Industrial 1",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Proyecto Industrial 2",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Proyecto Transporte 1",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Proyecto Transporte 2",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Proyecto, Planificación y Construcción de Obras 1",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Proyecto, Planificación y Construcción de Obras 2",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "PUENTES",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Recuperación de información y recomendaciones en la web",
+    "codigo": "1938",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Red de Acceso",
+    "codigo": "5933",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Redes de Computadoras",
+    "codigo": "1446",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Redes de Computadoras",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Redes de Datos",
+    "codigo": null,
+    "instituto": "Otras"
+  },
+  {
+    "nombre": "Redes de Datos 1",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Redes de Datos 2",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Redes de Sensores Inalámbricos",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Redes de Transporte de Alta Capacidad",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Redes Eléctricas",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Redes neuronales para lenguaje natural",
+    "codigo": "1887",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Redes Ópticas",
+    "codigo": "5907",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Refrigeración",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Refrigeración Industrial",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Refrigeración indutrial",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Relaciones Personales en Ingeniería de Software y Gerenciamiento de Proyecto",
+    "codigo": "1758",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Relaciones Personales y Laborales",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Repensando los Sistemas Alimentarios",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Represas y Canales",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Representación Gráfica para Industrias de Procesos",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Resistencia de Materiales 1",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "RESISTENCIA DE MATERIALES 2",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Seguridad en la Construcción",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Seguridad industrial",
+    "codigo": "TIM65",
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Seminario de aprendizaje automático estadístico para predicción genómica",
+    "codigo": "5854",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Seminario de Ingeniería Biomédica",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Seminario de Iniciacióna la Investigación",
+    "codigo": "2907",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Seminario sobre encuentros entre Arte y Tecnologías",
+    "codigo": "1236",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Señales Aleatorias y Modulación",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Señales y Sistemas",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Simulación a eventos discretos",
+    "codigo": "1617",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Sistemas de Conducción en Ingeniería Sanitaria",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Sistemas de Control en Tiempo Discreto",
+    "codigo": "5906",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Sistemas de control en tiempo discreto",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Sistemas de Gestión de Contenidos",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Sistemas de Información Gegráfico Avanzado",
+    "codigo": "TCI28",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Sistemas de Referencia en Geodesia",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Sistemas Embebidos para Tiempo Real",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Sistemas Oleohidráulicos y Neumáticos",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Sistemas Operativos",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Sistemas Operativos",
+    "codigo": "1537",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Sistemas y Control",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Subestaciones en Media Tensión",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Taller",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Taller 1: Ajuste y montaje",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller 1: Ajuste y Montaje (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller 2: Metrología",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller 2: Metrología (Tecnólogo Industrial Mecánico plan 2016)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller 2: Modelado cuantitativo para problemas de producción",
+    "codigo": "2033",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Taller 3: Máquinas Herramientas",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller 4: Mejora de la Competitividad",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Taller 4: Motores de combustión interna",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller 5: Soldadura",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "TALLER BÁSICO DE ESTRATEGIAS Y ORIENTACIÓN",
+    "codigo": "1275",
+    "instituto": "UEFI"
+  },
+  {
+    "nombre": "Taller de Administración de Redes y Servicios de Comunicaciones",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de Administración para Ingeniería Civil",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Taller de agrimensura",
+    "codigo": "1991",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Taller de Aplicaciones de Internet Ricas",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de Aplicaciones para Dispositivos Móviles",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de Aprendizaje Automático",
+    "codigo": "5720",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Taller de bases de datos nosql",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de CAD",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Taller de calidad de datos geográficos",
+    "codigo": "1883",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Taller de Cambio Tecnológico en Instituciones Financieras",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de Cartas Geográficas",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Taller de Cartografía",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Taller de Datos Espaciales y Sistemas de Información Geográfica",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Taller de Desarrollo de Aplicaciones web con php",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de Diseño de Procesos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Taller de Diseño y Programación de Video Juegos 2D",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de evaluación de tecnología de la información",
+    "codigo": "1774",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Taller de genexus avanzado",
+    "codigo": "TI48",
+    "instituto": "Otras"
+  },
+  {
+    "nombre": "TALLER DE GESTION DE LA INNOVACION EN TECNOLOGÍA",
+    "codigo": "TI47",
+    "instituto": "Otras"
+  },
+  {
+    "nombre": "Taller de Ingeniería Civil",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "TALLER DE INGENIERIA FISICO-MATEMATICA",
+    "codigo": "1889",
+    "instituto": "Otras"
+  },
+  {
+    "nombre": "Taller de iniciación a los sistemas ciber-físicos",
+    "codigo": "1888",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Taller de Introducción a la Ingeniería Eléctrica",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Taller de Máquinas Eléctricas",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Taller de Minería de procesos de negocios",
+    "codigo": "1537",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "TALLER DE PROCESAMIENTO DE AUDIO Y VIDEO CON PURE DATA/GEM",
+    "codigo": "1990",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Taller de Programación",
+    "codigo": "1325",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Taller de Redes Inalámbricas",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de Representación y Comunicación Gráfica_Módulo A",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Taller de Representación y Comunicación Gráfica_Módulo Civil",
+    "codigo": null,
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Taller de Representacióny Comunicación Gráfica Módulo B",
+    "codigo": "1269",
+    "instituto": "DISI"
+  },
+  {
+    "nombre": "Taller de seguridad  Informática",
+    "codigo": "1891",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Taller de Sistemas Ciber-físicos",
+    "codigo": "1952",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Taller de Sistemas de Información",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de Sistemas de Información .NET",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de Sistemas de Información Geográfica",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Taller de sistemas de información geográfica (Tecnólogo en Cartografía)",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Taller de Sistemas de Información Geográficos Empresariales",
+    "codigo": "1776",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Taller de Sistemas de Información Java EE",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "TALLER DE TECNICAS DE MEDICION EN HIDROLOGIA E HIDRAULICA",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Taller de Telecomunicaciones",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Taller Fourier",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Taller introductorio de ingeniería de software",
+    "codigo": "1783",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Taller Laboratorio de Electrónica de Potencia",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Taller Laboratorio de electrónica de Potencia Rectificadores e inversores",
+    "codigo": "5604",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Taller Laboratorio de Electrónica de Potencia: rectificadores e inversores",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Taller: herramientas para la innovación",
+    "codigo": null,
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Técnicas de Descomposición en Programación Matemática",
+    "codigo": "2398",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Tecnología de Servicios Audiovisuales",
+    "codigo": "5851",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Tecnología de servicios audiovisuales",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Tecnología del Hormigón",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "TECNOLOGÍA Y SERVICIOS INDUSTRIALES 1",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Tecnología y Servicios Industriales 2",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Tecnología y Utilización de Gases Combustibles",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Tecnologías Alternativas para la Pasteurización y Esterilización de Alimentos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Tecnologías Avanzadas para Procesar Alimentos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Tecnologías de Red en Internet",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Tecnologías de Redes y Servicios de Telecomunicaciones",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Telefonía",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Temas avanzados en códigos para la corrección de errores",
+    "codigo": "1899",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Temas Avanzados en Sistemas Inalámbricos (TASI)",
+    "codigo": "5860",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Teoría de Circuitos",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Teoría de Circuitos (Eléctrica)",
+    "codigo": "1456",
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Teoría de Lenguajes",
+    "codigo": "1325",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Teoría de Máquinas y Mecanismos",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Teoría de Restricciones",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Teoría del Buque",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Teoría y análisis de errores",
+    "codigo": "1893",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Termodinámica Aplicada a la Ingeniería de Procesos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Tesis de la Licenciatura en Computación",
+    "codigo": "1860",
+    "instituto": "INCO"
+  },
+  {
+    "nombre": "Tiempos y Métodos",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Topografía altimétrica",
+    "codigo": "1900",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "Topografía Planimétrica",
+    "codigo": "1465",
+    "instituto": "IA"
+  },
+  {
+    "nombre": "TOPOLOGIA Y ANALISIS REAL",
+    "codigo": "1886",
+    "instituto": "IMERL"
+  },
+  {
+    "nombre": "Trabajos Especiales en Metalurgia",
+    "codigo": null,
+    "instituto": "IEM"
+  },
+  {
+    "nombre": "Transferencia de Calor (Tecnólogo Industrial Mecánico)",
+    "codigo": null,
+    "instituto": ""
+  },
+  {
+    "nombre": "Transferencia de Calor 1",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Transferencia de Calor 2",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Transferencia de Calor y Masa 1",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Transferencia de Calor y Masa 2",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Transporte Aéreo",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Transporte de Energía Eléctrica",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Transporte de sustancias en flujos a superficie libre",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Transporte Ferroviario",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Transporte Fluvial y Marítimo",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Transporte Industrial",
+    "codigo": null,
+    "instituto": "IIMPI"
+  },
+  {
+    "nombre": "Transporte por Carretera",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Transporte Urbano",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Tratamiento de Efluentes",
+    "codigo": null,
+    "instituto": "IMFIA"
+  },
+  {
+    "nombre": "Tratamiento de Efluentes y Residuos Sólidos",
+    "codigo": null,
+    "instituto": "IIQ"
+  },
+  {
+    "nombre": "Tratamiento de Imágenes por Computadora",
+    "codigo": null,
+    "instituto": "IIE"
+  },
+  {
+    "nombre": "Trazado de Caminos",
+    "codigo": null,
+    "instituto": "IET"
+  },
+  {
+    "nombre": "Tutorías entre Pares Académicas Progresa/FING",
+    "codigo": null,
+    "instituto": "Otras"
+  },
+  {
+    "nombre": "Vibraciones y Ondas",
+    "codigo": null,
+    "instituto": "IF"
+  },
+  {
+    "nombre": "Visión por Computadora",
+    "codigo": "5865",
+    "instituto": "IIE"
+  }
+]

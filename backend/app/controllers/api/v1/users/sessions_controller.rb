@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Api
   module V1
     class Users::SessionsController < Devise::SessionsController
@@ -24,7 +25,7 @@ module Api
       def respond_to_on_destroy
         if request.headers['Authorization'].present?
           jwt_payload = JWT.decode(request.headers['Authorization'].split.last,
-                                  Rails.application.credentials.devise_jwt_secret_key!).first
+                                   Rails.application.credentials.devise_jwt_secret_key!).first
 
           current_user = User.find(jwt_payload['sub'])
         end
@@ -45,7 +46,7 @@ module Api
       # before_action :configure_sign_in_params, only: [:create]
 
       protected
-      
+
       def configure_sign_in_params
         devise_parameter_sanitizer.permit(:sign_in, keys: [:attribute])
       end
