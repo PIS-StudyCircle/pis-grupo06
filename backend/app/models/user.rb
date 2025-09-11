@@ -7,20 +7,22 @@ class User < ApplicationRecord
          jwt_revocation_strategy: self
 
   # tutorías como asistente o tutor
-  has_many :user_tutorings
+  has_many :user_tutorings, dependent: :destroy
   has_many :tutorings, through: :user_tutorings
 
   # favoritos
-  has_many :favorite_courses
+  has_many :favorite_courses, dependent: :destroy
   has_many :favorite_courses_list, through: :favorite_courses, source: :course
 
   # temas creados
-  has_many :created_subjects, class_name: "Subject", foreign_key: "creator_id"
+  has_many :created_subjects,
+           class_name: "Subject",
+           foreign_key: "creator_id",
+           inverse_of: :creator,
+           dependent: :nullify
 
   belongs_to :faculty
 
   # validaciones
-  validates :faculty, presence: true 
   validates :email, presence: true, uniqueness: true
-  validates :name, presence: true, uniqueness: true
 end

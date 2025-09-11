@@ -1,8 +1,7 @@
 class Faculty < ApplicationRecord
   belongs_to :university
-  has_many :courses
-  has_many :users
+  has_many :courses, dependent: :destroy
+  has_many :users, dependent: :destroy
 
-  # validaciones 
-  validates :university, presence: true
+  # validaciones
 end

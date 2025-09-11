@@ -15,7 +15,7 @@ RSpec.describe "Courses API", type: :request do
 
       expect(response).to have_http_status(:ok)
 
-      json = JSON.parse(response.body)
+      json = response.parsed_body
 
       expect(json).to have_key("courses")
       expect(json["courses"].size).to eq(20) # porque pagy items=20

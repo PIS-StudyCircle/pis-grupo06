@@ -18,4 +18,4 @@ json_data.each do |entry|
   )
 end
 
-Rails.logger.debug "Finished seeding courses. Total courses: #{Course.count}"
+Rails.logger.debug { "Finished seeding courses. Total courses: #{Course.count}" }

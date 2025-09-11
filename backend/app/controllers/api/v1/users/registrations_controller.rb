@@ -12,14 +12,14 @@ module Api
       private
 
       def sign_up_params
-        params_hash = params.require(:user).permit(
-          :email, :password, :password_confirmation,
-          :name, :last_name, :description
+        params_hash = params.expect(
+          user: [:email, :password, :password_confirmation,
+                 :name, :last_name, :description]
         )
 
         # Por ahora los estudiantes siempre son de la Fing, UDELAR
         fing = Faculty.find_by(name: "Facultad de Ingeniería")
-        params_hash[:faculty_id] = fing.id if fing.present? 
+        params_hash[:faculty_id] = fing.id if fing.present?
 
         params_hash
       end
@@ -57,8 +57,8 @@ module Api
         UserSerializer.new(user).serializable_hash[:data].slice(:id, :type, :attributes)
       end
 
-      def render_bad_request(ex)
-        render json: { status: 400, message: ex.message }, status: :bad_request
+      def render_bad_request(exception)
+        render json: { status: 400, message: exception.message }, status: :bad_request
       end
     end
   end
