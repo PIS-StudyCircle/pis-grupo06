@@ -37,9 +37,10 @@ module Api
           }, status: :created
         else
           render json: {
-            status: 422,
-            message: "User couldn't be created successfully.",
-            errors: resource.errors.as_json(full_messages: true)
+            errors: resource.errors.full_messages
+            #status: 422,
+            #message: "User couldn't be created successfully.",
+            #errors: resource.errors.as_json(full_messages: true)
           }, status: :unprocessable_entity
         end
       end
