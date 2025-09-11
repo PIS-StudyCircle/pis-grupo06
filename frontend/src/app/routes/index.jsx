@@ -12,6 +12,7 @@ export function AppRoutes() {
         <Route path="/sign_in" element={<SignInPage />} />
         <Route path="/sign_up" element={<RegisterPage />} />
       </Route>
+      
       <Route path="/" element={<Navigate to="/courses" replace />} />
       <Route path="/courses" element={<CoursePage />} />
     </Routes>

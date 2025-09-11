@@ -18,4 +18,9 @@ class User < ApplicationRecord
   has_many :created_subjects, class_name: "Subject", foreign_key: "creator_id"
 
   belongs_to :faculty
+
+  # validaciones
+  validates :faculty, presence: true 
+  validates :email, presence: true, uniqueness: true
+  validates :name, presence: true, uniqueness: true
 end

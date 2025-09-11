@@ -12,10 +12,16 @@ module Api
       private
 
       def sign_up_params
-        params.require(:user).permit(
+        params_hash = params.require(:user).permit(
           :email, :password, :password_confirmation,
           :name, :last_name, :description
         )
+
+        # Por ahora los estudiantes siempre son de la Fing, UDELAR
+        fing = Faculty.find_by(name: "Facultad de Ingeniería")
+        params_hash[:faculty_id] = fing.id if fing.present? 
+
+        params_hash
       end
 
       def respond_with(resource, _opts = {})

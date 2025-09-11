@@ -4,4 +4,8 @@ class Subject < ApplicationRecord
 
   has_many :subject_tutorings
   has_many :tutorings, through: :subject_tutorings
+
+  # validaciones
+  validates :course, presence: true
+  validates :name, presence: true, uniqueness: { scope: :course_id }
 end
