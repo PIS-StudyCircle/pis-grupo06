@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
-import { FacultiesPage } from "@/features/faculties";
 import { SignInPage, RegisterPage } from "@/features/users";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 

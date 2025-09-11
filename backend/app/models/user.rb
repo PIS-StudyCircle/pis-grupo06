@@ -5,7 +5,6 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable,
          jwt_revocation_strategy: self
-         :recoverable, :rememberable, :validatable
 
   # tutorías como asistente o tutor
   has_many :user_tutorings
