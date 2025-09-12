@@ -5,7 +5,6 @@ module Api
     class Users::RegistrationsController < Devise::RegistrationsController
       respond_to :json
 
-      skip_before_action :authenticate_user!, only: [:create], raise: false
       before_action :configure_sign_up_params, only: [:create]
       rescue_from ActionController::ParameterMissing, with: :render_bad_request
 
@@ -29,19 +28,22 @@ module Api
           token = request.env['warden-jwt_auth.token']
           headers['Authorization'] = "Bearer #{token}" if token.present?
 
-          render json: {
-            status: 201,
+          data = {
+            token: token,
+            user:  UserSerializer.new(resource).serializable_hash[:data][:attributes]
+          }
+
+          success_response(
             message: 'Signed up successfully.',
-            token: token, # opcional: también lo devolvemos en body
-            data: serialized_user(resource)
-          }, status: :created
+            data:,
+            status:  :created
+          )
         else
-          render json: {
-            errors: resource.errors.full_messages
-            #status: 422,
-            #message: "User couldn't be created successfully.",
-            #errors: resource.errors.as_json(full_messages: true)
-          }, status: :unprocessable_entity
+          error_response(
+            message: "User couldn't be created successfully.",
+            errors:  resource.errors.as_json(full_messages: true),
+            status:  :unprocessable_entity
+          )
         end
       end
 
@@ -54,12 +56,11 @@ module Api
         )
       end
 
-      def serialized_user(user)
-        UserSerializer.new(user).serializable_hash[:data].slice(:id, :type, :attributes)
-      end
-
       def render_bad_request(exception)
-        render json: { status: 400, message: exception.message }, status: :bad_request
+        error_response(
+          message: exception.message,
+          status:  :bad_request
+        )
       end
     end
   end

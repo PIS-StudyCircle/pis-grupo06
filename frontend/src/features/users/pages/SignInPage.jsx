@@ -21,7 +21,7 @@ export default function SignInPage() {
       await signIn(email, password);
       nav("/");
     } catch (e) {
-      setErr(e?.data?.status?.message || "Error al iniciar sesión");
+      setErr(e?.data?.status?.message || "Usuario y/o contraseña inválidos");
     }
   }
 

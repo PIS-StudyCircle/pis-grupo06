@@ -1,4 +1,5 @@
 const baseFromEnv = import.meta.env.VITE_API_URL;
+
 if (!baseFromEnv) {
   throw new Error(
     "Falta VITE_API_URL. Definí VITE_API_URL (p.ej. http://localhost:3000) en tu .env"
@@ -14,14 +15,19 @@ export function setToken(t) {
   try {
     if (t) sessionStorage.setItem("token", t);
     else sessionStorage.removeItem("token");
-  } catch {}
+  } catch(err) {
+    console.error("Failed to set/remove token in sessionStorage:", err);
+  }
 }
+
 export function getToken() {
   if (authToken) return authToken;
   try {
     const t = sessionStorage.getItem("token");
     if (t) authToken = t;
-  } catch {}
+  } catch(err) {
+    console.error("Failed to get token from sessionStorage:", err);
+  }
   return authToken;
 }
 
@@ -60,9 +66,17 @@ export async function http(path, { auth = false, ...opts } = {}) {
   try {
     data = await res.json();
   } catch {
+    // ignorar, puede que no venga JSON
   }
   
-  if (!authHeader && data?.status?.token) setToken(data.status.token);
+  const tokenFromBody =
+    data?.data?.token ||
+    data?.token ||     
+    null;
+
+  if (!authHeader && tokenFromBody) {
+    setToken(tokenFromBody);
+  }
 
   if (!res.ok) {
     const err = new Error(`HTTP ${res.status} en ${url}`);

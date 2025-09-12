@@ -27,4 +27,6 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :name, presence: true
   validates :last_name, presence: true
+  validates :password_confirmation, presence: true, on: :create
+  validates :description, length: { maximum: 500 }, allow_blank: true
 end
