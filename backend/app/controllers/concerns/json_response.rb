@@ -1,9 +1,10 @@
 # frozen_string_literal: true
+
 module JsonResponse
   extend ActiveSupport::Concern
 
   private
-  
+
   def success_response(message:, data: nil, status: :ok)
     render json: {
       message: message,

@@ -30,19 +30,19 @@ module Api
 
           data = {
             token: token,
-            user:  UserSerializer.new(resource).serializable_hash[:data][:attributes]
+            user: UserSerializer.new(resource).serializable_hash[:data][:attributes]
           }
 
           success_response(
             message: 'Signed up successfully.',
             data:,
-            status:  :created
+            status: :created
           )
         else
           error_response(
             message: "User couldn't be created successfully.",
-            errors:  resource.errors.as_json(full_messages: true),
-            status:  :unprocessable_entity
+            errors: resource.errors.as_json(full_messages: true),
+            status: :unprocessable_entity
           )
         end
       end
@@ -59,7 +59,7 @@ module Api
       def render_bad_request(exception)
         error_response(
           message: exception.message,
-          status:  :bad_request
+          status: :bad_request
         )
       end
     end
