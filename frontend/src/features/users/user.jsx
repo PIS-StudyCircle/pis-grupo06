@@ -1,65 +1,53 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut } from "./services/auth.api";
-import { getToken, setToken } from "./services/https";
+import { getItem, saveItem, removeItem } from "@/shared/utils/storage";
+import { API_BASE } from "@/shared/config";
 
 const Ctx = createContext(null);
 export const useUser = () => useContext(Ctx);
-
-function readStoredUser() {
-  try {
-    const raw = sessionStorage.getItem("user");
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function clearStoredUser() {
-  try { sessionStorage.removeItem("user"); } catch {}
-}
 
 export default function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [booting, setBooting] = useState(true);
 
-  useEffect(() => {
-    hydrate();
-  }, []);
+  useEffect(() => { hydrate(); }, []);
 
   async function hydrate() {
     try {
-      const token = getToken();
-      const stored = readStoredUser();
+      const cached = getItem("user", null);
+      if (cached) setUser(cached);
 
-      if (token && stored) {
-        setUser(stored);
-      } else if (!token && stored) {
-        clearStoredUser();
-        setUser(null);
+      const res = await fetch(`${API_BASE}/users/me`, { credentials: "include" });
+
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        saveItem("user", data.user);
       } else {
         setUser(null);
+        removeItem("user");
       }
     } finally {
       setBooting(false);
     }
   }
 
-  async function signIn(email, password) {
-    const u = await apiSignIn({ email, password });
+  async function handleAuth(fn, ...args) {
+    const u = await fn(...args);
     setUser(u || null);
+    if (u) saveItem("user", u);
+    else removeItem("user");
+    return u;
   }
 
-  async function signup(form) {
-    const u = await apiSignup(form);
-    setUser(u || null);
-  }
+  const signIn = (email, password) => handleAuth(apiSignIn, { email, password });
+  const signup = (form) => handleAuth(apiSignup, form);
 
   async function signOut() {
     try {
       await apiSignOut();
     } finally {
-      clearStoredUser();
-      setToken(null);
+      removeItem("user");
       setUser(null);
     }
   }

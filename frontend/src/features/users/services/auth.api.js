@@ -1,14 +1,10 @@
-import { http, setToken } from "./https";
+import { http } from "./https";
+import { saveItem, removeItem } from "@/shared/utils/storage";
 
 function storeUserMaybe(data) {
-  const user = data?.data?.user || null;
-  if (user) {
-    try {
-      sessionStorage.setItem("user", JSON.stringify(user));
-    } catch (err) {
-      console.error("Failed to save user in sessionStorage:", err); 
-    }
-  }
+  const user = data?.data?.user || data?.user || null;
+  if (user) saveItem("user", user);
+  else removeItem("user");
   return user;
 }
 
@@ -23,13 +19,8 @@ export async function signup(form) {
       description: form.description,
     },
   };
-  const data = await http("/users", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-
-  const user = storeUserMaybe(data);
-  return user;
+  const data = await http("/users", { method: "POST", body: JSON.stringify(body) });
+  return storeUserMaybe(data);
 }
 
 export async function signIn({ email, password }) {
@@ -37,20 +28,10 @@ export async function signIn({ email, password }) {
     method: "POST",
     body: JSON.stringify({ api_v1_user: { email, password } }),
   });
-
-  const tokenInBody = data?.data?.token || data?.token || null;
-  if (tokenInBody) setToken(tokenInBody);
-
-  const user = storeUserMaybe(data);
-  return user;
+  return storeUserMaybe(data);
 }
 
 export async function signOut() {
-  await http("/users/sign_out", { method: "DELETE", auth: true });
-  try {
-    sessionStorage.removeItem("user");
-  } catch(err) {
-    console.error("Failed to remove user from sessionStorage:", err);
-  }
-  setToken(null);
+  await http("/users/sign_out", { method: "DELETE" });
+  removeItem("user");
 }

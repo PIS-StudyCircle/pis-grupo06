@@ -9,6 +9,9 @@ Rails.application.routes.draw do
                  }
 
       get "up", to: proc { [200, {}, ['OK']] }
+      namespace :users do
+        get :me, to: 'me#show'
+      end
 
       resources :courses
     end
