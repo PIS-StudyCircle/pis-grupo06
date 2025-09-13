@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import NavBar from "@components/NavBar";
 import Footer from "@components/Footer";
 import { useCourses } from "../hooks/useCourses";
 import SearchInput from "@components/SearchInput";
@@ -21,10 +20,8 @@ export default function CoursePage() {
   }, [query]);
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex-shrink-0">
-        <NavBar />
-      </div>
+    <div className="flex flex-col ">
+      
 
       <div className="flex flex-1 overflow-hidden bg-[#f3f8f9]">
         <div className="w-1/4 bg-white rounded-lg shadow-md m-4"></div>
@@ -45,7 +42,7 @@ export default function CoursePage() {
 
         <div className="w-1/4 bg-white rounded-lg shadow-md m-4"></div>
       </div>
-      <Footer />
+      
     </div>
   );
 }
