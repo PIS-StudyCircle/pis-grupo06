@@ -10,7 +10,7 @@ file_path = Rails.root.join("db/courses.json")
 json_data = JSON.parse(File.read(file_path))
 
 json_data.each do |entry|
-  Course.create!(
+  Course.find_or_create_by!(
     name: entry['nombre'],
     code: entry['codigo'],
     institute: entry['instituto'],
