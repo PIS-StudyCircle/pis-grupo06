@@ -13,7 +13,9 @@ export default function CourseDetailPage() {
       <NavBar />
 
       <main className="flex-1">
-        {loading && <div className="p-6 max-w-3xl mx-auto">Cargando curso...</div>}
+        {loading && (
+          <div className="p-6 max-w-3xl mx-auto">Cargando curso...</div>
+        )}
         {error && (
           <div className="p-6 max-w-3xl mx-auto text-red-600">
             Error: {error.message}
@@ -24,10 +26,13 @@ export default function CourseDetailPage() {
         )}
 
         {!loading && !error && course && (
-          <div className="p-6 max-w-3xl mx-auto">
+          <div className="p-6 max-w-3xl mx-auto space-y-6">
+            {/* Card del curso */}
             <div className="bg-white rounded-lg shadow p-6">
               {/* Cabecera del curso */}
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">{course.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                {course.name}
+              </h1>
 
               {course.code && (
                 <p className="text-gray-700 mb-2">
@@ -37,7 +42,8 @@ export default function CourseDetailPage() {
 
               {course.institute && (
                 <p className="text-gray-700 mb-2">
-                  <span className="font-semibold">Instituto:</span> {course.institute}
+                  <span className="font-semibold">Instituto:</span>{" "}
+                  {course.institute}
                 </p>
               )}
 
@@ -45,35 +51,44 @@ export default function CourseDetailPage() {
                 <p className="text-gray-700 mt-4">{course.description}</p>
               )}
 
-              {/* Acciones (debajo de la info y a la derecha) */}
-              <div className="mt-4 flex justify-end gap-3">
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => navigate(`/tutor/registrarse?course=${course.id}`)}
-                >
-                  Ser tutor
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => navigate(`/tutoria/solicitar?course=${course.id}`)}
-                >
-                  Recibir tutoría
-                </button>
+              {/* Acciones */}
+              <div className="mt-6 flex justify-center gap-4">
+                <div className="w-1/3">
+                  <button
+                    type="button"
+                    className="btn w-full"
+                    onClick={() =>
+                      navigate(`/tutor/registrarse?course=${course.id}`)
+                    }
+                  >
+                    Ser tutor
+                  </button>
+                </div>
+                <div className="w-1/3">
+                  <button
+                    type="button"
+                    className="btn w-full"
+                    onClick={() =>
+                      navigate(`/tutoria/solicitar?course=${course.id}`)
+                    }
+                  >
+                    Recibir tutoría
+                  </button>
+                </div>
               </div>
 
+              {/* Divider sutil */}
+              <div className="border-t border-gray-200 mt-6 pt-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  Temas
+                </h2>
 
-
-              {/* Temas asociados */}
-              <section className="mt-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">Temas</h2>
-
-                {Array.isArray(course.subjects) && course.subjects.length > 0 ? (
+                {Array.isArray(course.subjects) &&
+                  course.subjects.length > 0 ? (
                   <ul className="flex flex-wrap gap-2">
                     {course.subjects.map((s) => (
                       <li
-                        key={s.id}
+                        key={s.id} /*  */
                         className="px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm"
                       >
                         {s.name}
@@ -81,11 +96,11 @@ export default function CourseDetailPage() {
                     ))}
                   </ul>
                 ) : (
-                  <div className="px-3 py-2 rounded-lg bg-gray-50 border text-gray-500 text-sm">
+                  <div className="mt-2 p-3 border rounded-md bg-gray-50 text-sm text-gray-500 text-center">
                     Todavía no hay temas asociados
                   </div>
                 )}
-              </section>
+              </div>
             </div>
           </div>
         )}
