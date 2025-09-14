@@ -29,31 +29,35 @@ export default function CourseDetailPage() {
           <div className="p-6 max-w-3xl mx-auto space-y-6">
             {/* Card del curso */}
             <div className="bg-white rounded-lg shadow p-6">
-              {/* Cabecera del curso */}
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {course.name}
-              </h1>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Columna izquierda - info */}
+                <div className="md:col-span-2 text-left">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                    {course.name}
+                  </h1>
 
-              {course.code && (
-                <p className="text-gray-700 mb-2">
-                  <span className="font-semibold">Código:</span> {course.code}
-                </p>
-              )}
+                  <div className="space-y-1 pl-[2px]">
+                    {course.code && (
+                      <p className="text-gray-700">
+                        <span className="font-semibold">Código:</span>{" "}
+                        {course.code}
+                      </p>
+                    )}
+                    {course.institute && (
+                      <p className="text-gray-700">
+                        <span className="font-semibold">Instituto:</span>{" "}
+                        {course.institute}
+                      </p>
+                    )}
+                  </div>
 
-              {course.institute && (
-                <p className="text-gray-700 mb-2">
-                  <span className="font-semibold">Instituto:</span>{" "}
-                  {course.institute}
-                </p>
-              )}
+                  {course.description && (
+                    <p className="text-gray-700 mt-4">{course.description}</p>
+                  )}
+                </div>
 
-              {course.description && (
-                <p className="text-gray-700 mt-4">{course.description}</p>
-              )}
-
-              {/* Acciones */}
-              <div className="mt-6 flex justify-center gap-4">
-                <div className="w-1/3">
+                {/* Columna derecha - botones */}
+                <div className="flex flex-col gap-3">
                   <button
                     type="button"
                     className="btn w-full"
@@ -63,8 +67,6 @@ export default function CourseDetailPage() {
                   >
                     Ser tutor
                   </button>
-                </div>
-                <div className="w-1/3">
                   <button
                     type="button"
                     className="btn w-full"
@@ -84,11 +86,11 @@ export default function CourseDetailPage() {
                 </h2>
 
                 {Array.isArray(course.subjects) &&
-                  course.subjects.length > 0 ? (
+                course.subjects.length > 0 ? (
                   <ul className="flex flex-wrap gap-2">
                     {course.subjects.map((s) => (
                       <li
-                        key={s.id} /*  */
+                        key={s.id}
                         className="px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-sm"
                       >
                         {s.name}
@@ -105,7 +107,6 @@ export default function CourseDetailPage() {
           </div>
         )}
       </main>
-
       <Footer />
     </div>
   );
