@@ -23,10 +23,12 @@ export async function signup(form) {
   return storeUserMaybe(data);
 }
 
-export async function signIn({ email, password }) {
+export async function signIn(form) {
   const data = await http("/users/sign_in", {
     method: "POST",
-    body: JSON.stringify({ api_v1_user: { email, password } }),
+    body: JSON.stringify({ api_v1_user: { 
+      email: form.email, 
+      password: form.password } }),
   });
   return storeUserMaybe(data);
 }

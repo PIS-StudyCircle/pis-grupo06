@@ -40,7 +40,7 @@ export default function UserProvider({ children }) {
     return u;
   }
 
-  const signIn = (email, password) => handleAuth(apiSignIn, { email, password });
+  const signIn = (form) => handleAuth(apiSignIn, form);
   const signup = (form) => handleAuth(apiSignup, form);
 
   async function signOut() {

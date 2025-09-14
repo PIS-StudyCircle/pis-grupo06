@@ -1,29 +1,20 @@
-import { useState } from "react";
 import { useUser } from "../user";
-import { useNavigate } from "react-router-dom";
 import { AuthLayout } from "../components/AuthLayout";
-import { AuthInput } from "../components/AuthInput";
-import { ErrorAlert } from "../components/ErrorAlert";
-import { SubmitButton } from "../components/SubmitButton";
+import { Input } from "../../../shared/components/Input";
+import { ErrorAlert } from "../../../shared/components/ErrorAlert";
+import { SubmitButton } from "../../../shared/components/SubmitButton";
+import { useFormState } from "../../../shared/utils/UseFormState";
+import { useFormSubmit } from "../../../shared/utils/UseFormSubmit";
 
 
 export default function SignInPage() {
+  
   const { signIn } = useUser();
-  const nav = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [err, setErr] = useState("");
-
-  async function onSubmit(e) {
-    e.preventDefault();
-    setErr("");
-    try {
-      await signIn(email, password);
-      nav("/");
-    } catch (e) {
-      setErr(e?.data?.status?.message || "Usuario y/o contraseña inválidos");
-    }
-  }
+  const { form, setField } = useFormState({
+    email: "",
+    password: "",
+  });
+  const { error, onSubmit } = useFormSubmit(signIn, "/");
 
   return (
     <AuthLayout
@@ -32,22 +23,23 @@ export default function SignInPage() {
        footerLink = '/sign_up'
        footerLinkText = 'Sign up' 
     >
-      <form onSubmit={onSubmit} className="space-y-6">
-        <AuthInput
+      <form onSubmit={(e) => onSubmit(e,form)} className="space-y-6">
+        <Input
           id = 'email'
           label = 'Email'
           type = 'email'
-          value = {email}
-          onChange = {(e) => setEmail(e.target.value)}
+          value = {form.email}
+          required
+          onChange = {(e) => setField("email",e.target.value)}
         />
 
-        <AuthInput
+        <Input
           id = 'password'
           label = 'Password'
           type = 'password'
-          value = {password}
+          value = {form.password}
           required
-          onChange = {(e) => setPassword(e.target.value)}
+          onChange = {(e) => setField("password",e.target.value)}
         />
 
         {/* Opciones extra: Recordar y Olvidé contraseña */}
@@ -64,7 +56,7 @@ export default function SignInPage() {
         </div>
 
         <ErrorAlert>
-          {err}
+          {error}
         </ErrorAlert>
 
         <SubmitButton text='Sign In'/>

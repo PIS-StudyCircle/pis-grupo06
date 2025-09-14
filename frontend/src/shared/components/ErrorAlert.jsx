@@ -1,6 +1,5 @@
 export function ErrorAlert({ children }) {
 
-
   const msgs = Array.isArray(children)
     ? children
     : (children ? String(children).split("\n") : []);
