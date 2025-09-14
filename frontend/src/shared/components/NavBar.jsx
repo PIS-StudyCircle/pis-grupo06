@@ -8,7 +8,7 @@ export default function NavBar() {
     async function handleLogout() {
         try {
         await signOut();
-        nav("/sign_in", { replace: true });
+        nav("/", { replace: true });
         } catch (e) {
         console.error("Error en logout:", e);
         }
