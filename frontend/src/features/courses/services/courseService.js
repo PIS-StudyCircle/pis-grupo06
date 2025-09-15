@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_BASE } from "@/shared/config";
 
 export const getCourses = async (page = 1, perPage = 20, search = "") => {
   const params = new URLSearchParams({
@@ -10,7 +10,7 @@ export const getCourses = async (page = 1, perPage = 20, search = "") => {
     params.append("search", search);
   }
 
-  const response = await fetch(`${API_URL}/api/v1/courses?${params}`);
+  const response = await fetch(`${API_BASE}/courses?${params}`);
   if (!response.ok) throw new Error("Error fetching courses");
   return await response.json();
 };
