@@ -39,7 +39,10 @@ jobs:
 
       - name: Prepare DB
         working-directory: backend
-        run: bin/rails db:prepare
+        run: |
+          bin/rails db:drop db:create
+          bin/rails db:schema:load
+          bin/rails db:prepare
 
       - name: Run RSpec
         working-directory: backend
@@ -65,7 +68,7 @@ jobs:
         run: bundle exec brakeman -q -w2
 
   frontend_jest:
-    name: Frontend • Jest
+    name: Frontend Verification
     runs-on: ubuntu-latest
 
     defaults:
@@ -93,13 +96,7 @@ jobs:
       - name: Lint
         run: npm run lint --if-present
 
-      # 🔧 Desactivado temporalmente: Jest tests no están corriendo bien en CI
+      # Desactivado temporalmente: Jest tests no están corriendo bien localmente ni en CI
       # - name: Run Jest
       #   run: npx jest --runInBand
 
-  ci_conclusion:
-    name: CI Conclusion
-    runs-on: ubuntu-latest
-    needs: [backend_rspec, backend_lint, frontend_jest]
-    steps:
-      - run: echo "All checks passed ✅"
