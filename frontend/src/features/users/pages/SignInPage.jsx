@@ -1,4 +1,4 @@
-import { useUser } from "../user";
+import { useUser } from "../hooks/user_context";
 import { AuthLayout } from "../components/AuthLayout";
 import { Input } from "../../../shared/components/Input";
 import { ErrorAlert } from "../../../shared/components/ErrorAlert";

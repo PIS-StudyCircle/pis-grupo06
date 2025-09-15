@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useUser } from "../../features/users/user";
+import { useUser } from "../../features/users/hooks/user_context";
 
 export default function PrivateRoute() {
   const { user, booting } = useUser();
