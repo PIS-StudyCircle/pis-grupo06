@@ -1,4 +1,4 @@
-import { useUser } from "../../features/users/user";
+import { useUser } from "../../features/users/hooks/user_context";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function NavBar() {
