@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
 import { getTutorings } from "../services/tutoringService";
 
-export const useTutorings = (initialPage = 1, perPage = 20) => {
+export const useTutorings = (initialPage = 1, perPage = 20, filters = {}) => {
   const [tutorings, setTutorings] = useState([]);
   const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(initialPage);
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchTutorings = async () => {
       setLoading(true);
       try {
-        const response = await getTutorings(page, perPage, search); 
+        const response = await getTutorings(page, perPage, filters); 
         setTutorings(response.tutorings);   
         setPagination(response.pagination);
       } catch (err) {
@@ -25,7 +24,7 @@ export const useTutorings = (initialPage = 1, perPage = 20) => {
     };
 
     fetchTutorings();
-  }, [page, perPage, search]);
+  }, [page, perPage, filters]);
 
-  return { tutorings, loading, error, pagination, page, setPage, search, setSearch };
+  return { tutorings, loading, error, pagination, page, setPage };
 };

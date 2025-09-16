@@ -16,7 +16,7 @@ export function AppRoutes() {
       
       <Route path="/" element={<Navigate to="/courses" replace />} />
       <Route path="/courses" element={<CoursePage />} />
-      <Route path="/tutorings" element={<TutoringPage />} />
+      <Route path="/tutorings" element={<TutoringPage filters={{ codigo: "1862", status: "1" }} />} />
     </Routes>
   );
 }

@@ -5,8 +5,8 @@ import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";    
 import Pagination from "@components/Pagination";
 
-export default function TutoringPage() {
-  const { tutorings, loading, error, pagination, page, setPage, search, setSearch } = useTutorings();
+export default function TutoringPage({filters = {}}) {
+  const { tutorings, loading, error, pagination, page, setPage, search, setSearch } = useTutorings({filters});
   const totalPages = pagination.last || 1;
 
   const [query, setQuery] = useState(search);

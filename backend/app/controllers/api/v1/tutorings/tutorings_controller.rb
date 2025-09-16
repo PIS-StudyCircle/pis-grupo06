@@ -4,15 +4,33 @@ module Api
       include Pagy::Backend
 
       def index
-        tutorings = case params[:filter]
-        when 'created_by'
-          current_user.tutorings           # tutorings que creó el usuario
-        when 'enrolled'
-          current_user.enrolled_tutorings # tutorings en las que está anotado
-        when 'tutor'
-          Tutoring.where(tutor_id: current_user.id) # tutorings donde es tutor
-        else
-          Tutoring.all
+        tutorings = Tutoring.all
+
+        #tutorias en las que el usuario esta inscripto
+        if params[:enrolled].present? && ActiveModel::Type::Boolean.new.cast(params[:enrolled])
+          tutorings = tutorings.enrolled_by(current_user)
+        end
+
+        #tutorias de una materia especifica (por codigo de curso)
+        if params[:course_cod].present?
+          tutorings = tutorings.with_course_code(params[:course_cod])
+        end
+        
+        #tutorias creadas por el usuario indicado (no current_user, esto por si se quiere ampliar a ver tutorias creadas por otros usuarios)
+        if params[:created_by_user].present?
+          tutorings = tutorings.created_by(params[:created_by_user])
+        end
+
+        #los que aun no tienen tutor asignado
+        if params[:no_tutor].present? && ActiveModel::Type::Boolean.new.cast(params[:no_tutor])
+          tutorings = tutorings.without_tutor
+        end
+
+        #por defecto muestro las futuras
+        if params[:past].present? && ActiveModel::Type::Boolean.new.cast(params[:past])
+          tutorings = tutorings.past
+        else 
+          tutorings = tutorings.upcoming
         end
 
         @pagy, @tutorings = pagy(tutorings, items: params[:per_page] || 20)
