@@ -1,24 +1,31 @@
-// src/shared/components/layout/Layout.jsx
+/**
+ * Layout de la app:
+ * - Navbar fija arriba
+ * - Sidebar (desktop) colapsable
+ * - Drawer (mobile) que se abre/cierra con botón o gesto de swipe
+ * - Contenido principal con margen dinámico según estado del sidebar
+ */
 import { useEffect, useRef, useState } from "react";
 import Sidebar from "./Sidebar";
 import NavBar from "./NavBar";
 
 export default function Layout({ children }) {
-  // Desktop: colapsado por defecto
+  // Estado del sidebar en escritorio: colapsado por defecto (w-16) / expandido (w-64)
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Mobile drawer
+  // Estado del drawer en móvil (off-canvas)
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // --- Gesto de swipe (mobile) ---
+  // --- Detección de gesto (swipe) en móvil ---
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const tracking = useRef(false);
 
   useEffect(() => {
-    const EDGE = 24;       // px desde el borde para iniciar apertura
-    const TH = 48;         // umbral de distancia para confirmar swipe
-    const MAX_ANGLE = 30;  // tolerancia vertical
+    // Parámetros del gesto
+    const EDGE = 24;       // Zona activa desde el borde izquierdo para iniciar apertura
+    const TH = 48;         // Distancia mínima horizontal para confirmar el gesto
+    const MAX_ANGLE = 30;  // Ángulo máximo respecto al eje X (evita activar con scroll vertical)
 
     function onTouchStart(e) {
       if (e.touches.length !== 1) return;
@@ -26,7 +33,9 @@ export default function Layout({ children }) {
       touchStartX.current = t.clientX;
       touchStartY.current = t.clientY;
 
-      // Solo empezamos a trackear apertura si tocó en el borde
+      // Solo comenzamos a trackear si:
+      // - Drawer cerrado y el toque comenzó en el borde izquierdo (apertura), o
+      // - Drawer abierto (permite cerrar con swipe inverso)
       tracking.current = (!mobileOpen && t.clientX <= EDGE) || mobileOpen;
     }
 
@@ -36,15 +45,16 @@ export default function Layout({ children }) {
       const dx = t.clientX - touchStartX.current;
       const dy = t.clientY - touchStartY.current;
 
-      // Si el movimiento es muy vertical, abortamos
-      if (Math.abs(dy) > Math.tan((MAX_ANGLE * Math.PI) / 180) * Math.abs(dx)) return;
+      // Ignorar si el gesto es predominantemente vertical (p. ej., scroll)
+      const maxTan = Math.tan((MAX_ANGLE * Math.PI) / 180);
+      if (Math.abs(dy) > maxTan * Math.abs(dx)) return;
 
-      // Abrir (izq -> der) si estaba cerrado
+      // Abrir (swipe izquierda -> derecha) si estaba cerrado
       if (!mobileOpen && dx > TH) {
         setMobileOpen(true);
         tracking.current = false;
       }
-      // Cerrar (der -> izq) si estaba abierto
+      // Cerrar (swipe derecha -> izquierda) si estaba abierto
       if (mobileOpen && dx < -TH) {
         setMobileOpen(false);
         tracking.current = false;
@@ -55,7 +65,7 @@ export default function Layout({ children }) {
       tracking.current = false;
     }
 
-    // Listeners en el documento (solo mobile)
+    // Listeners globales (solo relevantes en mobile, pero no hacemos UA sniffing)
     document.addEventListener("touchstart", onTouchStart, { passive: true });
     document.addEventListener("touchmove", onTouchMove, { passive: true });
     document.addEventListener("touchend", onTouchEnd, { passive: true });
@@ -69,21 +79,25 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen">
-      {/* 👇 Pasamos toggleSidebar para que el avatar en móvil abra el drawer */}
+      {/* Navbar fija. En móvil, el avatar invoca la apertura del drawer */}
       <NavBar toggleSidebar={() => setMobileOpen(true)} />
 
-      {/* Sidebar: desktop + mobile drawer + bottom bar */}
+      {/* Lateral: sidebar (desktop) + drawer (mobile) */}
       <Sidebar
         isOpen={sidebarOpen}
-        onToggleDesktop={() => setSidebarOpen(v => !v)}
+        onToggleDesktop={() => setSidebarOpen((v) => !v)}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
       />
 
-      {/* Contenido */}
+      {/* Contenedor del contenido.
+          - pt-16: compensa la altura de la navbar fija
+          - pb-14 en móvil: deja espacio si hubiera bottom bar (ajustable)
+          - Margen izquierdo en desktop según estado del sidebar */}
       <main
-        className={`pt-16 pb-14 lg:pb-0 transition-all duration-300
-                    ${sidebarOpen ? "lg:ml-64" : "lg:ml-16"}`}
+        className={`pt-16 pb-14 lg:pb-0 transition-all duration-300 ${
+          sidebarOpen ? "lg:ml-64" : "lg:ml-16"
+        }`}
       >
         {children}
       </main>

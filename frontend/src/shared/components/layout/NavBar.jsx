@@ -1,7 +1,7 @@
-// src/shared/components/layout/NavBar.jsx
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useUser } from "../../../features/users/hooks/user_context"; // o "@/features/users/hooks/user_context"
+import { useUser } from "../../../features/users/hooks/user_context";
+import { ChevronDown, LogOut, User } from "lucide-react";
 
 const NavBar = ({ toggleSidebar = () => {} }) => {
   const { user, signOut } = useUser();
@@ -23,62 +23,60 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
   const userInitial = (user?.name?.[0] || "?").toUpperCase();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-40 bg-[#00173D] shadow-sm">
-      <div className="px-4 sm:px-6 lg:px-8">
+    <nav className="navbar">
+      <div className="navbar-wrap">
         {/* ======= ESCRITORIO (>= sm) ======= */}
-        <div className="hidden sm:flex items-center justify-between h-16">
+        <div className="navbar-desk">
           {/* Left: logo */}
-          <div className="flex items-center gap-4">
-            <Link to="/courses" className="flex items-center gap-2">
-              <img src="/icon_sin_fondo.png" alt="Study Circle" style={{ width: 60, height: 60 }} />
-              <span className="text-white font-semibold hidden sm:block">Study Circle</span>
+          <div className="navbar-brand">
+            <Link to="/courses" className="navbar-brand-link">
+              <img
+                src="/icon_sin_fondo.png"
+                alt="Study Circle"
+                style={{ width: 60, height: 60 }}
+              />
+              <span className="navbar-title">Study Circle</span>
             </Link>
           </div>
 
           {/* Right: auth */}
-          <div className="flex items-center gap-4">
+          <div className="auth-wrap">
             {user ? (
               <div className="relative">
                 <button
                   onClick={toggleDropdown}
-                  className="flex items-center gap-2 p-2 text-white rounded-lg hover:bg-[#041E49] transition-colors"
+                  className="btn-avatar"
+                  aria-expanded={isDropdownOpen}
                 >
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-gray-700">{userInitial}</span>
+                  <div className="avatar">
+                    <span className="avatar-letter">{userInitial}</span>
                   </div>
                   <span className="hidden md:block font-medium truncate max-w-[160px]">
                     {user.name || user.email}
                   </span>
-                  <svg
-                    className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      isDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                  <div className="dropdown" role="menu">
                     <div className="py-1">
                       <Link
                         to="/profile"
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="dropdown-item"
                         onClick={() => setIsDropdownOpen(false)}
                       >
-                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+                        <User className="w-4 h-4 mr-3" />
                         Ver perfil
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
+                        className="dropdown-item text-left w-full"
                       >
-                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7" />
-                        </svg>
+                        <LogOut className="w-4 h-4 mr-3" />
                         Cerrar sesión
                       </button>
                     </div>
@@ -86,9 +84,13 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
                 )}
               </div>
             ) : (
-              <div className="flex gap-4 text-white">
-                <Link to="/sign_in" className="px-3 hover:underline">Iniciar sesión</Link>
-                <Link to="/sign_up" className="px-3 hover:underline">Registrarse</Link>
+              <div className="flex gap-4">
+                <Link to="/sign_in" className="auth-link">
+                  Iniciar sesión
+                </Link>
+                <Link to="/sign_up" className="auth-link">
+                  Registrarse
+                </Link>
               </div>
             )}
           </div>
@@ -96,44 +98,48 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
 
         {/* ======= CELULAR (< sm) ======= */}
         {user ? (
-          /* Logueado: avatar (abre sidebar) a la izquierda, logo centrado */
-          <div className="sm:hidden relative h-16 flex items-center justify-center">
-            {/* Avatar: ahora SOLO abre el sidebar */}
+          <div className="navbar-mobile">
             <button
               type="button"
               onClick={() => {
-                setIsDropdownOpen(false); // por si quedó abierto en desktop
+                setIsDropdownOpen(false);
                 toggleSidebar();
               }}
               aria-label="Abrir menú"
               aria-controls="sidebar"
-              className="absolute left-2 flex items-center gap-2 p-2 text-white rounded-lg hover:bg-[#041E49] transition-colors"
+              className="btn-avatar-mobile"
             >
-              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-gray-700">{userInitial}</span>
+              <div className="avatar">
+                <span className="avatar-letter">{userInitial}</span>
               </div>
             </button>
 
-            {/* Logo centrado */}
-            <Link
-              to="/courses"
-              className="absolute left-1/2 -translate-x-1/2 flex items-center"
-              aria-label="Ir a cursos"
-            >
-              <img src="/icon_sin_fondo.png" alt="Study Circle" style={{ width: 48, height: 48 }} />
+            <Link to="/courses" className="navbar-logo-mobile" aria-label="Ir a cursos">
+              <img
+                src="/icon_sin_fondo.png"
+                alt="Study Circle"
+                style={{ width: 48, height: 48 }}
+              />
             </Link>
           </div>
         ) : (
-          /* No logueado en móvil: igual que antes */
-          <div className="sm:hidden flex items-center justify-between h-16">
+          <div className="navbar-mobile-guest">
             <div className="flex items-center gap-2">
-              <Link to="/courses" className="flex items-center gap-2">
-                <img src="/icon_sin_fondo.png" alt="Study Circle" style={{ width: 48, height: 48 }} />
+              <Link to="/courses" className="navbar-brand-link" aria-label="Ir a cursos">
+                <img
+                  src="/icon_sin_fondo.png"
+                  alt="Study Circle"
+                  style={{ width: 48, height: 48 }}
+                />
               </Link>
             </div>
-            <div className="flex gap-3 text-white">
-              <Link to="/sign_in" className="px-2 hover:underline">Iniciar sesión</Link>
-              <Link to="/sign_up" className="px-2 hover:underline">Registrarse</Link>
+            <div className="flex gap-3">
+              <Link to="/sign_in" className="px-2 text-white hover:underline">
+                Iniciar sesión
+              </Link>
+              <Link to="/sign_up" className="px-2 text-white hover:underline">
+                Registrarse
+              </Link>
             </div>
           </div>
         )}

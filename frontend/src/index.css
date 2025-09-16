@@ -43,11 +43,134 @@
     @apply cursor-not-allowed;
   }
 
-  /* Que los íconos dentro de botones/enlaces no “roben” el cursor */
   button svg,
   a svg {
     pointer-events: none;
   }
 }
 
+/* ===== COMPONENTES ===== */
+@layer components {
+  /* === NAVBAR === */
+  .navbar {
+    @apply fixed top-0 left-0 right-0 z-40 bg-[#00173D] shadow-sm;
+  }
+  .navbar-wrap {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  .navbar-desk {
+    @apply hidden sm:flex items-center justify-between h-16;
+  }
+  .navbar-brand {
+    @apply flex items-center gap-4;
+  }
+  .navbar-brand-link {
+    @apply flex items-center gap-2;
+  }
+  .navbar-title {
+    @apply text-white font-semibold hidden sm:block;
+  }
+  .auth-wrap {
+    @apply flex items-center gap-4;
+  }
+  .auth-link {
+    @apply px-3 text-white hover:underline;
+  }
+  .btn-avatar {
+    @apply flex items-center gap-2 p-2 text-white rounded-lg hover:bg-[#041E49] transition-colors;
+  }
+  .avatar {
+    @apply w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center;
+  }
+  .avatar-letter {
+    @apply text-sm font-medium text-gray-700;
+  }
+  .dropdown {
+    @apply absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg border border-gray-200 z-50;
+  }
+  .dropdown-item {
+    @apply flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors;
+  }
+  .navbar-mobile {
+    @apply sm:hidden relative h-16 flex items-center justify-center;
+  }
+  .navbar-mobile-guest {
+    @apply sm:hidden flex items-center justify-between h-16;
+  }
+  .btn-avatar-mobile {
+    @apply absolute left-2 flex items-center gap-2 p-2 text-white rounded-lg hover:bg-[#041E49] transition-colors;
+  }
+  .navbar-logo-mobile {
+    @apply absolute left-1/2 -translate-x-1/2 flex items-center;
+  }
 
+  /* === SIDEBAR (desktop) === */
+  .sidebar-desktop {
+    @apply hidden lg:block fixed left-0 z-30 bg-[#00173D] text-white border-r border-white/10 shadow-sm
+           top-16 h-[calc(100vh-4rem)] transition-all duration-300 ease-in-out;
+  }
+  .sidebar-header {
+    @apply flex items-center justify-between p-3 border-b border-white/10;
+  }
+  .sidebar-toggle-btn {
+    @apply inline-flex items-center gap-2 p-2 rounded-lg hover:bg-white/10;
+  }
+  .sidebar-nav {
+    @apply p-2;
+  }
+  .sidebar-list {
+    @apply space-y-1;
+  }
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-white/90 hover:bg-white/10;
+  }
+  .sidebar-link--active {
+    @apply bg-white/10 text-white;
+  }
+  .sidebar-user-card {
+    @apply absolute bottom-3 left-3 right-3 bg-white/5 rounded-lg p-2 flex items-center;
+  }
+  .sidebar-user-initial {
+    @apply w-8 h-8 bg-white/20 rounded-full flex items-center justify-center;
+  }
+  .sidebar-user-label {
+    @apply text-xs text-white/70 whitespace-nowrap;
+  }
+  .sidebar-user-name {
+    @apply text-sm font-medium text-white truncate max-w-[160px];
+  }
+
+  /* === DRAWER (mobile) === */
+  .drawer-root {
+    @apply lg:hidden fixed inset-0 z-50 transition pointer-events-none;
+  }
+  .drawer-root--open {
+    @apply pointer-events-auto;
+  }
+  .drawer-overlay {
+    @apply absolute inset-0 bg-black/40 transition-opacity opacity-0;
+  }
+  .drawer-overlay--open {
+    @apply opacity-100;
+  }
+  .drawer-panel {
+    @apply absolute top-16 left-0 h-[calc(100vh-4rem)] w-64
+           bg-[#00173D] text-white border-r border-white/10 shadow-xl
+           transform transition-transform duration-300 ease-in-out -translate-x-full;
+  }
+  .drawer-panel--open {
+    @apply translate-x-0;
+  }
+  .drawer-header {
+    @apply flex items-center justify-between p-3 border-b border-white/10;
+  }
+  .drawer-close-btn {
+    @apply p-2 rounded-lg hover:bg-white/10;
+  }
+  .drawer-footer {
+    @apply absolute bottom-0 left-0 right-0 p-3 border-t border-white/10 bg-[#00173D];
+  }
+  .drawer-logout-btn {
+    @apply w-full flex items-center gap-3 px-3 py-2 rounded-md bg-white/10 hover:bg-white/15 transition-colors text-left;
+  }
+}
