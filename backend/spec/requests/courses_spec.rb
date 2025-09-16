@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe "Courses API", type: :request do
-
   let!(:universidad) { University.create!(name: "Universidad de Ejemplo") }
   let!(:facultad) { Faculty.create!(name: "Facultad de Ingeniería", university: universidad) }
 
@@ -64,7 +63,6 @@ RSpec.describe "Courses API", type: :request do
   end
 
   describe "GET /api/v1/courses/:id" do
-
     let!(:course_with_subjects) do
       course = Course.create!(name: "Curso Especial", code: "CE1", institute: "Instituto Especial", faculty: facultad)
       3.times do |i|
@@ -81,7 +79,7 @@ RSpec.describe "Courses API", type: :request do
 
       expect(json["name"]).to eq("Curso Especial")
       expect(json["subjects"].size).to eq(3)
-      expect(json["subjects"].map { |s| s["name"] }).to contain_exactly("Tema 1", "Tema 2", "Tema 3")
+      expect(json["subjects"].pluck("name")).to contain_exactly("Tema 1", "Tema 2", "Tema 3")
     end
 
     it "devuelve 404 si el curso no existe" do
