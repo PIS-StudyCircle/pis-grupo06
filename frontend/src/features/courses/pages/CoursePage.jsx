@@ -18,7 +18,7 @@ export default function CoursePage() {
       setPage(1);
     }, 400);
     return () => clearTimeout(timeout);
-  }, [query]);
+  }, [query, setPage, setSearch]);
 
   return (
     <div className="flex flex-col h-screen">
