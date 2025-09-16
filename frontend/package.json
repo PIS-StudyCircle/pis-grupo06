@@ -19,6 +19,7 @@
       "^@components/(.*)$": "<rootDir>/src/shared/components/$1"
     },
     "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js",
       "@testing-library/jest-dom"
     ]
   },
