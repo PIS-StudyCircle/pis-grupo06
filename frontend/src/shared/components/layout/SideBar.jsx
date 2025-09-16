@@ -88,22 +88,22 @@ const Sidebar = ({
         {/* Navegación (desktop) */}
         <nav className="sidebar-nav">
           <ul className="sidebar-list">
-            {menuItems.map(({ title, path, Icon }) => {
-              const active = isActive(path);
+            {menuItems.map((item) => {
+              const active = isActive(item.path);
+              const ItemIcon = item.Icon; // <- tomamos el componente desde el objeto
               return (
-                <li key={path}>
+                <li key={item.path}>
                   <Link
-                    to={path}
+                    to={item.path}
                     className={`sidebar-link ${active ? "sidebar-link--active" : ""}`}
                   >
-                    {/* Aseguramos uso de Icon */}
-                    <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
+                    <ItemIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
                     <span
                       className={`font-medium whitespace-nowrap transition-all duration-200 ${
                         isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
                       }`}
                     >
-                      {title}
+                      {item.title}
                     </span>
                   </Link>
                 </li>
@@ -168,18 +168,18 @@ const Sidebar = ({
                 </li>
               )}
 
-              {menuItems.map(({ title, path, Icon }) => {
-                const active = isActive(path);
+              {menuItems.map((item) => {
+                const active = isActive(item.path);
+                const ItemIcon = item.Icon; // <- igual en mobile
                 return (
-                  <li key={path}>
+                  <li key={item.path}>
                     <Link
-                      to={path}
+                      to={item.path}
                       onClick={onMobileClose}
                       className={`sidebar-link ${active ? "sidebar-link--active" : ""}`}
                     >
-                      {/* Aseguramos uso de Icon */}
-                      <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
-                      <span className="font-medium whitespace-nowrap">{title}</span>
+                      <ItemIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
+                      <span className="font-medium whitespace-nowrap">{item.title}</span>
                     </Link>
                   </li>
                 );
