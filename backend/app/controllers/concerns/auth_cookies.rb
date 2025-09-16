@@ -20,7 +20,7 @@ module AuthCookies
   end
 
   def set_auth_cookies(token)
-    cookies.encrypted[:jwt] = {
+    cookies[:jwt] = {
       value: token,
       httponly: true,
       secure: Rails.env.production?,
