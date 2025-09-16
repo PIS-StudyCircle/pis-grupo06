@@ -263,7 +263,7 @@ Devise.setup do |config|
   # should add them to the navigational formats lists.
   #
   # The "*/*" below is required to match Internet Explorer requests.
-  config.navigational_formats = [] # This will prevent devise from using flash messages
+  config.navigational_formats = ['*/*', :html] # This will prevent devise from using flash messages
   # which are a default feature and are not present in Rails api mode.
 
   # The default HTTP method used to sign out a resource. Default is :delete.
@@ -324,4 +324,11 @@ Devise.setup do |config|
     ]
     jwt.expiration_time = 7.days.to_i
   end
+
+  config.omniauth :google_oauth2,
+                  ENV['GOOGLE_CLIENT_ID'],
+                  ENV['GOOGLE_CLIENT_SECRET'],
+                  scope: 'email,profile',
+                  prompt: 'select_account',
+                  access_type: 'online'
 end

@@ -4,6 +4,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable,
+         :omniauthable, omniauth_providers: [:google_oauth2],
          jwt_revocation_strategy: self
 
   # tutorías como asistente o tutor
@@ -29,4 +30,27 @@ class User < ApplicationRecord
   validates :last_name, presence: true
   validates :password_confirmation, presence: true, on: :create
   validates :description, length: { maximum: 500 }, allow_blank: true
+
+
+  def self.from_omniauth(auth)
+    # auth.info: { email, first_name, last_name, ... }
+    user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
+
+    if user.new_record?
+      user.email = auth.info.email
+      user.name  = auth.info.first_name.presence || auth.info.name
+      user.last_name = auth.info.last_name
+      user.password = Devise.friendly_token[0, 32]
+      user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
+      user.save!
+    else
+      # opcional: actualizar nombre/apellido si cambiaron
+      user.update(
+        name: user.name.presence || auth.info.first_name || auth.info.name,
+        last_name: user.last_name.presence || auth.info.last_name
+      )
+    end
+
+    user
+  end
 end

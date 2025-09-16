@@ -58,6 +58,19 @@ export default function SignInPage() {
           error={errors.password}
         />
 
+        <a
+          href="http://localhost:3000/api/v1/users/auth/google_oauth2"
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#4285F4",
+            color: "white",
+            borderRadius: "5px",
+            textDecoration: "none"
+          }}
+        >
+        Login with Google
+      </a>
+
         {/* Opciones extra: Recordar y Olvidé contraseña */}
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center">

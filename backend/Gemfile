@@ -45,6 +45,10 @@ gem 'jsonapi-serializer'
 
 gem 'pagy'
 
+gem 'omniauth'
+
+gem 'omniauth-google-oauth2'
+
 group :development, :test do
   gem 'rspec-rails', '~> 8.0.0'
 
