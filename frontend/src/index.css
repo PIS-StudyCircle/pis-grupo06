@@ -26,3 +26,28 @@
   background-color: rgba(0,0,0,0.5); 
 }
 
+@layer base {
+  /* Manito en todos los botones “clickables” */
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  [role="button"] {
+    @apply cursor-pointer;
+  }
+
+  /* Botones deshabilitados: cursor de no permitido */
+  button:disabled,
+  [disabled],
+  [aria-disabled="true"] {
+    @apply cursor-not-allowed;
+  }
+
+  /* Que los íconos dentro de botones/enlaces no “roben” el cursor */
+  button svg,
+  a svg {
+    pointer-events: none;
+  }
+}
+
+

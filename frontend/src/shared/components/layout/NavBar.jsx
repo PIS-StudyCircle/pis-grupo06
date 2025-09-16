@@ -1,106 +1,142 @@
 // src/shared/components/layout/NavBar.jsx
-import { Link } from 'react-router-dom';
-import SearchInput from '../SearchInput';
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useUser } from "../../../features/users/hooks/user_context"; // o "@/features/users/hooks/user_context"
 
+const NavBar = ({ toggleSidebar = () => {} }) => {
+  const { user, signOut } = useUser();
+  const nav = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-const NavBar = ({ toggleSidebar }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(true);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const toggleDropdown = () => setIsDropdownOpen((v) => !v);
 
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
+  async function handleLogout() {
+    try {
+      await signOut();
+      setIsDropdownOpen(false);
+      nav("/", { replace: true });
+    } catch (e) {
+      console.error("Error en logout:", e);
+    }
+  }
 
-    const handleLogout = () => {
-        setIsAuthenticated(false);
-        setIsDropdownOpen(false);
-        // Aquí puedes agregar la lógica de logout
-    };
+  const userInitial = (user?.name?.[0] || "?").toUpperCase();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-40 bg-[#00173D] shadow-sm border-b border-gray-200">
+    <nav className="fixed top-0 left-0 right-0 z-40 bg-[#00173D] shadow-sm">
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Left side */}
+        {/* ======= ESCRITORIO (>= sm) ======= */}
+        <div className="hidden sm:flex items-center justify-between h-16">
+          {/* Left: logo */}
           <div className="flex items-center gap-4">
-            {/* Menu button */}
-            <button
-              onClick={toggleSidebar}
-              className="p-2 rounded-md border-none"
-            >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-
-            {/* Logo */}
-            <img src="/icon_sin_fondo.png" alt="Mi imagen" style={{width: '60px',height: '60px'}}/>
+            <Link to="/courses" className="flex items-center gap-2">
+              <img src="/icon_sin_fondo.png" alt="Study Circle" style={{ width: 60, height: 60 }} />
+              <span className="text-white font-semibold hidden sm:block">Study Circle</span>
+            </Link>
           </div>
 
-          {/* Right side */}
+          {/* Right: auth */}
           <div className="flex items-center gap-4">
-            {/* User menu */}
-            {isAuthenticated ? (
-              // 🔹 Menú de usuario si está logueado
+            {user ? (
               <div className="relative">
-                <button 
+                <button
                   onClick={toggleDropdown}
                   className="flex items-center gap-2 p-2 text-white rounded-lg hover:bg-[#041E49] transition-colors"
                 >
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-gray-700">A</span>
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-gray-700">{userInitial}</span>
                   </div>
-                  <span className="hidden md:block font-medium">Admin</span>
+                  <span className="hidden md:block font-medium truncate max-w-[160px]">
+                    {user.name || user.email}
+                  </span>
                   <svg
-                    className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
-                {/* Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                     <div className="py-1">
-                      <button
+                      <Link
+                        to="/profile"
                         className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        onClick={() => setIsDropdownOpen(false)}
                       >
                         <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        Ver Perfil
-                      </button>
+                        Ver perfil
+                      </Link>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
                       >
                         <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7" />
                         </svg>
-                        Cerrar Sesión
+                        Cerrar sesión
                       </button>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              // 🔹 Links de inicio de sesión / registro si NO está logueado
               <div className="flex gap-4 text-white">
-                <button className="hover:underline">Iniciar sesión</button>
-                <button className="hover:underline">Registrarse</button>
+                <Link to="/sign_in" className="px-3 hover:underline">Iniciar sesión</Link>
+                <Link to="/sign_up" className="px-3 hover:underline">Registrarse</Link>
               </div>
             )}
           </div>
         </div>
+
+        {/* ======= CELULAR (< sm) ======= */}
+        {user ? (
+          /* Logueado: avatar (abre sidebar) a la izquierda, logo centrado */
+          <div className="sm:hidden relative h-16 flex items-center justify-center">
+            {/* Avatar: ahora SOLO abre el sidebar */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsDropdownOpen(false); // por si quedó abierto en desktop
+                toggleSidebar();
+              }}
+              aria-label="Abrir menú"
+              aria-controls="sidebar"
+              className="absolute left-2 flex items-center gap-2 p-2 text-white rounded-lg hover:bg-[#041E49] transition-colors"
+            >
+              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                <span className="text-sm font-medium text-gray-700">{userInitial}</span>
+              </div>
+            </button>
+
+            {/* Logo centrado */}
+            <Link
+              to="/courses"
+              className="absolute left-1/2 -translate-x-1/2 flex items-center"
+              aria-label="Ir a cursos"
+            >
+              <img src="/icon_sin_fondo.png" alt="Study Circle" style={{ width: 48, height: 48 }} />
+            </Link>
+          </div>
+        ) : (
+          /* No logueado en móvil: igual que antes */
+          <div className="sm:hidden flex items-center justify-between h-16">
+            <div className="flex items-center gap-2">
+              <Link to="/courses" className="flex items-center gap-2">
+                <img src="/icon_sin_fondo.png" alt="Study Circle" style={{ width: 48, height: 48 }} />
+              </Link>
+            </div>
+            <div className="flex gap-3 text-white">
+              <Link to="/sign_in" className="px-2 hover:underline">Iniciar sesión</Link>
+              <Link to="/sign_up" className="px-2 hover:underline">Registrarse</Link>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

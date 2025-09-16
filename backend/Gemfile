@@ -39,6 +39,10 @@ gem "dotenv"
 
 gem "devise"
 
+gem "devise-jwt"
+
+gem 'jsonapi-serializer'
+
 gem 'pagy'
 
 group :development, :test do
