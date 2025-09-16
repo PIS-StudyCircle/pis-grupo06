@@ -1,3 +1,4 @@
+// src/shared/components/layout/Sidebar.jsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../../../features/users/hooks/user_context";
 import {
@@ -84,7 +85,7 @@ const Sidebar = ({
           )}
         </div>
 
-        {/* Navegación */}
+        {/* Navegación (desktop) */}
         <nav className="sidebar-nav">
           <ul className="sidebar-list">
             {menuItems.map(({ title, path, Icon }) => {
@@ -93,16 +94,13 @@ const Sidebar = ({
                 <li key={path}>
                   <Link
                     to={path}
-                    className={`sidebar-link ${
-                      active ? "sidebar-link--active" : ""
-                    }`}
+                    className={`sidebar-link ${active ? "sidebar-link--active" : ""}`}
                   >
+                    {/* Aseguramos uso de Icon */}
                     <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
                     <span
                       className={`font-medium whitespace-nowrap transition-all duration-200 ${
-                        isOpen
-                          ? "opacity-100"
-                          : "opacity-0 w-0 overflow-hidden"
+                        isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
                       }`}
                     >
                       {title}
@@ -135,18 +133,12 @@ const Sidebar = ({
       >
         {/* Overlay */}
         <div
-          className={`drawer-overlay ${
-            mobileOpen ? "drawer-overlay--open" : ""
-          }`}
+          className={`drawer-overlay ${mobileOpen ? "drawer-overlay--open" : ""}`}
           onClick={onMobileClose}
         />
 
-        {/* Panel lateral */}
-        <aside
-          className={`drawer-panel ${
-            mobileOpen ? "drawer-panel--open" : ""
-          }`}
-        >
+        {/* Panel lateral (mobile) */}
+        <aside className={`drawer-panel ${mobileOpen ? "drawer-panel--open" : ""}`}>
           {/* Header con X (mobile) */}
           <div className="drawer-header">
             <span className="text-lg font-semibold">Menú</span>
@@ -160,7 +152,7 @@ const Sidebar = ({
             </button>
           </div>
 
-          {/* Navegación */}
+          {/* Navegación (mobile) */}
           <nav className="p-2 pb-20">
             <ul className="space-y-1">
               {user && (
@@ -168,17 +160,14 @@ const Sidebar = ({
                   <Link
                     to="/profile"
                     onClick={onMobileClose}
-                    className={`sidebar-link ${
-                      isActive("/profile") ? "sidebar-link--active" : ""
-                    }`}
+                    className={`sidebar-link ${isActive("/profile") ? "sidebar-link--active" : ""}`}
                   >
                     <UserIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
-                    <span className="font-medium whitespace-nowrap">
-                      Ver perfil
-                    </span>
+                    <span className="font-medium whitespace-nowrap">Ver perfil</span>
                   </Link>
                 </li>
               )}
+
               {menuItems.map(({ title, path, Icon }) => {
                 const active = isActive(path);
                 return (
@@ -186,14 +175,11 @@ const Sidebar = ({
                     <Link
                       to={path}
                       onClick={onMobileClose}
-                      className={`sidebar-link ${
-                        active ? "sidebar-link--active" : ""
-                      }`}
+                      className={`sidebar-link ${active ? "sidebar-link--active" : ""}`}
                     >
+                      {/* Aseguramos uso de Icon */}
                       <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
-                      <span className="font-medium whitespace-nowrap">
-                        {title}
-                      </span>
+                      <span className="font-medium whitespace-nowrap">{title}</span>
                     </Link>
                   </li>
                 );
