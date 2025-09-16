@@ -1,14 +1,31 @@
 import { useUser } from "../hooks/user_context";
 import { AuthLayout } from "../components/AuthLayout";
-import { Input } from "../../../shared/components/Input";
-import { ErrorAlert } from "../../../shared/components/ErrorAlert";
-import { SubmitButton } from "../../../shared/components/SubmitButton";
-import { useFormState } from "../../../shared/utils/UseFormState";
-import { useFormSubmit } from "../../../shared/utils/UseFormSubmit";
+import { Input } from "@components/Input";
+import { Textarea } from "@components/Textarea";
+import { ErrorAlert } from "@components/ErrorAlert";
+import { SubmitButton } from "@components/SubmitButton";
+import { useFormState } from "@utils/UseFormState";
+import {
+  validateRequired,
+  validateEmail,
+  validatePassword,
+  validatePasswordConfirmation,
+} from "@utils/validation";
+import { useValidation } from "@hooks/useValidation";
+import { useFormSubmit } from "@utils/UseFormSubmit";
+
+const validators = {
+  name: (value) => validateRequired(value, "Name"),
+  last_name: (value) => validateRequired(value, "Last Name"),
+  email: validateEmail,
+  password: validatePassword,
+  password_confirmation: (value, form) =>
+    validatePasswordConfirmation(form.password, value),
+};
 
 export default function RegisterPage() {
-
   const { signup } = useUser();
+
   const { form, setField } = useFormState({
     email: "",
     password: "",
@@ -17,81 +34,89 @@ export default function RegisterPage() {
     last_name: "",
     description: "",
   });
+
+  const { errors, validate } = useValidation(validators);
   const { error, onSubmit } = useFormSubmit(signup, "/");
 
-return (
-  <AuthLayout
-      title ='Signup Your Account'
-      footerText ="Already have an account?"
-      footerLink = '/sign_in'
-      footerLinkText = 'Sign in'
-  >
-    <form onSubmit={(e) => onSubmit(e,form)} className="space-y-6">
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validate(form)) {
+      onSubmit(form); 
+    }
+  };
 
-      <Input
-        id = 'name'
-        label = 'Name'
-        type = 'text'
-        required
-        value = {form.name}
-        onChange = {(e) => setField("name",e.target.value)}
-      />
-
-      <Input
-        id = 'lastname'
-        label = 'Lastname'
-        type = 'text'
-        required
-        value = {form.last_name}
-        onChange = {(e) => setField("last_name",e.target.value)}
-      />
-
-      <Input
-        id = 'email'
-        label = 'Email'
-        type = 'email'
-        required
-        value = {form.email}
-        onChange = {(e) => setField("email",e.target.value)}
-      />
-
-      <Input
-        id = 'password'
-        label = 'Password'
-        type = 'password'
-        value = {form.password}
-        required
-        onChange = {(e) => setField("password",e.target.value)}
-      />
-
-      <Input
-        id = 'password_confirmation'
-        label = 'Password confirmation'
-        type = 'password'
-        value = {form.password_confirmation}
-        required
-        onChange = {(e) => setField("password_confirmation",e.target.value)}
-      />
-
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-          Description
-        </label>
-        <textarea
-          id = "description"
-          name = "description"
-          value = {form.description}
-          onChange = {(e) => setField("description",e.target.value)}
-          className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+  return (
+    <AuthLayout
+      title="Signup Your Account"
+      footerText="Already have an account?"
+      footerLink="/sign_in"
+      footerLinkText="Sign in"
+    >
+      <form onSubmit={handleSubmit} noValidate className="space-y-6">
+        <Input
+          id="name"
+          type="text"
+          value={form.name}
+          onChange={(e) => setField("name", e.target.value)}
+          placeholder="Name"
+          error={errors.name} 
         />
-      </div>
 
-      <ErrorAlert>
-        {error}
-      </ErrorAlert>
+        <Input
+          id="last_name"
+          type="text"
+          value={form.last_name}
+          onChange={(e) => setField("last_name", e.target.value)}
+          placeholder="Last name"
+          error={errors.last_name} 
+        />
 
-      <SubmitButton text='Sign Up'/>
-    </form>
-  </AuthLayout>
+        <Input
+          id="email"
+          type="email"
+          value={form.email}
+          onChange={(e) => setField("email", e.target.value)}
+          placeholder="Email"
+          error={errors.email}
+        />
+
+        <Input
+          id="password"
+          type="password"
+          value={form.password}
+          onChange={(e) => setField("password", e.target.value)}
+          placeholder="Password"
+          error={errors.password}
+        />
+
+        <Input
+          id="password_confirmation"
+          type="password"
+          value={form.password_confirmation}
+          onChange={(e) =>
+            setField("password_confirmation", e.target.value)
+          }
+          placeholder="Password confirmation"
+          error={errors.password_confirmation}
+        />
+
+        <Textarea
+          id="description"
+          value={form.description}
+          onChange={(e) => setField("description", e.target.value)}
+          placeholder="Description"
+        />
+
+        {error.length > 0 && (
+          <ErrorAlert>
+            {error.map((err, idx) => (
+              <p key={idx}>{err}</p>
+            ))}
+          </ErrorAlert>
+        )}
+
+        <SubmitButton text="Sign Up" />
+      </form>
+    </AuthLayout>
   );
 }

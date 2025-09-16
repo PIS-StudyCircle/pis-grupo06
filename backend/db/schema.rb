@@ -110,10 +110,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_150918) do
     t.string "name", null: false
     t.string "last_name", null: false
     t.text "description"
-    t.string "provider"
-    t.string "uid"
-    t.string "jti", null: false
     t.bigint "faculty_id"
+    t.string "jti", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true

@@ -6,6 +6,7 @@ Rails.application.routes.draw do
                  controllers: {
                    sessions: 'api/v1/users/sessions',
                    registrations: 'api/v1/users/registrations',
+                   passwords: 'api/v1/users/passwords'
                  }
 
       get "up", to: proc { [200, {}, ['OK']] }

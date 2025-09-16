@@ -5,13 +5,12 @@ export function useFormSubmit(action, redirectTo = "/") {
   const [error, setError] = useState([]);
   const nav = useNavigate();
 
-  async function onSubmit(e, form) {
-    e.preventDefault();
+  async function onSubmit(form) {
     setError([]);
 
     try {
-      await action(form);   // por ejemplo: signup(form) o login(form)
-      nav(redirectTo);      // a dónde ir si todo sale bien
+      await action(form);   
+      nav(redirectTo);      
     } catch (e) {
       if (Array.isArray(e?.data?.errors)) {
         setError(e.data.errors);

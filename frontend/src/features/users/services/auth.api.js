@@ -1,5 +1,5 @@
 import { http } from "./https";
-import { saveItem, removeItem } from "@/shared/utils/storage";
+import { saveItem, removeItem } from "@utils/storage";
 
 function storeUserMaybe(data) {
   const user = data?.data?.user || data?.user || null;
