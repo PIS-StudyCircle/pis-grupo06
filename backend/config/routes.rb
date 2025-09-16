@@ -1,16 +1,19 @@
 Rails.application.routes.draw do
-  get "up" => "rails/health#show", as: :rails_health_check
-
-  root to: "home#index"
-
-  # Defines the root path route ("/")
-  # root "posts#index"
-
   namespace :api do
     namespace :v1 do
+      devise_for :users,
+                 defaults: { format: :json },
+                 controllers: {
+                   sessions: 'api/v1/users/sessions',
+                   registrations: 'api/v1/users/registrations',
+                 }
+
+      get "up", to: proc { [200, {}, ['OK']] }
+      namespace :users do
+        get :me, to: 'me#show'
+      end
+
       resources :courses
     end
   end
-
-  get "/ping", to: "api#ping"
 end

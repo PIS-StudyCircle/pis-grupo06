@@ -4,13 +4,13 @@ require 'json'
 uni = University.find_or_create_by!(name: "Universidad de la República")
 fing = Faculty.find_or_create_by!(name: "Facultad de Ingeniería", university: uni)
 
-puts "Seeding courses from JSON..."
+Rails.logger.debug "Seeding courses from JSON..."
 
-file_path = Rails.root.join('db', 'courses.json')
+file_path = Rails.root.join("db/courses.json")
 json_data = JSON.parse(File.read(file_path))
 
 json_data.each do |entry|
-  Course.create!(
+  Course.find_or_create_by!(
     name: entry['nombre'],
     code: entry['codigo'],
     institute: entry['instituto'],
@@ -18,4 +18,4 @@ json_data.each do |entry|
   )
 end
 
-puts "Finished seeding courses. Total courses: #{Course.count}"
+Rails.logger.debug { "Finished seeding courses. Total courses: #{Course.count}" }

@@ -11,9 +11,9 @@ module Api
 
         @pagy, @courses = pagy(courses, items: params[:per_page] || 20)
 
-        render json: { 
-          courses: @courses, 
-          pagination: pagy_metadata(@pagy) 
+        render json: {
+          courses: @courses,
+          pagination: pagy_metadata(@pagy)
         }
       end
 
@@ -42,7 +42,7 @@ module Api
       private
 
       def course_params
-        params.require(:course).permit(:name, :code, :institute, :faculty)
+        params.expect(course: [:name, :code, :institute, :faculty])
       end
     end
   end
