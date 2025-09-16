@@ -18,7 +18,13 @@ export default function NavBar() {
         <nav className="bg-[#101f3f] p-4 text-white">
             <div className="container mx-auto flex justify-between items-center">
                 <div className="text-lg font-bold">
-                    <a href="/courses">Study Circle</a>
+                    <a href="/courses">
+                        <img 
+                          src="/src/assets/icon.png" 
+                          alt="Study Circle" 
+                          className="h-8 w-auto" 
+                        />
+                      </a>
                 </div>
 
                 {/* Si hay usuario logueado → mostramos nombre y botón de logout */}
