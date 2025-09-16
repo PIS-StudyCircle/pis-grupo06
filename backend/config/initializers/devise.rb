@@ -313,7 +313,7 @@ Devise.setup do |config|
   # config.sign_in_after_change_password = true
 
   config.jwt do |jwt|
-    jwt.secret = Rails.application.credentials.fetch(:devise_jwt_secret_key)
+    jwt.secret = ENV['DEVISE_JWT_SECRET_KEY'] || Rails.application.credentials.fetch(:devise_jwt_secret_key)
     jwt.dispatch_requests = [
       ['POST', %r{^/api/v1/users/sign_in$}],
       ['POST', %r{^/api/v1/users$}] # signup devuelve token # opcional: token al registrarse. Sacar si queremos que al registarse no se inice sesion

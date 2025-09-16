@@ -30,7 +30,9 @@ export async function http(path, opts = {}) {
   if (res.status === 204) return null;
 
   let data = {};
-  try { data = await res.json(); } catch {}
+  try { data = await res.json(); } catch {
+     // No JSON (204 o texto plano) es válido
+  }
 
   if (!res.ok) {
     const err = new Error(`HTTP ${res.status} en ${url}`);

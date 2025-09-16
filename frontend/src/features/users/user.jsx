@@ -1,10 +1,8 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut } from "./services/auth.api";
 import { getItem, saveItem, removeItem } from "@/shared/utils/storage";
 import { API_BASE } from "@/shared/config";
-
-const Ctx = createContext(null);
-export const useUser = () => useContext(Ctx);
+import { Ctx } from "./hooks/user_context";
 
 export default function UserProvider({ children }) {
   const [user, setUser] = useState(null);

@@ -3,8 +3,9 @@ require 'rails_helper'
 RSpec.describe "Courses API", type: :request do
   describe "GET /api/v1/courses" do
     before do
-      facultad = Faculty.first
-      # Creamos 25 cursos para probar paginación
+      universidad = University.create!(name: "Universidad de Ejemplo")
+      facultad = Faculty.create!(name: "Facultad de Ingeniería", university: universidad)
+
       25.times do |i|
         Course.create!(name: "Curso #{i + 1}", code: "C#{i + 1}", institute: "Instituto #{i + 1}", faculty: facultad)
       end
