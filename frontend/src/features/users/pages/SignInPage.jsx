@@ -50,7 +50,7 @@ export default function SignInPage() {
               Remember my preference
             </label>
           </div>
-          <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <a href="/forgot_password" className="font-medium text-indigo-600 hover:text-indigo-500">
             Forgot Password?
           </a>
         </div>

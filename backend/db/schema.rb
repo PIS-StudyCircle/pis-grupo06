@@ -15,6 +15,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_150918) do
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
 
+  create_table "articles", force: :cascade do |t|
+    t.string "title"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "courses", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -103,11 +110,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_150918) do
     t.string "name", null: false
     t.string "last_name", null: false
     t.text "description"
+    t.string "provider"
+    t.string "uid"
     t.string "jti", null: false
     t.bigint "faculty_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true
+    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 

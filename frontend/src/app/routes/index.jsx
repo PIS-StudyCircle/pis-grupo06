@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
-import { SignInPage, RegisterPage } from "@/features/users";
+import { SignInPage, RegisterPage, ForgotPasswordPage } from "@/features/users";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 
 import CoursePage from "@/features/courses/pages/CoursePage";
@@ -11,6 +11,7 @@ export function AppRoutes() {
       <Route element={<RequireGuestRoute />}>
         <Route path="/sign_in" element={<SignInPage />} />
         <Route path="/sign_up" element={<RegisterPage />} />
+        <Route path="/forgot_password" element={<ForgotPasswordPage />} />
       </Route>
       
       <Route path="/" element={<Navigate to="/courses" replace />} />
