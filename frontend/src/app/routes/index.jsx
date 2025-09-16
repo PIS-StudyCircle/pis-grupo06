@@ -4,6 +4,7 @@ import { SignInPage, RegisterPage } from "@/features/users";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 
 import CoursePage from "@/features/courses/pages/CoursePage";
+import TutoringPage from "@/features/tutorings/pages/TutoringPage";
 
 export function AppRoutes() {
   return (
@@ -15,6 +16,7 @@ export function AppRoutes() {
       
       <Route path="/" element={<Navigate to="/courses" replace />} />
       <Route path="/courses" element={<CoursePage />} />
+      <Route path="/tutorings" element={<TutoringPage />} />
     </Routes>
   );
 }

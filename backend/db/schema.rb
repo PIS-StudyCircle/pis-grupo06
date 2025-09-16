@@ -74,6 +74,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_150918) do
     t.integer "capacity", null: false
   end
 
+  #agregar campo owner a tabla tutorings, fk a user_id
+
   create_table "universities", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
