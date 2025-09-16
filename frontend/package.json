@@ -10,18 +10,6 @@
     "preview": "vite preview",
     "test": "jest"
   },
-  "jest": {
-    "testEnvironment": "jsdom",
-    "transform": {
-      "^.+\\.[jt]sx?$": "babel-jest"
-    },
-    "moduleNameMapper": {
-      "^@components/(.*)$": "<rootDir>/src/shared/components/$1"
-    },
-    "setupFilesAfterEnv": [
-      "@testing-library/jest-dom"
-    ]
-  },
   "babel": {
     "presets": [
       [
