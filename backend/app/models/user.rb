@@ -29,4 +29,9 @@ class User < ApplicationRecord
   validates :last_name, presence: true
   validates :password_confirmation, presence: true, on: :create
   validates :description, length: { maximum: 500 }, allow_blank: true
+
+  def devise_mailer
+  UserMailer
+end
+
 end

@@ -50,8 +50,65 @@ export default function UserProvider({ children }) {
     }
   }
 
+  const forgotPassword = async (formData) => {
+
+  try {
+    const response = await fetch('http://localhost:3000/api/v1/users/password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        user: {
+          email: formData.email
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "La solicitud falló");
+    }
+
+    const data = await response.json();
+
+  } catch (error) {
+    throw new Error("No se pudo procesar la solicitud. Verifica el email e inténtalo de nuevo.");
+  }
+  };
+
+ const resetPassword = async (formData) => {
+
+  try {
+    const response = await fetch(`${API_BASE}/users/password`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user: {
+          reset_password_token: formData.reset_password_token,
+          password: formData.password,
+          password_confirmation: formData.password_confirmation
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const errorMessages = Object.entries(errorData.errors).map(([field, messages]) => `${field} ${messages.join(', ')}`);
+      throw new Error(errorMessages.join('; '));
+    }
+    
+    return true;
+
+  } catch (error) {
+    throw error; 
+  }
+};
+
   return (
-    <Ctx.Provider value={{ user, booting, signIn, signup, signOut }}>
+    <Ctx.Provider value={{ user, booting, signIn, signup, signOut, forgotPassword, resetPassword }}>
       {children}
     </Ctx.Provider>
   );

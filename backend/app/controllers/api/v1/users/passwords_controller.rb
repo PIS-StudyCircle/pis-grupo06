@@ -2,6 +2,7 @@ module Api
   module V1
     module Users
       class PasswordsController < Devise::PasswordsController
+        wrap_parameters false 
         respond_to :json
 
         # POST /api/v1/users/password

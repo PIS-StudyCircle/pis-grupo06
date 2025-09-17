@@ -17,66 +17,69 @@ const validators = {
 
 export default function ResetPasswordPage() {
   const [params] = useSearchParams();
-
-  const token = params.get("token");
-  //const tokenTest = "abcd1234"; // Solo para pruebas locales
-
+  const token = params.get("reset_password_token");
   const { resetPassword } = useUser();
-  
-    const { form, setField } = useFormState({
-      token: token || "",
-      password: "",
-      confirm_password: "",
-    });
-  
-    const { errors, validate } = useValidation(validators);
-  
-    const { error, onSubmit } = useFormSubmit(resetPassword, "/");
-  
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      if (validate(form)) {
-        onSubmit(form);
-      }
-    };
+
+  const { form, setField } = useFormState({
+    reset_password_token: token || "",
+    password: "",
+    password_confirmation: "",
+  });
+
+  const { errors, validate } = useValidation(validators);
+
+  const { error, onSubmit, submitted } = useFormSubmit(resetPassword);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validate(form)) {
+      onSubmit(form);
+    }
+  };
 
   return (
     <AuthLayout
-      title="Ingrese su nueva contraseña"
-      footerText="¿Recuerdas tu contraseña?"
+      title="Ingresa tu nueva contraseña"
+      footerText="¿Ya recordaste tu contraseña?"
       footerLink="/sign_in"
       footerLinkText="Iniciar sesión"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Input
-          id="password"
-          label="Nueva contraseña"
-          type="password"
-          value={form.password}
-          required
-          onChange={(e) => setField("password", e.target.value)}
-          error={errors.password}
-        />
-        <Input
-          id="password_confirmation"
-          label="Confirmar nueva contraseña"
-          type="password"
-          value={form.confirm_password}
-          required
-          onChange={(e) => setField("confirm_password", e.target.value)}
-          error={errors.confirm_password}
-        />
+      {submitted ? (
+        <div className="text-center text-green-600 font-semibold">
+          ¡Contraseña actualizada con éxito! Redirigiendo...
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <Input
+            id="password"
+            label="Nueva contraseña"
+            type="password"
+            value={form.password}
+            required
+            onChange={(e) => setField("password", e.target.value)}
+            error={errors.password}
+          />
+          <Input
+            id="password_confirmation"
+            label="Confirmar nueva contraseña"
+            type="password"
+            value={form.password_confirmation}
+            required
+            onChange={(e) => setField("password_confirmation", e.target.value)}
+            error={errors.password_confirmation}
+          />
 
-        {error.length > 0 && (
-          <ErrorAlert>
-            {error.map((err, idx) => (
-              <p key={idx}>{err}</p>
-            ))}
-          </ErrorAlert>
-        )}
+          {error.length > 0 && (
+            <ErrorAlert>
+              {error.map((err, idx) => (
+                <p key={idx}>{err}</p>
+              ))}
+            </ErrorAlert>
+          )}
 
-        <SubmitButton text="Cambiar contraseña" />
-      </form>
+          <SubmitButton text="Cambiar contraseña" />
+        </form>
+      )}
     </AuthLayout>
   );
 }
