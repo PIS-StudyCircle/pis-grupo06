@@ -39,8 +39,16 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
   # Cómo se entregan los mails en dev
-  config.action_mailer.delivery_method = :letter_opener
-
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+  address:              "smtp.gmail.com",
+  port:                 587,
+  domain:               "gmail.com",
+  user_name:            "studycircle.project@gmail.com", 
+  password:             ENV["SMTP_PASS"],        # acá va el app password
+  authentication:       "plain",
+  enable_starttls_auto: true
+}
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 

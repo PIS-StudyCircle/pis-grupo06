@@ -28,7 +28,7 @@ export default function ResetPasswordPage() {
 
   const { errors, validate } = useValidation(validators);
 
-  const { error, onSubmit, submitted } = useFormSubmit(resetPassword);
+  const { error, onSubmit, submitted } = useFormSubmit(resetPassword, "/sign_in");
 
   const handleSubmit = (e) => {
     e.preventDefault();
