@@ -9,7 +9,7 @@ module AuthCookies
     token = request.env['warden-jwt_auth.token']
     return if token.blank?
 
-    set_auth_cookies(token)
+    write_auth_cookies(token)
 
     response.headers.delete('Authorization')
   end
@@ -19,7 +19,7 @@ module AuthCookies
     cookies.delete(:csrf_token, secure: Rails.env.production?, same_site: :none)
   end
 
-  def set_auth_cookies(token)
+  def write_auth_cookies(token)
     cookies[:jwt] = {
       value: token,
       httponly: true,

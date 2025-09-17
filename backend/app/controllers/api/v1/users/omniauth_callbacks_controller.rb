@@ -1,5 +1,3 @@
-# app/controllers/api/v1/users/omniauth_callbacks_controller.rb
-require 'pry-byebug'
 module Api
   module V1
     module Users
@@ -8,19 +6,17 @@ module Api
         include ActionController::RequestForgeryProtection
         include AuthCookies
 
-        skip_forgery_protection # viene por redirect de Google (GET)
+        skip_forgery_protection
 
         def google_oauth2
           Rails.logger.info "[OA] callback session_id=#{request.session.id} probe=#{session[:oauth_probe]}"
           auth  = request.env['omniauth.auth']
           user  = User.from_omniauth(auth)
 
-          # Firmar y generar JWT (porque devise-jwt no dispatcha en este GET)
-          # scope = :user (usa tu scope real si cambiaste)
-          token = Warden::JWTAuth::UserEncoder.new.call(@user, :user, nil).first
+          token = Warden::JWTAuth::UserEncoder.new.call(user, :user, nil).first
 
-          set_auth_cookies(token)
-          sign_in(user) # opcional si necesitás recursos de Devise
+          write_auth_cookies(token)
+          sign_in(user)
 
           redirect_to success_redirect_url
         rescue => e

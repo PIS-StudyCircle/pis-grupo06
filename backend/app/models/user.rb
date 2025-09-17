@@ -5,7 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :jwt_authenticatable,
          :omniauthable, omniauth_providers: [:google_oauth2],
-         jwt_revocation_strategy: self
+                        jwt_revocation_strategy: self
 
   # tutorías como asistente o tutor
   has_many :user_tutorings, dependent: :destroy
@@ -31,23 +31,32 @@ class User < ApplicationRecord
   validates :password_confirmation, presence: true, on: :create
   validates :description, length: { maximum: 500 }, allow_blank: true
 
-
   def self.from_omniauth(auth)
-    # auth.info: { email, first_name, last_name, ... }
-    user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
+    user = find_by(provider: auth.provider, uid: auth.uid) || find_by(email: auth.info.email)
 
-    if user.new_record?
+    if user.nil?
+      user = User.new
+      user.provider = auth.provider
+      user.uid = auth.uid
+
+      fing = Faculty.find_by(name: "Facultad de Ingeniería")
+      user.faculty = fing if fing.present?
+
       user.email = auth.info.email
       user.name  = auth.info.first_name.presence || auth.info.name
       user.last_name = auth.info.last_name
-      user.password = Devise.friendly_token[0, 32]
-      user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
+
+      password = Devise.friendly_token[0, 32]
+      user.password = password
+      user.password_confirmation = password
+
       user.save!
     else
-      # opcional: actualizar nombre/apellido si cambiaron
       user.update(
         name: user.name.presence || auth.info.first_name || auth.info.name,
-        last_name: user.last_name.presence || auth.info.last_name
+        last_name: user.last_name.presence || auth.info.last_name,
+        provider: auth.provider,
+        uid: auth.uid
       )
     end
 

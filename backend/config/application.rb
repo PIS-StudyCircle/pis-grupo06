@@ -24,20 +24,20 @@ module Backend
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
-    
+
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
     # Enabled the session store for api_only application
-   config.middleware.insert_before 0, ActionDispatch::Cookies
+    config.middleware.insert_before 0, ActionDispatch::Cookies
 
     # 2) Sesión inmediatamente después de Cookies (definimos opciones acá mismo)
     config.middleware.insert_after ActionDispatch::Cookies,
-      ActionDispatch::Session::CookieStore,
-      key: '_app_session',
-      same_site: :lax,                 # dev: :lax funciona para el callback de Google
-      secure: Rails.env.production?    # prod: true con HTTPS
+                                   ActionDispatch::Session::CookieStore,
+                                   key: '_app_session',
+                                   same_site: :lax,                 # dev: :lax funciona para el callback de Google
+                                   secure: Rails.env.production?    # prod: true con HTTPS
 
     # 3) Tu middleware JWT DESPUÉS de que existan cookies+sesión
     config.middleware.insert_after ActionDispatch::Session::CookieStore, JwtCookieToAuthorization
