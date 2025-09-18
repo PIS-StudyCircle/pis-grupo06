@@ -1,11 +1,18 @@
-import { useCurrentUser } from "../hooks/useCurrentUser";
-
+import { useUser } from "@context/UserContext"; 
 export default function Profile() {
-  const { user, loading, error } = useCurrentUser();
+  const { user, loading, error } = useUser(); 
 
-  if (loading) return <p className="text-center mt-10">Cargando...</p>;
-  if (error)
+  if (loading) {
+    return <p className="text-center mt-10">Cargando...</p>;
+  }
+
+  if (error) {
     return <p className="text-center mt-10">Error al cargar perfil.</p>;
+  }
+
+  if (!user) {
+    return <p className="text-center mt-10">No hay usuario cargado.</p>;
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -14,7 +21,7 @@ export default function Profile() {
 
         <div className="flex flex-col items-center mb-6">
           <img
-            src="./src/assets/avatar.png"
+            src="/src/assets/avatar.png"
             alt="avatar"
             className="w-24 h-24 rounded-full border-4 border-white shadow-md"
           />

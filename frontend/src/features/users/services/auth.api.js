@@ -24,7 +24,7 @@ export async function signup(form) {
 }
 
 export async function signIn(form) {
-  const data = await http("/users/iniciar_sesion", {
+  const data = await http("/users/sign_in", {
     method: "POST",
     body: JSON.stringify({ api_v1_user: { 
       email: form.email, 
@@ -34,6 +34,6 @@ export async function signIn(form) {
 }
 
 export async function signOut() {
-  await http("/users/cerrar_sesion", { method: "DELETE" });
+  await http("/users/sign_out", { method: "DELETE" });
   removeItem("user");
 }
