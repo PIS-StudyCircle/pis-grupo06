@@ -6,6 +6,8 @@ module Api
       def index
         tutorings = Tutoring.all
 
+        tutorings = tutorings.includes(:course, :subjects)
+
         #tutorias en las que el usuario esta inscripto
         if params[:enrolled].present? && ActiveModel::Type::Boolean.new.cast(params[:enrolled])
           tutorings = tutorings.enrolled_by(current_user)
@@ -36,10 +38,27 @@ module Api
         @pagy, @tutorings = pagy(tutorings, items: params[:per_page] || 20)
 
         render json: {
-          tutorings: @tutorings,
+          tutorings: @tutorings.map do |t|
+            {
+              id: t.id,
+              scheduled_at: t.scheduled_at,
+              duration_mins: t.duration_mins,
+              modality: t.modality,
+              capacity: t.capacity,
+              enrolled: t.enrolled,
+              course: {
+                id: t.course.id,
+                name: t.course.name,
+                code: t.course.code
+              },
+              subjects: t.subjects.map { |s| { id: s.id, name: s.name } },
+              created_by_id: t.created_by_id,
+              tutor_id: t.tutor_id
+            }
+          end,
           pagination: pagy_metadata(@pagy)
         }
-      end
+      end      
     end
   end
 end

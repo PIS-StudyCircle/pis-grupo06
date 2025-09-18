@@ -6,18 +6,9 @@ import TutoringList from "../components/TutoringList";
 import Pagination from "@components/Pagination";
 
 export default function TutoringPage({filters = {}}) {
-  const { tutorings, loading, error, pagination, page, setPage, search, setSearch } = useTutorings({filters});
+  const { tutorings, loading, error, pagination, page, setPage, search, setSearch } = useTutorings(1, 20, filters);
   const totalPages = pagination.last || 1;
 
-  const [query, setQuery] = useState(search);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setSearch(query);
-      setPage(1);
-    }, 400);
-    return () => clearTimeout(timeout);
-  }, [query, setPage, setSearch]);
 
   return (
     <div className="flex flex-col h-screen">
