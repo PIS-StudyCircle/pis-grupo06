@@ -34,10 +34,10 @@ export default function SignInPage() {
 
   return (
     <AuthLayout
-      title="Sign in Your Account"
-      footerText="Don't have an account?"
-      footerLink="/sign_up"
-      footerLinkText="Sign up"
+      title="Inicio de Sesión"
+      footerText="¿No tienes una cuenta?"
+      footerLink="/registrarse"
+      footerLinkText="¡Regístrate!"
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
         <Input
@@ -54,7 +54,7 @@ export default function SignInPage() {
           type="password"
           value={form.password}
           onChange={(e) => setField("password", e.target.value)}
-          placeholder="Password"
+          placeholder="Contraseña"
           error={errors.password}
         />
 
@@ -68,14 +68,14 @@ export default function SignInPage() {
               className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
             />
             <label htmlFor="remember-me" className="ml-2 block text-gray-900 font-light">
-              Remember my preference
+              Recordar preferencias
             </label>
           </div>
           <a
             href="#"
             className="font-medium text-indigo-600 hover:text-indigo-500"
           >
-            Forgot Password?
+            ¿Olvidaste tu contraseña?
           </a>
         </div>
 
@@ -88,7 +88,7 @@ export default function SignInPage() {
           </ErrorAlert>
         )}
 
-        <SubmitButton text="Sign In" />
+        <SubmitButton text="Ingresar" />
       </form>
     </AuthLayout>
   );
