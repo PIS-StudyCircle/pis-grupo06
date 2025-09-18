@@ -20,6 +20,7 @@ jest.mock("react-router-dom", () => ({
 
 
 import { render, screen, fireEvent, act } from "@testing-library/react";
+import { MemoryRouter } from 'react-router-dom'
 import CoursePage from "../pages/CoursePage";
 import { useCourses } from "../hooks/useCourses";
 
@@ -78,7 +79,11 @@ describe("CoursePage", () => {
       setPage: mockSetPage,
     });
 
-    render(<CoursePage />);
+    render(
+      <MemoryRouter>
+        <CoursePage />
+      </MemoryRouter>
+    );
 
     // Verifica que los cursos se muestren
     expect(screen.getByText("Curso A")).toBeInTheDocument();

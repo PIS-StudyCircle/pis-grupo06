@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import NavBar from "@components/NavBar";
+import NavBar from "@components/layout/NavBar";
 import Footer from "@components/Footer";
 import { useCourse } from "../hooks/useCourse";
 import CourseTopics from "../components/Topics";

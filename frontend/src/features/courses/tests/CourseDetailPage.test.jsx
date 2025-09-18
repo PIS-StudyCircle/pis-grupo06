@@ -3,7 +3,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import CourseDetailPage from "../pages/CourseDetailPage";
 import * as courseService from "../services/courseService";
 
-jest.mock("@components/NavBar", () => () => <div>NavBar</div>);
+jest.mock("@components/layout/NavBar", () => () => <div>NavBar</div>);
 jest.mock("@components/Footer", () => () => <div>Footer</div>);
 
 jest.mock("../services/courseService", () => ({
@@ -19,9 +19,9 @@ jest.mock("react-router-dom", () => ({
 
 function renderWithRouter(courseId = "1") {
     return render(
-        <MemoryRouter initialEntries={[`/courses/${courseId}`]}>
+        <MemoryRouter initialEntries={[`/materias/${courseId}`]}>
             <Routes>
-                <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+                <Route path="/materias/:courseId" element={<CourseDetailPage />} />
             </Routes>
         </MemoryRouter>
     );
