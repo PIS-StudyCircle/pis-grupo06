@@ -87,7 +87,7 @@ RSpec.describe "Courses API", type: :request do
 
       expect(response).to have_http_status(:not_found)
       json = response.parsed_body
-      expect(json["error"]).to eq("Course not found")
+      expect(json["error"]).to eq("No se encontró el curso solicitado")
     end
   end
 end
