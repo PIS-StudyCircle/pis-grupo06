@@ -26,7 +26,7 @@ module Api
           }
         )
       rescue ActiveRecord::RecordNotFound
-        render json: { error: "Course not found" }, status: :not_found
+        render json: { error: "No se encontró el curso solicitado" }, status: :not_found
       end
 
       # este metodo no va a estar disponible para el usuario
