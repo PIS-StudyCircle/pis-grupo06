@@ -4,7 +4,8 @@ export default function Profile() {
   const { user, loading, error } = useCurrentUser();
 
   if (loading) return <p className="text-center mt-10">Cargando...</p>;
-  if (error) return <p className="text-center mt-10">Error al cargar perfil.</p>;
+  if (error)
+    return <p className="text-center mt-10">Error al cargar perfil.</p>;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -33,15 +34,17 @@ export default function Profile() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm">Descripción</label>
-            <textarea
-              value={user.description || ""}
-              readOnly
-              rows={3}
-              className="w-full rounded-lg px-3 py-2 text-black bg-white opacity-80"
-            />
-          </div>
+          {user.description && (
+            <div>
+              <label className="block text-sm">Descripción</label>
+              <textarea
+                value={user.description}
+                readOnly
+                rows={3}
+                className="w-full rounded-lg px-3 py-2 text-black bg-white opacity-80"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

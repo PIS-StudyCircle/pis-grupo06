@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  namespace :api do 
-    get "users/profiles", to: "users#profile"
+  namespace :api do
+    get "users/profiles"
     namespace :v1 do
       devise_for :users,
                  defaults: { format: :json },
@@ -10,7 +10,6 @@ Rails.application.routes.draw do
                  }
 
       get "up", to: proc { [200, {}, ['OK']] }
-
       namespace :users do
         get :me, to: 'me#show'
       end
