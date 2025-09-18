@@ -15,8 +15,8 @@ import { useValidation } from "@hooks/useValidation";
 import { useFormSubmit } from "@utils/UseFormSubmit";
 
 const validators = {
-  name: (value) => validateRequired(value, "Name"),
-  last_name: (value) => validateRequired(value, "Last Name"),
+  nombre: (value) => validateRequired(value, "Nombre"),
+  apellido: (value) => validateRequired(value, "Apellido"),
   email: validateEmail,
   password: validatePassword,
   password_confirmation: (value, form) =>
@@ -47,28 +47,28 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout
-      title="Signup Your Account"
-      footerText="Already have an account?"
-      footerLink="/sign_in"
-      footerLinkText="Sign in"
+      title="Registro"
+      footerText="¿Ya tienes una cuenta?"
+      footerLink="/iniciar_sesion"
+      footerLinkText="Inicia sesión"
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
         <Input
           id="name"
           type="text"
-          value={form.name}
-          onChange={(e) => setField("name", e.target.value)}
-          placeholder="Name"
-          error={errors.name} 
+          value={form.nombre}
+          onChange={(e) => setField("nombre", e.target.value)}
+          placeholder="Nombre"
+          error={errors.nombre} 
         />
 
         <Input
           id="last_name"
           type="text"
-          value={form.last_name}
-          onChange={(e) => setField("last_name", e.target.value)}
-          placeholder="Last name"
-          error={errors.last_name} 
+          value={form.apellido}
+          onChange={(e) => setField("apellido", e.target.value)}
+          placeholder="Apellido"
+          error={errors.apellido} 
         />
 
         <Input
@@ -85,7 +85,7 @@ export default function RegisterPage() {
           type="password"
           value={form.password}
           onChange={(e) => setField("password", e.target.value)}
-          placeholder="Password"
+          placeholder="Contraseña"
           error={errors.password}
         />
 
@@ -96,7 +96,7 @@ export default function RegisterPage() {
           onChange={(e) =>
             setField("password_confirmation", e.target.value)
           }
-          placeholder="Password confirmation"
+          placeholder="Confirmación de contraseña"
           error={errors.password_confirmation}
         />
 
@@ -104,7 +104,7 @@ export default function RegisterPage() {
           id="description"
           value={form.description}
           onChange={(e) => setField("description", e.target.value)}
-          placeholder="Description"
+          placeholder="Descripción"
         />
 
         {error.length > 0 && (
@@ -115,7 +115,7 @@ export default function RegisterPage() {
           </ErrorAlert>
         )}
 
-        <SubmitButton text="Sign Up" />
+        <SubmitButton text="Confirmar" />
       </form>
     </AuthLayout>
   );
