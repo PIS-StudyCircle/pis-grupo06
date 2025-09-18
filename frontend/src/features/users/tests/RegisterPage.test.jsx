@@ -92,7 +92,7 @@ describe("RegisterPage", () => {
     expect(screen.getByTestId("password")).toBeInTheDocument();
     expect(screen.getByTestId("password_confirmation")).toBeInTheDocument();
     expect(screen.getByTestId("description")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /sign up/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /confirmar|sign ?up/i })).toBeInTheDocument();
   });
 
   it("calls setField when typing in inputs", () => {
@@ -117,7 +117,7 @@ describe("RegisterPage", () => {
     });
 
     render(<RegisterPage />);
-    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+    fireEvent.click(screen.getByRole("button", { name: /confirmar|sign ?up/i }));
     expect(validateMock).toHaveBeenCalled();
     expect(onSubmitMock).toHaveBeenCalled();
   });
