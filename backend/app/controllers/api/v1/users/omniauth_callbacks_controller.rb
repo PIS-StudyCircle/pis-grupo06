@@ -38,7 +38,7 @@ module Api
         end
 
         def failure_redirect_url(error: nil)
-          base = ENV.fetch('FRONTEND_FAILURE_URL', 'http://localhost:5173/sign_in')
+          base = ENV.fetch('FRONTEND_FAILURE_URL', 'http://localhost:5173/iniciar_sesion')
           error ? "#{base}?error=#{CGI.escape(error)}" : base
         end
       end
