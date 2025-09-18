@@ -8,7 +8,7 @@ import CourseTopics from "../components/Topics";
 export default function CourseDetailPage() {
   const { courseId } = useParams();
   const { course, loading, error } = useCourse(courseId);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
