@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
   namespace :api do
-    get "users/profiles"
     namespace :v1 do
       devise_for :users,
                  defaults: { format: :json },
