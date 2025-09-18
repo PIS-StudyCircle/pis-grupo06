@@ -1,6 +1,6 @@
 // src/shared/components/layout/Sidebar.jsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useUser } from "../../../features/users/hooks/user_context";
+import { useUser } from "@/features/users/hooks/user_context";
 import {
   Home,
   BookOpen,
@@ -23,8 +23,8 @@ const Sidebar = ({
 
   const authedItems = [
     { title: "Home",     path: "/",         Icon: Home },
-    { title: "Clases",   path: "/classes",  Icon: BookOpen },
-    { title: "Tutorías", path: "/tutoring", Icon: Users },
+    { title: "Clases",   path: "#",  Icon: BookOpen },
+    { title: "Tutorías", path: "#", Icon: Users },
     { title: "Materias", path: "/subjects", Icon: GraduationCap },
   ];
   const guestItems = [

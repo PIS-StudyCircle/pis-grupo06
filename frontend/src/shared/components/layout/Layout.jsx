@@ -6,7 +6,7 @@
  * - Contenido principal con margen dinámico según estado del sidebar
  */
 import { useEffect, useRef, useState } from "react";
-import Sidebar from "./Sidebar";
+import Sidebar from "./SideBar";
 import NavBar from "./NavBar";
 
 export default function Layout({ children }) {
