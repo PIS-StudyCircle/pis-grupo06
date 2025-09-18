@@ -47,8 +47,6 @@ const Sidebar = ({
     }
   }
 
-  const userInitial = (user?.name?.[0] || user?.email?.[0] || "?").toUpperCase();
-
   return (
     <>
       {/* ===== Desktop sidebar (lg+) ===== */}
