@@ -18,7 +18,7 @@ module Api
           write_auth_cookies(token)
           sign_in(user)
 
-          redirect_to success_redirect_url
+          redirect_to success_redirect_url, allow_other_host: true
         rescue => e
           Rails.logger.error("[OAuth] Google error: #{e.class}: #{e.message}")
           redirect_to failure_redirect_url(error: 'oauth_failed')
@@ -28,7 +28,7 @@ module Api
           error = request.params['error'] || 'unknown_error'
           Rails.logger.error("[OAuth] Failure callback invoked: #{error}")
 
-          redirect_to failure_redirect_url(error: 'oauth_denied')
+          redirect_to failure_redirect_url(error: 'oauth_denied'), allow_other_host: true
         end
 
         private
