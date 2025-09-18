@@ -49,7 +49,7 @@ export default function RegisterPage() {
     <AuthLayout
       title="Registro"
       footerText="¿Ya tienes una cuenta?"
-      footerLink="/sign_in"
+      footerLink="/iniciar_sesion"
       footerLinkText="Inicia sesión"
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-6">

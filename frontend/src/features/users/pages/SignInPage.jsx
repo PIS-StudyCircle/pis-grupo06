@@ -36,7 +36,7 @@ export default function SignInPage() {
     <AuthLayout
       title="Inicio de Sesión"
       footerText="¿No tienes una cuenta?"
-      footerLink="/sign_up"
+      footerLink="/registrarse"
       footerLinkText="¡Regístrate!"
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
