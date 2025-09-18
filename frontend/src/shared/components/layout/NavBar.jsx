@@ -65,7 +65,7 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
                   <div className="dropdown" role="menu">
                     <div className="py-1">
                       <Link
-                        to="/profile"
+                        to="/perfil"
                         className="dropdown-item"
                         onClick={() => setIsDropdownOpen(false)}
                       >

@@ -6,7 +6,16 @@ import CourseList from "../components/CourseList";
 import Pagination from "@components/Pagination";
 
 export default function CoursePage() {
-  const { courses, loading, error, pagination, page, setPage, search, setSearch } = useCourses();
+  const {
+    courses,
+    loading,
+    error,
+    pagination,
+    page,
+    setPage,
+    search,
+    setSearch,
+  } = useCourses();
   const totalPages = pagination.last || 1;
 
   const [query, setQuery] = useState(search);
@@ -21,13 +30,11 @@ export default function CoursePage() {
 
   return (
     <div className="flex flex-col ">
-      
-
-      <div className="flex flex-1 overflow-hidden bg-[#f3f8f9]">
-        <div className="w-1/4 bg-white rounded-lg shadow-md m-4"></div>
-
-        <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
-          <h1 className="text-2xl font-bold p-2 mb-4 text-black">Materias Disponibles</h1>
+      <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-2xl font-bold p-2 mb-4 text-black">
+            Materias Disponibles
+          </h1>
 
           <SearchInput
             value={query}
@@ -39,10 +46,7 @@ export default function CoursePage() {
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>
-
-        <div className="w-1/4 bg-white rounded-lg shadow-md m-4"></div>
       </div>
-      
     </div>
   );
 }

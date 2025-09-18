@@ -25,11 +25,11 @@ const Sidebar = ({
     { title: "Home",     path: "/",         Icon: Home },
     { title: "Clases",   path: "#",  Icon: BookOpen },
     { title: "Tutorías", path: "#", Icon: Users },
-    { title: "Materias", path: "/subjects", Icon: GraduationCap },
+    { title: "Materias", path: "/materias", Icon: GraduationCap },
   ];
   const guestItems = [
     { title: "Home",     path: "/",         Icon: Home },
-    { title: "Materias", path: "/subjects", Icon: GraduationCap },
+    { title: "Materias", path: "/materias", Icon: GraduationCap },
   ];
   const menuItems = user ? authedItems : guestItems;
 
@@ -112,18 +112,7 @@ const Sidebar = ({
           </ul>
         </nav>
 
-        {/* Footer usuario */}
-        {user && (
-          <div className="sidebar-user-card" style={{ gap: isOpen ? 8 : 0 }}>
-            <div className="sidebar-user-initial">
-              <span className="text-white font-bold text-sm">{userInitial}</span>
-            </div>
-            <div className={`${isOpen ? "block" : "hidden"}`}>
-              <p className="sidebar-user-label">Usuario</p>
-              <p className="sidebar-user-name">{user.name || user.email}</p>
-            </div>
-          </div>
-        )}
+        
       </aside>
 
       {/* ===== Mobile drawer ===== */}
@@ -158,7 +147,7 @@ const Sidebar = ({
               {user && (
                 <li>
                   <Link
-                    to="/profile"
+                    to="/perfil"
                     onClick={onMobileClose}
                     className={`sidebar-link ${isActive("/profile") ? "sidebar-link--active" : ""}`}
                   >
