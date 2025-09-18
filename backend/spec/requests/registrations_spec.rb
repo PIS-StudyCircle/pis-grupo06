@@ -39,7 +39,7 @@ RSpec.describe "Api::V1::Users::Registrations", type: :request do
         }.to change(User, :count).by(1)
 
         expect(response).to have_http_status(:created)
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["message"]).to eq("Signed up successfully.")
         expect(json["data"]["user"]["email"]).to eq("john.doe@example.com")
         created_user = User.find_by(email: "john.doe@example.com")
@@ -55,7 +55,7 @@ RSpec.describe "Api::V1::Users::Registrations", type: :request do
         }.not_to change(User, :count)
 
         expect(response).to have_http_status(:unprocessable_entity)
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["message"]).to eq("User couldn't be created successfully.")
         expect(json["errors"]).not_to be_empty
       end
@@ -65,7 +65,7 @@ RSpec.describe "Api::V1::Users::Registrations", type: :request do
       it "returns bad_request" do
         post "/api/v1/users", params: {}
         expect(response).to have_http_status(:bad_request)
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["message"]).to match(/param is missing or the value is empty/i)
       end
     end
