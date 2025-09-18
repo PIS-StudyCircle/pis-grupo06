@@ -4,7 +4,7 @@
 jest.mock("../../../shared/components/layout/NavBar", () => () => <div>NavBar</div>);
 jest.mock("../../../shared/components/Footer", () => () => <div>Footer</div>);
 
-jest.mock("../../hooks/useCourses", () => ({
+jest.mock("../hooks/useCourses", () => ({
   useCourses: jest.fn(),
 }));
 
