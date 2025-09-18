@@ -5,16 +5,6 @@ import { useNavigate } from 'react-router-dom';
 const VisitorWelcomePage = () => {
     const navigate = useNavigate();
 
-  const handleRegister = () => {
-    // navigate('/register');
-    console.log('Navegar a registro');
-  };
-
-  const handleLogin = () => {
-    // navigate('/login');
-    console.log('Navegar a login');
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="max-w-[995px] w-full text-center space-y-8">
@@ -44,14 +34,14 @@ const VisitorWelcomePage = () => {
         {/* Botones de acción */}
         <div className="space-y-4 pt-6">
           <button
-            onClick={handleRegister}
+            onClick={() => navigate('/registrarse')}
             className="w-full max-w-xs mx-auto block bg-blue-200 hover:bg-blue-300 text-blue-800 font-medium py-3 px-6 rounded-lg transition-colors duration-200"
           >
             Registrarse
           </button>
           
           <button
-            onClick={handleLogin}
+            onClick={() => navigate('/iniciar_sesion')}
             className="w-full max-w-xs mx-auto block bg-blue-200 hover:bg-blue-300 text-blue-800 font-medium py-3 px-6 rounded-lg transition-colors duration-200"
           >
             Iniciar sesión

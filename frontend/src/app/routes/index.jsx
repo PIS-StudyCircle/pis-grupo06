@@ -16,7 +16,7 @@ export function AppRoutes() {
       
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
-      <Route path="/visitor-flow" element={<VisitorFlow />} />
+      <Route path="/flujo-visitante" element={<VisitorFlow />} />
     </Routes>
   );
 }
