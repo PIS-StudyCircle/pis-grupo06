@@ -4,7 +4,7 @@
 jest.mock("@components/NavBar", () => () => <div>NavBar</div>);
 jest.mock("@components/Footer", () => () => <div>Footer</div>);
 
-jest.mock("../../context/useCourses", () => ({
+jest.mock("../../hooks/useCourses", () => ({
   useCourses: jest.fn(),
 }));
 
