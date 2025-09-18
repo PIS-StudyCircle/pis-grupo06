@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams/*, useNavigate*/ } from "react-router-dom";
 import NavBar from "@components/layout/NavBar";
 import Footer from "@components/Footer";
 import { useCourse } from "../hooks/useCourse";
