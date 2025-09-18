@@ -8,7 +8,7 @@ jest.mock("../hooks/useCourses", () => ({
   useCourses: jest.fn(),
 }));
 
-jest.mock("../../context/useFiltredCourses", () => ({
+jest.mock("../hooks/useFiltredCourses", () => ({
   useFilteredCourses: jest.fn((courses) => courses),
 }));
 
@@ -21,9 +21,9 @@ jest.mock("react-router-dom", () => ({
 
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import CoursePage from "../pages/CoursePage";
-import { useCourses } from "../../context/useCourses";
+import { useCourses } from "../hooks/useCourses";
 
-jest.mock("../../context/useCourses");
+jest.mock("../hooks/useCourses");
 
 describe("CoursePage", () => {
   const mockSetPage = jest.fn();
