@@ -21,8 +21,6 @@ export default defineConfig([
       globals: {
         ...globals.browser,
         ...globals.jest,
-        ...globals.node,
-        API_URL: "readonly",
       },
       parserOptions: {
         ecmaVersion: 'latest',

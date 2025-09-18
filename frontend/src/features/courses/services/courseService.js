@@ -17,7 +17,7 @@ export const getCourses = async (page = 1, perPage = 20, search = "") => {
 
 // Nuevo servicio para obtener un curso por ID
 export const getCourseByID = async (courseId) => {
-  const response = await fetch(`${API_URL}/api/v1/courses/${courseId}`);
-  if (!response.ok) throw new Error("Error fetching course");
+  const response = await fetch(`${API_BASE}/courses/${courseId}`);
+  if (!response.ok) throw new Error("Error al encontrar el curso");
   return await response.json();
 };

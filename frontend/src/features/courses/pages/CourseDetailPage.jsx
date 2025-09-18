@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import NavBar from "@components/NavBar";
 import Footer from "@components/Footer";
 import { useCourse } from "../hooks/useCourse";
-import CourseTopics from "../components/CourseTopics";
+import CourseTopics from "../components/Topics";
 
 
 export default function CourseDetailPage() {
@@ -63,26 +63,23 @@ export default function CourseDetailPage() {
                   <button
                     type="button"
                     className="btn w-full"
-                    onClick={() =>
-                      navigate(`/tutor/registrarse?course=${course.id}`)
-                    }
+                     // onClick={() => navigate(`/tutor/registrarse?course=${course.id}`)}
                   >
                     Ser tutor
                   </button>
                   <button
                     type="button"
                     className="btn w-full"
-                    onClick={() =>
-                      navigate(`/tutoria/solicitar?course=${course.id}`)
-                    }
+                    // onClick={() => navigate(`/tutoria/solicitar?course=${course.id}`)}
                   >
                     Recibir tutoría
                   </button>
                 </div>
               </div>
 
-              {/* Temas del curso */}
-              <CourseTopics subjects={course?.subjects ?? []} />
+             {/*Busco los temas de la materia*/}
+             <CourseTopics subjects={course?.subjects ?? []} />
+
             </div>
           </div>
         )}
