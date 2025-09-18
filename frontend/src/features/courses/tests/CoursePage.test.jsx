@@ -2,7 +2,7 @@
 //porque Jest no sabe interpretar import.meta, que se usa en courseService.js
 
 jest.mock("../../../shared/components/layout/NavBar", () => () => <div>NavBar</div>);
-jest.mock("../../../shared/components/layout/Footer", () => () => <div>Footer</div>);
+jest.mock("../../../shared/components/Footer", () => () => <div>Footer</div>);
 
 jest.mock("../hooks/useCourses", () => ({
   useCourses: jest.fn(),
