@@ -15,8 +15,8 @@ import { useValidation } from "@hooks/useValidation";
 import { useFormSubmit } from "@utils/UseFormSubmit";
 
 const validators = {
-  nombre: (value) => validateRequired(value, "Nombre"),
-  apellido: (value) => validateRequired(value, "Apellido"),
+  name: (value) => validateRequired(value, "Nombre"),
+  last_name: (value) => validateRequired(value, "Apellido"),
   email: validateEmail,
   password: validatePassword,
   password_confirmation: (value, form) =>
@@ -56,19 +56,19 @@ export default function RegisterPage() {
         <Input
           id="name"
           type="text"
-          value={form.nombre}
-          onChange={(e) => setField("nombre", e.target.value)}
+          value={form.name}
+          onChange={(e) => setField("name", e.target.value)}
           placeholder="Nombre"
-          error={errors.nombre} 
+          error={errors.name} 
         />
 
         <Input
           id="last_name"
           type="text"
-          value={form.apellido}
-          onChange={(e) => setField("apellido", e.target.value)}
+          value={form.last_name}
+          onChange={(e) => setField("last_name", e.target.value)}
           placeholder="Apellido"
-          error={errors.apellido} 
+          error={errors.last_name} 
         />
 
         <Input
