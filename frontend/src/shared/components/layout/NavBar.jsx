@@ -29,7 +29,7 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
         <div className="navbar-desk">
           {/* Left: logo */}
           <div className="navbar-brand">
-            <Link to="/courses" className="navbar-brand-link">
+            <Link to="/cursos" className="navbar-brand-link">
               <img
                 src="/icon_sin_fondo.png"
                 alt="Study Circle"
@@ -85,10 +85,10 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
               </div>
             ) : (
               <div className="flex gap-4">
-                <Link to="/sign_in" className="auth-link">
+                <Link to="/iniciar_sesion" className="auth-link">
                   Iniciar sesión
                 </Link>
-                <Link to="/sign_up" className="auth-link">
+                <Link to="/registrarse" className="auth-link">
                   Registrarse
                 </Link>
               </div>
@@ -114,7 +114,7 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
               </div>
             </button>
 
-            <Link to="/courses" className="navbar-logo-mobile" aria-label="Ir a cursos">
+            <Link to="/" className="navbar-logo-mobile" aria-label="Ir a cursos">
               <img
                 src="/icon_sin_fondo.png"
                 alt="Study Circle"
@@ -125,7 +125,7 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
         ) : (
           <div className="navbar-mobile-guest">
             <div className="flex items-center gap-2">
-              <Link to="/courses" className="navbar-brand-link" aria-label="Ir a cursos">
+              <Link to="/materias" className="navbar-brand-link" aria-label="Ir a cursos">
                 <img
                   src="/icon_sin_fondo.png"
                   alt="Study Circle"
