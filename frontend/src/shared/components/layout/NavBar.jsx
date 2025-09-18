@@ -134,10 +134,10 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
               </Link>
             </div>
             <div className="flex gap-3">
-              <Link to="/sign_in" className="px-2 text-white hover:underline">
+              <Link to="/iniciar_sesion" className="px-2 text-white hover:underline">
                 Iniciar sesión
               </Link>
-              <Link to="/sign_up" className="px-2 text-white hover:underline">
+              <Link to="/registrarse" className="px-2 text-white hover:underline">
                 Registrarse
               </Link>
             </div>
