@@ -10,7 +10,7 @@ inherit_mode:
 AllCops:
   DisabledByDefault: true
   SuggestExtensions: false
-  NewCops: disable
+  NewCops: enable
   Exclude:
     - "bin/*"
     - "db/schema.rb"
@@ -34,6 +34,8 @@ Lint/MissingSuper:
     - "app/components/*"
 
 Layout/LineLength:
+  Exclude:
+    - 'config/initializers/**/*'
   Max: 120
 
 Layout/FirstArrayElementIndentation:
@@ -53,7 +55,11 @@ Security:
 
 Rails/BulkChangeTable:
   Exclude:
-    - 'db/migrate/20190321140119_add_validations.rb'
+    - 'db/migrate/**/*'
+
+Rails/NotNullColumn:
+  Exclude:
+    - 'db/migrate/**/*'
 
 Rails/LexicallyScopedActionFilter:
   Enabled: false
