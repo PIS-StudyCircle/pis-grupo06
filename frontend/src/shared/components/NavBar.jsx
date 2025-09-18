@@ -30,8 +30,8 @@ export default function NavBar() {
                 ) : (
                 // Si NO hay usuario logueado → mostramos links de login/registro
                     <div>
-                        <Link to="/sign_in" className="px-3 hover:underline">Iniciar sesión</Link>
-                        <Link to="/sign_up" className="px-3 hover:underline">Registrarse</Link>
+                        <Link to="/iniciar_sesion" className="px-3 hover:underline">Iniciar sesión</Link>
+                        <Link to="/registrarse" className="px-3 hover:underline">Registrarse</Link>
                     </div>
                 )}
             </div>
