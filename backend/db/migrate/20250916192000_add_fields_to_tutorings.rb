@@ -1,7 +1,9 @@
 class AddFieldsToTutorings < ActiveRecord::Migration[8.0]
   def change
     # FK a users: created_by
-    add_reference :tutorings, :created_by, foreign_key: { to_table: :users }
+    unless column_exists?(:tutorings, :created_by_id)
+      add_reference :tutorings, :created_by, foreign_key: { to_table: :users }
+    end
 
     # FK a users: tutor (nullable)
     add_reference :tutorings, :tutor, foreign_key: { to_table: :users }, null: true
