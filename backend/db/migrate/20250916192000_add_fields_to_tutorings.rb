@@ -1,8 +1,5 @@
 class AddFieldsToTutorings < ActiveRecord::Migration[8.0]
   def change
-    # FK a courses
-    add_reference :tutorings, :course, foreign_key: true
-
     # FK a users: created_by
     add_reference :tutorings, :created_by, foreign_key: { to_table: :users }
 
