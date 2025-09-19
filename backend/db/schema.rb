@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_16_192000) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_16_185419) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -110,12 +110,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_192000) do
     t.string "name", null: false
     t.string "last_name", null: false
     t.text "description"
-    t.bigint "faculty_id"
     t.string "jti", null: false
+    t.bigint "faculty_id"
+    t.string "provider"
+    t.string "uid"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["uid"], name: "index_users_on_uid"
   end
 
   add_foreign_key "courses", "faculties"
