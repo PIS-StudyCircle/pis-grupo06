@@ -17,6 +17,18 @@ module Api
         }
       end
 
+      # Método para obtener un curso por ID y sus temas asociados
+      def show
+        course = Course.includes(:subjects).find(params[:id])
+        render json: course.as_json(
+          include: {
+            subjects: { only: [:id, :name] } # en schema subjects tiene :id, :name
+          }
+        )
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: "No se encontró el curso solicitado" }, status: :not_found
+      end
+
       # este metodo no va a estar disponible para el usuario
       def create
         @course = Course.new(course_params)
