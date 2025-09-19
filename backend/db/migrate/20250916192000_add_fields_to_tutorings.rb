@@ -6,9 +6,12 @@ class AddFieldsToTutorings < ActiveRecord::Migration[8.0]
     end
 
     # FK a users: tutor (nullable)
-    add_reference :tutorings, :tutor, foreign_key: { to_table: :users }, null: true
-
+    unless column_exists?(:tutorings, :tutor_id)
+      add_reference :tutorings, :tutor, foreign_key: { to_table: :users }, null: true
+    end
+    
     # Enrolled (cantidad de usuarios)
     add_column :tutorings, :enrolled, :integer, default: 0, null: false
   end
 end
+
