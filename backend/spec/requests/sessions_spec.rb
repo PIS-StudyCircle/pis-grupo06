@@ -31,18 +31,16 @@ RSpec.describe "Api::V1::Users::Sessions", type: :request do
 
   describe "POST /api/v1/users/sign_in" do
     context "con credenciales válidas" do
-      it "devuelve 401 porque todavía no tenemos armado el flujo de login en el test" do
+      it "devuelve 200 " do
         post "/api/v1/users/sign_in",
-             params: { user: { email: email, password: password } }.to_json,
-             headers: json_headers,
+             params: { api_v1_user: { email:, password:} },
              as: :json
-
-        expect(response).to have_http_status(:unauthorized)
+        expect(response).to have_http_status(:ok)
       end
     end
 
     context "con credenciales inválidas" do
-      it "también devuelve 401" do
+      it "devuelve 401" do
         post "/api/v1/users/sign_in",
              params: { user: { email: email, password: "wrong" } }.to_json,
              headers: json_headers,
