@@ -12,11 +12,11 @@ export function AppRoutes() {
       <Route element={<RequireGuestRoute />}>
         <Route path="/iniciar_sesion" element={<SignInPage />} />
         <Route path="/registrarse" element={<RegisterPage />} />
+        <Route path="/flujo-visitante" element={<VisitorFlow />} />
       </Route>
       
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
-      <Route path="/flujo-visitante" element={<VisitorFlow />} />
     </Routes>
   );
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 
-const VisitorWelcomePage = () => {
+const VisitorFlow = () => {
     const navigate = useNavigate();
 
   return (
@@ -52,5 +52,5 @@ const VisitorWelcomePage = () => {
   );
 };
 
-export default VisitorWelcomePage;
+export default VisitorFlow;
   
