@@ -10,7 +10,8 @@ module.exports = {
     "^@features/(.*)$": "<rootDir>/src/features/$1",
     "^@/shared/config$": "<rootDir>/src/shared/config-test.js",
     "^@/shared/utils/(.*)$": "<rootDir>/src/shared/utils/$1",
-
+    "^@utils/(.*)$": "<rootDir>/src/shared/utils/$1",
+    "^@hooks/(.*)$": "<rootDir>/src/shared/hooks/$1",
   },
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js", "@testing-library/jest-dom"],
   moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node"],

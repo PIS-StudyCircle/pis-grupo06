@@ -1,0 +1,12 @@
+# config/locales/es.yml
+es:
+  activerecord:
+    models:
+      user: "Usuario"
+    attributes:
+      user:
+        email: "Correo electrónico"
+        name: "Nombre"
+        last_name: "Apellido"
+        password: "Contraseña"
+        password_confirmation: "Confirmación de contraseña"             

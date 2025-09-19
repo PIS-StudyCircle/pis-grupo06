@@ -1,8 +1,8 @@
 // IMPORTANTE!: Mocks antes de cualquier import que los use, porque si intenta importarlos antes de que sean mockeados, falla
 //porque Jest no sabe interpretar import.meta, que se usa en courseService.js
 
-jest.mock("@components/NavBar", () => () => <div>NavBar</div>);
-jest.mock("@components/Footer", () => () => <div>Footer</div>);
+jest.mock("../../../shared/components/layout/NavBar", () => () => <div>NavBar</div>);
+jest.mock("../../../shared/components/Footer", () => () => <div>Footer</div>);
 
 jest.mock("../hooks/useCourses", () => ({
   useCourses: jest.fn(),
