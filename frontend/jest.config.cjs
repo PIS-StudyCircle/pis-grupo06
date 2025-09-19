@@ -12,6 +12,7 @@ module.exports = {
     "^@/shared/utils/(.*)$": "<rootDir>/src/shared/utils/$1",
     "^@utils/(.*)$": "<rootDir>/src/shared/utils/$1",
     "^@hooks/(.*)$": "<rootDir>/src/shared/hooks/$1",
+    "^@context/(.*)$": "<rootDir>/src/shared/context/$1",
   },
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js", "@testing-library/jest-dom"],
   moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node"],
