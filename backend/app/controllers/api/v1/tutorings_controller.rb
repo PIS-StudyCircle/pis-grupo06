@@ -17,6 +17,11 @@ module Api
         if params[:course_cod].present?
           tutorings = tutorings.with_course_code(params[:course_cod])
         end
+
+        #tutorias de una materia especifica (porid de curso)
+        if params[:course_id].present?
+          tutorings = tutorings.by_course_id(params[:course_id])
+        end
         
         #tutorias creadas por el usuario indicado (no current_user, esto por si se quiere ampliar a ver tutorias creadas por otros usuarios)
         if params[:created_by_user].present?

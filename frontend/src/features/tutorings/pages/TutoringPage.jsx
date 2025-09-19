@@ -1,11 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use, useMemo } from "react";
 import NavBar from "@components/NavBar";
 import Footer from "@components/Footer";
 import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";    
 import Pagination from "@components/Pagination";
+import { useSearchParams } from "react-router-dom";
 
-export default function TutoringPage({filters = {}}) {
+export default function TutoringPage({ mode = 'serTutor'}) {
+
+  const [sp] = useSearchParams();
+  const filters = useMemo(() => {
+    // Convierte los parámetros de búsqueda en un objeto de filtros
+    return {
+      course_id: sp.get("course_id") || undefined,
+      no_tutor: sp.get("no_tutor") === 'true' ? true : undefined,
+      enrolled: sp.get("enrolled") === 'true' ? true : (sp.get("enrolled") === 'false' ? false : undefined),
+      createdByUser: sp.get("createdByUser") === 'true' ? true : undefined,
+      past: sp.get("past") === 'true' ? true : (sp.get("past") === 'false' ? false : undefined),
+    };
+  }, [sp]);
+ 
   const { tutorings, loading, error, pagination, page, setPage, search, setSearch } = useTutorings(1, 20, filters);
   const totalPages = pagination.last || 1;
 
@@ -22,7 +36,7 @@ export default function TutoringPage({filters = {}}) {
         <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
           <h1 className="text-2xl font-bold p-2 mb-4 text-black">Tutorias Disponibles</h1>
 
-          <TutoringList tutorings={tutorings} loading={loading} error={error} />
+          <TutoringList tutorings={tutorings} loading={loading} error={error} mode={mode}/>
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>

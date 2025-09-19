@@ -19,6 +19,10 @@ class Tutoring < ApplicationRecord
     joins(:course).where(courses: { code: code }) if code.present?
   }
 
+  # Tutorías filtradas por id de curso
+  scope :by_course_id, ->(id) {
+    where(course_id: id )}
+
   # Tutorías creadas por un usuario específico
   scope :created_by, ->(user_id) {
     where(created_by_id: user_id) if user_id.present?

@@ -4,14 +4,24 @@ export default function TutoringCard({ tutoring, mode }) {
       <div className="flex w-full gap-4">
 
         <div className="flex-none w-[80%] flex flex-col text-left">
-          <p className="text-gray-700 text-sm font-semibold">
+
+          <p className="text-black text-lg font-semibold">
             {tutoring.course.name}
           </p>
+
           <p className="text-gray-600 text-sm mt-1 font-semibold">
-          Fecha: {tutoring.scheduled_at ? tutoring.scheduled_at.toLocaleString() : "Sin definir"}
-        </p>
-          <p className="text-gray-600 text-sm mt-1 font-semibold">Modalidad:</p>{tutoring.modality}
+            Fecha: <strong>{tutoring.scheduled_at ? 
+              new Date(tutoring.scheduled_at).toLocaleString("es-ES", {
+                dateStyle: "long",
+                timeStyle: "short"
+              })
+            : "Sin definir"}</strong>
+          </p>
+
+          <p className="text-gray-600 text-sm mt-1 font-semibold">Modalidad: <strong>{tutoring.modality}</strong></p>
+
           <p className="text-gray-600 text-sm mt-1 font-semibold">Temas:</p>
+
           <div className="flex flex-wrap gap-2 mt-1">
             {tutoring.subjects.slice(0, 3).map((subject) => (
               <span
@@ -27,9 +37,11 @@ export default function TutoringCard({ tutoring, mode }) {
               </span>
             )}
           </div>
+
           <p className="text-gray-600 text-sm mt-2">
-            Cupos disponibles: {tutoring.capacity - tutoring.enrolled}
+            Cupos disponibles: <strong>{tutoring.capacity - tutoring.enrolled}</strong>
           </p>
+
         </div>
 
         <div className="flex-none w-[20%] flex flex-col justify-start items-end pr-3">
