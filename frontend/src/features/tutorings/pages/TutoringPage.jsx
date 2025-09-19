@@ -4,21 +4,8 @@ import Footer from "@components/Footer";
 import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";    
 import Pagination from "@components/Pagination";
-import { useSearchParams } from "react-router-dom";
 
-export default function TutoringPage({ mode = 'serTutor'}) {
-
-  const [sp] = useSearchParams();
-  const filters = useMemo(() => {
-    // Convierte los parámetros de búsqueda en un objeto de filtros
-    return {
-      course_id: sp.get("course_id") || undefined,
-      no_tutor: sp.get("no_tutor") === 'true' ? true : undefined,
-      enrolled: sp.get("enrolled") === 'true' ? true : (sp.get("enrolled") === 'false' ? false : undefined),
-      createdByUser: sp.get("createdByUser") === 'true' ? true : undefined,
-      past: sp.get("past") === 'true' ? true : (sp.get("past") === 'false' ? false : undefined),
-    };
-  }, [sp]);
+export default function TutoringPage({ filters={}, mode = 'serTutor'}) {
  
   const { tutorings, loading, error, pagination, page, setPage, search, setSearch } = useTutorings(1, 20, filters);
   const totalPages = pagination.last || 1;
