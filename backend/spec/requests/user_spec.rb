@@ -34,7 +34,7 @@ RSpec.describe "Api::V1::Users", type: :request do
         get "/api/v1/users/me", headers: headers
 
         expect(response).to have_http_status(:ok)
-        json = response.parsed_body
+        json    = response.parsed_body
         payload = extract_user(json)
 
         expect(payload).to be_present
@@ -43,7 +43,6 @@ RSpec.describe "Api::V1::Users", type: :request do
         expect(payload["last_name"]).to eq(user.last_name)
         expect(payload["description"]).to eq(user.description)
 
-        # Chequea facultad si viene como id o como objeto
         if payload.key?("faculty_id")
           expect(payload["faculty_id"]).to eq(faculty.id)
         elsif payload.key?("faculty")
@@ -64,6 +63,34 @@ RSpec.describe "Api::V1::Users", type: :request do
         headers = base_headers.merge("Authorization" => "Bearer invalid.token.here")
         get "/api/v1/users/me", headers: headers
         expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "response shape / serializer" do
+      it "devuelve user con los atributos del serializer y sin campos sensibles" do
+        headers = Devise::JWT::TestHelpers.auth_headers(base_headers, user)
+
+        get "/api/v1/users/me", headers: headers
+
+        expect(response).to have_http_status(:ok)
+
+        json  = response.parsed_body
+        attrs = json.fetch("user")
+
+        expected_attrs =
+          UserSerializer.new(user).serializable_hash[:data][:attributes].as_json
+
+        expect(attrs).to eq(expected_attrs)
+
+        expect(attrs).not_to include(
+          "encrypted_password",
+          "reset_password_token",
+          "reset_password_sent_at",
+          "remember_created_at",
+          "jti",
+          "provider",
+          "uid"
+        )
       end
     end
   end
