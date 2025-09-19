@@ -7,6 +7,7 @@ import { useFormState } from "@utils/UseFormState";
 import { useFormSubmit } from "@utils/UseFormSubmit";
 import { useValidation } from "@hooks/useValidation";
 import { validateEmail, validatePassword } from "@utils/validation";
+import { API_BASE } from "@/shared/config";
 
 const validators = {
   email: validateEmail,
@@ -58,19 +59,8 @@ export default function SignInPage() {
           error={errors.password}
         />
 
-        {/* Opciones extra: Recordar y Olvidé contraseña */}
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              name="remember-me"
-              type="checkbox"
-              className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-            />
-            <label htmlFor="remember-me" className="ml-2 block text-gray-900 font-light">
-              Recordar preferencias
-            </label>
-          </div>
+        {/* Opciones extra: Olvidé contraseña */}
+        <div className="flex items-center justify-center text-sm">
           <a
             href="#"
             className="font-medium text-indigo-600 hover:text-indigo-500"
@@ -88,7 +78,12 @@ export default function SignInPage() {
           </ErrorAlert>
         )}
 
-        <SubmitButton text="Ingresar" />
+        <SubmitButton text="Sign In" />
+
+        <a href={`${API_BASE}/users/auth/google_oauth2`}
+          className="w-full flex justify-center px-4 py-2 font-semibold text-white bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 mb-4">
+          Iniciar sesión con Google
+        </a>
       </form>
     </AuthLayout>
   );
