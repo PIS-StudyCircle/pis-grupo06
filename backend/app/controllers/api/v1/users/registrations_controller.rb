@@ -14,6 +14,12 @@ module Api
       after_action :stash_jwt_and_csrf_cookies, only: :create, if: -> { resource.persisted? }
       rescue_from ActionController::ParameterMissing, with: :render_bad_request
 
+      def destroy
+        resource.destroy
+        Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
+        render json: { message: "Cuenta eliminada con éxito" }, status: :ok
+      end
+
       private
 
       def sign_up_params
