@@ -33,7 +33,7 @@ RSpec.describe "Api::V1::Users::Sessions", type: :request do
     context "con credenciales válidas" do
       it "devuelve 200 " do
         post "/api/v1/users/sign_in",
-             params: { api_v1_user: { email:, password:} },
+             params: { api_v1_user: { email:, password: } },
              as: :json
         expect(response).to have_http_status(:ok)
       end
