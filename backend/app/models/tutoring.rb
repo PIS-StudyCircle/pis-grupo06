@@ -8,15 +8,16 @@ class Tutoring < ApplicationRecord
   belongs_to :course
   belongs_to :creator, class_name: 'User', foreign_key: 'created_by_id', optional: true
   belongs_to :tutor, class_name: 'User', optional: true
-
-   # Tutorías en las que un usuario está inscripto
+  
+  # Tutorías en las que un usuario está inscripto
   scope :enrolled_by, ->(user) {
-    joins(:user_tutorings).where(user_tutorings: { user_id: user.id })
+    return none unless user.present?
+    left_joins(:user_tutorings).where(user_tutorings: { user_id: user.id })
   }
 
-  # Tutorías filtradas por código de curso
-  scope :with_course_code, ->(code) {
-    joins(:course).where(courses: { code: code }) if code.present?
+  # Tutorías filtradas por id de curso
+  scope :with_course_id, ->(id) {
+    joins(:course).where(courses: { id: id }) if id.present?
   }
 
   # Tutorías filtradas por id de curso

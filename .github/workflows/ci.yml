@@ -97,6 +97,6 @@ jobs:
         run: npm run lint --if-present
 
       # Desactivado temporalmente: Jest tests no están corriendo bien localmente ni en CI
-      # - name: Run Jest
-      #   run: npx jest --runInBand
+      - name: Run Jest
+        run: npx jest --runInBand
 

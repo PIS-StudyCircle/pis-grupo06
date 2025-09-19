@@ -4,6 +4,7 @@ module Api
       include Pagy::Backend
 
       def index
+        
         tutorings = Tutoring.all
 
         tutorings = tutorings.includes(:course, :subjects)
@@ -14,8 +15,8 @@ module Api
         end
 
         #tutorias de una materia especifica (por codigo de curso)
-        if params[:course_cod].present?
-          tutorings = tutorings.with_course_code(params[:course_cod])
+        if params[:course_id].present?
+          tutorings = tutorings.with_course_id(params[:course_id])
         end
 
         #tutorias de una materia especifica (porid de curso)
@@ -41,6 +42,12 @@ module Api
         end
 
         @pagy, @tutorings = pagy(tutorings, items: params[:per_page] || 20)
+
+        puts "Tutorings antes de map: #{tutorings.map(&:id)}"
+        tutorings.each do |t|
+          puts "Tutoring #{t.id} course: #{t.course.inspect}"
+        end
+
 
         render json: {
           tutorings: @tutorings.map do |t|

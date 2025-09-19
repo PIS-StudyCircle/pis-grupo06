@@ -10,18 +10,6 @@
     "preview": "vite preview",
     "test": "jest"
   },
-  "jest": {
-    "testEnvironment": "jsdom",
-    "transform": {
-      "^.+\\.[jt]sx?$": "babel-jest"
-    },
-    "moduleNameMapper": {
-      "^@components/(.*)$": "<rootDir>/src/shared/components/$1"
-    },
-    "setupFilesAfterEnv": [
-      "@testing-library/jest-dom"
-    ]
-  },
   "babel": {
     "presets": [
       [
@@ -41,6 +29,7 @@
     ]
   },
   "dependencies": {
+    "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
