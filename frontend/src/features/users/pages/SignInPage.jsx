@@ -7,6 +7,7 @@ import { useFormState } from "@utils/UseFormState";
 import { useFormSubmit } from "@utils/UseFormSubmit";
 import { useValidation } from "@hooks/useValidation";
 import { validateEmail, validatePassword } from "@utils/validation";
+import { API_BASE } from "@/shared/config";
 
 const validators = {
   email: validateEmail,
@@ -34,10 +35,10 @@ export default function SignInPage() {
 
   return (
     <AuthLayout
-      title="Sign in Your Account"
-      footerText="Don't have an account?"
-      footerLink="/sign_up"
-      footerLinkText="Sign up"
+      title="Inicio de Sesión"
+      footerText="¿No tienes una cuenta?"
+      footerLink="/registrarse"
+      footerLinkText="¡Regístrate!"
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
         <Input
@@ -54,7 +55,7 @@ export default function SignInPage() {
           type="password"
           value={form.password}
           onChange={(e) => setField("password", e.target.value)}
-          placeholder="Password"
+          placeholder="Contraseña"
           error={errors.password}
         />
 
@@ -86,6 +87,11 @@ export default function SignInPage() {
         )}
 
         <SubmitButton text="Sign In" />
+
+        <a href={`${API_BASE}/users/auth/google_oauth2`}
+          className="w-full flex justify-center px-4 py-2 font-semibold text-white bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 mb-4">
+          Iniciar sesión con Google
+        </a>
       </form>
     </AuthLayout>
   );

@@ -10,17 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_11_150918) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_16_192000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
-
-  create_table "articles", force: :cascade do |t|
-    t.string "title"
-    t.text "body"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
 
   create_table "courses", force: :cascade do |t|
     t.string "name", null: false
@@ -79,6 +72,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_150918) do
     t.integer "duration_mins", default: 60, null: false
     t.string "modality", null: false
     t.integer "capacity", null: false
+    t.bigint "course_id"
+    t.bigint "created_by_id"
+    t.bigint "tutor_id"
+    t.integer "enrolled", default: 0, null: false
+    t.index ["course_id"], name: "index_tutorings_on_course_id"
+    t.index ["created_by_id"], name: "index_tutorings_on_created_by_id"
+    t.index ["tutor_id"], name: "index_tutorings_on_tutor_id"
   end
 
   create_table "universities", force: :cascade do |t|
@@ -112,11 +112,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_150918) do
     t.text "description"
     t.bigint "faculty_id"
     t.string "jti", null: false
+    t.string "provider"
+    t.string "uid"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true
-    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["uid"], name: "index_users_on_uid"
   end
 
   add_foreign_key "courses", "faculties"
@@ -127,6 +129,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_11_150918) do
   add_foreign_key "subject_tutorings", "tutorings"
   add_foreign_key "subjects", "courses"
   add_foreign_key "subjects", "users", column: "creator_id"
+  add_foreign_key "tutorings", "courses"
+  add_foreign_key "tutorings", "users", column: "created_by_id"
+  add_foreign_key "tutorings", "users", column: "tutor_id"
   add_foreign_key "user_tutorings", "tutorings"
   add_foreign_key "user_tutorings", "users"
   add_foreign_key "users", "faculties"

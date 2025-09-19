@@ -9,14 +9,14 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route element={<RequireGuestRoute />}>
-        <Route path="/sign_in" element={<SignInPage />} />
-        <Route path="/sign_up" element={<RegisterPage />} />
+        <Route path="/iniciar_sesion" element={<SignInPage />} />
+        <Route path="/registrarse" element={<RegisterPage />} />
         <Route path="/forgot_password" element={<ForgotPasswordPage />} />
         <Route path="/reset_password" element={<ResetPasswordPage />} />
       </Route>
       
-      <Route path="/" element={<Navigate to="/courses" replace />} />
-      <Route path="/courses" element={<CoursePage />} />
+      <Route path="/" element={<Navigate to="/materias" replace />} />
+      <Route path="/materias" element={<CoursePage />} />
     </Routes>
   );
 }
