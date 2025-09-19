@@ -33,9 +33,18 @@ module Backend
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
     # Enabled the session store for api_only application
-    config.session_store :cookie_store, key: '_interslice_session'
-    config.middleware.use ActionDispatch::Cookies
-    config.middleware.use config.session_store, config.session_options
-    config.middleware.insert_before Warden::Manager, JwtCookieToAuthorization
+    config.middleware.insert_before 0, ActionDispatch::Cookies
+
+    # 2) Sesión inmediatamente después de Cookies (definimos opciones acá mismo)
+    config.middleware.insert_after ActionDispatch::Cookies,
+                                   ActionDispatch::Session::CookieStore,
+                                   key: '_app_session',
+                                   same_site: :lax,                 # dev: :lax funciona para el callback de Google
+                                   secure: Rails.env.production?    # prod: true con HTTPS
+
+    # 3) Tu middleware JWT DESPUÉS de que existan cookies+sesión
+    config.middleware.insert_after ActionDispatch::Session::CookieStore, JwtCookieToAuthorization
+
+    # Nada más acá. No insertes estrategias OmniAuth ni otro CookieStore en otro archivo.
   end
 end
