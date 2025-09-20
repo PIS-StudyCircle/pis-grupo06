@@ -1,5 +1,6 @@
 class UserMailer < Devise::Mailer
   include Devise::Controllers::UrlHelpers
+
   default template_path: "user_mailer"
   default from: "StudyCircle <studycircle.project@gmail.com>"
 
@@ -10,4 +11,3 @@ class UserMailer < Devise::Mailer
     super
   end
 end
-

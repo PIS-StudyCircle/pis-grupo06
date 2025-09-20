@@ -18,5 +18,6 @@ export function useFormSubmit(action, redirectTo = "/") {
     }
   }
 
-  return { error, onSubmit, submitted }; 
+  return { error, onSubmit, submitted };
 }
+

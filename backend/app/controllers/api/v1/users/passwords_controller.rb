@@ -2,7 +2,7 @@ module Api
   module V1
     module Users
       class PasswordsController < Devise::PasswordsController
-        wrap_parameters false 
+        wrap_parameters false
         respond_to :json
 
         # POST /api/v1/users/password
@@ -30,11 +30,8 @@ module Api
         private
 
         def resource_params
-          params.require(:user).permit(:email, :password, :password_confirmation, :reset_password_token)
+          params.expect(user: [:email, :password, :password_confirmation, :reset_password_token])
         end
-
-        
-        private
 
         def respond_with(resource, _opts = {})
           render json: resource
