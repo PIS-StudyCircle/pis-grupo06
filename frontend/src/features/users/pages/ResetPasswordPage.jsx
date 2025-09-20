@@ -28,7 +28,7 @@ export default function ResetPasswordPage() {
 
   const { errors, validate } = useValidation(validators);
 
-  const { error, onSubmit, submitted } = useFormSubmit(resetPassword, "/iniciar_sesion");
+  const { error, onSubmit } = useFormSubmit(resetPassword, "/");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,11 +44,6 @@ export default function ResetPasswordPage() {
       footerLink="/sign_in"
       footerLinkText="Iniciar sesión"
     >
-      {submitted ? (
-        <div className="text-center text-green-600 font-semibold">
-          ¡Contraseña actualizada con éxito! Redirigiendo...
-        </div>
-      ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input
             id="password"
@@ -79,7 +74,6 @@ export default function ResetPasswordPage() {
 
           <SubmitButton text="Cambiar contraseña" />
         </form>
-      )}
     </AuthLayout>
   );
 }

@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
 
   const { errors, validate } = useValidation(validators);
 
-  const { error, onSubmit } = useFormSubmit(forgotPassword, "/");
+  const { error, onSubmit } = useFormSubmit(forgotPassword, null);
 
   const [submitted, setSubmitted] = useState(false);
 
@@ -64,7 +64,8 @@ export default function ForgotPasswordPage() {
         </form>
       ) : (
         <div className="text-green-600 text-center">
-          El correo puede tardar unos minutos en llegar.
+          <div>El correo puede tardar unos minutos en llegar.</div>
+          <div>Luego de recibirlo, puedes cerrar esta ventana.</div>
         </div>
       )}
     </AuthLayout>
