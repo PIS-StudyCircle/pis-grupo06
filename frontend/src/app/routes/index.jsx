@@ -3,9 +3,24 @@ import PrivateRoute from "./PrivateRoute";
 import { SignInPage, RegisterPage } from "@/features/users";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 
+import { useUser } from "../../features/users/hooks/user_context";
+
 import CoursePage from "@/features/courses/pages/CoursePage";
 import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
 import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
+
+function HomeRedirect() {
+  const { user, booting } = useUser();
+  
+  if (booting) return null; // o spinner
+  
+  return user 
+    ? <Navigate to="/materias" replace /> 
+    : <Navigate to="/flujo-visitante" replace />;
+}
+
+
+
 
 export function AppRoutes() {
   return (
@@ -16,9 +31,11 @@ export function AppRoutes() {
         <Route path="/flujo-visitante" element={<VisitorFlow />} />
       </Route>
       
-      <Route path="/" element={<Navigate to="/materias" replace />} />
+      <Route path="/" element={<HomeRedirect />} />
       <Route path="/materias" element={<CoursePage />} />
-      <Route path="/materias/:courseId" element={<CourseDetailPage />} />
+      <Route element={<PrivateRoute />}> 
+        <Route path="/materias/:courseId" element={<CourseDetailPage />} />
+      </Route>
     </Routes>
   );
 }

@@ -29,7 +29,7 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
         <div className="navbar-desk">
           {/* Left: logo */}
           <div className="navbar-brand">
-            <Link to="/cursos" className="navbar-brand-link">
+            <Link to="/materias" className="navbar-brand-link">
               <img
                 src="/icon_sin_fondo.png"
                 alt="Study Circle"
