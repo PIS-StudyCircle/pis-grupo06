@@ -1,4 +1,4 @@
-import { useUser } from "@context/UserContext";
+import { useUser } from "../hooks/user_context";
 import { AuthLayout } from "../components/AuthLayout";
 import { Input } from "@components/Input";
 import { Textarea } from "@components/Textarea";

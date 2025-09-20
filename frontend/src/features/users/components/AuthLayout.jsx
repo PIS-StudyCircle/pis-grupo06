@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "@/assets/logo_completo.png";
+import logo from "../../../assets/logo_completo.png";
 
 export function AuthLayout({ title, children, footerText, footerLink, footerLinkText }) {
   return (
