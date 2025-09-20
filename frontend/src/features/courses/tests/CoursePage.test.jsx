@@ -19,7 +19,15 @@ jest.mock("react-router-dom", () => ({
 }));
 
 
-import { render, screen, fireEvent, act } from "@testing-library/react";
+
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"), // mantener los demás exports reales
+  useNavigate: () => jest.fn(),              // mock de useNavigate
+}));
+
+
+import { render, screen, fireEvent, act, act } from "@testing-library/react";
+import { MemoryRouter } from 'react-router-dom'
 import CoursePage from "../pages/CoursePage";
 import { useCourses } from "../hooks/useCourses";
 
@@ -27,6 +35,11 @@ jest.mock("../hooks/useCourses");
 
 describe("CoursePage", () => {
   const mockSetPage = jest.fn();
+
+  beforeAll(() => {
+    // decimos a Jest que use timers falsos (controlados)
+    jest.useFakeTimers();
+  });
 
   beforeAll(() => {
     // decimos a Jest que use timers falsos (controlados)
@@ -78,7 +91,11 @@ describe("CoursePage", () => {
       setPage: mockSetPage,
     });
 
-    render(<CoursePage />);
+    render(
+      <MemoryRouter>
+        <CoursePage />
+      </MemoryRouter>
+    );
 
     // Verifica que los cursos se muestren
     expect(screen.getByText("Curso A")).toBeInTheDocument();
@@ -153,6 +170,4 @@ describe("CoursePage", () => {
     render(<CoursePage />);
 
   });
-
-
 });

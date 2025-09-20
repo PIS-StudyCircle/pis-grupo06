@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { extractErrors } from "./extractErrors";
+import { extractErrors } from "./extractErrors";
 
 export function useFormSubmit(action, redirectTo = "/") {
   const [error, setError] = useState([]);
@@ -18,5 +19,5 @@ export function useFormSubmit(action, redirectTo = "/") {
     }
   }
 
-  return { error, onSubmit, submitted }; 
+  return { error, onSubmit, submitted };
 }
