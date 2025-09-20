@@ -10,7 +10,7 @@ export function useFormSubmit(action, redirectTo = "/") {
   async function onSubmit(form) {
     setError([]);
     try {
-       await action(form);
+      await action(form);
       setSubmitted(true); 
       nav(redirectTo);  
     } catch (e) {
