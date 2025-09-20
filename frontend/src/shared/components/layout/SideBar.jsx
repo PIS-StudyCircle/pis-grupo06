@@ -1,6 +1,6 @@
 // src/shared/components/layout/Sidebar.jsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useUser } from "@/features/users/hooks/user_context";
+import { useUser } from "@context/UserContext";
 import {
   Home,
   BookOpen,

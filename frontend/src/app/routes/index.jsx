@@ -6,7 +6,8 @@ import  PrivateRoute  from "./PrivateRoute";
 import CoursePage from "@/features/courses/pages/CoursePage";
 import TutoringPage from "@/features/tutorings/pages/TutoringPage";
 import PruebaPage from "@/features/tutorings/pages/PruebaPage";
-
+import ProfilePage from "@/features/users/pages/Profile";
+import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
 
 export function AppRoutes() {
   return (
@@ -15,14 +16,21 @@ export function AppRoutes() {
         <Route path="/iniciar_sesion" element={<SignInPage />} />
         <Route path="/registrarse" element={<RegisterPage />} />
       </Route>
-      <Route path="/" element={<Navigate to="/materias" replace />} />
-      <Route path="/materias" element={<CoursePage />} />
      <Route element={<PrivateRoute />}>
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
       </Route>
 
       {/* Ruta de prueba filtros, se puede eliminar despues */}
       <Route path="/pruebaFiltrosTutorias" element={<PruebaPage />} />
+      
+
+      <Route element={<PrivateRoute />}>
+        <Route path="/perfil" element={<ProfilePage />} />
+      </Route>
+
+      <Route path="/" element={<Navigate to="/materias" replace />} />
+      <Route path="/materias" element={<CoursePage />} />
+      <Route path="/materias/:courseId" element={<CourseDetailPage />} />
     </Routes>
   );
 }
