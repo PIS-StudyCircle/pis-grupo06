@@ -19,14 +19,7 @@ jest.mock("react-router-dom", () => ({
 }));
 
 
-
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"), // mantener los demás exports reales
-  useNavigate: () => jest.fn(),              // mock de useNavigate
-}));
-
-
-import { render, screen, fireEvent, act, act } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter } from 'react-router-dom'
 import CoursePage from "../pages/CoursePage";
 import { useCourses } from "../hooks/useCourses";
