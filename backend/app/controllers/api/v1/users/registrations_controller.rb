@@ -15,7 +15,15 @@ module Api
       rescue_from ActionController::ParameterMissing, with: :render_bad_request
 
       def destroy
-        resource.destroy
+        unless current_user
+          render json: { error: "No autenticado" }, status: :unauthorized and return
+        end
+
+        unless current_user.valid_password?(params.dig(:user, :password))
+          render json: { error: "Contraseña incorrecta" }, status: :unauthorized and return
+        end
+
+        current_user.destroy
         Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
         render json: { message: "Cuenta eliminada con éxito" }, status: :ok
       end

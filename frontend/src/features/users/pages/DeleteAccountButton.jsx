@@ -4,6 +4,7 @@ import { useUser } from "@context/UserContext";
 
 export default function DeleteAccountButton() {
   const [confirming, setConfirming] = useState(false);
+  const [password, setPassword] = useState("");
   const { signOut } = useUser();
   const navigate = useNavigate();
 
@@ -11,14 +12,18 @@ export default function DeleteAccountButton() {
     try {
       const res = await fetch("http://localhost:3000/api/v1/users", {
         method: "DELETE",
-        credentials: "include", // importante para cookies / JWT
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }), // Enviamos la contraseña
       });
 
       if (!res.ok) {
-        throw new Error("Error al eliminar la cuenta");
+        const data = await res.json();
+        throw new Error(data.error || "Error al eliminar la cuenta");
       }
 
-      // Limpia el usuario del contexto y redirige
       signOut();
       navigate("/iniciar_sesion");
     } catch (error) {
@@ -41,10 +46,18 @@ export default function DeleteAccountButton() {
           <p className="mb-3 font-medium">
             ¿Estás seguro de que querés eliminar tu cuenta? Esta acción no se puede deshacer.
           </p>
+          <input
+            type="password"
+            placeholder="Confirmá tu contraseña"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="w-full mb-3 px-3 py-2 rounded border border-red-300"
+          />
           <div className="flex justify-between">
             <button
               onClick={handleDelete}
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold shadow-md transition"
+              disabled={!password}
             >
               Sí, eliminar
             </button>
