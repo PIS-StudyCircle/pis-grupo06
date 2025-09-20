@@ -6,6 +6,7 @@ import ProfilePage from "@/features/users/pages/Profile";
 
 
 import CoursePage from "@/features/courses/pages/CoursePage";
+import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
 
 export function AppRoutes() {
   return (
@@ -22,6 +23,7 @@ export function AppRoutes() {
 
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
+      <Route path="/materias/:courseId" element={<CourseDetailPage />} />
     </Routes>
   );
 }
