@@ -3,6 +3,7 @@ import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut } from 
 import { getItem, saveItem, removeItem } from "@/shared/utils/storage";
 import { API_BASE } from "@/shared/config";
 import { Ctx } from "./hooks/user_context";
+import { resetPassword as apiResetPassword } from "./services/auth.api";
 
 export default function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -69,28 +70,13 @@ export default function UserProvider({ children }) {
   };
 
   const resetPassword = async (formData) => {
-    const response = await fetch(`${API_BASE}/users/password`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user: {
-          reset_password_token: formData.reset_password_token,
-          password: formData.password,
-          password_confirmation: formData.password_confirmation,
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      const errorMessages = Object.entries(errorData.errors)
-        .map(([field, messages]) => `${field} ${messages.join(", ")}`);
-      throw new Error(errorMessages.join("; "));
-    }
-
-    return true;
+    const data = await apiResetPassword(formData);
+    const unpackedUser = data.user.data.attributes;
+    setUser(unpackedUser);
+    saveItem("user", unpackedUser);
+    saveItem("token", data.token);
   };
-
+  
   return (
     <Ctx.Provider value={{ user, booting, signIn, signup, signOut, forgotPassword, resetPassword }}>
       {children}

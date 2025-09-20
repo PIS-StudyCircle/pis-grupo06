@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
     <AuthLayout
       title="Reestablecer tu contraseña"
       footerText="¿Recuerdas tu contraseña?"
-      footerLink="/sign_in"
+      footerLink="/iniciar_sesion"
       footerLinkText="Iniciar sesión"
     >
       {!submitted ? (

@@ -50,10 +50,10 @@ export async function forgotPassword(form) {
 export async function resetPassword(form) {
   const body = {
     user: {
-      token: form.token,
+      reset_password_token: form.reset_password_token,
       password: form.password,
       password_confirmation: form.password_confirmation,
     },
   };
-  return await http("/users/password", { method: "POST", body: JSON.stringify(body) });
+  return await http("/users/password", { method: "PUT", body: JSON.stringify(body) });
 }

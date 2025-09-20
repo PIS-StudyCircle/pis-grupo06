@@ -41,7 +41,7 @@ export default function ResetPasswordPage() {
     <AuthLayout
       title="Ingresa tu nueva contraseña"
       footerText="¿Ya recordaste tu contraseña?"
-      footerLink="/sign_in"
+      footerLink="/iniciar_sesion"
       footerLinkText="Iniciar sesión"
     >
         <form onSubmit={handleSubmit} className="space-y-6">

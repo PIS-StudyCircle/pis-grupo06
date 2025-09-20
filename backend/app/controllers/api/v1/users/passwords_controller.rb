@@ -5,7 +5,6 @@ module Api
         wrap_parameters false
         respond_to :json
 
-        # POST /api/v1/users/password
         # -> envía email con link para reset
         def create
           self.resource = resource_class.send_reset_password_instructions(resource_params)
@@ -16,14 +15,23 @@ module Api
           end
         end
 
-        # PUT /api/v1/users/password
         # -> restablece la contraseña con el token
         def update
           self.resource = resource_class.reset_password_by_token(resource_params)
           if resource.errors.empty?
-            render json: { message: "Contraseña actualizada correctamente" }, status: :ok
+            sign_in(resource_name, resource)
+            token, _payload = Warden::JWTAuth::UserEncoder.new.call(resource, :user, nil)
+            render json: {
+            message: "Contraseña actualizada correctamente.",
+            user: UserSerializer.new(resource), 
+            token: token
+          }, status: :ok
           else
-            render json: { errors: resource.errors.full_messages }, status: :unprocessable_entity
+            if resource.errors.key?(:reset_password_token)
+              render json: { errors: ["El enlace de restablecimiento es inválido o ya ha sido utilizado."] }, status: :unprocessable_entity
+            else
+              render json: { errors: resource.errors.full_messages }, status: :unprocessable_entity
+            end
           end
         end
 
