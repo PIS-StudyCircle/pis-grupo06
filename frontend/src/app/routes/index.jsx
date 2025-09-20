@@ -5,7 +5,7 @@ import { RequireGuestRoute } from "./RequireGuestRoute";
 import ProfilePage from "@/features/users/pages/Profile";
 
 
-import { useUser } from "../../features/users/hooks/user_context";
+import { useUser } from "@context/UserContext";
 
 import CoursePage from "@/features/courses/pages/CoursePage";
 import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
