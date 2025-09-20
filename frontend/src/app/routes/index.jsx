@@ -5,6 +5,7 @@ import { RequireGuestRoute } from "./RequireGuestRoute";
 
 import CoursePage from "@/features/courses/pages/CoursePage";
 import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
+import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
 
 export function AppRoutes() {
   return (
@@ -17,6 +18,7 @@ export function AppRoutes() {
       
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
+      <Route path="/materias/:courseId" element={<CourseDetailPage />} />
     </Routes>
   );
 }
