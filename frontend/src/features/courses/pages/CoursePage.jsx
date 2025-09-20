@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import Footer from "@components/Footer";
+import CourseList from "../components/CourseList";
+
 import { useCourses } from "../hooks/useCourses";
 import SearchInput from "@components/SearchInput";
-import CourseList from "../components/CourseList";
 import Pagination from "@components/Pagination";
 
 export default function CoursePage() {

@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import RegisterPage from "../pages/RegisterPage";
 
-jest.mock("../hooks/user_context", () => ({
+jest.mock("@context/UserContext", () => ({
   useUser: () => ({
     signup: jest.fn(),
   }),
