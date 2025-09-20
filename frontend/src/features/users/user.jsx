@@ -11,20 +11,23 @@ export default function UserProvider({ children }) {
   useEffect(() => { hydrate(); }, []);
 
   async function hydrate() {
+    const cached = getItem("user", null);
+    if (cached) setUser(cached);
+
     try {
-      const cached = getItem("user", null);
-      if (cached) setUser(cached);
-
       const res = await fetch(`${API_BASE}/users/me`, { credentials: "include" });
-
       if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-        saveItem("user", data.user);
+        const { user: fetchedUser } = await res.json();
+        setUser(fetchedUser);
+        saveItem("user", fetchedUser);
       } else {
         setUser(null);
         removeItem("user");
       }
+    } catch (err) {
+      console.error("Error al obtener el usuario:", err);
+      setUser(null);
+      removeItem("user");
     } finally {
       setBooting(false);
     }
@@ -44,6 +47,8 @@ export default function UserProvider({ children }) {
   async function signOut() {
     try {
       await apiSignOut();
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
     } finally {
       removeItem("user");
       setUser(null);
@@ -51,61 +56,40 @@ export default function UserProvider({ children }) {
   }
 
   const forgotPassword = async (formData) => {
-
-  try {
-    const response = await fetch('http://localhost:3000/api/v1/users/password', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        user: {
-          email: formData.email
-        }
-      })
+    const response = await fetch(`${API_BASE}/users/password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user: { email: formData.email } }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "La solicitud falló");
     }
-
-    const data = await response.json();
-
-  } catch (error) {
-    throw new Error("No se pudo procesar la solicitud. Verifica el email e inténtalo de nuevo.");
-  }
   };
 
- const resetPassword = async (formData) => {
-
-  try {
+  const resetPassword = async (formData) => {
     const response = await fetch(`${API_BASE}/users/password`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         user: {
           reset_password_token: formData.reset_password_token,
           password: formData.password,
-          password_confirmation: formData.password_confirmation
-        }
-      })
+          password_confirmation: formData.password_confirmation,
+        },
+      }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      const errorMessages = Object.entries(errorData.errors).map(([field, messages]) => `${field} ${messages.join(', ')}`);
-      throw new Error(errorMessages.join('; '));
+      const errorMessages = Object.entries(errorData.errors)
+        .map(([field, messages]) => `${field} ${messages.join(", ")}`);
+      throw new Error(errorMessages.join("; "));
     }
-    
-    return true;
 
-  } catch (error) {
-    throw error; 
-  }
-};
+    return true;
+  };
 
   return (
     <Ctx.Provider value={{ user, booting, signIn, signup, signOut, forgotPassword, resetPassword }}>

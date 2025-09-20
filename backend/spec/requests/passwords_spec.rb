@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe "Api::V1::Users::Passwords", type: :request do
-    let!(:universidad) { University.create!(name: "Universidad de Ejemplo") }
-    let!(:facultad) { Faculty.create!(name: "Facultad de Ingeniería", university: universidad) }
-    let!(:user) do
+  let!(:universidad) { University.create!(name: "Universidad de Ejemplo") }
+  let!(:facultad) { Faculty.create!(name: "Facultad de Ingeniería", university: universidad) }
+  let!(:user) do
     User.create!(
       email: "test@example.com",
       password: "password123",
@@ -22,7 +22,7 @@ RSpec.describe "Api::V1::Users::Passwords", type: :request do
         }.to change { ActionMailer::Base.deliveries.count }.by(1)
 
         expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json["message"]).to eq("Se envió un email con instrucciones para restablecer tu contraseña")
       end
     end
@@ -33,7 +33,7 @@ RSpec.describe "Api::V1::Users::Passwords", type: :request do
 
     #     expect(response).to have_http_status(:unprocessable_entity)
     #     json = JSON.parse(response.body)
-    #     expect(json["errors"]).to include("Email no encontrado") 
+    #     expect(json["errors"]).to include("Email no encontrado")
     #   end
     # end
   end
@@ -52,7 +52,7 @@ RSpec.describe "Api::V1::Users::Passwords", type: :request do
           }, as: :json
 
       expect(response).to have_http_status(:ok)
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["message"]).to eq("Contraseña actualizada correctamente")
       expect(user.reload.valid_password?("newpassword123")).to be true
     end
@@ -68,8 +68,8 @@ RSpec.describe "Api::V1::Users::Passwords", type: :request do
           }, as: :json
 
       expect(response).to have_http_status(:unprocessable_entity)
-      json = JSON.parse(response.body)
-      expect(json["errors"]).to include("Código para restablecer contraseña no es válido") # depende del mensaje de Devise
+      json = response.parsed_body
+      expect(json["errors"]).to include("Código para restablecer contraseña no es válido")
     end
   end
 end
