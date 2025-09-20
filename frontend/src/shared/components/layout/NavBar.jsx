@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useUser } from "../../../features/users/hooks/user_context";
+import { useUser } from "@context/UserContext";
 import { ChevronDown, LogOut, User } from "lucide-react";
 
 const NavBar = ({ toggleSidebar = () => {} }) => {
@@ -114,7 +114,7 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
               </div>
             </button>
 
-            <Link to="/" className="navbar-logo-mobile" aria-label="Ir a cursos">
+            <Link to="/materias" className="navbar-logo-mobile" aria-label="Ir a cursos">
               <img
                 src="/icon_sin_fondo.png"
                 alt="Study Circle"

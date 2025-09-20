@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import SignInPage from "../pages/SignInPage";
 
-jest.mock("../hooks/user_context", () => ({
+jest.mock("@context/UserContext", () => ({
   useUser: () => ({
     signIn: jest.fn(),
   }),
