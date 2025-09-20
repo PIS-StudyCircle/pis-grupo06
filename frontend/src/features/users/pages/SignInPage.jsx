@@ -69,11 +69,11 @@ export default function SignInPage() {
               className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
             />
             <label htmlFor="remember-me" className="ml-2 block text-gray-900 font-light">
-              Remember my preference
+              Recordar mis preferencias
             </label>
           </div>
           <a href="/forgot_password" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Forgot Password?
+            ¿Olvidaste la contraseña?
           </a>
         </div>
 
@@ -92,6 +92,7 @@ export default function SignInPage() {
           className="w-full flex justify-center px-4 py-2 font-semibold text-white bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 mb-4">
           Iniciar sesión con Google
         </a>
+
       </form>
     </AuthLayout>
   );
