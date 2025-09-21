@@ -13,15 +13,10 @@ class Tutoring < ApplicationRecord
   scope :enrolled_by, ->(user) {
     return none if user.blank?
 
-    left_joins(:user_tutorings).where(user_tutorings: { user_id: user.id })
+    joins(:user_tutorings).where(user_tutorings: { user_id: user.id })
   }
 
-  # Tutorías filtradas por id de curso
-  scope :with_course_id, ->(id) {
-    joins(:course).where(courses: { id: id }) if id.present?
-  }
-
-  # Tutorías filtradas por id de curso
+  # Tutorías filtradas por id de materia (course_id)
   scope :by_course_id, ->(id) {
     where(course_id: id)
   }
@@ -41,4 +36,42 @@ class Tutoring < ApplicationRecord
 
   # Futuras (scheduled_at >= ahora)
   scope :upcoming, -> { where(scheduled_at: Time.current..) }
+
+  # --- Validaciones ---
+
+  validates :scheduled_at, presence: true
+
+  validate :scheduled_at_cannot_be_in_past
+
+  validates :duration_mins,
+            presence: true,
+            numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 240 }
+
+  validates :modality,
+            presence: true,
+            inclusion: { in: %w[virtual presencial],
+                         message: "%{value} no es una modalidad válida" }
+
+  validates :capacity,
+            presence: true,
+            numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 100 }
+
+  validate :capacity_not_less_than_enrolled
+
+  private
+
+  def scheduled_at_cannot_be_in_past
+    return if scheduled_at.blank?
+    if scheduled_at < Time.current
+      errors.add(:scheduled_at, "La fecha de la tutoria no puede ser del pasado") 
+    end
+  end
+
+  def capacity_not_less_than_enrolled
+    return if capacity.blank?
+    if enrolled > capacity
+      errors.add(:capacity, "La cantidad de inscriptos no puede ser mayor a la capacidad")
+    end
+  end
+
 end

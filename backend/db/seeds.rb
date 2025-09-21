@@ -136,8 +136,8 @@ course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
 # Elegir entre 1 y 3 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..3))
 
-tutoring_request = Tutoring.create!(
-  scheduled_at: 3.days.from_now,
+tutoring_request = Tutoring.find_or_create_by!(
+  scheduled_at: 6.days.from_now,
   duration_mins: 90,
   modality: "virtual",
   capacity: 3,
@@ -157,7 +157,7 @@ course = Course.find_by(id: 145) # Fisica I
 # Elegir 1 subjects al azar
 subject = course.subjects.sample(1).first
 
-tutoring_request = Tutoring.create!(
+tutoring_request = Tutoring.find_or_create_by!(
   scheduled_at: 3.days.from_now,
   duration_mins: 90,
   modality: "virtual",
@@ -175,7 +175,7 @@ creator = User.find_by!(email: "anaperez@gmail.com")
 course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
 # Elegir 1 subjects al azar
 subject = course.subjects.sample(1).first
-tutoring_offered = Tutoring.create!(
+tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 5.days.from_now,
   duration_mins: 60,
   modality: "presencial",
@@ -193,8 +193,8 @@ course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
 # Elegir entre 1 y 5 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..5))
 
-tutoring_request = Tutoring.create!(
-  scheduled_at: 3.days.from_now,
+tutoring_request = Tutoring.find_or_create_by!(
+  scheduled_at: 4.days.from_now,
   duration_mins: 90,
   modality: "virtual",
   capacity: 3,

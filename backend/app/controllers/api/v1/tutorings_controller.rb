@@ -13,11 +13,6 @@ module Api
           tutorings = tutorings.enrolled_by(current_user)
         end
 
-        # tutorias de una materia especifica (por id de curso)
-        if params[:course_id].present?
-          tutorings = tutorings.with_course_id(params[:course_id])
-        end
-
         # tutorias de una materia especifica (porid de curso)
         if params[:course_id].present?
           tutorings = tutorings.by_course_id(params[:course_id])
