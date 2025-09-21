@@ -6,7 +6,10 @@ class Tutoring < ApplicationRecord
   has_many :subjects, through: :subject_tutorings
 
   belongs_to :course
-  belongs_to :creator, class_name: 'User', foreign_key: 'created_by_id', optional: true, inverse_of: :created_tutorings
+  belongs_to :creator, class_name: 'User',
+                       foreign_key: 'created_by_id',
+                       optional: true,
+                       inverse_of: :created_tutorings
   belongs_to :tutor, class_name: 'User', optional: true
 
   # Tutorías en las que un usuario está inscripto
@@ -40,7 +43,6 @@ class Tutoring < ApplicationRecord
   # --- Validaciones ---
 
   validates :scheduled_at, presence: true
-
   validate :scheduled_at_cannot_be_in_past
 
   validates :duration_mins,
@@ -50,28 +52,34 @@ class Tutoring < ApplicationRecord
   validates :modality,
             presence: true,
             inclusion: { in: %w[virtual presencial],
-                         message: "%{value} no es una modalidad válida" }
+                         message: :inclusion }
 
   validates :capacity,
             presence: true,
             numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 100 }
-
   validate :capacity_not_less_than_enrolled
+
+  # --- Métodos auxiliares ---
+
+  def enrolled
+    user_tutorings.size
+  end
 
   private
 
   def scheduled_at_cannot_be_in_past
     return if scheduled_at.blank?
+
     if scheduled_at < Time.current
-      errors.add(:scheduled_at, "La fecha de la tutoria no puede ser del pasado") 
+      errors.add(:scheduled_at, :past)
     end
   end
 
   def capacity_not_less_than_enrolled
     return if capacity.blank?
+
     if enrolled > capacity
-      errors.add(:capacity, "La cantidad de inscriptos no puede ser mayor a la capacidad")
+      errors.add(:capacity, :less_than_enrolled)
     end
   end
-
 end

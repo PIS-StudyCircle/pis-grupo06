@@ -2,7 +2,6 @@
 # db/seeds.rb
 require 'json'
 require 'securerandom'
-require 'securerandom'
 
 # ------ FACULTADES Y CURSOS ------
 # ------ FACULTADES Y CURSOS ------
