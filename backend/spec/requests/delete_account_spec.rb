@@ -22,7 +22,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
 
   def successful_login
     post "/api/v1/users/sign_in",
-      params: { user: { email: user.email, password: user.password } }.to_json,
+      params: { api_v1_user: { email: user.email, password: user.password } },
       headers: base_headers,
       as: :json
     expect(response).to have_http_status(:ok)
@@ -44,7 +44,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
     headers = Devise::JWT::TestHelpers.auth_headers(base_headers, user)
     expect {
       delete "/api/v1/users",
-        params: { user: { password: "incorrect" } }.to_json,
+        params: { user: { email: user.email, password: "incorrecto" } },
         headers: headers,
         as: :json
     }.not_to change(User, :count)
@@ -65,7 +65,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
     headers = successful_login
     expect {
       delete "/api/v1/users",
-        params: { user: { password: user.password } }.to_json,
+        params: { user: { email: user.email, password: user.password } },
         headers: headers,
         as: :json
       expect(User.find_by(id: user.id)).to be_nil
