@@ -13,12 +13,10 @@ import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
 
 function HomeRedirect() {
   const { user, booting } = useUser();
-  
+
   if (booting) return null; // o spinner
-  
-  return user 
-    ? <Navigate to="/materias" replace /> 
-    : <Navigate to="/flujo-visitante" replace />;
+
+  return <Navigate to="/materias" replace />
 }
 
 
@@ -32,11 +30,11 @@ export function AppRoutes() {
         <Route path="/registrarse" element={<RegisterPage />} />
         <Route path="/flujo-visitante" element={<VisitorFlow />} />
       </Route>
-      
+
       <Route path="/" element={<HomeRedirect />} />
 
       <Route path="/materias" element={<CoursePage />} />
-      <Route element={<PrivateRoute />}> 
+      <Route element={<PrivateRoute />}>
         <Route path="/materias/:courseId" element={<CourseDetailPage />} />
         <Route path="/perfil" element={<ProfilePage />} />
       </Route>
