@@ -37,9 +37,9 @@ export default function TutoringCard({ tutoring, mode }) {
         </div>
 
         <div className="flex-none w-[20%] flex flex-col justify-start items-end pr-3">
-          {mode === "serTutor" && <button className="tutoring-card-button">Ser tutor</button>}
-          {mode === "unirme" && <button className="tutoring-card-button">Unirme</button>}
-          {mode === "misTutorias" && <button className="tutoring-card-button">Desuscribirme</button>}
+          {mode === "serTutor" && <button className="btn btn-primary tutoring-card-button">Ser tutor</button>}
+          {mode === "unirme" && <button className="btn btn-primary tutoring-card-button">Unirme</button>}
+          {mode === "misTutorias" && <button className="btn btn-primary tutoring-card-button">Desuscribirme</button>}
         </div>
       </div>
 

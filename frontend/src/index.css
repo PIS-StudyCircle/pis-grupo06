@@ -194,6 +194,6 @@
   }
 
   .tutoring-card-button{
-    @apply btn btn-primary cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold text-sm py-1 px-3 rounded-full
+    @apply cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold text-sm py-1 px-3 rounded-full
   }
 }
