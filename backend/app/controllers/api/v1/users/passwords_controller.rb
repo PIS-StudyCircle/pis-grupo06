@@ -22,7 +22,11 @@ module Api
 
           user = resource_class.with_reset_password_token(token)
           if user.nil?
-            return render json: { errors: ["El enlace de restablecimiento es inválido o ya ha sido utilizado."] }, status: :unprocessable_entity
+            return render json: {
+              errors: [
+                "El enlace de restablecimiento es inválido o ya ha sido utilizado. Por favor solicita uno nuevo."
+              ]
+            }, status: :unprocessable_entity
           end
 
           # Verificar si la nueva contraseña es igual a la actual.
