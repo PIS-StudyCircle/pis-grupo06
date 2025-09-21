@@ -13,24 +13,24 @@ const validators = {
 };
 
 export default function DeleteAccountButton() {
- const { signOut } = useUser();
- 
-   const { form, setField } = useFormState({
-    password: "",
-   });
- 
-   const { errors, validate } = useValidation(validators);
- 
-   const { error, onSubmit } = useFormSubmit(signOut, "/");
+  const { deleteAccount } = useUser();
 
-   const [confirming, setConfirming] = useState(false);
- 
-   const handleSubmit = (e) => {
-     e.preventDefault();
-     if (validate(form)) {
-       onSubmit(form);
-     }
-   };
+  const { form, setField } = useFormState({
+    password: "",
+    });
+
+    const { errors, validate } = useValidation(validators);
+
+    const { error, onSubmit } = useFormSubmit(deleteAccount, "/");
+
+    const [confirming, setConfirming] = useState(false);
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      if (validate(form)) {
+        onSubmit(form);
+      }
+    };
 
   return (
     <div className="flex flex-col items-center mt-4">

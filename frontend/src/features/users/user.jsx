@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut } from "./services/auth.api";
+import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut, deleteAccount as apiDeleteAccount } from "./services/auth.api";
 import { getItem, saveItem, removeItem } from "@/shared/utils/storage";
 import { API_BASE } from "@/shared/config";
 import { Ctx } from "./hooks/user_context";
@@ -50,8 +50,13 @@ export default function UserProvider({ children }) {
     }
   }
 
+  const deleteAccount = async (form) => {
+    await apiDeleteAccount(form);
+    setUser(null); 
+  };
+
   return (
-    <Ctx.Provider value={{ user, booting, signIn, signup, signOut }}>
+    <Ctx.Provider value={{ user, booting, signIn, signup, signOut, deleteAccount }}>
       {children}
     </Ctx.Provider>
   );

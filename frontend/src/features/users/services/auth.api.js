@@ -37,3 +37,17 @@ export async function signOut() {
   await http("/users/sign_out", { method: "DELETE" });
   removeItem("user");
 }
+
+export async function deleteAccount(form) {
+  const body = {
+    user: {
+      password: form.password,
+    },
+  };
+  await http("/users", { 
+    method: "DELETE", 
+    body: JSON.stringify(body) 
+  });
+  removeItem("user");
+  removeItem("token");
+}
