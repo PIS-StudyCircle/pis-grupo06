@@ -1,16 +1,11 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import DeleteAccountButton from "../pages/DeleteAccountButton";
 
-jest.mock("../hooks/user_context", () => ({
+jest.mock("@context/UserContext", () => ({
   useUser: () => ({
     signIn: jest.fn(),
   }),
-}));
-
-
-jest.mock("../components/AuthLayout", () => ({
-  AuthLayout: ({ children }) => <div>{children}</div>,
 }));
 
 jest.mock("@components/Input", () => ({

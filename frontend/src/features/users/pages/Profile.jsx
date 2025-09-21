@@ -1,4 +1,4 @@
-import { useUser } from "../hooks/user_context";
+import { useUser } from "@context/UserContext"; 
 import DeleteAccountButton from "./DeleteAccountButton";
 
 export default function Profile() {

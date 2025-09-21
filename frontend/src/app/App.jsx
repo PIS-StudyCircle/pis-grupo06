@@ -2,7 +2,7 @@
 import { AppRoutes } from "./routes";
 import Layout from "../shared/components/layout/Layout";
 
-import UserProvider from "../features/users/user";
+import UserProvider from "../features/users/userProvider";
 
 import "../App.css";
 
