@@ -20,6 +20,15 @@ export default function Layout({ children }) {
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const tracking = useRef(false);
+  
+  // Ref para evitar stale closures
+  const mobileOpenRef = useRef(mobileOpen);
+  
+  // Mantener el ref sincronizado con el estado
+  useEffect(() => {
+    mobileOpenRef.current = mobileOpen;
+  }, [mobileOpen]);
+
 
   useEffect(() => {
     // Parámetros del gesto
@@ -93,10 +102,10 @@ export default function Layout({ children }) {
       {/* Contenedor del contenido.
           - pt-16: compensa la altura de la navbar fija
           - pb-14 en móvil: deja espacio si hubiera bottom bar (ajustable)
-          - Margen izquierdo en desktop según estado del sidebar */}
+          - Margen izquierdo según estado del sidebar en todas las pantallas */}
       <main
         className={`pt-16 pb-14 lg:pb-0 transition-all duration-300 ${
-          sidebarOpen ? "lg:ml-64" : "lg:ml-16"
+          sidebarOpen ? "sm:ml-64" : "sm:ml-16"
         }`}
       >
         {children}
