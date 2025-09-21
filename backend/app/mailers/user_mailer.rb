@@ -6,7 +6,7 @@ class UserMailer < Devise::Mailer
 
   def reset_password_instructions(record, token, opts = {})
     @token = token
-    @frontend_url = "http://localhost:5173/reset_password?reset_password_token=#{token}"
+    @frontend_url = "http://localhost:5173/restablecer_contrasena?reset_password_token=#{token}"
     opts[:subject] = "StudyCircle - Restablecer tu contraseña"
     super
   end

@@ -107,7 +107,7 @@
 
   /* === SIDEBAR (desktop) === */
   .sidebar-desktop {
-    @apply hidden lg:block fixed left-0 z-30 bg-[#00173D] text-white border-r border-white/10 shadow-sm
+    @apply hidden sm:block fixed left-0 z-30 bg-[#00173D] text-white border-r border-white/10 shadow-sm
            top-16 h-[calc(100vh-4rem)] transition-all duration-300 ease-in-out;
   }
   .sidebar-header {
@@ -143,7 +143,7 @@
 
   /* === DRAWER (mobile) === */
   .drawer-root {
-    @apply lg:hidden fixed inset-0 z-50 transition pointer-events-none;
+    @apply block sm:hidden fixed inset-0 z-50 transition pointer-events-none;
   }
   .drawer-root--open {
     @apply pointer-events-auto;

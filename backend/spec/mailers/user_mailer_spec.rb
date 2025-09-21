@@ -34,11 +34,11 @@ RSpec.describe UserMailer, type: :mailer do
     end
 
     it "incluye el link al frontend en el cuerpo del correo (HTML)" do
-      expect(mail.html_part.body.decoded).to include("http://localhost:5173/reset_password?reset_password_token=#{token}")
+      expect(mail.html_part.body.decoded).to include("http://localhost:5173/restablecer_contrasena?reset_password_token=#{token}")
     end
 
     it "incluye el link al frontend en el cuerpo del correo (texto)" do
-      expect(mail.text_part.body.decoded).to include("http://localhost:5173/reset_password?reset_password_token=#{token}")
+      expect(mail.text_part.body.decoded).to include("http://localhost:5173/restablecer_contrasena?reset_password_token=#{token}")
     end
   end
 end

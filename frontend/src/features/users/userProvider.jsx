@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut } from "./services/auth.api";
 import { getItem, saveItem, removeItem } from "@/shared/utils/storage";
 import { API_BASE } from "@/shared/config";
-import { Ctx } from "./hooks/user_context";
+import { Ctx } from "@context/UserContext";
 import { resetPassword as apiResetPassword } from "./services/auth.api";
 
 export default function UserProvider({ children }) {

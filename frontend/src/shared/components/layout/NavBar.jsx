@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useUser } from "../../../features/users/hooks/user_context";
+import { useUser } from "@context/UserContext";
 import { ChevronDown, LogOut, User } from "lucide-react";
+
 
 const NavBar = ({ toggleSidebar = () => {} }) => {
   const { user, signOut } = useUser();
@@ -29,7 +30,7 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
         <div className="navbar-desk">
           {/* Left: logo */}
           <div className="navbar-brand">
-            <Link to="/cursos" className="navbar-brand-link">
+            <Link to={user ? "/materias" : "/flujo-visitante"} className="navbar-brand-link">
               <img
                 src="/icon_sin_fondo.png"
                 alt="Study Circle"
@@ -103,7 +104,8 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
               type="button"
               onClick={() => {
                 setIsDropdownOpen(false);
-                toggleSidebar();
+                // Asegurar que siempre se ejecute toggleSidebar
+                setTimeout(() => toggleSidebar(), 0);
               }}
               aria-label="Abrir menú"
               aria-controls="sidebar"
@@ -114,7 +116,7 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
               </div>
             </button>
 
-            <Link to="/" className="navbar-logo-mobile" aria-label="Ir a cursos">
+            <Link to="/materias" className="navbar-logo-mobile" aria-label="Ir a cursos">
               <img
                 src="/icon_sin_fondo.png"
                 alt="Study Circle"
@@ -125,13 +127,21 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
         ) : (
           <div className="navbar-mobile-guest">
             <div className="flex items-center gap-2">
-              <Link to="/materias" className="navbar-brand-link" aria-label="Ir a cursos">
+              <button
+                type="button"
+                onClick={() => {
+                  toggleSidebar();
+                }}
+                aria-label="Abrir menú"
+                aria-controls="sidebar"
+                className="navbar-brand-link"
+              >
                 <img
                   src="/icon_sin_fondo.png"
                   alt="Study Circle"
                   style={{ width: 48, height: 48 }}
                 />
-              </Link>
+              </button>
             </div>
             <div className="flex gap-3">
               <Link to="/iniciar_sesion" className="px-2 text-white hover:underline">

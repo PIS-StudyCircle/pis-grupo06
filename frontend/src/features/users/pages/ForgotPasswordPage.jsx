@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUser } from "../hooks/user_context";
+import { useUser } from "@context/UserContext";
 import { AuthLayout } from "../components/AuthLayout";
 import { Input } from "@components/Input";
 import { ErrorAlert } from "@components/ErrorAlert";

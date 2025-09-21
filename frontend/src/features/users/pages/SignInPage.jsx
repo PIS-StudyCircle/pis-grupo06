@@ -1,4 +1,4 @@
-import { useUser } from "../hooks/user_context";
+import { useUser } from "@context/UserContext";
 import { AuthLayout } from "../components/AuthLayout";
 import { Input } from "@components/Input";
 import { ErrorAlert } from "@components/ErrorAlert";
@@ -72,7 +72,7 @@ export default function SignInPage() {
               Recordar mis preferencias
             </label>
           </div>
-          <a href="/forgot_password" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <a href="/olvide_contrasena" className="font-medium text-indigo-600 hover:text-indigo-500">
             ¿Olvidaste la contraseña?
           </a>
         </div>
