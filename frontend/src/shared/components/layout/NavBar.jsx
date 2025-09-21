@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useUser } from "@context/UserContext";
 import { ChevronDown, LogOut, User } from "lucide-react";
 
-// Para que el navbar se adapte igual en <1024px y <640px, asegúrate de que los estilos móviles se apliquen hasta 1024px en tu CSS.
 
 const NavBar = ({ toggleSidebar = () => {} }) => {
   const { user, signOut } = useUser();
