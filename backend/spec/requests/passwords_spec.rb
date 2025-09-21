@@ -53,7 +53,7 @@ RSpec.describe "Api::V1::Users::Passwords", type: :request do
 
       expect(response).to have_http_status(:ok)
       json = response.parsed_body
-      expect(json["message"]).to eq("Contraseña actualizada correctamente")
+      expect(json["message"]).to eq("Contraseña actualizada correctamente.")
       expect(user.reload.valid_password?("newpassword123")).to be true
     end
 
@@ -69,7 +69,7 @@ RSpec.describe "Api::V1::Users::Passwords", type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
       json = response.parsed_body
-      expect(json["errors"]).to include("Código para restablecer contraseña no es válido")
+      expect(json["errors"]).to include("El enlace de restablecimiento es inválido o ya ha sido utilizado.")
     end
   end
 end
