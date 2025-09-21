@@ -1,7 +1,10 @@
 # db/seeds.rb
+# db/seeds.rb
 require 'json'
 require 'securerandom'
+require 'securerandom'
 
+# ------ FACULTADES Y CURSOS ------
 # ------ FACULTADES Y CURSOS ------
 uni = University.find_or_create_by!(name: "Universidad de la República")
 fing = Faculty.find_or_create_by!(name: "Facultad de Ingeniería", university: uni)
