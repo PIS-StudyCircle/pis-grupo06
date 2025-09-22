@@ -1,14 +1,15 @@
 [build]
   publish = "dist"
-  command = """
-  : "${BACKEND_URL?Definí BACKEND_URL (https://tu-backend.herokuapp.com)}";
-  npm run build;
-  HOST=${URL#https://};
-  BACKEND="${BACKEND_URL%/}";
-  # 1) Proxy API (REWRITE 200 con headers)
-  echo "/api/* ${BACKEND}/api/:splat 200!  X-Forwarded-Proto=https  X-Forwarded-Host=${HOST}" > dist/_redirects
-  # 2) Fallback SPA (DEBE ir después)
-  echo "/* /index.html 200" >> dist/_redirects
-  # Debug: imprimilo en el log del deploy
-  echo '--- dist/_redirects ---'; cat dist/_redirects; echo '-----------------------';
-  """
+  command = "npm run build"
+
+[[redirects]]
+  from = "/api/*"
+  to   = "https://studycircle-backend-staging-df5d9bd407a6.herokuapp.com/api/:splat"
+  status = 200
+  force  = true
+  headers = { X-Forwarded-Proto = "https", X-Forwarded-Host = "studycircle-frontend-staging.netlify.app" }
+
+[[redirects]]
+  from = "/*"
+  to   = "/index.html"
+  status = 200
