@@ -2,30 +2,15 @@
   publish = "dist"
   command = "npm run build"
 
-# === Producción (master) ===
-[context."branch=master"]
-  [[redirects]]
-    from = "/api/*"
-    to   = "https://studycircle-backend-production-08429859fc6e.herokuapp.com/api/:splat"
-    status = 200
-    force  = true
-    headers = { X-Forwarded-Proto = "https", X-Forwarded-Host = "studycircle-frontend-production.netlify.app" }
+[[redirects]]
+  from = "/api/*"
+  to   = "https://studycircle-backend-production-08429859fc6e.herokuapp.com/api/:splat"
+  status = 200
+  force  = true
+  headers = { X-Forwarded-Proto = "https", X-Forwarded-Host = "studycircle-frontend-production.netlify.app" }
 
-  [[redirects]]
-    from = "/*"
-    to   = "/index.html"
-    status = 200
+[[redirects]]
+  from = "/*"
+  to   = "/index.html"
+  status = 200
 
-# === Staging (dev) ===
-[context."branch=dev"]
-  [[redirects]]
-    from = "/api/*"
-    to   = "https://studycircle-backend-staging-df5d9bd407a6.herokuapp.com/api/:splat"
-    status = 200
-    force  = true
-    headers = { X-Forwarded-Proto = "https", X-Forwarded-Host = "studycircle-frontend-staging.netlify.app" }
-
-  [[redirects]]
-    from = "/*"
-    to   = "/index.html"
-    status = 200
