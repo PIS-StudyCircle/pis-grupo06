@@ -1,0 +1,14 @@
+[build]
+  publish = "dist"
+  command = """
+  : "${BACKEND_URL?Definí BACKEND_URL (https://tu-backend.herokuapp.com)}";
+  npm run build;
+  HOST=${URL#https://};
+  BACKEND="${BACKEND_URL%/}";
+  # 1) Proxy API (REWRITE 200 con headers)
+  echo "/api/* ${BACKEND}/api/:splat 200!  X-Forwarded-Proto=https  X-Forwarded-Host=${HOST}" > dist/_redirects
+  # 2) Fallback SPA (DEBE ir después)
+  echo "/* /index.html 200" >> dist/_redirects
+  # Debug: imprimilo en el log del deploy
+  echo '--- dist/_redirects ---'; cat dist/_redirects; echo '-----------------------';
+  """

@@ -1,10 +1,13 @@
-# OmniAuth 2: por defecto solo POST. Habilitamos GET y mantenemos POST.
-OmniAuth.config.allowed_request_methods = %i[get post]
+OmniAuth.config.allowed_request_methods = %i[get]
 
-# (Opcional) silenciar warning por GET en dev
 if Rails.env.development?
   OmniAuth.config.silence_get_warning = true if OmniAuth.config.respond_to?(:silence_get_warning=)
 end
 
-# Log a Rails.logger
 OmniAuth.config.logger = Rails.logger
+
+OmniAuth.config.full_host = ->(env) {
+  scheme = env["HTTP_X_FORWARDED_PROTO"] || env["rack.url_scheme"] || "http"
+  host   = env["HTTP_X_FORWARDED_HOST"]  || env["HTTP_HOST"]
+  "#{scheme}://#{host}"
+}
