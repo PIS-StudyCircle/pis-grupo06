@@ -1,0 +1,11 @@
+[build]
+  publish = "dist"
+  command = """
+  : "${BACKEND_URL?Definí BACKEND_URL (https://tu-backend.herokuapp.com)}";
+  mkdir -p public;
+  HOST=${URL#https://};
+  BACKEND="${BACKEND_URL%/}";
+  echo "/api/* ${BACKEND}/api/:splat 200!  X-Forwarded-Proto=https  X-Forwarded-Host=${HOST}" > public/_redirects;
+  echo "/* /index.html 200" >> public/_redirects
+  npm run build
+  """

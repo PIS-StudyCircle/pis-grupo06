@@ -41,7 +41,7 @@ module Backend
     config.middleware.insert_after ActionDispatch::Cookies,
                                    ActionDispatch::Session::CookieStore,
                                    key: '_app_session',
-                                   same_site: (Rails.env.in?(non_prod_envs) ? :lax : :none),
+                                   same_site: :lax,
                                    secure: !Rails.env.in?(non_prod_envs)
 
     # 3) Tu middleware JWT DESPUÉS de que existan cookies+sesión
