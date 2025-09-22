@@ -11,6 +11,7 @@ export const getCourses = async (page = 1, perPage = 20, search = "") => {
   }
 
   const response = await fetch(`${API_BASE}/courses?${params}`);
+  
   if (!response.ok) throw new Error("Error fetching courses");
   return await response.json();
 };
