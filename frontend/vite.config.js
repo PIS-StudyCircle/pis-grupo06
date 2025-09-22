@@ -14,4 +14,16 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, './src/shared/hooks'),
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        headers: {
+          "X-Forwarded-Proto": "http",
+          "X-Forwarded-Host": "localhost:5173",
+        },
+      },
+    },
+  },
 })
