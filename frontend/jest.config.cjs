@@ -13,7 +13,9 @@ module.exports = {
     "^@utils/(.*)$": "<rootDir>/src/shared/utils/$1",
     "^@hooks/(.*)$": "<rootDir>/src/shared/hooks/$1",
     "^@context/(.*)$": "<rootDir>/src/shared/context/$1",
-    "^.+\\.(svg|png|jpg|jpeg|gif)$": "<rootDir>/__mocks__/fileMock.js",
+    
+    // Mockear assets
+    '\\.(svg|png|jpg|jpeg|gif)$': 'identity-obj-proxy',
   },
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js", "@testing-library/jest-dom"],
   moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node"],
