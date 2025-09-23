@@ -8,6 +8,9 @@ export const useSubjects = (courseId, initialPage = 1, perPage = 10) => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(initialPage);
   const [search, setSearch] = useState("");
+  const [reloadTick, setReloadTick] = useState(0);
+
+  const refetch = () => setReloadTick(t => t + 1);
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -25,7 +28,7 @@ export const useSubjects = (courseId, initialPage = 1, perPage = 10) => {
     };
 
     fetchSubjects();
-  }, [page, perPage, search]);
+  }, [page, perPage, search, reloadTick]);
 
-  return { subjects, loading, error, pagination, page, setPage, search, setSearch };
+  return { subjects, loading, error, pagination, page, setPage, search, setSearch, refetch };
 };

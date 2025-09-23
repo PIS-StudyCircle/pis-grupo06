@@ -1,5 +1,6 @@
 import { useState } from "react";
 import SubjectCard from "./SubjectCard";
+import {createSubject} from "../services/subjectService";
 import { useValidation } from "@hooks/useValidation";
 import {validateRequired, validateDate } from "@utils/validation";
 
@@ -9,12 +10,15 @@ export default function SubjectList({
   error,
   showCheckbox = false,
   showButton = false,
-  courseId
+  courseId,
+  onCreated = () => {}
 }) {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newName, setNewName] = useState("");
   const [newDate, setNewDate] = useState("");
   const [selectedIds, setSelectedIds] = useState([]); //Para crear tutorias
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState("");
 
   // --- Validaciones ---
   const validators = {
@@ -30,35 +34,41 @@ export default function SubjectList({
   if (!subjects || subjects.length === 0)
     return <div>No hay temas disponibles.</div>;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const form = {
-      subjectName: newName,
-      dueDate: newDate,
-    };
+    const form = {subjectName: newName, dueDate: newDate,};
+    if (!validate(form)) {return;}
 
-    if (!validate(form)) {
-      return;
+    try {
+      // Llamar API - POST de subjects
+      const created = await createSubject({
+        name: newName,
+        course_id: courseId,
+        due_date: newDate || null
+      });
+
+      // re-fetch
+      onCreated?.();
+
+      // Limpiar UI
+      setShowNewForm(false);
+      setNewName("");
+      setNewDate("");
+
+    } catch (err) {
+      // Mostrar error de API
+      const msg =
+        err?.errors
+          ? Object.entries(err.errors)
+              .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
+              .join(" | ")
+          : err?.message || "No se pudo crear el tema.";
+      setFormError(msg);
+
+    } finally {
+      setSaving(false);
     }
-
-    // Llamar API - POST de subjects
-
-    var newId = 852; //Id declarado para probar, la idea es que sea el que devuelve el POST de subjects
-    
-
-    const newSubject = {
-      id: newId,
-      name: newName,
-      due_date: newDate,
-    };
-    subjects.push(newSubject); //Sacar cuando se llame al backend
-    
-    setSelectedIds((prev) => [...prev, newId]);
-    // limpiar
-    setShowNewForm(false);
-    setNewName("");
-    setNewDate("");
   };
 
   const handleCheckboxChange = (id, checked) => {
@@ -135,12 +145,12 @@ export default function SubjectList({
               </span>
             )}
           </div>
-
+          
+          {formError && <p className="text-red-600 text-xs">{formError}</p>}
           <div className="flex gap-2 mt-2">
             <button
               type="submit"
-              className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600"
-            >
+              className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600">
               Guardar
             </button>
             <button

@@ -3,6 +3,8 @@ module Api
         class SubjectsController < ApplicationController
             include Pagy::Backend
 
+            before_action :authenticate_user!, only: [:create]
+
             def index
                 subjects = Subject.order(:name)
 
@@ -20,6 +22,25 @@ module Api
                 }   
                 
             end
+
+            def create
+                subject = Subject.new(subject_params)
+                subject.creator = current_user  # asocia el creador
+
+                if subject.save
+                    # Devolvé el objeto simple (el front lo espera así). Incluye due_date si existe en el modelo.
+                    render json: subject, status: :created
+                else
+                    render json: subject.errors, status: :unprocessable_entity
+                end
+            end
+            
+            private
+
+            def subject_params
+                params.expect(subject: [:name, :course_id, :due_date])
+            end
+
         end
     end
 end

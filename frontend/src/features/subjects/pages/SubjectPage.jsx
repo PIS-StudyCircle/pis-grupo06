@@ -4,8 +4,15 @@ import SubjectList from "../components/SubjectList";
 import { useSubjects } from "../hooks/useSubjects";
 import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
+import { useParams } from "react-router-dom";
 
 export default function SubjectPage({courseId, showCheckbox = false, showButton = false}) {
+  
+  // ESTo ESTA PARA PODER USAR subjects/:courseId. CUANDO YA NO SE VAYA A USAR SE CAMBIA A courseId
+  const { courseId: courseIdFromRoute } = useParams();
+  const cid = Number(courseId ?? courseIdFromRoute);
+  // SACAR CID DE ABAJO TAMBIEN
+
   const {
     subjects,
     loading,
@@ -15,9 +22,14 @@ export default function SubjectPage({courseId, showCheckbox = false, showButton 
     setPage,
     search,
     setSearch,
-  } = useSubjects(185); //pongo 185 (gal 1) para las pruebas mientras desarrollamos crear tema, seria courseId
+    refetch
+  } = useSubjects(cid); // ESTE CID ESTA PARA PODER USAR subjects/:courseId. CUANDO YA NO SE VAYA A USAR SE CAMBIA A courseId
   const totalPages = pagination.last || 1;
 
+  const handleCreated = () => {
+    if (page !== 1) setPage(1);
+    else refetch();  
+  }
   const [query, setQuery] = useState(search);
 
   useEffect(() => {
@@ -42,7 +54,8 @@ export default function SubjectPage({courseId, showCheckbox = false, showButton 
             placeholder="Buscar tema..."
           />
 
-          <SubjectList subjects={subjects} loading={loading} error={error} showCheckbox={showCheckbox} showButton={showButton} courseId={courseId} />
+          {/*ESTE CID ESTA PARA PODER USAR subjects/:courseId. CUANDO YA NO SE VAYA A USAR SE CAMBIA A courseId*/}
+          <SubjectList subjects={subjects} loading={loading} error={error} showCheckbox={showCheckbox} showButton={showButton} courseId={cid} onCreated={handleCreated} />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>
