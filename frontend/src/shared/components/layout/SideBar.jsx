@@ -24,7 +24,7 @@ const Sidebar = ({
   const authedItems = [
     { title: "Inicio", path: "/", Icon: Home },
     { title: "Clases", path: "#", Icon: BookOpen },
-    { title: "Tutorías", path: "#", Icon: Users },
+    { title: "Tutorías", path: "/tutorias", Icon: Users },
     { title: "Materias", path: "/materias", Icon: GraduationCap },
   ];
   const guestItems = [

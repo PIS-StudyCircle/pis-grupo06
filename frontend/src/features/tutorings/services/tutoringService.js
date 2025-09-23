@@ -16,7 +16,7 @@ export const getTutorings = async (page = 1, perPage = 20, filters = {} ) => {
   const response = await fetch(`${API_BASE}/tutorings?${params}`, {
     credentials: "include",
   });
-  if (!response.ok) throw new Error("Error fetching tutorings");
+  if (!response.ok) throw new Error("Error al cargar las tutorías");
   return await response.json();
 
 };

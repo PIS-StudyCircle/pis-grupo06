@@ -13,11 +13,6 @@ module Api
           tutorings = tutorings.enrolled_by(current_user)
         end
 
-        # tutorias de una materia especifica (por codigo de curso)
-        if params[:course_id].present?
-          tutorings = tutorings.with_course_id(params[:course_id])
-        end
-
         # tutorias de una materia especifica (porid de curso)
         if params[:course_id].present?
           tutorings = tutorings.by_course_id(params[:course_id])
@@ -42,11 +37,6 @@ module Api
         end
 
         @pagy, @tutorings = pagy(tutorings, items: params[:per_page] || 20)
-
-        Rails.logger.debug { "Tutorings antes de map: #{tutorings.map(&:id)}" }
-        tutorings.each do |t|
-          Rails.logger.debug "Tutoring #{t.id} course: #{t.course.inspect}"
-        end
 
         render json: {
           tutorings: @tutorings.map do |t|
