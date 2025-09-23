@@ -22,21 +22,38 @@ const Sidebar = ({
   const nav = useNavigate();
 
   const authedItems = [
-    { title: "Home",     path: "/",         Icon: Home },
-    { title: "Clases",   path: "#",  Icon: BookOpen },
-    { title: "Tutorías", path: "/tutorias", Icon: Users },
+    { title: "Inicio", path: "/", Icon: Home },
+    { title: "Clases", path: "#", Icon: BookOpen },
+    { title: "Tutorías", path: "#", Icon: Users },
     { title: "Materias", path: "/materias", Icon: GraduationCap },
   ];
   const guestItems = [
-    { title: "Home",     path: "/",         Icon: Home },
+    { title: "Inicio", path: "/flujo-visitante", Icon: Home },
     { title: "Materias", path: "/materias", Icon: GraduationCap },
   ];
   const menuItems = user ? authedItems : guestItems;
 
-  const isActive = (p) =>
-    location.pathname === p || location.pathname.startsWith(p + "/");
-  const widthCls = isOpen ? "w-64" : "w-64 lg:w-16";
+  // Función helper para obtener todos los items del drawer móvil
+  const getMobileMenuItems = () => {
+    if (!user) return menuItems;
+    
+    // Crear una copia y insertar "Ver perfil" después del primer elemento
+    const items = [...menuItems];
+    items.splice(1, 0, { 
+      title: "Ver perfil", 
+      path: "/perfil", 
+      Icon: UserIcon,
+      id: "perfil",  // ID único para este item
+    });
+    return items;
+  };
 
+  const isActive = (p) => 
+    !!p && (location.pathname === p || location.pathname.startsWith(p + "/"));
+  // Ahora el sidebar se puede expandir en todas las pantallas
+  const widthCls = isOpen ? "w-64" : "w-16";
+
+ 
   async function handleLogout() {
     try {
       await signOut();
@@ -63,7 +80,7 @@ const Sidebar = ({
           >
             <Menu className="w-5 h-5" />
             <span
-              className={`font-semibold ${
+              className={`font-semibold transition-all duration-200 ${
                 isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
               }`}
             >
@@ -71,6 +88,7 @@ const Sidebar = ({
             </span>
           </button>
 
+          {/* Botón X se muestra cuando está abierto */}
           {isOpen && (
             <button
               onClick={onToggleDesktop}
@@ -88,9 +106,10 @@ const Sidebar = ({
           <ul className="sidebar-list">
             {menuItems.map((item) => {
               const active = isActive(item.path);
-              const ItemIcon = item.Icon; // <- tomamos el componente desde el objeto
+              const ItemIcon = item.Icon;
               return (
-                <li key={item.path}>
+                // 3) key única y estable
+                <li key={item.title}>
                   <Link
                     to={item.path}
                     className={`sidebar-link ${active ? "sidebar-link--active" : ""}`}
@@ -110,7 +129,7 @@ const Sidebar = ({
           </ul>
         </nav>
 
-        
+
       </aside>
 
       {/* ===== Mobile drawer ===== */}
@@ -142,24 +161,14 @@ const Sidebar = ({
           {/* Navegación (mobile) */}
           <nav className="p-2 pb-20">
             <ul className="space-y-1">
-              {user && (
-                <li>
-                  <Link
-                    to="/perfil"
-                    onClick={onMobileClose}
-                    className={`sidebar-link ${isActive("/profile") ? "sidebar-link--active" : ""}`}
-                  >
-                    <UserIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
-                    <span className="font-medium whitespace-nowrap">Ver perfil</span>
-                  </Link>
-                </li>
-              )}
-
-              {menuItems.map((item) => {
+              {getMobileMenuItems().map((item) => {
                 const active = isActive(item.path);
-                const ItemIcon = item.Icon; // <- igual en mobile
+                const ItemIcon = item.Icon;
+                // Usar ID único si existe, sino usar title como fallback
+                const keyId = item.id || item.title;
+                
                 return (
-                  <li key={item.path}>
+                  <li key={keyId}>
                     <Link
                       to={item.path}
                       onClick={onMobileClose}

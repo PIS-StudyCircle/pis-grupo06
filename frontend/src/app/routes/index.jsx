@@ -7,7 +7,10 @@ import CoursePage from "@/features/courses/pages/CoursePage";
 import TutoringPage from "@/features/tutorings/pages/TutoringPage";
 import PruebaPage from "@/features/tutorings/pages/PruebaPage";
 import ProfilePage from "@/features/users/pages/Profile";
+import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
 import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
+
+
 
 export function AppRoutes() {
   return (
@@ -26,11 +29,16 @@ export function AppRoutes() {
 
       <Route element={<PrivateRoute />}>
         <Route path="/perfil" element={<ProfilePage />} />
+        <Route path="/flujo-visitante" element={<VisitorFlow />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/materias" replace />} />
+
       <Route path="/materias" element={<CoursePage />} />
-      <Route path="/materias/:courseId" element={<CourseDetailPage />} />
+      <Route element={<PrivateRoute />}>
+        <Route path="/materias/:courseId" element={<CourseDetailPage />} />
+        <Route path="/perfil" element={<ProfilePage />} />
+      </Route>
     </Routes>
   );
 }

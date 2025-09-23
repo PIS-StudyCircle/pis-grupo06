@@ -36,11 +36,13 @@ module Backend
     config.middleware.insert_before 0, ActionDispatch::Cookies
 
     # 2) Sesión inmediatamente después de Cookies (definimos opciones acá mismo)
+    non_prod_envs = %w[development test]
+
     config.middleware.insert_after ActionDispatch::Cookies,
                                    ActionDispatch::Session::CookieStore,
                                    key: '_app_session',
-                                   same_site: :lax,                 # dev: :lax funciona para el callback de Google
-                                   secure: Rails.env.production?    # prod: true con HTTPS
+                                   same_site: :lax,
+                                   secure: !Rails.env.in?(non_prod_envs)
 
     # 3) Tu middleware JWT DESPUÉS de que existan cookies+sesión
     config.middleware.insert_after ActionDispatch::Session::CookieStore, JwtCookieToAuthorization

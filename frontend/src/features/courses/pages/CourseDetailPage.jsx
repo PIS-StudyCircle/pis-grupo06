@@ -1,5 +1,4 @@
 import { useParams/*, useNavigate*/ } from "react-router-dom";
-import NavBar from "@components/layout/NavBar";
 import Footer from "@components/Footer";
 import { useCourse } from "../hooks/useCourse";
 import CourseTopics from "../components/Topics";
@@ -12,8 +11,6 @@ export default function CourseDetailPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <NavBar />
-
       <main className="flex-1">
         {loading && (
           <div className="p-6 max-w-3xl mx-auto">Cargando curso...</div>

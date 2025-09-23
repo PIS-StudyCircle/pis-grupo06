@@ -19,7 +19,7 @@ json_data.each do |entry|
   )
 end
 
-# Cargamos algunos estudiantes de ejemplo
+# ------ USUARIOS ------
 students = [
   { name: "Ana", last_name: "Pérez", email: "anaperez@gmail.com" },
   { name: "Luis", last_name: "Gómez", email: "luisgomez@gmail.com" },
@@ -44,6 +44,8 @@ students.each do |student_data|
     user.jti = SecureRandom.uuid
   end
 end
+
+# ------ TEMAS DE MATERIAS ------
 
 # Crear subjects para un curso
 course = Course.find_by(id: 447) # PIS
