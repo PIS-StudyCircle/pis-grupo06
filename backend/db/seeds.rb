@@ -48,7 +48,7 @@ end
 # ------ TEMAS DE MATERIAS ------
 
 # Crear subjects para un curso
-course = Course.find_by(id: 447) # PIS
+course = Course.find_by(id: 443) # PIS
 creator = User.find_by(email: "anaperez@gmail.com") || User.first
 
 Subject.find_or_create_by!(name: "Análisis de Requerimientos", course: course) do |s|

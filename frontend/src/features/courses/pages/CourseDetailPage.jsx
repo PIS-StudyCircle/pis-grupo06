@@ -1,4 +1,4 @@
-import { useParams/*, useNavigate*/ } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Footer from "@components/Footer";
 import { useCourse } from "../hooks/useCourse";
 import CourseTopics from "../components/Topics";
@@ -7,7 +7,7 @@ import CourseTopics from "../components/Topics";
 export default function CourseDetailPage() {
   const { courseId } = useParams();
   const { course, loading, error } = useCourse(courseId);
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -60,9 +60,9 @@ export default function CourseDetailPage() {
                   <button
                     type="button"
                     className="btn w-full"
-                     // onClick={() => navigate(`/tutor/registrarse?course=${course.id}`)}
+                    onClick={() => navigate(`/tutor/registrarse?curso=${course.id}`)}
                   >
-                    Ser tutor
+                    Brindar tutoría
                   </button>
                   <button
                     type="button"
