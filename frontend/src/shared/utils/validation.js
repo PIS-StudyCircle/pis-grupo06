@@ -21,3 +21,15 @@ export function validatePasswordConfirmation(password, confirmation) {
   if (password !== confirmation) return "Las contraseñas no coinciden";
   return null;
 }
+
+export function validateDate(date) {
+  if (!date) return "La fecha es obligatoria";
+
+  const inputDate = new Date(date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); 
+  if (isNaN(inputDate.getTime())) return "Fecha no válida";
+  if (inputDate < today) return "La fecha no puede ser anterior a hoy";
+
+  return null;
+}

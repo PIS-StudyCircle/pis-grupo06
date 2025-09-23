@@ -8,6 +8,7 @@ import ProfilePage from "@/features/users/pages/Profile";
 import CoursePage from "@/features/courses/pages/CoursePage";
 import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
 import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
+import SubjectPage from "@/features/subjects/pages/SubjectPage";
 
 
 
@@ -27,6 +28,9 @@ export function AppRoutes() {
         <Route path="/materias/:courseId" element={<CourseDetailPage />} />
         <Route path="/perfil" element={<ProfilePage />} />
       </Route>
+      {/* SOLO PARA PROBAR MIENTRAS DESARROLLAMOS CREAR TEMA */}
+        <Route path="/subjects" element={<SubjectPage showButton={true} showCheckbox={true} />} /> 
+
     </Routes>
   );
 }
