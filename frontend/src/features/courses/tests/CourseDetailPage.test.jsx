@@ -129,7 +129,7 @@ describe("CourseDetailPage", () => {
   
     expect(await screen.findByText("Curso Sin Temas")).toBeInTheDocument();
     expect(
-      screen.getByText(/Todavía no hay temas asociados/i)
+      screen.getByText(/No hay temas disponibles./i)
     ).toBeInTheDocument();
   });
   
