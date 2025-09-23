@@ -74,9 +74,7 @@ export default function CourseDetailPage() {
                 </div>
               </div>
 
-             {/*Busco los temas de la materia*/}
-             {/* <CourseTopics subjects={course?.subjects ?? []} /> */}
-             {/* <SubjectList subjects={course?.subjects ?? []} showCheckbox={false} /> */}
+             {/*El mostrar los temas de la materia se delega a SubjectPage*/}
              <SubjectPage courseId={course.id} showCheckbox = {false} showButton={false} />
 
             </div>

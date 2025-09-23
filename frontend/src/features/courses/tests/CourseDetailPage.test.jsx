@@ -10,6 +10,10 @@ jest.mock("../services/courseService", () => ({
     getCourseByID: jest.fn(() => Promise.resolve({ id: 1, name: "Test course" })),
 }));
 
+jest.mock("@/features/subjects/pages/SubjectPage", () => (props) => (
+  <div>Mock SubjectPage - courseId: {props.courseId}</div>
+));
+
 const mockedNavigate = jest.fn();
 
 jest.mock("react-router-dom", () => ({
@@ -77,7 +81,7 @@ describe("CourseDetailPage", () => {
     expect(await screen.findByText("Curso Test")).toBeInTheDocument();
     expect(screen.getByText(/Código:/)).toBeInTheDocument();
     expect(screen.getByText(/Instituto:/)).toBeInTheDocument();
-    expect(screen.getByText("Tema 1")).toBeInTheDocument();
+    expect(screen.getByText(/Mock SubjectPage/)).toBeInTheDocument();
   });
 
   it("muestra el curso aunque no tenga código ni instituto", async () => {
@@ -115,40 +119,6 @@ describe("CourseDetailPage", () => {
     expect(screen.getByText(/Instituto:/)).toBeInTheDocument();
   });
   
-  it("muestra mensaje si el curso no tiene temas", async () => {
-    jest.spyOn(courseService, "getCourseByID").mockResolvedValue({
-      id: 1,
-      name: "Curso Sin Temas",
-      code: "C101",
-      institute: "Instituto Z",
-      description: "Descripción disponible",
-      subjects: [],
-    });
-  
-    renderWithRouter("1");
-  
-    expect(await screen.findByText("Curso Sin Temas")).toBeInTheDocument();
-    expect(
-      screen.getByText(/No hay temas disponibles./i)
-    ).toBeInTheDocument();
-  });
-  
-  it("renderiza múltiples temas correctamente", async () => {
-    jest.spyOn(courseService, "getCourseByID").mockResolvedValue({
-      id: 1,
-      name: "Curso MultiTemas",
-      subjects: [
-        { id: 1, name: "Tema 1" },
-        { id: 2, name: "Tema 2" },
-      ],
-    });
-  
-    renderWithRouter("1");
-  
-    expect(await screen.findByText("Tema 1")).toBeInTheDocument();
-    expect(screen.getByText("Tema 2")).toBeInTheDocument();
-  });
-
   it("tiene elementos accesibles", async () => {
     jest.spyOn(courseService, "getCourseByID").mockResolvedValue({
       id: 1,
