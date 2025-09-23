@@ -173,6 +173,68 @@ Subject.find_or_create_by!(name: "Autovalores y autovectores", course: course) d
   s.due_date = 6.months.from_now
 end
 
+creator = User.find_by(email: "luciafernandez@gmail.com") || User.first
+
+Subject.find_or_create_by!(name: "Autovalores y autovectores", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Espacios vectoriales", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Subespacios y bases", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Transformaciones lineales", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Núcleo e imagen", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Producto escalar y ortogonalidad", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Diagonalización de matrices", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Formas cuadráticas", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Aplicaciones a geometría", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Eigenespacios", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Cambio de base", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Determinantes avanzados", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Sistemas homogéneos", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Teorema espectral", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Aplicaciones a física e ingeniería", course: course) do |s|
+  s.creator = creator
+end
+
 # ========================
 course = Course.find_by(id: 3) #Administración de Infraestructuras
 creator = User.find_by(email: "anaperez@gmail.com") || User.first
