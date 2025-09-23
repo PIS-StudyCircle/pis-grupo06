@@ -15,7 +15,7 @@ export default function SubjectPage({courseId, showCheckbox = false, showButton 
     setPage,
     search,
     setSearch,
-  } = useSubjects(185);
+  } = useSubjects(185); //pongo 185 (gal 1) para las pruebas mientras desarrollamos crear tema, seria courseId
   const totalPages = pagination.last || 1;
 
   const [query, setQuery] = useState(search);
