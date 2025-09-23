@@ -61,17 +61,6 @@ export default function SignInPage() {
 
         {/* Opciones extra: Recordar y Olvidé contraseña */}
         <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              name="remember-me"
-              type="checkbox"
-              className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-            />
-            <label htmlFor="remember-me" className="ml-2 block text-gray-900 font-light">
-              Recordar mis preferencias
-            </label>
-          </div>
           <a href="/olvide_contrasena" className="font-medium text-indigo-600 hover:text-indigo-500">
             ¿Olvidaste la contraseña?
           </a>

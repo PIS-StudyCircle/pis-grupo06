@@ -26,16 +26,6 @@ RSpec.describe "Api::V1::Users::Passwords", type: :request do
         expect(json["message"]).to eq("Se envió un email con instrucciones para restablecer tu contraseña")
       end
     end
-
-    # context "cuando el email no existe" do
-    #   it "retorna errores" do
-    #     post "/api/v1/users/password", params: { user: { email: "noexiste@example.com" } }, as: :json
-
-    #     expect(response).to have_http_status(:unprocessable_entity)
-    #     json = JSON.parse(response.body)
-    #     expect(json["errors"]).to include("Email no encontrado")
-    #   end
-    # end
   end
 
   describe "PUT /api/v1/users/password" do
