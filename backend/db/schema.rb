@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_16_185419) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_23_171815) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -60,6 +60,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_185419) do
     t.datetime "updated_at", null: false
     t.bigint "course_id", null: false
     t.bigint "creator_id", null: false
+    t.date "due_date"
     t.index ["course_id", "name"], name: "index_subjects_on_course_id_and_name", unique: true
     t.index ["course_id"], name: "index_subjects_on_course_id"
     t.index ["creator_id"], name: "index_subjects_on_creator_id"

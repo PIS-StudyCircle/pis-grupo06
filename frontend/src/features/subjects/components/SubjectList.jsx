@@ -56,6 +56,11 @@ export default function SubjectList({
       setNewName("");
       setNewDate("");
 
+      //al crearlo se agrega automaticamente a selectedIds
+      if (showCheckbox) {
+        setSelectedIds((prev) => [...prev, created.id]);
+      }
+
     } catch (err) {
       // Mostrar error de API
       const msg =
@@ -167,9 +172,6 @@ export default function SubjectList({
           </div>
         </form>
       )}
-
-      {/* DEBUG  */}
-      <pre className="text-xs text-gray-500 mt-2">{JSON.stringify(selectedIds)}</pre>
     </div>
   );
 }
