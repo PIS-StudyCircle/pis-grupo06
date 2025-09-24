@@ -4,7 +4,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import TutoringFiltersPage from "../pages/PruebaPage";
 
 // --- Mock de TutoringPage para capturar props ---
-let lastChildProps = null;
+//let lastChildProps = null;
 jest.mock("../pages/TutoringPage", () => ({
   __esModule: true,
   default: (props) => {
