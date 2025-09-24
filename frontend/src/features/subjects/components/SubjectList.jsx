@@ -82,16 +82,6 @@ export default function SubjectList({
 
   return (
     <div className="flex flex-col gap-2">
-      {subjects.map((subject) => (
-        <SubjectCard
-          key={subject.id}
-          subject={subject}
-          showCheckbox={showCheckbox}
-          onCheckboxChange={handleCheckboxChange}
-          checked={selectedIds.includes(subject.id)}
-        />
-      ))}
-
       {showButton && !showNewForm && (
         <button
           onClick={() => setShowNewForm(true)}
@@ -170,6 +160,15 @@ export default function SubjectList({
           </div>
         </form>
       )}
+      {subjects.map((subject) => (
+        <SubjectCard
+          key={subject.id}
+          subject={subject}
+          showCheckbox={showCheckbox}
+          onCheckboxChange={handleCheckboxChange}
+          checked={selectedIds.includes(subject.id)}
+        />
+      ))}
     </div>
   );
 }

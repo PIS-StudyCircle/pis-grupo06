@@ -1,23 +1,20 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Footer from "@components/Footer";
-import { useCourse } from "../hooks/useCourse";
-import SubjectPage from "../../subjects/pages/SubjectPage";
-
-//cambiar todo lo que diga courses por subjects y crear nuevos hooks
-//por simplicidad y para visualizar como queda la página, solo muestra los cursos
+import { useCourse } from "../../../courses/hooks/useCourse";
+import SubjectPage from "../../../subjects/pages/SubjectPage";
 
 export default function CreateTutoringByTutor() {
   const [searchParams] = useSearchParams();
   const courseId = searchParams.get("curso");
   const { course, loadingCourse, errorCourse } = useCourse(courseId);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const navigate = useNavigate();
 
-  // Envía los temas seleccionados al backend
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("[Submit] selectedSubjects en el padre:", selectedSubjects);
-    alert("Temas seleccionados: " + selectedSubjects.join(", "));
+    localStorage.setItem("selectedSubjects", JSON.stringify(selectedSubjects));
+    navigate(`/tutoria/crear_tutoria?curso=${courseId}`);
   };
 
   return (
@@ -60,24 +57,3 @@ export default function CreateTutoringByTutor() {
     </div>
   );
 }
-
-/* Menú de filtros
-                  {showFilter && (
-                    <div className="absolute right-0 top-full mt-2 bg-white border rounded shadow p-4 z-10">
-                      <div className="mb-2 font-semibold">Opciones de filtro</div>
-                      <label className="block mb-1">
-                        <input type="checkbox" /> Ejemplo de filtro 1
-                      </label>
-                      <label className="block mb-1">
-                        <input type="checkbox" /> Ejemplo de filtro 2
-                      </label>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-primary mt-2"
-                        onClick={() => setShowFilter(false)}
-                      >
-                        Aplicar filtros
-                      </button>
-                    </div>
-                  )}
-                  */

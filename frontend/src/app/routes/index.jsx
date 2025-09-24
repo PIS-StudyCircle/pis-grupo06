@@ -8,8 +8,8 @@ import ProfilePage from "@/features/users/pages/Profile";
 import CoursePage from "@/features/courses/pages/CoursePage";
 import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
 import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
-import SubjectPage from "@/features/subjects/pages/SubjectPage";
-import CreateTutoringByTutor from "@/features/courses/pages/CreateTutoringByTutor";
+import SelectTutoringByTutor from "@/features/subjects/tutoring/pages/SelectTutoringByTutor";
+import CreateTutoringByTutor from "@/features/subjects/tutoring/pages/CreateTutoringByTutor";
 
 
 export function AppRoutes() {
@@ -27,7 +27,8 @@ export function AppRoutes() {
       <Route element={<PrivateRoute />}>
         <Route path="/materias/:courseId" element={<CourseDetailPage />} />
         <Route path="/perfil" element={<ProfilePage />} />
-        <Route path="/tutor/registrarse" element={<CreateTutoringByTutor />} />
+        <Route path="/tutoria/elegir_temas" element={<SelectTutoringByTutor />} />
+        <Route path="/tutoria/crear_tutoria" element={<CreateTutoringByTutor />} />
       </Route>
 
     </Routes>

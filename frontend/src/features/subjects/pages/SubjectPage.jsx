@@ -49,7 +49,6 @@ export default function SubjectPage({courseId, showCheckbox = false, showButton 
             placeholder="Buscar tema..."
           />
 
-          {/*ESTE CID ESTA PARA PODER USAR subjects/:courseId. CUANDO YA NO SE VAYA A USAR SE CAMBIA A courseId*/}
           <SubjectList subjects={subjects} loading={loading} error={error} showCheckbox={showCheckbox} showButton={showButton} courseId={courseId} onCreated={handleCreated} onSelectionChange={onSelectionChange} />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
