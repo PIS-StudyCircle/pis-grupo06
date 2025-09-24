@@ -6,7 +6,7 @@ import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
 import { useParams } from "react-router-dom";
 
-export default function SubjectPage({courseId, showCheckbox = false, showButton = false}) {
+export default function SubjectPage({courseId, showCheckbox = false, showButton = false, onSelectionChange}) {
   
   // ESTo ESTA PARA PODER USAR subjects/:courseId. CUANDO YA NO SE VAYA A USAR SE CAMBIA A courseId
   const { courseId: courseIdFromRoute } = useParams();
@@ -55,7 +55,7 @@ export default function SubjectPage({courseId, showCheckbox = false, showButton 
           />
 
           {/*ESTE CID ESTA PARA PODER USAR subjects/:courseId. CUANDO YA NO SE VAYA A USAR SE CAMBIA A courseId*/}
-          <SubjectList subjects={subjects} loading={loading} error={error} showCheckbox={showCheckbox} showButton={showButton} courseId={cid} onCreated={handleCreated} />
+          <SubjectList subjects={subjects} loading={loading} error={error} showCheckbox={showCheckbox} showButton={showButton} courseId={cid} onCreated={handleCreated} onSelectionChange={onSelectionChange} />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>

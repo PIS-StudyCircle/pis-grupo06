@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SubjectCard from "./SubjectCard";
-import {createSubject} from "../services/subjectService";
+import { createSubject } from "../services/subjectService";
 import { useValidation } from "@hooks/useValidation";
-import {validateRequired, validateDate } from "@utils/validation";
+import { validateRequired, validateDate } from "@utils/validation";
 
 export default function SubjectList({
   subjects,
@@ -11,12 +11,13 @@ export default function SubjectList({
   showCheckbox = false,
   showButton = false,
   courseId,
-  onCreated = () => {}
+  onCreated = () => {},
+  onSelectionChange = () => {},
 }) {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newName, setNewName] = useState("");
   const [newDate, setNewDate] = useState("");
-  const [selectedIds, setSelectedIds] = useState([]); //Para crear tutorias
+  const [selectedIds, setSelectedIds] = useState([]); // Para crear tutorías
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
@@ -25,8 +26,12 @@ export default function SubjectList({
     subjectName: (value) => validateRequired(value, "Nombre"),
     dueDate: (value) => validateDate(value, "Fecha de vencimiento"),
   };
-
   const { errors, validate } = useValidation(validators);
+
+  // --- Notificar cambios de selección ---
+  useEffect(() => {
+    onSelectionChange(selectedIds);
+  }, [selectedIds, onSelectionChange]);
 
   // --- Early returns ---
   if (loading) return <div>Cargando temas...</div>;
@@ -37,32 +42,26 @@ export default function SubjectList({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const form = {subjectName: newName, dueDate: newDate,};
-    if (!validate(form)) {return;}
+    const form = { subjectName: newName, dueDate: newDate };
+    if (!validate(form)) return;
 
     try {
-      // Llamar API - POST de subjects
       const created = await createSubject({
         name: newName,
         course_id: courseId,
-        due_date: newDate || null
+        due_date: newDate || null,
       });
 
-      // re-fetch
       onCreated?.();
 
-      // Limpiar UI
       setShowNewForm(false);
       setNewName("");
       setNewDate("");
 
-      //al crearlo se agrega automaticamente a selectedIds
       if (showCheckbox) {
         setSelectedIds((prev) => [...prev, created.id]);
       }
-
     } catch (err) {
-      // Mostrar error de API
       const msg =
         err?.errors
           ? Object.entries(err.errors)
@@ -70,7 +69,6 @@ export default function SubjectList({
               .join(" | ")
           : err?.message || "No se pudo crear el tema.";
       setFormError(msg);
-
     } finally {
       setSaving(false);
     }
@@ -108,7 +106,6 @@ export default function SubjectList({
           onSubmit={handleSubmit}
           className="flex flex-col gap-2 p-2 border rounded-md bg-gray-50 text-sm"
         >
-          {/* Nombre */}
           <div className="flex flex-col text-left">
             <label
               htmlFor="subjectName"
@@ -150,12 +147,13 @@ export default function SubjectList({
               </span>
             )}
           </div>
-          
+
           {formError && <p className="text-red-600 text-xs">{formError}</p>}
           <div className="flex gap-2 mt-2">
             <button
               type="submit"
-              className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600">
+              className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600"
+            >
               Guardar
             </button>
             <button
