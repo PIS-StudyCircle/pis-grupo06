@@ -1,22 +1,46 @@
 module Api
-  module V1
-    class SubjectsController < ApplicationController
-      include Pagy::Backend
+    module V1
+        class SubjectsController < ApplicationController
+            include Pagy::Backend
 
-      def index
-        subjects = Subject.order(:name)
-        # Filtro por course_id
-        subjects = subjects.where(course_id: params[:course_id]) if params[:course_id].present?
-        # Filtro de búsqueda por nombre
-        subjects = subjects.where("unaccent(name) ILIKE unaccent(?)", "%#{params[:search]}%") if params[:search].present?
+            before_action :authenticate_user!, only: [:create]
 
-        @pagy, @subjects = pagy(subjects, items: params[:per_page] || 10)
+            def index
+                subjects = Subject.order(:name)
 
-        render json: {
-          subjects: @subjects.as_json(only: [:id, :name, :course_id]),
-          pagination: pagy_metadata(@pagy)
-        }
-      end
+                # Filtro de búsqueda por nombre
+                subjects = subjects.where("unaccent(name) ILIKE unaccent(?)", "%#{params[:search]}%") if params[:search].present?
+                
+                # Filtro de búsqueda por id de curso                
+                subjects = subjects.where(course_id: params[:course_id]) if params[:course_id].present?
+
+                @pagy, @subjects = pagy(subjects, items: params[:per_page] || 20)
+
+                render json: {
+                    subjects: @subjects,
+                    pagination: pagy_metadata(@pagy)
+                }   
+                
+            end
+
+            def create
+                subject = Subject.new(subject_params)
+                subject.creator = current_user  # asocia el creador
+
+                if subject.save
+                    # Devolvé el objeto simple (el front lo espera así). Incluye due_date si existe en el modelo.
+                    render json: subject, status: :created
+                else
+                    render json: subject.errors, status: :unprocessable_entity
+                end
+            end
+            
+            private
+
+            def subject_params
+                params.expect(subject: [:name, :course_id, :due_date])
+            end
+
+        end
     end
-  end
 end

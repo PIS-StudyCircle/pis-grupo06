@@ -8,6 +8,7 @@ import ProfilePage from "@/features/users/pages/Profile";
 import CoursePage from "@/features/courses/pages/CoursePage";
 import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
 import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
+import SubjectPage from "@/features/subjects/pages/SubjectPage";
 import CreateTutoringByTutor from "@/features/courses/pages/CreateTutoringByTutor";
 
 
@@ -26,8 +27,11 @@ export function AppRoutes() {
       <Route element={<PrivateRoute />}>
         <Route path="/materias/:courseId" element={<CourseDetailPage />} />
         <Route path="/perfil" element={<ProfilePage />} />
+        {/* SOLO PARA PROBAR MIENTRAS DESARROLLAMOS CREAR TEMA */}
+        <Route path="/subjects/:courseId" element={<SubjectPage showButton={true} showCheckbox={true} />} /> 
         <Route path="/tutor/registrarse" element={<CreateTutoringByTutor />} />
       </Route>
+
     </Routes>
   );
 }
