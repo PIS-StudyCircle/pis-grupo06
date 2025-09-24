@@ -33,7 +33,7 @@ RSpec.describe "Tutoring model (self-contained spec)", type: :request do
   def create_tutoring(attrs = {})
     defaults = {
       course: create_course,
-      scheduled_at: 1.day.from_now,   
+      scheduled_at: 1.day.from_now,
       duration_mins: 60,
       modality: "virtual",
       capacity: 5
@@ -151,57 +151,56 @@ RSpec.describe "Tutoring model (self-contained spec)", type: :request do
 
   # ---------- SCOPES ----------
   describe "scopes" do
-  around do |ex|
-    travel_to(Time.zone.now.change(usec: 0)) { ex.run }  # t0
-  end
+    around do |ex|
+      travel_to(Time.zone.now.change(usec: 0)) { ex.run } # t0
+    end
 
-  before do
-    @course_a = create_course
-    @course_b = create_course
-    @user     = create_user
-    @creator  = create_user
-    @tutor_u  = create_user
+    before do
+      @course_a = create_course
+      @course_b = create_course
+      @user     = create_user
+      @creator  = create_user
+      @tutor_u  = create_user
 
-    @tut_a1 = create_tutoring(course: @course_a, creator: @creator, tutor: @tutor_u, scheduled_at: 5.days.from_now)
-    @tut_a2 = create_tutoring(course: @course_a, creator: @creator, tutor: nil,     scheduled_at: 2.days.from_now)
-    @tut_b1 = create_tutoring(course: @course_b, creator: nil,      tutor: nil,     scheduled_at: 7.days.from_now)
+      @tut_a1 = create_tutoring(course: @course_a, creator: @creator, tutor: @tutor_u, scheduled_at: 5.days.from_now)
+      @tut_a2 = create_tutoring(course: @course_a, creator: @creator, tutor: nil,     scheduled_at: 2.days.from_now)
+      @tut_b1 = create_tutoring(course: @course_b, creator: nil,      tutor: nil,     scheduled_at: 7.days.from_now)
 
-    create_user_tutoring(user: @user, tutoring: @tut_a1)
-  end
+      create_user_tutoring(user: @user, tutoring: @tut_a1)
+    end
 
-  it ".enrolled_by(user)" do
-    expect(Tutoring.enrolled_by(@user)).to contain_exactly(@tut_a1)
-  end
+    it ".enrolled_by(user)" do
+      expect(Tutoring.enrolled_by(@user)).to contain_exactly(@tut_a1)
+    end
 
-  it ".enrolled_by(nil)" do
-    expect(Tutoring.enrolled_by(nil)).to be_empty
-  end
+    it ".enrolled_by(nil)" do
+      expect(Tutoring.enrolled_by(nil)).to be_empty
+    end
 
-  it ".by_course_id" do
-    expect(Tutoring.by_course_id(@course_b.id)).to contain_exactly(@tut_b1)
-  end
+    it ".by_course_id" do
+      expect(Tutoring.by_course_id(@course_b.id)).to contain_exactly(@tut_b1)
+    end
 
-  it ".created_by" do
-    expect(Tutoring.created_by(@creator.id)).to match_array([@tut_a1, @tut_a2])
-  end
+    it ".created_by" do
+      expect(Tutoring.created_by(@creator.id)).to match_array([@tut_a1, @tut_a2])
+    end
 
-  it ".without_tutor" do
-    expect(Tutoring.without_tutor).to match_array([@tut_a2, @tut_b1])
-  end
+    it ".without_tutor" do
+      expect(Tutoring.without_tutor).to match_array([@tut_a2, @tut_b1])
+    end
 
     context ".past y .upcoming" do
-    before { travel 4.days }
-    after  { travel_back }
+      before { travel 4.days }
 
-    it ".past" do
-      expect(Tutoring.past).to include(@tut_a2)
-      expect(Tutoring.past).not_to include(@tut_a1, @tut_b1)
-    end
+      it ".past" do
+        expect(Tutoring.past).to include(@tut_a2)
+        expect(Tutoring.past).not_to include(@tut_a1, @tut_b1)
+      end
 
-    it ".upcoming" do
-      expect(Tutoring.upcoming).to include(@tut_a1, @tut_b1)
-      expect(Tutoring.upcoming).not_to include(@tut_a2)
+      it ".upcoming" do
+        expect(Tutoring.upcoming).to include(@tut_a1, @tut_b1)
+        expect(Tutoring.upcoming).not_to include(@tut_a2)
+      end
     end
   end
-end
 end

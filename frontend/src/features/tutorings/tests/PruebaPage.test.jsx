@@ -8,8 +8,7 @@ let lastChildProps = null;
 jest.mock("../pages/TutoringPage", () => ({
   __esModule: true,
   default: (props) => {
-    lastChildProps = props;
-    // Renderizamos algo visible y exportamos los props como data-* para asserts
+    //lastChildProps = props;
     return (
       <div
         data-testid="tutoring-page"
