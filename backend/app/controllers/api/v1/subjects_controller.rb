@@ -25,10 +25,9 @@ module Api
 
             def create
                 subject = Subject.new(subject_params)
-                subject.creator = current_user  # asocia el creador
+                subject.creator = current_user
 
                 if subject.save
-                    # Devolvé el objeto simple (el front lo espera así). Incluye due_date si existe en el modelo.
                     render json: subject, status: :created
                 else
                     render json: subject.errors, status: :unprocessable_entity
@@ -38,7 +37,7 @@ module Api
             private
 
             def subject_params
-                params.expect(subject: [:name, :course_id, :due_date])
+                params.expect(subject: [:name, :course_id])
             end
 
         end

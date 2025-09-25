@@ -16,9 +16,9 @@ export const getSubjects = async (courseId, page = 1, perPage = 10, search = "")
   return await response.json();
 };
 
-export const createSubject = async ({ name, course_id, due_date = null}) => {
+export const createSubject = async ({ name, course_id}) => {
 
-  const body = { subject: { name, course_id, due_date} };
+  const body = { subject: { name, course_id} };
 
   const resp = await fetch(`${API_BASE}/subjects`, {
     method: 'POST',

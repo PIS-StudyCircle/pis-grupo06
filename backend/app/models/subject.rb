@@ -7,4 +7,10 @@ class Subject < ApplicationRecord
 
   # validaciones
   validates :name, presence: true, uniqueness: { scope: :course_id }
+
+  before_validation :set_default_due_date, on: :create
+
+  def set_default_due_date
+    self.due_date ||= 3.months.from_now.to_date
+  end
 end

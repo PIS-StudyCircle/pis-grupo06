@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import SubjectCard from "./SubjectCard";
 import { createSubject } from "../services/subjectService";
 import { useValidation } from "@hooks/useValidation";
-import { validateRequired, validateDate } from "@utils/validation";
+import { validateRequired } from "@utils/validation";
 
 export default function SubjectList({
   subjects,
@@ -16,7 +16,6 @@ export default function SubjectList({
 }) {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newName, setNewName] = useState("");
-  const [newDate, setNewDate] = useState("");
   const [selectedIds, setSelectedIds] = useState([]); // Para crear tutorías
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
@@ -24,7 +23,6 @@ export default function SubjectList({
   // --- Validaciones ---
   const validators = {
     subjectName: (value) => validateRequired(value, "Nombre"),
-    dueDate: (value) => validateDate(value, "Fecha de vencimiento"),
   };
   const { errors, validate } = useValidation(validators);
 
@@ -42,21 +40,19 @@ export default function SubjectList({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const form = { subjectName: newName, dueDate: newDate };
+    const form = { subjectName: newName };
     if (!validate(form)) return;
 
     try {
       const created = await createSubject({
         name: newName,
         course_id: courseId,
-        due_date: newDate || null,
       });
 
       onCreated?.();
 
       setShowNewForm(false);
       setNewName("");
-      setNewDate("");
 
       if (showCheckbox) {
         setSelectedIds((prev) => [...prev, created.id]);
@@ -127,27 +123,6 @@ export default function SubjectList({
             )}
           </div>
 
-          <div className="flex flex-col text-left">
-            <label
-              htmlFor="dueDate"
-              className="text-gray-600 text-xs font-medium mb-1"
-            >
-              Fecha de vencimiento
-            </label>
-            <input
-              id="dueDate"
-              type="date"
-              value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
-              className="p-1 border rounded-md text-sm"
-            />
-            {errors.dueDate && (
-              <span className="text-red-500 text-xs mt-1">
-                {errors.dueDate}
-              </span>
-            )}
-          </div>
-
           {formError && <p className="text-red-600 text-xs">{formError}</p>}
           <div className="flex gap-2 mt-2">
             <button
@@ -162,7 +137,6 @@ export default function SubjectList({
               onClick={() => {
                 setShowNewForm(false);
                 setNewName("");
-                setNewDate("");
               }}
             >
               Cancelar
