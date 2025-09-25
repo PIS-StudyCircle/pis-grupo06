@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import UserList from "../components/UserList";
-import { useTutors } from "../hooks/usersServices";
+import { useTutors } from "../hooks/useUsers";
 import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
 

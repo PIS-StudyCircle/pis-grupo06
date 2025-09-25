@@ -1,4 +1,6 @@
 import { API_BASE } from "@/shared/config";
+import { getUsers } from "../services/usersServices";
+
 const API_URL = `${API_BASE}/users/list`;
 
 import { useState, useEffect } from "react";
@@ -17,8 +19,7 @@ export const useUsers = (initialPage = 1, perPage = 20, initialRole = "") => {
       setLoading(true);
       try {
         const response = await getUsers(page, perPage, search, role);
-        // 👇 ajusta nombres según tu backend
-        setUsers(response.data);          
+        setUsers(response.data);
         setPagination({
           page: response.page,
           perPage: response.per_page,
@@ -36,7 +37,18 @@ export const useUsers = (initialPage = 1, perPage = 20, initialRole = "") => {
     fetchUsers();
   }, [page, perPage, search, role]);
 
-  return { users, loading, error, pagination, page, setPage, search, setSearch, role, setRole };
+  return {
+    users,
+    loading,
+    error,
+    pagination,
+    page,
+    setPage,
+    search,
+    setSearch,
+    role,
+    setRole,
+  };
 };
 
 export const useTutors = (initialPage = 1, perPage = 20) => {

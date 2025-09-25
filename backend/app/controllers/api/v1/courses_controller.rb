@@ -1,48 +1,48 @@
 module Api
   module V1
-    module Users
-      class ListController < ApplicationController
-        include Pagy::Backend
-        before_action :authenticate_user!, except: [:index]
+    class CoursesController < ApplicationController
+      include Pagy::Backend
 
-        def index
-          # users = User.order(:name)
-          users = [
-            { id: 1, name: "Juan", last_name: "Pérez", email: "juan.perez@example.com", photo: "https://miapp.com/uploads/juan.jpg" },
-            { id: 2, name: "María", last_name: "Gómez", email: "maria.gomez@example.com", photo: "https://miapp.com/uploads/maria.jpg" },
-            { id: 3, name: "Carlos", last_name: "Fernández", email: "carlos.fernandez@example.com", photo: "https://miapp.com/uploads/carlos.jpg" },
-            { id: 4, name: "Lucía", last_name: "Martínez", email: "lucia.martinez@example.com", photo: "https://miapp.com/uploads/lucia.jpg" },
-            { id: 5, name: "Andrés", last_name: "Rodríguez", email: "andres.rodriguez@example.com", photo: "https://miapp.com/uploads/andres.jpg" },
-            { id: 6, name: "Sofía", last_name: "López", email: "sofia.lopez@example.com", photo: "https://miapp.com/uploads/sofia.jpg" },
-            { id: 7, name: "Martín", last_name: "García", email: "martin.garcia@example.com", photo: "https://miapp.com/uploads/martin.jpg" }
-          ]
+      def index
+        courses = Course.order(:name)
 
-          # Filtro de búsqueda por nombre o apellido
-          if params[:search].present?
-            users = users.where(
-              "unaccent(name) ILIKE unaccent(?) OR unaccent(last_name) ILIKE unaccent(?)",
-              "%#{params[:search]}%", "%#{params[:search]}%"
-            )
-          end
+        # Filtro de búsqueda por nombre
+        courses = courses.where("unaccent(name) ILIKE unaccent(?)", "%#{params[:search]}%") if params[:search].present?
 
-          # Filtro por rol (si algún día agregás columna `role`)
-          users = users.where(role: params[:role]) if params[:role].present? && User.column_names.include?("role")
+        @pagy, @courses = pagy(courses, items: params[:per_page] || 20)
 
-          # Paginación con Pagy
-          @pagy, @users = pagy(users, items: params[:per_page] || 20)
+        render json: {
+          courses: @courses,
+          pagination: pagy_metadata(@pagy)
+        }
+      end
 
-          render json: {
-            users: @users.as_json(only: [:id, :name, :last_name, :email]), # + :photo si agregás la columna
-            pagination: pagy_metadata(@pagy)
+      # Método para obtener un curso por ID y sus temas asociados
+      def show
+        course = Course.includes(:subjects).find(params[:id])
+        render json: course.as_json(
+          include: {
+            subjects: { only: [:id, :name] } # en schema subjects tiene :id, :name
           }
-        end
+        )
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: "No se encontró el curso solicitado" }, status: :not_found
+      end
 
-        def show
-          user = User.find(params[:id])
-          render json: user.as_json(only: [:id, :name, :last_name, :email])
-        rescue ActiveRecord::RecordNotFound
-          render json: { error: "No se encontró el usuario solicitado" }, status: :not_found
+      # este metodo no va a estar disponible para el usuario
+      def create
+        @course = Course.new(course_params)
+        if @course.save
+          render json: @course, status: :created
+        else
+          render json: @course.errors, status: :unprocessable_entity
         end
+      end
+
+      private
+
+      def course_params
+        params.expect(course: [:name, :code, :institute, :faculty])
       end
     end
   end

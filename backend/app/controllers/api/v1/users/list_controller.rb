@@ -6,7 +6,6 @@ module Api
         before_action :authenticate_user!, except: [:index]
 
         def index
-          # users = User.order(:name)
           users = [
             { id: 1, name: "Juan", last_name: "Pérez", email: "juan.perez@example.com", photo: "https://miapp.com/uploads/juan.jpg" },
             { id: 2, name: "María", last_name: "Gómez", email: "maria.gomez@example.com", photo: "https://miapp.com/uploads/maria.jpg" },
@@ -17,23 +16,16 @@ module Api
             { id: 7, name: "Martín", last_name: "García", email: "martin.garcia@example.com", photo: "https://miapp.com/uploads/martin.jpg" }
           ]
 
-          # Filtro de búsqueda por nombre o apellido
-          if params[:search].present?
-            users = users.where(
-              "unaccent(name) ILIKE unaccent(?) OR unaccent(last_name) ILIKE unaccent(?)",
-              "%#{params[:search]}%", "%#{params[:search]}%"
-            )
-          end
-
-          # Filtro por rol (si algún día agregás columna `role`)
-          users = users.where(role: params[:role]) if params[:role].present? && User.column_names.include?("role")
-
-          # Paginación con Pagy
-          @pagy, @users = pagy(users, items: params[:per_page] || 20)
-
           render json: {
-            users: @users.as_json(only: [:id, :name, :last_name, :email]), # + :photo si agregás la columna
-            pagination: pagy_metadata(@pagy)
+            users: users,
+            pagination: {
+              page: 1,
+              prev: nil,
+              next: nil,
+              last: 1,
+              count: users.size,
+              items: users.size
+            }
           }
         end
 
