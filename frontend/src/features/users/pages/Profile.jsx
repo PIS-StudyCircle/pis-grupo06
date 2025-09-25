@@ -21,7 +21,7 @@ export default function Profile() {
 
         <div className="flex flex-col items-center mb-6">
           <img
-            src="/src/assets/avatar.png"
+            src="/avatar.png"
             alt="avatar"
             className="w-24 h-24 rounded-full border-4 border-white shadow-md"
           />
