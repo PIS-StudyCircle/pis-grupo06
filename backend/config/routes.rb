@@ -14,6 +14,9 @@ Rails.application.routes.draw do
         get :me, to: 'me#show'
       end
 
+      namespace :users do
+        resources :list, only: [:index, :show]
+      end 
       resources :courses
     end
   end
