@@ -1,14 +1,11 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
-import { SignInPage, RegisterPage, TutorPage } from "@/features/users";
+import { SignInPage, RegisterPage, TutorPage, VisitorFlow } from "@/features/users";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 import ProfilePage from "@/features/users/pages/Profile";
 
 
 import { CoursePage, CourseDetailPage } from "@/features/courses";
-
-import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
-
 
 
 export function AppRoutes() {
