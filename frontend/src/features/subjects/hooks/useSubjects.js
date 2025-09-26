@@ -28,7 +28,7 @@ export const useSubjects = (courseId, initialPage = 1, perPage = 10) => {
     };
 
     fetchSubjects();
-  }, [page, perPage, search, reloadTick]);
+  }, [courseId, page, perPage, search, reloadTick]);
 
   return { subjects, loading, error, pagination, page, setPage, search, setSearch, refetch };
 };

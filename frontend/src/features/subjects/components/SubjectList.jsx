@@ -17,7 +17,6 @@ export default function SubjectList({
   const [showNewForm, setShowNewForm] = useState(false);
   const [newName, setNewName] = useState("");
   const [selectedIds, setSelectedIds] = useState([]); // Para crear tutorías
-  const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
   // --- Validaciones ---
@@ -65,8 +64,6 @@ export default function SubjectList({
               .join(" | ")
           : err?.message || "No se pudo crear el tema.";
       setFormError(msg);
-    } finally {
-      setSaving(false);
     }
   };
 
