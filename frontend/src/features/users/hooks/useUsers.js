@@ -1,8 +1,6 @@
 import { API_BASE } from "@/shared/config";
 import { getUsers } from "../services/usersServices";
 
-const API_URL = `${API_BASE}/users/list`;
-
 import { useState, useEffect } from "react";
 
 export const useUsers = (initialPage = 1, perPage = 20, initialRole = "") => {
