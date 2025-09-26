@@ -1,7 +1,8 @@
+// src/app/App.jsx
 import { AppRoutes } from "./routes";
 import Layout from "@components/layout/Layout";
 
-import UserProvider from "../features/users/userProvider.";
+import UserProvider from "../features/users/userProvider";
 
 import "../App.css";
 

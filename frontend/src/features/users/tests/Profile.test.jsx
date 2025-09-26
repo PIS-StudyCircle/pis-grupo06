@@ -6,9 +6,23 @@ jest.mock("@context/UserContext", () => ({
   useUser: jest.fn(),
 }));
 
+const mockUseFormSubmit = jest.fn();
+jest.mock("@utils/UseFormSubmit", () => ({
+  __esModule: true,
+  useFormSubmit: (...args) => mockUseFormSubmit(...args),
+}));
+
 import { useUser } from "@context/UserContext";
 
 describe("<Profile />", () => {
+
+  beforeEach(() => {
+    mockUseFormSubmit.mockReturnValue({
+      error: [],
+      onSubmit: jest.fn(),
+    });
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
