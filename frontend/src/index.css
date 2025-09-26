@@ -188,4 +188,13 @@
   .btn-sm {
     @apply px-2 py-1 text-sm;
   }
+
+  /*cards de tutoring*/
+  .tutoring-card-title{
+    @apply text-gray-600 text-sm font-semibold;
+  }
+
+  .tutoring-card-button{
+    @apply cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold text-sm py-1 px-3 rounded-full
+  }
 }
