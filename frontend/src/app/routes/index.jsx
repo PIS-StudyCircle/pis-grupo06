@@ -11,11 +11,11 @@ export function AppRoutes() {
       <Route element={<RequireGuestRoute />}>
         <Route path="/iniciar_sesion" element={<SignInPage />} />
         <Route path="/registrarse" element={<RegisterPage />} />
+        <Route path="/flujo-visitante" element={<VisitorFlow />} />
       </Route>
      <Route element={<PrivateRoute />}>
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
         <Route path="/perfil" element={<ProfilePage />} />
-        <Route path="/flujo-visitante" element={<VisitorFlow />} />
         <Route path="/materias/:courseId" element={<CourseDetailPage />} />
       </Route>
       <Route path="/" element={<Navigate to="/materias" replace />} />
