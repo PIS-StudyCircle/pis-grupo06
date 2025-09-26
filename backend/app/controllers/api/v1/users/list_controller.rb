@@ -7,14 +7,23 @@ module Api
 
         def index
           users = [
-            { id: 1, name: "Juan", last_name: "Pérez", email: "juan.perez@example.com", photo: "https://miapp.com/uploads/juan.jpg" },
-            { id: 2, name: "María", last_name: "Gómez", email: "maria.gomez@example.com", photo: "https://miapp.com/uploads/maria.jpg" },
-            { id: 3, name: "Carlos", last_name: "Fernández", email: "carlos.fernandez@example.com", photo: "https://miapp.com/uploads/carlos.jpg" },
-            { id: 4, name: "Lucía", last_name: "Martínez", email: "lucia.martinez@example.com", photo: "https://miapp.com/uploads/lucia.jpg" },
-            { id: 5, name: "Andrés", last_name: "Rodríguez", email: "andres.rodriguez@example.com", photo: "https://miapp.com/uploads/andres.jpg" },
-            { id: 6, name: "Sofía", last_name: "López", email: "sofia.lopez@example.com", photo: "https://miapp.com/uploads/sofia.jpg" },
-            { id: 7, name: "Martín", last_name: "García", email: "martin.garcia@example.com", photo: "https://miapp.com/uploads/martin.jpg" }
+            { id: 1, name: "Juan", last_name: "Pérez", email: "juan.perez@example.com", photo: "https://i.pravatar.cc/150?img=5" },
+            { id: 2, name: "María", last_name: "Gómez", email: "maria.gomez@example.com", photo: "https://i.pravatar.cc/150?img=6" },
+            { id: 3, name: "Carlos", last_name: "Fernández", email: "carlos.fernandez@example.com", photo: "https://i.pravatar.cc/150?img=7" },
+            { id: 4, name: "Lucía", last_name: "Martínez", email: "lucia.martinez@example.com", photo: "https://i.pravatar.cc/150?img=8" },
+            { id: 5, name: "Andrés", last_name: "Rodríguez", email: "andres.rodriguez@example.com", photo: "https://i.pravatar.cc/150?img=9" },
+            { id: 6, name: "Sofía", last_name: "López", email: "sofia.lopez@example.com", photo: "https://i.pravatar.cc/150?img=10" },
+            { id: 7, name: "Martín", last_name: "García", email: "martin.garcia@example.com", photo: "https://i.pravatar.cc/150?img=11" }
           ]
+
+          if params[:search].present?
+            query = params[:search].downcase
+            users = users.select do |u|
+              [u[:name], u[:last_name], u[:email]].any? do |field|
+                field.downcase.include?(query)
+              end
+            end
+          end
 
           render json: {
             users: users,

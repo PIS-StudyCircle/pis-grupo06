@@ -5,7 +5,7 @@ export default function UserCard({ user }) {
   return (
     <div className="w-full bg-white rounded-lg shadow p-4 my-4 flex items-center justify-between gap-4">
       <div className="flex items-center gap-4">
-        {/* Foto del usuario */}
+        
         <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
           {user.photo ? (
             <img
@@ -30,15 +30,15 @@ export default function UserCard({ user }) {
         </div>
       </div>
 
-      {/* Botón para ver perfil */}
-      <Link to={`/usuarios/${user.id}`} className="block">
+      {/* Botón para ver perfil  --> Hay que ver si implementamos esto, debriamos */}
+      {/* <Link to={`/usuarios/${user.id}`} className="block">
         <button
           type="button"
           className="inline-flex items-center text-white hover:text-white border border-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg text-sm px-2 py-2 text-center me-2 mb-2 dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 cursor-pointer"
         >
           <HiArrowRight className="w-5 h-5" />
         </button>
-      </Link>
+      </Link> */}
     </div>
   );
 }
