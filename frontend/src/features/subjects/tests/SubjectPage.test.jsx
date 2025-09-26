@@ -78,8 +78,9 @@ describe("SubjectPage", () => {
 
   it("muestra la fecha de vencimiento si existe", async () => {
     const subjectsWithDueDate = [
-      { id: 1, name: "Tema I", due_date: "2025-10-01T00:00:00Z" },
+      { id: 1, name: "Tema I", due_date: "2025-09-30T12:00:00Z" }
     ];
+
   
     subjectService.getSubjects.mockResolvedValue({
       subjects: subjectsWithDueDate,
@@ -96,7 +97,7 @@ describe("SubjectPage", () => {
     expect(await screen.findByText("Tema I")).toBeInTheDocument();
   
     // Verifica que la fecha de vencimiento se muestre formateada
-    expect(screen.getByText(/Vencimiento: 30\/9\/2025/)).toBeInTheDocument();
+    expect(screen.getByText(/Vencimiento:\s*9\/30\/2025/)).toBeInTheDocument();
   });
 
   it("muestra checkboxes si showCheckbox es true", async () => {

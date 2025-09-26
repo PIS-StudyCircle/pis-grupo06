@@ -190,7 +190,7 @@ end
 
 Subject.find_or_create_by!(name: "Aplicaciones a física e ingeniería", course: course) do |s|
   s.creator = creator
-end 
+end
 # ------------------TUTORIAS------------------ #
 
 # Tutoría 1 creada por estudiante solicitandola, con 3 temas, sin tutor asignado
