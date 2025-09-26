@@ -3,9 +3,7 @@ import PrivateRoute from "./PrivateRoute";
 import { CoursePage, CourseDetailPage } from "@/features/courses";
 import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow } from "@/features/users";
 import { RequireGuestRoute } from "./RequireGuestRoute";
-
-
-
+import { TutoringPage } from "@/features/tutorings";
 
 export function AppRoutes() {
   return (
@@ -15,12 +13,11 @@ export function AppRoutes() {
         <Route path="/registrarse" element={<RegisterPage />} />
         <Route path="/flujo-visitante" element={<VisitorFlow />} />
       </Route>
-
-      <Route element={<PrivateRoute />}>
-        <Route path="/materias/:courseId" element={<CourseDetailPage />} />
+     <Route element={<PrivateRoute />}>
+        <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
         <Route path="/perfil" element={<ProfilePage />} />
+        <Route path="/materias/:courseId" element={<CourseDetailPage />} />
       </Route>
-
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
       <Route path="/tutores" element={<TutorPage />} />

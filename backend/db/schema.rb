@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_16_185419) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_21_023253) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -72,6 +72,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_185419) do
     t.integer "duration_mins", default: 60, null: false
     t.string "modality", null: false
     t.integer "capacity", null: false
+    t.bigint "created_by_id"
+    t.bigint "tutor_id"
+    t.integer "enrolled", default: 0, null: false
+    t.bigint "course_id", null: false
+    t.index ["course_id"], name: "index_tutorings_on_course_id"
+    t.index ["created_by_id"], name: "index_tutorings_on_created_by_id"
+    t.index ["tutor_id"], name: "index_tutorings_on_tutor_id"
   end
 
   create_table "universities", force: :cascade do |t|
@@ -122,6 +129,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_185419) do
   add_foreign_key "subject_tutorings", "tutorings"
   add_foreign_key "subjects", "courses"
   add_foreign_key "subjects", "users", column: "creator_id"
+  add_foreign_key "tutorings", "courses"
+  add_foreign_key "tutorings", "users", column: "created_by_id"
+  add_foreign_key "tutorings", "users", column: "tutor_id"
   add_foreign_key "user_tutorings", "tutorings"
   add_foreign_key "user_tutorings", "users"
   add_foreign_key "users", "faculties"
