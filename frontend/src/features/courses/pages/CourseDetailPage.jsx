@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import Footer from "@components/Footer";
 import { useCourse } from "../hooks/useCourse";
-import CourseTopics from "../components/Topics";
+import SubjectPage from "@/features/subjects/pages/SubjectPage";
 
 
 export default function CourseDetailPage() {
@@ -73,8 +73,8 @@ export default function CourseDetailPage() {
                 </div>
               </div>
 
-             {/*Busco los temas de la materia*/}
-             <CourseTopics subjects={course?.subjects ?? []} />
+             {/*El mostrar los temas de la materia se delega a SubjectPage*/}
+             <SubjectPage courseId={course.id} showCheckbox = {false} showButton={false} />
 
             </div>
           </div>
