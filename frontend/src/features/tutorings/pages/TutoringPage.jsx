@@ -1,6 +1,7 @@
 import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";    
-import Pagination from "../../../shared/components/Pagination";
+import Pagination from "@components/Pagination";
+
 
 export default function TutoringPage({filters = {}, mode = ""}) {
   const { tutorings, loading, error, pagination, page, setPage } = useTutorings(1, 20, filters);

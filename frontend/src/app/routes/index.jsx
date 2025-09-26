@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import PrivateRoute from "./PrivateRoute";
 import { CoursePage, CourseDetailPage } from "@/features/courses";
 import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow } from "@/features/users";
 import { RequireGuestRoute } from "./RequireGuestRoute";
-
+import TutoringPage from "@/features/tutorings/pages/TutoringPage";
 
 export function AppRoutes() {
   return (
@@ -14,10 +15,6 @@ export function AppRoutes() {
      <Route element={<PrivateRoute />}>
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
       </Route>
-
-      {/* Ruta de prueba filtros, se puede eliminar despues */}
-      <Route path="/pruebaFiltrosTutorias" element={<PruebaPage />} />
-      
 
       <Route element={<PrivateRoute />}>
         <Route path="/perfil" element={<ProfilePage />} />

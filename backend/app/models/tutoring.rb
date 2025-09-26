@@ -41,12 +41,9 @@ class Tutoring < ApplicationRecord
   scope :upcoming, -> { where(scheduled_at: Time.current..) }
 
   # --- Validaciones ---
-
-  validates :scheduled_at, presence: true
   validate :scheduled_at_cannot_be_in_past
 
   validates :duration_mins,
-            presence: true,
             numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 240 }
 
   validates :modality,
