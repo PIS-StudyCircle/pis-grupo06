@@ -50,9 +50,3 @@ export const useUsers = (initialPage = 1, perPage = 20, initialRole = "") => {
 export const useTutors = (initialPage = 1, perPage = 20) => {
   return useUsers(initialPage, perPage, "tutor");
 };
-
-export const getUserById = async (id) => {
-  const response = await fetch(`${API_URL}/${id}`);
-  if (!response.ok) throw new Error(`Error al obtener usuario con id ${id}`);
-  return await response.json();
-};

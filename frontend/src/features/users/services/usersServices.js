@@ -14,3 +14,10 @@ export const getUsers = async (page = 1, perPage = 20, search = "", role = "") =
   console.log("Response data:", data);
   return data;
 };
+
+
+export const getUserById = async (id) => {
+  const response = await fetch(`${API_URL}/${id}`);
+  if (!response.ok) throw new Error(`Error al obtener usuario con id ${id}`);
+  return await response.json();
+};

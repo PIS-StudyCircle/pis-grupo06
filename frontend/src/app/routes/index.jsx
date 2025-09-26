@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import { CoursePage, CourseDetailPage } from "@/features/courses";
-import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow } from "@/features/users";
+import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow, UserProfilePage} from "@/features/users";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 
 
@@ -19,11 +19,12 @@ export function AppRoutes() {
       <Route element={<PrivateRoute />}>
         <Route path="/materias/:courseId" element={<CourseDetailPage />} />
         <Route path="/perfil" element={<ProfilePage />} />
+        <Route path="/tutores" element={<TutorPage />} />
+        <Route path="/users/:id" element={<UserProfilePage />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
-      <Route path="/tutores" element={<TutorPage />} />
     </Routes>
   );
 }
