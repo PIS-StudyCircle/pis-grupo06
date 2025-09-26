@@ -1,4 +1,4 @@
-import {formatDateTime} from "../../../shared/utils/FormatDate";
+import {formatDateTime} from "@shared/utils/FormatDate";
 
 export default function TutoringCard({ tutoring, mode }) {
   return (
