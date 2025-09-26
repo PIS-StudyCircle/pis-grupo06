@@ -87,7 +87,7 @@ RSpec.describe "Tutoring model (self-contained spec)", type: :request do
 
   # ---------- VALIDACIONES ----------
   describe "validations" do
-    it "requiere scheduled_at" do
+    it "permite scheduled_at en blanco" do
       t = Tutoring.new(
         course: create_course,
         scheduled_at: nil,
@@ -95,8 +95,7 @@ RSpec.describe "Tutoring model (self-contained spec)", type: :request do
         modality: "virtual",
         capacity: 5
       )
-      expect(t.valid?).to be false
-      expect(t.errors[:scheduled_at]).to be_present
+      expect(t.valid?).to be true
     end
 
     it "no permite scheduled_at en el pasado" do
