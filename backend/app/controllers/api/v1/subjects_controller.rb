@@ -51,7 +51,6 @@ module Api
         }
 
         success_response(message: "Tema y tutorias cargadas con exito", data: data)
-        
       rescue ActiveRecord::RecordNotFound
         error_response(message: "Tema no encontrado", status: :not_found)
       end
