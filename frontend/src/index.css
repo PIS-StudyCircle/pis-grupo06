@@ -26,6 +26,7 @@
   background-color: rgba(0,0,0,0.5); 
 }
 
+
 @layer base {
   /* Manito en todos los botones “clickables” */
   button,

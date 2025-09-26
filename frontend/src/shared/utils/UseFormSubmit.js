@@ -4,17 +4,20 @@ import { extractErrors } from "./extractErrors";
 
 export function useFormSubmit(action, redirectTo = "/") {
   const [error, setError] = useState([]);
+  const [submitted, setSubmitted] = useState(false); 
   const nav = useNavigate();
 
   async function onSubmit(form) {
     setError([]);
     try {
       await action(form);
-      nav(redirectTo);
+      setSubmitted(true); 
+      nav(redirectTo);  
     } catch (e) {
       setError(extractErrors(e));
     }
   }
 
-  return { error, onSubmit };
+  return { error, onSubmit, submitted };
 }
+

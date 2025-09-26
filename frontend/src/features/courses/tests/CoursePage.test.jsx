@@ -34,6 +34,11 @@ describe("CoursePage", () => {
     jest.useFakeTimers();
   });
 
+  beforeAll(() => {
+    // decimos a Jest que use timers falsos (controlados)
+    jest.useFakeTimers();
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -158,6 +163,4 @@ describe("CoursePage", () => {
     render(<CoursePage />);
 
   });
-
-
 });

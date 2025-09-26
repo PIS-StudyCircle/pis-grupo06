@@ -69,4 +69,8 @@ class User < ApplicationRecord
 
     user
   end
+
+  def devise_mailer
+    UserMailer
+  end
 end
