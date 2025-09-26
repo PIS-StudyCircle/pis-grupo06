@@ -17,13 +17,13 @@ export function AppRoutes() {
       </Route>
 
       <Route element={<PrivateRoute />}>
-        <Route path="/materias/:courseId" element={<CourseDetailPage />} />
         <Route path="/perfil" element={<ProfilePage />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
       <Route path="/tutores" element={<TutorPage />} />
+      <Route path="/materias/:courseId" element={<CourseDetailPage />} />
     </Routes>
   );
 }
