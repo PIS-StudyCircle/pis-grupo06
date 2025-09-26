@@ -38,19 +38,6 @@ module Api
             render json: { error: "No se encontró el usuario solicitado" }, status: :not_found
           end
         end
-
-        def sample_users
-          [
-            { id: 1, name: "Juan", last_name: "Pérez", email: "juan.perez@example.com", photo: "https://i.pravatar.cc/150?img=5" },
-            { id: 2, name: "María", last_name: "Gómez", email: "maria.gomez@example.com", photo: "https://i.pravatar.cc/150?img=6" },
-            { id: 3, name: "Carlos", last_name: "Fernández", email: "carlos.fernandez@example.com", photo: "https://i.pravatar.cc/150?img=7" },
-            { id: 4, name: "Lucía", last_name: "Martínez", email: "lucia.martinez@example.com", photo: "https://i.pravatar.cc/150?img=8" },
-            { id: 5, name: "Andrés", last_name: "Rodríguez", email: "andres.rodriguez@example.com", photo: "https://i.pravatar.cc/150?img=9" },
-            { id: 6, name: "Sofía", last_name: "López", email: "sofia.lopez@example.com", photo: "https://i.pravatar.cc/150?img=10" },
-            { id: 7, name: "Martín", last_name: "García", email: "martin.garcia@example.com", photo: "https://i.pravatar.cc/150?img=11" }
-          ]
-        end
-
       end
     end
   end
