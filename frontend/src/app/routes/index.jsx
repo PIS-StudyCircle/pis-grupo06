@@ -17,8 +17,6 @@ export function AppRoutes() {
      <Route element={<PrivateRoute />}>
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
         <Route path="/perfil" element={<ProfilePage />} />
-        {/* SOLO PARA PROBAR MIENTRAS DESARROLLAMOS CREAR TEMA */}
-        <Route path="/subjects/:courseId" element={<SubjectPage showButton={true} showCheckbox={true} />} /> 
       </Route>
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
