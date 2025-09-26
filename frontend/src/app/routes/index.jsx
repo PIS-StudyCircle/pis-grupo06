@@ -20,7 +20,7 @@ export function AppRoutes() {
         <Route path="/materias/:courseId" element={<CourseDetailPage />} />
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/tutores" element={<TutorPage />} />
-        <Route path="/users/:id" element={<UserProfilePage />} />
+        <Route path="/usuarios/:id" element={<UserProfilePage />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/materias" replace />} />
