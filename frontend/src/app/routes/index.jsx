@@ -26,6 +26,7 @@ export function AppRoutes() {
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
       <Route path="/materias/:courseId" element={<CourseDetailPage />} />
+      <Route path="/prototipoCalendly" element={<CourseDetailPage />} />
       <Route path="/tutores" element={<TutorPage />} />
     </Routes>
   );
