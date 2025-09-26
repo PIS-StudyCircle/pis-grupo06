@@ -25,9 +25,8 @@ module Api
       end
 
       def show
-        subject = Course.find(params[:course_id]).subjects.find(params[:id])
+        subject = Subject.find(params[:id])
 
-        # Ver a que se refieren con "active tutorings"
         active_tutorings = subject.tutorings
                                   .upcoming
                                   .order(:scheduled_at)
