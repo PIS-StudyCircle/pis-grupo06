@@ -16,4 +16,23 @@ module.exports = {
   },
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js", "@testing-library/jest-dom"],
   moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node"],
+  collectCoverageFrom: [
+    "src/**/*.{js,jsx}",
+    "!src/main.jsx",                        // entrypoint
+    "!src/app/App.jsx",                     // root app wrapper
+    "!src/app/routes/**/*",                 // definición de rutas
+    "!src/shared/config*.js",               // configs (test/prod)
+    "!src/features/**/index.jsx",           // archivos índice
+    "!src/shared/context/**/*",             // contextos mínimos
+    "!src/shared/components/layout/**/*",   // layout puro (NavBar, SideBar, etc.)
+    "!src/shared/components/Footer.jsx",
+    "!src/shared/components/SubmitButton.jsx",
+    "!src/shared/components/Textarea.jsx",
+    "!src/shared/utils/**/*",               // utils simples/wrappers
+  ],
+  coveragePathIgnorePatterns: [
+    "/node_modules/",
+    "/dist/",
+    "/services",
+  ],
 };
