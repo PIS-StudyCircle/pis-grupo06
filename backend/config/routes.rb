@@ -14,7 +14,9 @@ Rails.application.routes.draw do
         get :me, to: 'me#show'
       end
 
-      resources :courses
+      resources :courses do
+        resources :subjects, only: [:show]
+      end
 
       resources :tutorings
     end

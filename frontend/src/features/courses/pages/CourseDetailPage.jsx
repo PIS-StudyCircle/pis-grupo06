@@ -73,9 +73,7 @@ export default function CourseDetailPage() {
                 </div>
               </div>
 
-             {/*Busco los temas de la materia*/}
-             <CourseTopics subjects={course?.subjects ?? []} />
-
+              <CourseTopics courseId={course.id} subjects={course?.subjects ?? []} />
             </div>
           </div>
         )}
