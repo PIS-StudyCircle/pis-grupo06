@@ -19,13 +19,9 @@ export const useUsers = (initialPage = 1, perPage = 20, initialRole = "") => {
       setLoading(true);
       try {
         const response = await getUsers(page, perPage, search, role);
-        setUsers(response.data);
-        setPagination({
-          page: response.page,
-          perPage: response.per_page,
-          total: response.total,
-          totalPages: response.total_pages,
-        });
+        console.log("Fetched users:", response.users);
+        setUsers(response.users);
+        setPagination(response.pagination);
       } catch (err) {
         console.error("Error fetching users:", err);
         setError(err);

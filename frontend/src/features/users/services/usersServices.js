@@ -9,5 +9,8 @@ export const getUsers = async (page = 1, perPage = 20, search = "", role = "") =
 
   const response = await fetch(`${API_URL}?${params}`);
   if (!response.ok) throw new Error("Error al obtener usuarios");
-  return await response.json();
+
+  const data = await response.json(); 
+  console.log("Response data:", data);
+  return data;
 };
