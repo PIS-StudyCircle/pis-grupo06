@@ -1,7 +1,7 @@
 import { API_BASE } from "@/shared/config";
 
 export const createClassEvent = async ({ title, description, start, end, attendees }) => {
-  const response = await fetch(`${API_BASE}/calendar/events`, {
+  const response = await fetch(`${API_BASE}/calendar/sessions`, {
     method: "POST",
     headers: {
         "Content-Type": "application/json",

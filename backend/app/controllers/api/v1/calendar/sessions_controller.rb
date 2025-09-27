@@ -20,21 +20,25 @@ class Api::V1::Calendar::SessionsController < ApplicationController
     # obtener próximos eventos (ejemplo: los siguientes 10)
     result = service.list_events(
       'primary',
-      max_results: 10,
+      max_results: 50,
       single_events: true,
       order_by: 'startTime',
       time_min: Time.now.iso8601
     )
 
-    sessions = result.items.map do |event|
+    tutoring_events = result.items.select do |event|
+      event.extended_properties&.private&.dig('tutoring_id').present?
+    end
+
+    sessions = tutoring_events.map do |event|
       {
-        id: event.id,
+        id: event.extended_properties.private['tutoring_id'],
         subject: event.summary,
-        tutor: user.name, # o si tenés info adicional
+        tutor: user.name, 
         date: event.start.date_time || event.start.date,
         duration: event.end.date_time && event.start.date_time ? ((event.end.date_time - event.start.date_time) / 60).to_i : nil,
         location: event.location || "Sin ubicación",
-        status: "confirmada", # podés mapear según event.status
+        status: event.status, 
         topics: event.description.present? ? [event.description] : []
       }
     end
@@ -61,7 +65,12 @@ class Api::V1::Calendar::SessionsController < ApplicationController
       description: params[:description] || "",
       start: { date_time: params[:start_time], time_zone: 'America/Montevideo' },
       end:   { date_time: params[:end_time],   time_zone: 'America/Montevideo' },
-      attendees: (params[:attendees] || []).map { |a| { email: a[:email] } }
+      attendees: (params[:attendees] || []).map { |a| { email: a[:email] } },
+      extended_properties: {
+        private: {
+          tutoring_id: params[:tutoring_id].to_s  
+        }
+      }
     )
 
     result = service.insert_event('primary', event)

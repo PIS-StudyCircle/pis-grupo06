@@ -67,18 +67,15 @@ export default function StudentCalendarPage({ userId }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Calendar className="w-5 h-5 text-blue-600" />
-        <h2 className="text-xl font-semibold text-gray-900">
-          Próximas Sesiones
-        </h2>
-        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+    <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 p-6 w-full transition hover:ring-2 hover:ring-blue-200">
+      <div className="flex items-center gap-2 mb-6 justify-center">
+        <h2 className="text-xl font-bold text-gray-800">Próximas Sesiones</h2>
+        <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
           {sessions.length}
         </span>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 w-full">
         {sessions.map((session) => (
           <SessionCard key={session.id} session={session} />
         ))}
