@@ -66,7 +66,6 @@ students = [
   { name: "Gustavo", last_name: "Ortega", email: "gustavoortega@gmail.com" }
 ]
 
-
 students.each do |student_data|
   User.find_or_create_by!(email: student_data[:email]) do |user|
     user.name = student_data[:name]
