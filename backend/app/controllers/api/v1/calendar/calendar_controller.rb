@@ -38,14 +38,13 @@ class Api::V1::Calendar::Controller < ApplicationController
 
   private
 
-  # 🔄 refrescar token si expiró
+  # refrescar token si expiró
   def refresh_google_token(user)
     client = Signet::OAuth2::Client.new(
       client_id: ENV['GOOGLE_CLIENT_ID'],
       client_secret: ENV['GOOGLE_CLIENT_SECRET'],
       token_credential_uri: 'https://oauth2.googleapis.com/token',
       refresh_token: user.google_refresh_token,
-      grant_type: 'refresh_token'
     )
 
     client.fetch_access_token!

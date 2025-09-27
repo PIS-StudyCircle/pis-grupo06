@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_26_033205) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_27_173119) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -59,7 +59,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_033205) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "course_id", null: false
-    t.bigint "creator_id", null: false
+    t.bigint "creator_id"
+    t.date "due_date"
     t.index ["course_id", "name"], name: "index_subjects_on_course_id_and_name", unique: true
     t.index ["course_id"], name: "index_subjects_on_course_id"
     t.index ["creator_id"], name: "index_subjects_on_creator_id"
@@ -114,6 +115,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_033205) do
     t.string "jti", null: false
     t.string "provider"
     t.string "uid"
+    t.string "google_access_token"
+    t.string "google_refresh_token"
+    t.datetime "google_expires_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true
@@ -128,7 +132,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_033205) do
   add_foreign_key "subject_tutorings", "subjects"
   add_foreign_key "subject_tutorings", "tutorings"
   add_foreign_key "subjects", "courses"
-  add_foreign_key "subjects", "users", column: "creator_id"
+  add_foreign_key "subjects", "users", column: "creator_id", on_delete: :nullify
   add_foreign_key "tutorings", "courses"
   add_foreign_key "tutorings", "users", column: "created_by_id"
   add_foreign_key "tutorings", "users", column: "tutor_id"
