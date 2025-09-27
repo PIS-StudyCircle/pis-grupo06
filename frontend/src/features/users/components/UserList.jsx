@@ -7,7 +7,7 @@ export default function UserList({ users, loading, error }) {
     return <div>No hay usuarios disponibles. </div>;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="flex flex-col">
       {users.map((user) => (
         <UserCard key={user.id} user={user} />
       ))}

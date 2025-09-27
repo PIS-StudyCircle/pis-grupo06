@@ -8,7 +8,8 @@ export const getUsers = async (page = 1, perPage = 20, search = "", role = "") =
   if (role) params.append("role", role);
 
   const response = await fetch(`${API_URL}?${params}`);
-  if (!response.ok) throw new Error("Error al obtener usuarios");
+  if (!response.ok & role == "tutor") throw new Error("Error al obtener tutores");
+  if (!response.ok) throw new Error("Error al obtener usuarios"); 
 
   const data = await response.json(); 
   console.log("Response data:", data);
