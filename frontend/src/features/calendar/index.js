@@ -1,4 +1,4 @@
 export * from "./services/calendarApi";
 export * from "./hooks/useCalendar";
-export { default as TutorCalendar } from "./components/TutorCalendar";
-export { default as StudentCalendar } from "./components/StudentCalendar";
+export { default as TutorCalendarPage } from "./pages/TutorCalendarPage";
+export { default as StudentCalendarPage } from "./pages/StudentCalendarPage";

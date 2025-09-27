@@ -1,7 +1,7 @@
 require 'googleauth'
 require 'google/apis/calendar_v3'
 
-class Api::CalendarController < ApplicationController
+class Api::V1::Calendar::Controller < ApplicationController
   # POST /api/calendar/events
   def create_event
     user = current_user
