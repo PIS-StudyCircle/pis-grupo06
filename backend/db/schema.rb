@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_26_161915) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_27_173119) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -115,6 +115,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_26_161915) do
     t.bigint "faculty_id"
     t.string "provider"
     t.string "uid"
+    t.string "google_access_token"
+    t.string "google_refresh_token"
+    t.datetime "google_expires_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true

@@ -9,7 +9,10 @@ class Api::V1::Calendar::SessionsController < ApplicationController
     user = User.find(params[:user_id])
 
     # refrescar token si está vencido
-    access_token = refresh_google_token(user) if user.google_expires_at < Time.now
+    if user.google_expires_at.nil? || user.google_expires_at < Time.now
+        access_token = refresh_google_token(user)
+    end
+
 
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = user.google_access_token || access_token
@@ -74,8 +77,7 @@ class Api::V1::Calendar::SessionsController < ApplicationController
       client_id: ENV['GOOGLE_CLIENT_ID'],
       client_secret: ENV['GOOGLE_CLIENT_SECRET'],
       token_credential_uri: 'https://oauth2.googleapis.com/token',
-      refresh_token: user.google_refresh_token,
-      grant_type: 'refresh_token'
+      refresh_token: user.google_refresh_token
     )
 
     client.fetch_access_token!

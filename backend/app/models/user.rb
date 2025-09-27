@@ -39,36 +39,39 @@ class User < ApplicationRecord
   validates :description, length: { maximum: 500 }, allow_blank: true
 
   def self.from_omniauth(auth)
-    user = find_by(provider: auth.provider, uid: auth.uid) || find_by(email: auth.info.email)
+  user = find_by(provider: auth.provider, uid: auth.uid) || find_by(email: auth.info.email)
 
-    if user.nil?
-      user = User.new
-      user.provider = auth.provider
-      user.uid = auth.uid
+  if user.nil?
+    user = User.new
+    user.provider = auth.provider
+    user.uid = auth.uid
 
-      fing = Faculty.find_by(name: "Facultad de Ingeniería")
-      user.faculty = fing if fing.present?
+    fing = Faculty.find_by(name: "Facultad de Ingeniería")
+    user.faculty = fing if fing.present?
 
-      user.email = auth.info.email
-      user.name  = auth.info.first_name.presence || auth.info.name
-      user.last_name = auth.info.last_name
+    user.email = auth.info.email
+    user.name  = auth.info.first_name.presence || auth.info.name
+    user.last_name = auth.info.last_name
 
-      password = Devise.friendly_token[0, 32]
-      user.password = password
-      user.password_confirmation = password
-
-      user.save!
-    else
-      user.update(
-        name: user.name.presence || auth.info.first_name || auth.info.name,
-        last_name: user.last_name.presence || auth.info.last_name,
-        provider: auth.provider,
-        uid: auth.uid
-      )
-    end
-
-    user
+    password = Devise.friendly_token[0, 32]
+    user.password = password
+    user.password_confirmation = password
+  else
+    user.provider ||= auth.provider
+    user.uid      ||= auth.uid
+    user.name     ||= auth.info.first_name || auth.info.name
+    user.last_name ||= auth.info.last_name
   end
+
+  # 🔑 Guardar credenciales de Google
+  creds = auth.credentials || OpenStruct.new
+  user.google_access_token  = creds.token
+  user.google_refresh_token = creds.refresh_token || user.google_refresh_token
+  user.google_expires_at    = Time.at(creds.expires_at) if creds.expires_at
+
+  user.save!
+  user
+end
 
   def devise_mailer
     UserMailer
