@@ -77,7 +77,7 @@ class Api::V1::Calendar::SessionsController < ApplicationController
       client_id: ENV['GOOGLE_CLIENT_ID'],
       client_secret: ENV['GOOGLE_CLIENT_SECRET'],
       token_credential_uri: 'https://oauth2.googleapis.com/token',
-      refresh_token: user.google_refresh_token
+      refresh_token: user.google_refresh_token,
     )
 
     client.fetch_access_token!
