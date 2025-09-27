@@ -163,3 +163,144 @@ end
 Subject.find_or_create_by!(name: "Autovalores y autovectores", course: course) do |s|
   s.creator = creator
 end
+
+creator = User.find_by(email: "luciafernandez@gmail.com") || User.first
+
+Subject.find_or_create_by!(name: "Autovalores y autovectores", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Espacios vectoriales", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Subespacios y bases", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Transformaciones lineales", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Núcleo e imagen", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Producto escalar y ortogonalidad", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Diagonalización de matrices", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Formas cuadráticas", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Aplicaciones a geometría", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Eigenespacios", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Cambio de base", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Determinantes avanzados", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Sistemas homogéneos", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Teorema espectral", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Aplicaciones a física e ingeniería", course: course) do |s|
+  s.creator = creator
+end
+# ------------------TUTORIAS------------------ #
+
+# Tutoría 1 creada por estudiante solicitandola, con 3 temas, sin tutor asignado
+creator = User.find_by!(email: "luisgomez@gmail.com")
+course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
+# Elegir entre 1 y 3 subjects al azar
+subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
+tutoring_request = Tutoring.find_or_create_by!(
+  scheduled_at: 6.days.from_now,
+  duration_mins: 90,
+  modality: "virtual",
+  capacity: 3,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: nil
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
+end
+
+# Tutoría 2 creada por estudiante solicitandola, con 1 tema, sin tutor asignado
+creator = User.find_by!(email: "juanperez@gmail.com")
+course = Course.find_by(id: 145) # Fisica I
+# Elegir 1 subjects al azar
+subject = course.subjects.sample(1).first
+
+tutoring_request = Tutoring.find_or_create_by!(
+  scheduled_at: 3.days.from_now,
+  duration_mins: 90,
+  modality: "virtual",
+  capacity: 5,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: nil
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
+
+# Tutoría 3 creada por estudiante dictandola
+creator = User.find_by!(email: "anaperez@gmail.com")
+course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
+# Elegir 1 subjects al azar
+subject = course.subjects.sample(1).first
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 5.days.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 2,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+
+# Tutoría 4 creada por estudiante solicitandola, con 5 temas, sin tutor asignado
+creator = User.find_by!(email: "anaperez@gmail.com")
+course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
+# Elegir entre 1 y 5 subjects al azar
+subjects = Subject.where(course: course).shuffle.take(rand(1..5))
+
+tutoring_request = Tutoring.find_or_create_by!(
+  scheduled_at: 4.days.from_now,
+  duration_mins: 90,
+  modality: "virtual",
+  capacity: 3,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: nil
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
+end

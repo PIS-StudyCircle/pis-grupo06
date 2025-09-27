@@ -18,6 +18,8 @@ Rails.application.routes.draw do
         resources :list, only: [:index, :show]
       end
       resources :courses
+      resources :subjects
+      resources :tutorings
     end
   end
 end
