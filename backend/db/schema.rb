@@ -61,6 +61,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_27_173119) do
     t.bigint "course_id", null: false
     t.bigint "creator_id"
     t.date "due_date"
+    t.bigint "creator_id"
+    t.date "due_date"
     t.index ["course_id", "name"], name: "index_subjects_on_course_id_and_name", unique: true
     t.index ["course_id"], name: "index_subjects_on_course_id"
     t.index ["creator_id"], name: "index_subjects_on_creator_id"
@@ -68,10 +70,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_27_173119) do
 
   create_table "tutorings", force: :cascade do |t|
     t.datetime "scheduled_at"
+    t.datetime "scheduled_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "duration_mins", default: 60
+    t.integer "duration_mins", default: 60
     t.string "modality", null: false
+    t.integer "capacity"
     t.integer "capacity"
     t.bigint "created_by_id"
     t.bigint "tutor_id"
@@ -132,6 +137,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_27_173119) do
   add_foreign_key "subject_tutorings", "subjects"
   add_foreign_key "subject_tutorings", "tutorings"
   add_foreign_key "subjects", "courses"
+  add_foreign_key "subjects", "users", column: "creator_id", on_delete: :nullify
   add_foreign_key "subjects", "users", column: "creator_id", on_delete: :nullify
   add_foreign_key "tutorings", "courses"
   add_foreign_key "tutorings", "users", column: "created_by_id"
