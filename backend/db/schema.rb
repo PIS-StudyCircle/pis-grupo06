@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_27_173119) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_27_214025) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -67,10 +67,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_27_173119) do
   end
 
   create_table "tutorings", force: :cascade do |t|
-    t.datetime "scheduled_at"
+    t.datetime "scheduled_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "duration_mins", default: 60
+    t.integer "duration_mins", default: 60, null: false
     t.string "modality", null: false
     t.integer "capacity"
     t.bigint "created_by_id"
