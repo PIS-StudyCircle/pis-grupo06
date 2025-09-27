@@ -7,7 +7,7 @@ module Api
         before_action :authenticate_user!, except: [:index]
 
         def index
-          users = User.all
+          users = sample_users
           if params[:search].present?
             query = params[:search].downcase
             users = users.select do |u|
