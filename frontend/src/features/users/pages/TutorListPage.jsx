@@ -39,7 +39,7 @@ export default function TutorPage() {
             placeholder="Buscar tutor..."
           />
 
-          <UserList users={tutors} loading={loading} error={error} />
+          <UserList users={tutors} loading={loading} error={error} msj={"No hay tutores disponibles."} />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>
