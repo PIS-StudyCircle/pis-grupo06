@@ -49,6 +49,9 @@ gem 'omniauth'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-rails_csrf_protection'
 
+gem 'google-apis-calendar_v3'
+gem 'googleauth'
+
 gem 'rails-i18n'
 
 gem 'devise-i18n'

@@ -15,8 +15,11 @@ Rails.application.routes.draw do
       end
 
       resources :courses
-
       resources :tutorings
+
+      namespace :calendar do
+        resources :sessions, only: [:index, :create]
+      end
     end
   end
 end

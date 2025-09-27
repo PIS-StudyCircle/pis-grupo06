@@ -5,6 +5,8 @@ import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow } from "@
 import { RequireGuestRoute } from "./RequireGuestRoute";
 import { TutoringPage } from "@/features/tutorings";
 
+import { StudentCalendarPage } from "@/features/calendar";
+
 export function AppRoutes() {
   return (
     <Routes>
@@ -13,16 +15,18 @@ export function AppRoutes() {
         <Route path="/registrarse" element={<RegisterPage />} />
         <Route path="/flujo-visitante" element={<VisitorFlow />} />
       </Route>
+
      <Route element={<PrivateRoute />}>
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/materias/:courseId" element={<CourseDetailPage />} />
       </Route>
+
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
       <Route path="/tutores" element={<TutorPage />} />
       <Route path="/materias/:courseId" element={<CourseDetailPage />} />
-      <Route path="/prototipoCalendly" element={<CourseDetailPage />} />
+      <Route path="/prototipoCalendar" element={<StudentCalendarPage />} />
     </Routes>
   );
 }

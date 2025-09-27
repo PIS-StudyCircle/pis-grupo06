@@ -9,9 +9,9 @@ export const createClassEvent = async ({ title, description, start, end, attende
     body: JSON.stringify({
         title,
         description,
-        start_time: start,
+        start_time: start, 
         end_time: end,
-        attendees, // ej: [{ email: "alumno@example.com" }]
+        attendees, 
     }),
   });
 
@@ -23,8 +23,18 @@ export const createClassEvent = async ({ title, description, start, end, attende
     return await response.json();
 };
 
+export async function getSessionsByUser(userId) {
+  const res = await fetch(`${API_BASE}/calendar/sessions?user_id=${userId}`, {
+    credentials: "include"
+  });
+
+  if (!res.ok) throw new Error("Error al obtener sesiones del usuario");
+
+  return res.json();
+}
+
 export const getTutorEvents = async (tutorId) => {
-  const res = await fetch(`/api/calendar/events?tutor_id=${tutorId}`);
+  const res = await fetch(`${API_BASE}/calendar/events?tutor_id=${tutorId}`);
   if (!res.ok) throw new Error("Error al obtener eventos");
   return await res.json();
 };
