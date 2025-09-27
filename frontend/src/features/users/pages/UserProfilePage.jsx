@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { getUserById } from "../services/usersServices";
+import { DEFAULT_PHOTO } from "@/shared/config";
 
 export default function UserProfile() {
   const { id } = useParams(); // obtiene el id de la URL
@@ -8,11 +10,8 @@ export default function UserProfile() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`/api/users/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Error al obtener usuario");
-        return res.json();
-      })
+    setLoading(true);
+    getUserById(id)
       .then((data) => setUser(data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -30,6 +29,7 @@ export default function UserProfile() {
     return <p className="text-center mt-10">Usuario no encontrado.</p>;
   }
 
+  const photoUrl = user.photo || DEFAULT_PHOTO;
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-[#001F54] text-white rounded-3xl shadow-xl w-full max-w-md p-6">
@@ -37,7 +37,7 @@ export default function UserProfile() {
 
         <div className="flex flex-col items-center mb-6">
           <img
-            src="/avatar.png"
+            src={photoUrl}
             alt="avatar"
             className="w-24 h-24 rounded-full border-4 border-white shadow-md"
           />
@@ -65,6 +65,5 @@ export default function UserProfile() {
         </div>
       </div>
     </div>
-    );
+  );
 }
-

@@ -1,4 +1,3 @@
-import { HiArrowRight } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { DEFAULT_PHOTO } from "@/shared/config";
 
