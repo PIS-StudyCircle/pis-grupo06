@@ -16,7 +16,7 @@ Rails.application.routes.draw do
 
       namespace :users do
         resources :list, only: [:index, :show]
-      end 
+      end
       resources :courses
     end
   end

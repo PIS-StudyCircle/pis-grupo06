@@ -3,11 +3,11 @@ module Api
     module Users
       class ListController < ApplicationController
         include Pagy::Backend
+
         before_action :authenticate_user!, except: [:index]
 
         def index
-          users = sample_users
-
+          users = User.all
           if params[:search].present?
             query = params[:search].downcase
             users = users.select do |u|
