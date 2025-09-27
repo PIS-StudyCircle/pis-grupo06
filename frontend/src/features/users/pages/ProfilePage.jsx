@@ -20,7 +20,6 @@ export default function Profile() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-[#001F54] text-white rounded-3xl shadow-xl w-full max-w-md p-6">
-        <h2 className="text-xl font-bold mb-4">Perfil</h2>
 
         <div className="flex flex-col items-center mb-6">
           <img

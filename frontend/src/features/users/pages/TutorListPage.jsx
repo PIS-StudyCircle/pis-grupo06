@@ -1,11 +1,20 @@
 import { useEffect, useState } from "react";
 import UserList from "../components/UserList";
-import { useTutors } from "../hooks/useUsers";
+import { useUsers } from "../hooks/useUsers";
 import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
 
 export default function TutorPage() {
-  const { users: tutors, loading, error, pagination, page, setPage, search, setSearch } = useTutors();
+  const {
+    users: tutors,
+    loading,
+    error,
+    pagination,
+    page,
+    setPage,
+    search,
+    setSearch,
+  } = useUsers(1, 20, "tutor");
   const totalPages = pagination.last || 1;
 
   const [query, setQuery] = useState(search);

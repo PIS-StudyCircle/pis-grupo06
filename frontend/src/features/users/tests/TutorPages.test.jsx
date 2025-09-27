@@ -2,14 +2,14 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { DEFAULT_PHOTO } from "@/shared/config";
 import userEvent from "@testing-library/user-event";
-import TutorPage from "../pages/TutorPage";
+import TutorPage from "../pages/TutorListPage";
 import * as usersHook from "../hooks/useUsers";
 
 jest.mock("../hooks/useUsers");
 
-jest.mock('@/shared/config', () => ({
-  API_BASE: '/api/v1',
-  DEFAULT_PHOTO: 'http://example.com/default-avatar.png'
+jest.mock("@/shared/config", () => ({
+  API_BASE: "/api/v1",
+  DEFAULT_PHOTO: "http://example.com/default-avatar.png",
 }));
 
 describe("TutorPage", () => {
@@ -46,14 +46,22 @@ describe("TutorPage", () => {
     });
 
     render(<TutorPage />);
-    expect(screen.getByText(/Error al cargar los usuarios./i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Error al cargar los usuarios./i)
+    ).toBeInTheDocument();
   });
 
   it("muestra la lista de tutores con sus imágenes o iniciales", () => {
     usersHook.useTutors.mockReturnValue({
       users: [
-        { id: 1, name: "Juan", last_name: "Pérez", email: "juan@example.com", photo: "http://example.com/photo.jpg" },
-        { id: 2, name: "Ana", last_name: "Gómez", email: "ana@example.com"},
+        {
+          id: 1,
+          name: "Juan",
+          last_name: "Pérez",
+          email: "juan@example.com",
+          photo: "http://example.com/photo.jpg",
+        },
+        { id: 2, name: "Ana", last_name: "Gómez", email: "ana@example.com" },
       ],
       loading: false,
       error: null,
@@ -65,18 +73,24 @@ describe("TutorPage", () => {
     });
 
     render(
-        <MemoryRouter>
-          <TutorPage />
-        </MemoryRouter>
-      );
+      <MemoryRouter>
+        <TutorPage />
+      </MemoryRouter>
+    );
 
     // Usuarios renderizados
     expect(screen.getByText("Juan Pérez")).toBeInTheDocument();
     expect(screen.getByText("Ana Gómez")).toBeInTheDocument();
 
     // Imagen y iniciales
-    expect(screen.getByAltText("Juan Pérez")).toHaveAttribute("src", "http://example.com/photo.jpg");
-    expect(screen.getByAltText("Ana Gómez")).toHaveAttribute("src", DEFAULT_PHOTO);
+    expect(screen.getByAltText("Juan Pérez")).toHaveAttribute(
+      "src",
+      "http://example.com/photo.jpg"
+    );
+    expect(screen.getByAltText("Ana Gómez")).toHaveAttribute(
+      "src",
+      DEFAULT_PHOTO
+    );
   });
 
   it("muestra mensaje cuando no hay tutores", () => {
@@ -92,11 +106,13 @@ describe("TutorPage", () => {
     });
 
     render(
-        <MemoryRouter>
-          <TutorPage />
-        </MemoryRouter>
-      );
-    expect(screen.getByText(/No hay tutores disponibles./i)).toBeInTheDocument();
+      <MemoryRouter>
+        <TutorPage />
+      </MemoryRouter>
+    );
+    expect(
+      screen.getByText(/No hay tutores disponibles./i)
+    ).toBeInTheDocument();
   });
 
   it("actualiza la búsqueda al escribir", async () => {
@@ -115,10 +131,10 @@ describe("TutorPage", () => {
     });
 
     render(
-        <MemoryRouter>
-          <TutorPage />
-        </MemoryRouter>
-      );
+      <MemoryRouter>
+        <TutorPage />
+      </MemoryRouter>
+    );
 
     const input = screen.getByPlaceholderText(/buscar tutor/i);
     await userEvent.type(input, "Ana");
@@ -145,10 +161,10 @@ describe("TutorPage", () => {
     });
 
     render(
-        <MemoryRouter>
-          <TutorPage />
-        </MemoryRouter>
-      );
+      <MemoryRouter>
+        <TutorPage />
+      </MemoryRouter>
+    );
 
     // Buscar un botón de paginación (suponiendo que Pagination renderiza números)
     const nextPage = screen.getByRole("button", { name: /2/i });

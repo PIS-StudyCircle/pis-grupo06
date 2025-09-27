@@ -1,4 +1,3 @@
-import { API_BASE } from "@/shared/config";
 import { getUsers } from "../services/usersServices";
 
 import { useState, useEffect } from "react";
@@ -43,8 +42,4 @@ export const useUsers = (initialPage = 1, perPage = 20, initialRole = "") => {
     role,
     setRole,
   };
-};
-
-export const useTutors = (initialPage = 1, perPage = 20) => {
-  return useUsers(initialPage, perPage, "tutor");
 };

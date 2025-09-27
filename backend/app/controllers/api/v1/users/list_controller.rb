@@ -8,25 +8,16 @@ module Api
 
         def index
           users = User.all
-          if params[:search].present?
-            query = params[:search].downcase
-            users = users.select do |u|
-              [u[:name], u[:last_name], u[:email]].any? do |field|
-                field.downcase.include?(query)
-              end
-            end
-          end
+
+          users = users.where("unaccent(name) ILIKE unaccent(?)", "%#{params[:search]}%") if params[:search].present?
+          
+          # users = users.where(role: params[:role]) if params[:role].present?
+
+          @pagy, @users = pagy(users, items: params[:per_page] || 20)
 
           render json: {
-            users: users,
-            pagination: {
-              page: 1,
-              prev: nil,
-              next: nil,
-              last: 1,
-              count: users.size,
-              items: users.size
-            }
+            users: @users,
+            pagination: pagy_metadata(@pagy)
           }
         end
 

@@ -31,7 +31,41 @@ students = [
   { name: "Diego", last_name: "Martínez", email: "diegomartinez@gmail.com" },
   { name: "Sofía", last_name: "García", email: "sofiagarcia@gmail.com" },
   { name: "Martín", last_name: "Ramírez", email: "martinramirez@gmail.com" },
+
+  { name: "Clara", last_name: "Suárez", email: "clarasuarez@gmail.com" },
+  { name: "Andrés", last_name: "Méndez", email: "andresmendez@gmail.com" },
+  { name: "Paula", last_name: "Castro", email: "paulacastro@gmail.com" },
+  { name: "Jorge", last_name: "Vega", email: "jorgevega@gmail.com" },
+  { name: "Valentina", last_name: "Silva", email: "valentinasilva@gmail.com" },
+  { name: "Rodrigo", last_name: "Torres", email: "rodrigotorres@gmail.com" },
+  { name: "Florencia", last_name: "Pintos", email: "florenciapintos@gmail.com" },
+  { name: "Mateo", last_name: "Ramos", email: "mateoramos@gmail.com" },
+  { name: "Camila", last_name: "Sosa", email: "camilasosa@gmail.com" },
+  { name: "Bruno", last_name: "Acosta", email: "brunoacosta@gmail.com" },
+
+  { name: "Elena", last_name: "Domínguez", email: "elenadominguez@gmail.com" },
+  { name: "Tomás", last_name: "Garrido", email: "tomasgarrido@gmail.com" },
+  { name: "Natalia", last_name: "Guerra", email: "nataliaguerra@gmail.com" },
+  { name: "Sebastián", last_name: "Aguilar", email: "sebastianaguilar@gmail.com" },
+  { name: "Laura", last_name: "Maldonado", email: "lauramaldonado@gmail.com" },
+  { name: "Ignacio", last_name: "Ferrer", email: "ignacioferrer@gmail.com" },
+  { name: "Carolina", last_name: "Bermúdez", email: "carolinabermudez@gmail.com" },
+  { name: "Pablo", last_name: "Villar", email: "pablovillar@gmail.com" },
+  { name: "Agustina", last_name: "Benítez", email: "agustinabenitez@gmail.com" },
+  { name: "Federico", last_name: "Cardozo", email: "federicocardozo@gmail.com" },
+
+  { name: "Verónica", last_name: "Giménez", email: "veronicagimenez@gmail.com" },
+  { name: "Esteban", last_name: "Peralta", email: "estebanperalta@gmail.com" },
+  { name: "Rocío", last_name: "Vázquez", email: "rociovazquez@gmail.com" },
+  { name: "Gabriel", last_name: "Correa", email: "gabrielcorrea@gmail.com" },
+  { name: "Julieta", last_name: "Machado", email: "julietamachado@gmail.com" },
+  { name: "Fernando", last_name: "Núñez", email: "fernandonunez@gmail.com" },
+  { name: "Cecilia", last_name: "Morales", email: "ceciliamorales@gmail.com" },
+  { name: "Ricardo", last_name: "Mujica", email: "ricardomujica@gmail.com" },
+  { name: "Daniela", last_name: "Ruiz", email: "danielaruiz@gmail.com" },
+  { name: "Gustavo", last_name: "Ortega", email: "gustavoortega@gmail.com" }
 ]
+
 
 students.each do |student_data|
   User.find_or_create_by!(email: student_data[:email]) do |user|
