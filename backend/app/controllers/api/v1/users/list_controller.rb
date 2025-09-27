@@ -10,7 +10,7 @@ module Api
           users = User.all
 
           users = users.where("unaccent(name) ILIKE unaccent(?)", "%#{params[:search]}%") if params[:search].present?
-          
+
           # users = users.where(role: params[:role]) if params[:role].present?
 
           @pagy, @users = pagy(users, items: params[:per_page] || 20)
