@@ -13,7 +13,7 @@ export default function SubjectCard({
         <span className="font-medium">{subject.name}</span>
         {subject.due_date && (
           <span className="text-gray-500 text-xs">
-            Vencimiento: {new Date(subject.due_date).toLocaleDateString()}
+            Vencimiento: {new Date(subject.due_date).toLocaleDateString("es-ES")}
           </span>
         )}
       </div>

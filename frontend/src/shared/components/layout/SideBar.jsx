@@ -32,7 +32,6 @@ const Sidebar = ({
   const guestItems = [
     { title: "Inicio", path: "/flujo-visitante", Icon: Home },
     { title: "Materias", path: "/materias", Icon: GraduationCap },
-    { title: "Tutores", path: "/tutores", Icon: SquareUser },
   ];
 
   const menuItems = user ? authedItems : guestItems;

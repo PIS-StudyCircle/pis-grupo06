@@ -97,7 +97,7 @@ describe("SubjectPage", () => {
     expect(await screen.findByText("Tema I")).toBeInTheDocument();
   
     // Verifica que la fecha de vencimiento se muestre formateada
-    expect(screen.getByText(/Vencimiento:\s*9\/30\/2025/)).toBeInTheDocument();
+    expect(screen.getByText(/Vencimiento:\s*30\/9\/2025/)).toBeInTheDocument();
   });
 
   it("muestra checkboxes si showCheckbox es true", async () => {
