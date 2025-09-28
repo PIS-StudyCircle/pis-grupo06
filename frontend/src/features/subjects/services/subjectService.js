@@ -10,14 +10,14 @@ export const getSubjects = async (courseId, page = 1, perPage = 10, search = "")
   if (search) {
     params.append("search", search);
   }
-  const response = await fetch(`${API_BASE}/subjects?${params}`);
+  const response = await fetch(`${API_BASE}/courses/${courseId}/subjects?${params}`);
   
   if (!response.ok) throw new Error("Error al obtener los temas");
   return await response.json();
 };
 
-export const getSubject = async (subjectId) => {
-  const response = await fetch(`${API_BASE}/subjects/${subjectId}`, {
+export const getSubject = async (subjectId, courseId) => {
+  const response = await fetch(`${API_BASE}/courses/${courseId}/subjects/${subjectId}`, {
     credentials: "include",
   });
   

@@ -5,9 +5,9 @@ import { useParams } from "react-router-dom";
 
 
 export default function SubjectDetailPage() {
-  const { subjectId } = useParams();
+  const { courseId, subjectId } = useParams();
  
-  const { subject, loading, error } = useSubjectDetail(subjectId);
+  const { subject, loading, error } = useSubjectDetail(subjectId, courseId);
 
   
   return (

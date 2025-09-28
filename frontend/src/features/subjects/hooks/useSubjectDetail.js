@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getSubject } from "../services/subjectService";
 
-export const useSubjectDetail = (subjectId) => {
+export const useSubjectDetail = (subjectId, courseId) => {
   const [subject, setSubject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,7 +14,7 @@ export const useSubjectDetail = (subjectId) => {
       setError(null);
       
       try {
-        const response = await getSubject(subjectId);
+        const response = await getSubject(subjectId, courseId);
         
         // El backend devuelve la estructura: { data: { id, name, course_id, tutorings: [...] } }
         if (response.data) {
@@ -36,7 +36,7 @@ export const useSubjectDetail = (subjectId) => {
     };
 
     fetchSubjectDetail();
-  }, [subjectId]);
+  }, [subjectId, courseId]);
 
   return { subject, loading, error };
 };

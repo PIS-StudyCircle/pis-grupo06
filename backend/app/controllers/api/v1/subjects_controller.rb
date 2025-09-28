@@ -25,7 +25,10 @@ module Api
       end
 
       def show
-        subject = Subject.find(params[:id])
+        course = Course.find(params[:course_id])
+        subject = course.subjects.find(params[:id])
+
+        # subject = Subject.find(params[:id])
 
         data = {
           id: subject.id,

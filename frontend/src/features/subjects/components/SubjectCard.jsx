@@ -6,6 +6,7 @@ export default function SubjectCard({
   showCheckbox = false,
   onCheckboxChange,
   checked = false,
+  courseId,
 }) {
   return (
     <div className="flex items-center justify-between p-2 pl-4 border rounded-md bg-gray-50 text-gray-800 text-sm hover:bg-gray-100 h-15">
@@ -19,7 +20,7 @@ export default function SubjectCard({
       </div>
 
       {!showCheckbox && (
-        <Link to={`/temas/${subject.id}`}>
+        <Link to={`/materias/${courseId}/temas/${subject.id}`}>
           <button
             type="button"
             className="inline-flex items-center text-gray-700 hover:text-white border border-gray-800 hover:bg-gray-900 focus:outline-none font-medium rounded-lg text-sm px-2 py-2"
