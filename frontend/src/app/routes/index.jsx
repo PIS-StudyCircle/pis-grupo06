@@ -48,6 +48,11 @@ export function AppRoutes() {
       <Route path="/calendar" element={<TutorSchedulePage />} />
       <Route path="/appoint" element={<AppointClassPage />} />
       <Route path="/tutores" element={<TutorPage />} />
+      <Route path="/materias/:courseId/temas" element={<SubjectPage />} />
+
+      <Route path="/prototipoCalendar" element={<SessionList />} />
+      <Route path="/calendar" element={<TutorSchedulePage />} />
+      <Route path="/appoint" element={<AppointClassPage />} />
     </Routes>
   );
 }
