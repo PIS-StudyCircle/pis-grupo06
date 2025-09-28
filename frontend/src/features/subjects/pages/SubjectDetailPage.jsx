@@ -1,6 +1,7 @@
 import Footer from "@components/Footer";
 import { useSubjectDetail } from "../hooks/useSubjectDetail";
 import { TutoringPage } from "@/features/tutorings";
+import { useParams } from "react-router-dom";
 
 
 export default function SubjectDetailPage() {
