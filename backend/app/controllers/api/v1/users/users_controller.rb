@@ -22,7 +22,7 @@ module Api
         end
 
         def show
-          user = User.all.find { |u| u[:id] == params[:id].to_i }
+          user = User.find_by(id: params[:id])
           if user
             render json: user
           else
