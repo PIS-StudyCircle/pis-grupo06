@@ -12,8 +12,11 @@ Rails.application.routes.draw do
       get "up", to: proc { [200, {}, ['OK']] }
       namespace :users do
         get :me, to: 'me#show'
-        resources :list, only: [:index, :show]
       end
+
+      # index y show de UsersController
+      resources :users, module: :users, only: [:index, :show]
+
       resources :courses
       resources :subjects
       resources :tutorings

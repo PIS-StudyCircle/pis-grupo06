@@ -1,6 +1,6 @@
 import { API_BASE } from "@/shared/config";
 
-const API_URL = `${API_BASE}/users/list`;
+const API_URL = `${API_BASE}/users`;
 
 export const getUsers = async (page = 1, perPage = 20, search = "", role = "") => {
   const params = new URLSearchParams({ page, per_page: perPage });

@@ -1,7 +1,7 @@
 module Api
   module V1
     module Users
-      class ListController < ApplicationController
+      class UsersController < ApplicationController
         include Pagy::Backend
 
         before_action :authenticate_user!, except: [:index]
