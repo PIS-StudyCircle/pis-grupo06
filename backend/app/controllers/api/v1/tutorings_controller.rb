@@ -38,13 +38,13 @@ module Api
         else
           tutorings = tutorings.upcoming
         end
-        
+
         @pagy, @tutorings = pagy(tutorings, items: params[:per_page] || 20)
 
         tutoring_ids = @tutorings.pluck(:id)
         @tutorings_with_includes = Tutoring.where(id: tutoring_ids)
-                                          .includes(:course, :subjects)
-                                          .order(:id)
+                                           .includes(:course, :subjects)
+                                           .order(:id)
 
         render json: {
           tutorings: @tutorings_with_includes.map do |t|
@@ -55,7 +55,7 @@ module Api
               modality: t.modality,
               capacity: t.capacity,
               enrolled: t.enrolled,
-              
+
               course: {
                 id: t.course.id,
                 name: t.course.name,
