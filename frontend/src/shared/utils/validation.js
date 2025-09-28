@@ -1,5 +1,8 @@
-export function validateRequired(value, fieldName = "This field") {
+export function validateRequired(value, fieldName = "campo", gender = "m") {
   if (!value || value.trim() === "") {
+    if (gender === "f") {
+      return `La ${fieldName} es obligatoria`;
+    }
     return `El ${fieldName} es obligatorio`;
   }
   return null;

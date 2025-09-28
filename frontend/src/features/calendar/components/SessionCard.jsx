@@ -1,7 +1,8 @@
-// src/features/calendar/components/SessionCard.jsx
-import { Calendar, Clock, BookOpen, User, MapPin } from "lucide-react";
+import { Calendar, Clock, User, MapPin } from "lucide-react";
+import { deleteEvent } from "../services/calendarApi";
+import { showSuccess, showError, showConfirm } from "@utils/toastService";
 
-export default function SessionCard({ session }) {
+export default function SessionCard({ session, refresh }) {
   const formatDate = (date) => {
     return date.toLocaleDateString("es-ES", {
       weekday: "long",
@@ -42,6 +43,23 @@ export default function SessionCard({ session }) {
       default:
         return status;
     }
+  };
+  const handleCancel = (sessionId, refresh) => {
+    showConfirm(
+      "¿Seguro que deseas cancelar esta tutoría?",
+      async () => {
+        try {
+          await deleteEvent(sessionId);
+          showSuccess("Evento cancelado correctamente");
+          if (refresh) refresh();
+        } catch (err) {
+          showError("Error al cancelar: " + err.message);
+        }
+      },
+      () => {
+        console.log("Cancelado por el usuario");
+      }
+    );
   };
 
   return (
@@ -119,7 +137,10 @@ export default function SessionCard({ session }) {
         {session.status !== "cancelada" && (
           <>
             <span className="text-gray-300">|</span>
-            <button className="text-red-600 hover:text-red-800 text-sm font-medium">
+            <button
+              onClick={() => handleCancel(session.id, refresh)}
+              className="text-red-600 hover:text-red-800 text-sm font-medium"
+            >
               Cancelar
             </button>
           </>

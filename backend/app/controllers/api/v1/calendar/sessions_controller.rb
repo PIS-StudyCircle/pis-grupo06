@@ -80,6 +80,20 @@ class Api::V1::Calendar::SessionsController < ApplicationController
     render json: { success: false, error: e.message }, status: :unprocessable_entity
   end
 
+  def destroy
+    user = current_user
+    access_token = refresh_google_token(user) if user.google_expires_at < Time.now
+
+    service = Google::Apis::CalendarV3::CalendarService.new
+    service.authorization = user.google_access_token || access_token
+
+    service.delete_event('primary', params[:id]) 
+
+    render json: { success: true }
+  rescue => e
+    render json: { success: false, error: e.message }, status: :unprocessable_entity
+  end
+
   private
 
   def refresh_google_token(user)

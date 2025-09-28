@@ -23,7 +23,7 @@ Rails.application.routes.draw do
       resources :tutorings
 
       namespace :calendar do
-        resources :sessions, only: [:index, :create]
+        resources :sessions, only: [:index, :create, :destroy]
       end
     end
   end
