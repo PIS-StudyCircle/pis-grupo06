@@ -54,13 +54,13 @@ export default function Profile() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full p-6 border border-gray-200">
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full  border border-gray-200">
             <SessionList userId={user.id} />
           </div>
         </div>
 
         {/* Esto solo hay que mostrarlo cunado es tutor! */}
-        <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full max-w-xl p-6 border border-gray-200">
+        <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full max-w-xl border border-gray-200">
           <TutorSchedulePage tutor={user} />
         </div>
       </div>

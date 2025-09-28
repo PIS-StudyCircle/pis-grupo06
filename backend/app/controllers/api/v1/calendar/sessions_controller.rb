@@ -36,7 +36,13 @@ class Api::V1::Calendar::SessionsController < ApplicationController
         subject: event.summary,
         tutor: user.name, 
         date: event.start.date_time || event.start.date,
-        duration: event.end.date_time && event.start.date_time ? ((event.end.date_time - event.start.date_time) / 60).to_i : nil,
+        duration: if event.end.date_time && event.start.date_time
+                 start_time = event.start.date_time.to_time
+                 end_time   = event.end.date_time.to_time
+                 ((end_time - start_time) / 60).to_i
+               else
+                 nil
+               end,
         location: event.location || "Sin ubicación",
         status: event.status, 
         topics: event.description.present? ? [event.description] : []
