@@ -4,6 +4,18 @@ require 'google/apis/calendar_v3'
 class Api::V1::Calendar::SessionsController < ApplicationController
   before_action :authenticate_user!
 
+  def translate_response_status(status)
+    case status
+    when "needsAction" then "pendiente"
+    when "accepted"    then "confirmada"
+    when "declined"    then "rechazada"
+    when "tentative"   then "tentativa"
+    else "desconocido"
+    end
+  end
+
+  
+
   # GET /api/v1/calendar/sessions?user_id=1
   def index
     user = User.find(params[:user_id])
@@ -31,6 +43,9 @@ class Api::V1::Calendar::SessionsController < ApplicationController
     end
 
     sessions = tutoring_events.map do |event|
+      attendee_status = event.attendees&.map do |a|
+        { email: a.email, status: translate_response_status(a.response_status) }
+      end
       {
         id: event.extended_properties.private["tutoring_id"].presence || event.id,
         subject: event.summary,
@@ -45,6 +60,7 @@ class Api::V1::Calendar::SessionsController < ApplicationController
                end,
         location: event.location || "Sin ubicación",
         status: event.status, 
+        attendees: attendee_status,
         topics: event.description.present? ? [event.description] : []
       }
     end
