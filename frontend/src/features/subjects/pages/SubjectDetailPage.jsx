@@ -1,4 +1,3 @@
-import { useParams, useNavigate } from "react-router-dom";
 import Footer from "@components/Footer";
 import { useSubjectDetail } from "../hooks/useSubjectDetail";
 import { TutoringPage } from "@/features/tutorings";
