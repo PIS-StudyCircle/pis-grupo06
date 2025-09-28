@@ -15,6 +15,9 @@ Rails.application.routes.draw do
         get :me, to: 'me#show'
       end
 
+      # index y show de UsersController
+      resources :users, module: :users, only: [:index, :show]
+
       resources :courses
       resources :subjects
       resources :tutorings

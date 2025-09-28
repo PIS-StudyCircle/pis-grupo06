@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import Profile from "../pages/Profile";
+import Profile from "../pages/ProfilePage";
 import React from "react";
 
 jest.mock("@context/UserContext", () => ({
@@ -73,7 +73,7 @@ describe("<Profile />", () => {
       name: "Ana",
       last_name: "García",
       email: "ana@ejemplo.com",
-      description: "", 
+      description: "",
     };
     useUser.mockReturnValue({ user: fakeUser, loading: false, error: null });
 
@@ -88,8 +88,6 @@ describe("<Profile />", () => {
     expect(screen.getByDisplayValue(fakeUser.email)).toBeInTheDocument();
 
     // No hay textarea de descripción cuando description es vacía
-    expect(
-      screen.queryByLabelText("Descripción")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Descripción")).not.toBeInTheDocument();
   });
 });
