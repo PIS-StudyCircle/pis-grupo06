@@ -51,7 +51,7 @@ export default function AppointPage() {
         .split(",")
         .map((email) => ({ email: email.trim() }))
         .filter((a) => a.email);
-
+      console.log(attendeesArr);
       const eventData = {
         title: form.title,
         description: form.description,

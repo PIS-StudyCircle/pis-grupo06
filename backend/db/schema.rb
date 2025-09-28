@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_28_190122) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_28_193245) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -73,6 +73,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_28_190122) do
     t.integer "duration_mins", default: 60, null: false
     t.string "modality", null: false
     t.integer "capacity", null: false
+    t.integer "enrolled", default: 0, null: false
   end
 
   create_table "universities", force: :cascade do |t|

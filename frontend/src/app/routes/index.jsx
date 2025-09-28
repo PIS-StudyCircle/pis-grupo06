@@ -10,13 +10,17 @@ import {
   VisitorFlow,
   ForgotPasswordPage,
   ResetPasswordPage,
-  UserProfilePage
+  UserProfilePage,
 } from "@/features/users";
 import { SubjectPage } from "@/features/subjects";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 import { TutoringPage } from "@/features/tutorings";
 
-import { SessionList, TutorSchedulePage, AppointClassPage } from "@/features/calendar";
+import {
+  SessionListPage,
+  TutorSchedulePage,
+  AppointClassPage,
+} from "@/features/calendar";
 
 export function AppRoutes() {
   return (
@@ -44,15 +48,10 @@ export function AppRoutes() {
       <Route path="/materias/:courseId" element={<CourseDetailPage />} />
       <Route path="/materias/:courseId/temas" element={<SubjectPage />} />
 
-      <Route path="/prototipoCalendar" element={<SessionList />} />
+      <Route path="/prototipoCalendar" element={<SessionListPage />} />
       <Route path="/calendar" element={<TutorSchedulePage />} />
       <Route path="/appoint" element={<AppointClassPage />} />
       <Route path="/tutores" element={<TutorPage />} />
-      <Route path="/materias/:courseId/temas" element={<SubjectPage />} />
-
-      <Route path="/prototipoCalendar" element={<SessionList />} />
-      <Route path="/calendar" element={<TutorSchedulePage />} />
-      <Route path="/appoint" element={<AppointClassPage />} />
     </Routes>
   );
 }
