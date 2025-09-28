@@ -16,7 +16,7 @@ import { SubjectPage } from "@/features/subjects";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 import { TutoringPage } from "@/features/tutorings";
 
-import { StudentCalendarPage, TutorSchedulePage } from "@/features/calendar";
+import { StudentCalendarPage, TutorSchedulePage, AppointClassPage } from "@/features/calendar";
 
 export function AppRoutes() {
   return (
@@ -46,6 +46,7 @@ export function AppRoutes() {
 
       <Route path="/prototipoCalendar" element={<StudentCalendarPage />} />
       <Route path="/calendar" element={<TutorSchedulePage />} />
+      <Route path="/appoint" element={<AppointClassPage />} />
       <Route path="/tutores" element={<TutorPage />} />
     </Routes>
   );
