@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-RSpec.describe "Api::V1::Users::ListController", type: :request do
-  let(:base_url) { "/api/v1/users/list" }
+RSpec.describe "Api::V1::Users::UsersController", type: :request do
+  let(:base_url) { "/api/v1/users" }
 
   let!(:university) { University.create!(name: "Universidad de la República") }
   let!(:faculty)    { Faculty.create!(name: "Facultad de Ingeniería", university: university) }
