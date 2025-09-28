@@ -34,6 +34,3 @@
 /config/credentials/staging.key
 
 /config/credentials/production.key
-
-# Ignore coverage from testing
-/coverage
