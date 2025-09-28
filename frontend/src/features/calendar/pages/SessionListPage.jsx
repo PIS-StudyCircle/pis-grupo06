@@ -1,30 +1,37 @@
-import { useState, useEffect } from "react";
-import { Calendar } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 import SessionCard from "../components/SessionCard";
+import { Calendar } from "lucide-react";
 import { getSessionsByUser } from "../services/calendarApi";
+import { showError } from "@utils/toastService";
 
-export default function StudentCalendarPage({ userId }) {
+export default function SessionList({ userId }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchSessions = useCallback(async () => {
     if (!userId) return;
-
     setLoading(true);
-    getSessionsByUser(userId)
-      .then((data) => {
-        // Si el backend devuelve las fechas como strings ISO8601,
-        // hay que convertirlas a objetos Date
-        const parsed = data.map((s) => ({
+    try {
+      const data = await getSessionsByUser(userId);
+      const parsed = data
+        .map((s) => ({
           ...s,
           date: new Date(s.date),
-        }));
-        parsed.sort((a, b) => a.date - b.date);
-        setSessions(parsed);
-      })
-      .catch(() => setSessions([]))
-      .finally(() => setLoading(false));
+        }))
+        .sort((a, b) => a.date - b.date);
+
+      setSessions(parsed);
+    } catch (err) {
+      showError("Error al cargar sesiones: " + err.message);
+      setSessions([]);
+    } finally {
+      setLoading(false);
+    }
   }, [userId]);
+
+  useEffect(() => {
+    fetchSessions();
+  }, [fetchSessions]);
 
   if (loading) {
     return (
@@ -77,7 +84,11 @@ export default function StudentCalendarPage({ userId }) {
 
       <div className="space-y-4 w-full">
         {sessions.map((session) => (
-          <SessionCard key={session.id} session={session} />
+          <SessionCard
+            key={session.id}
+            session={session}
+            refresh={fetchSessions} 
+          />
         ))}
       </div>
     </div>

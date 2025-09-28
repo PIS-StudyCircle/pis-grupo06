@@ -1,5 +1,5 @@
 import { useUser } from "@context/UserContext";
-import { StudentCalendarPage, TutorSchedulePage } from "@/features/calendar";
+import { SessionList, TutorSchedulePage } from "@/features/calendar";
 
 export default function Profile() {
   const { user, loading, error } = useUser();
@@ -55,10 +55,11 @@ export default function Profile() {
           </div>
 
           <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full p-6 border border-gray-200">
-            <StudentCalendarPage userId={user.id} />
+            <SessionList userId={user.id} />
           </div>
         </div>
 
+        {/* Esto solo hay que mostrarlo cunado es tutor! */}
         <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full max-w-xl p-6 border border-gray-200">
           <TutorSchedulePage tutor={user} />
         </div>

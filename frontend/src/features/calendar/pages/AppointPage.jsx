@@ -1,28 +1,51 @@
-import { useState } from "react";
 import { createClassEvent } from "../services/calendarApi";
+import { Input } from "@components/Input";
+import { useFormState } from "@utils/UseFormState";
+import { useValidation } from "@hooks/useValidation";
+import { validateRequired } from "@utils/validation";
+import { SubmitButton } from "@components/SubmitButton";
+import { showSuccess, showError } from "@utils/toastService";
+import  { useNavigate  } from "react-router-dom";    
+
+const validators = {
+  title: (value) => validateRequired(value, "Título"),
+  description: (value) => validateRequired(value, "Descripción", "f"),
+  date: (value) => validateRequired(value, "Fecha"),
+  start_time: (value) => validateRequired(value, "Hora de inicio", "f"),
+  end_time: (value) => validateRequired(value, "Hora de fin", "f"),
+  attendees: (value) => validateRequired(value, "Participantes"),
+};
 
 export default function AppointPage() {
-  const [form, setForm] = useState({
+  const navigate = useNavigate();
+  const { form, setField } = useFormState({
     title: "",
     description: "",
-    start: "",
-    end: "",
+    date: "",
+    start_time: "",
+    end_time: "",
     attendees: "",
   });
 
+  const { errors, validate } = useValidation(validators);
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setField(e.target.name, e.target.value);
   };
 
   const toGoogleDateTime = (date, time) => {
-  const [year, month, day] = date.split("-");
-  const [hours, minutes] = time.split(":");
-  return `${year}-${month}-${day}T${hours}:${minutes}:00-03:00`;
-};
-
+    const [year, month, day] = date.split("-");
+    const [hours, minutes] = time.split(":");
+    return `${year}-${month}-${day}T${hours}:${minutes}:00-03:00`;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validate(form)) {
+      return;
+    }
+
     try {
       const attendeesArr = form.attendees
         .split(",")
@@ -30,126 +53,125 @@ export default function AppointPage() {
         .filter((a) => a.email);
 
       const eventData = {
-  title: form.title,
-  description: form.description,
-  start: toGoogleDateTime(form.date, form.start_time),
-  end: toGoogleDateTime(form.date, form.end_time),
-  attendees: attendeesArr,
-};
+        title: form.title,
+        description: form.description,
+        start: toGoogleDateTime(form.date, form.start_time),
+        end: toGoogleDateTime(form.date, form.end_time),
+        attendees: attendeesArr,
+      };
 
       const event = await createClassEvent(eventData);
 
       console.log("Evento creado exitosamente:", event);
-      alert(
-        "¡Evento creado exitosamente! Revisa la consola para más detalles."
-      );
+      showSuccess("¡Evento creado exitosamente!"); 
+      navigate("/perfil");
     } catch (error) {
       console.error("Error al crear el evento:", error);
-      alert(`Error al crear el evento: ${error.message}`);
+      showError(`Error al crear el evento: ${error.message}`); 
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Página de Citas - Testing
+    <div className="min-h-screen bg-gray-50 py-10 px-6">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-10 text-center">
+          Crear Evento de Clase
         </h1>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Crear Evento
+        <div
+          className="bg-gradient-to-br from-white to-gray-50 
+                    rounded-2xl shadow-2xl border border-gray-200 
+                    p-10"
+        >
+          <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-center">
+            Detalles del Evento
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Título
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={form.title}
-                onChange={handleChange}
-                className="w-full border rounded px-3 py-2"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Descripción
-              </label>
-              <input
-                type="text"
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                className="w-full border rounded px-3 py-2"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Fecha
-              </label>
-              <input
-                type="date"
-                name="date"
-                value={form.date}
-                onChange={handleChange}
-                className="w-full border rounded px-3 py-2"
-                required
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              id="title"
+              label="Título"
+              type="text"
+              value={form.title}
+              onChange={handleChange}
+              placeholder="Título del evento"
+              className="w-full"
+              error={errors.title}
+            />
 
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Hora de inicio
-              </label>
-              <input
+            <Input
+              id="description"
+              label="Descripción"
+              type="text"
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              placeholder="Descripción del evento"
+              className="w-full"
+              error={errors.description}
+            />
+
+            <Input
+              id="date"
+              label="Fecha"
+              type="date"
+              name="date"
+              value={form.date}
+              onChange={handleChange}
+              className="w-full"
+              error={errors.date}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Input
+                id="start_time"
+                label="Hora de inicio"
                 type="time"
                 name="start_time"
                 value={form.start_time}
                 onChange={handleChange}
-                className="w-full border rounded px-3 py-2"
-                required
+                className="w-full"
+                error={errors.start_time}
               />
-            </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Hora de fin
-              </label>
-              <input
+              <Input
+                id="end_time"
+                label="Hora de fin"
                 type="time"
                 name="end_time"
                 value={form.end_time}
                 onChange={handleChange}
-                className="w-full border rounded px-3 py-2"
-                required
+                className="w-full"
+                error={errors.end_time}
               />
             </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Emails de asistentes (separados por coma)
-              </label>
-              <input
-                type="text"
-                name="attendees"
-                value={form.attendees}
-                onChange={handleChange}
-                className="w-full border rounded px-3 py-2"
-                placeholder="ejemplo1@mail.com, ejemplo2@mail.com"
-                required
+            <Input
+              id="attendees"
+              label="Participantes (emails separados por comas)"
+              type="text"
+              name="attendees"
+              value={form.attendees}
+              onChange={handleChange}
+              placeholder="ejemplo1@mail.com, ejemplo2@mail.com"
+              error={errors.attendees}
+              className="w-full"
+            />
+
+            <div className="pt-6 flex justify-end gap-4">
+              <SubmitButton
+                text="Crear Evento"
+                fullWidth={false}
+                className="w-40"
               />
+              <button
+                type="button"
+                onClick={() => window.history.back()}
+                className="w-40 px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-md 
+                hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+              >
+                Cancelar
+              </button>
             </div>
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
-            >
-              Crear Evento
-            </button>
           </form>
         </div>
       </div>
