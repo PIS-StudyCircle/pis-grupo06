@@ -14,7 +14,23 @@ class Api::V1::Calendar::SessionsController < ApplicationController
     end
   end
 
-  
+   def session_status(event, attendees)
+    return "cancelada" if event.status == "cancelled"
+
+    # si algún invitado rechazó
+    return "rechazada" if attendees&.any? { |a| a[:status] == "rechazada" }
+
+    # si alguno está pendiente
+    return "pendiente" if attendees&.any? { |a| a[:status] == "pendiente" }
+
+    # si alguno está tentativo
+    return "tentativa" if attendees&.any? { |a| a[:status] == "tentativa" }
+
+    # si todos confirmaron
+    return "confirmada" if attendees&.all? { |a| a[:status] == "confirmada" }
+
+    "desconocido"
+  end
 
   # GET /api/v1/calendar/sessions?user_id=1
   def index
@@ -29,7 +45,7 @@ class Api::V1::Calendar::SessionsController < ApplicationController
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = user.google_access_token || access_token
 
-    # obtener próximos eventos (ejemplo: los siguientes 10)
+    # obtener próximos eventos (estos son todos los eventos del usuario)
     result = service.list_events(
       'primary',
       max_results: 50,
@@ -38,6 +54,7 @@ class Api::V1::Calendar::SessionsController < ApplicationController
       time_min: Time.now.iso8601
     )
 
+    # filtrar eventos de tutorías (StudyCircle)
     tutoring_events = result.items.select do |event|
       event.extended_properties&.private&.[]("app") == "tutorias"
     end
@@ -59,7 +76,7 @@ class Api::V1::Calendar::SessionsController < ApplicationController
                  nil
                end,
         location: event.location || "Sin ubicación",
-        status: event.status, 
+        status: session_status(event, attendee_status),
         attendees: attendee_status,
         topics: event.description.present? ? [event.description] : []
       }
