@@ -6,7 +6,7 @@ import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
 
 
-export default function SubjectPage({courseId, showCheckbox = false, showButton = false, onSelectionChange}) {
+export default function SubjectPage({ courseId, showButton = false, selectedSubjects = [], onSelectionChange }) {
 
   const {
     subjects,
@@ -42,15 +42,21 @@ export default function SubjectPage({courseId, showCheckbox = false, showButton 
           <h1 className="text-2xl font-bold p-2 mb-4 text-black">
             Temas
           </h1>
-
           <SearchInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar tema..."
           />
-
-          <SubjectList subjects={subjects} loading={loading} error={error} showCheckbox={showCheckbox} showButton={showButton} courseId={courseId} onCreated={handleCreated} onSelectionChange={onSelectionChange} />
-
+          <SubjectList
+            subjects={subjects}
+            loading={loading}
+            error={error}
+            showButton={showButton}
+            courseId={courseId}
+            onCreated={handleCreated}
+            selectedSubjects={selectedSubjects}
+            onSelectionChange={onSelectionChange}
+          />
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>
       </div>

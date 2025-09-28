@@ -75,7 +75,7 @@ export default function CourseDetailPage() {
               </div>
 
              {/*El mostrar los temas de la materia se delega a SubjectPage*/}
-             <SubjectPage courseId={course.id} showCheckbox = {false} showButton={false} />
+             <SubjectPage courseId={course.id} showButton={false} />
 
             </div>
           </div>

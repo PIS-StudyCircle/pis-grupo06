@@ -1,25 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import SubjectCard from "./SubjectCard";
 import { createSubject } from "../services/subjectService";
 import { useValidation } from "@hooks/useValidation";
 import { validateRequired, validateDate } from "@utils/validation";
+import { useUser } from "@context/UserContext"; //lo pongo para que funcione con la seed que estoy utilizando y no cambiar mucho, pero esto no iria
 
 export default function SubjectList({
   subjects,
   loading,
   error,
-  showCheckbox = false,
   showButton = false,
   courseId,
   onCreated = () => {},
+  selectedSubjects = [],
   onSelectionChange = () => {},
 }) {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newName, setNewName] = useState("");
   const [newDate, setNewDate] = useState("");
-  const [selectedIds, setSelectedIds] = useState([]); // Para crear tutorías
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
+  const { user } = useUser(); //lo pongo para que funcione con la seed que estoy utilizando y no cambiar mucho, pero esto no iria
 
   // --- Validaciones ---
   const validators = {
@@ -27,11 +28,6 @@ export default function SubjectList({
     dueDate: (value) => validateDate(value, "Fecha de vencimiento"),
   };
   const { errors, validate } = useValidation(validators);
-
-  // --- Notificar cambios de selección ---
-  useEffect(() => {
-    onSelectionChange(selectedIds);
-  }, [selectedIds, onSelectionChange]);
 
   // --- Early returns ---
   if (loading) return <div>Cargando temas...</div>;
@@ -50,6 +46,7 @@ export default function SubjectList({
         name: newName,
         course_id: courseId,
         due_date: newDate || null,
+        creator_id: user?.id, // lo pongo para que funcione con la seed que estoy utilizando y no cambiar mucho, pero esto no iria
       });
 
       onCreated?.();
@@ -58,8 +55,9 @@ export default function SubjectList({
       setNewName("");
       setNewDate("");
 
-      if (showCheckbox) {
-        setSelectedIds((prev) => [...prev, created.id]);
+      // Agrega el nuevo tema a la selección global
+      if (showButton) {
+        onSelectionChange([...selectedSubjects, created.id]);
       }
     } catch (err) {
       const msg =
@@ -74,10 +72,13 @@ export default function SubjectList({
     }
   };
 
-  const handleCheckboxChange = (id, checked) => {
-    setSelectedIds((prev) =>
-      checked ? [...prev, id] : prev.filter((sid) => sid !== id)
-    );
+  const handleSelect = (id) => {
+    if (!onSelectionChange) return;
+    if (selectedSubjects.includes(id)) {
+      onSelectionChange(selectedSubjects.filter((sid) => sid !== id));
+    } else {
+      onSelectionChange([...selectedSubjects, id]);
+    }
   };
 
   return (
@@ -164,9 +165,9 @@ export default function SubjectList({
         <SubjectCard
           key={subject.id}
           subject={subject}
-          showCheckbox={showCheckbox}
-          onCheckboxChange={handleCheckboxChange}
-          checked={selectedIds.includes(subject.id)}
+          selectable={showButton}
+          selected={selectedSubjects.includes(subject.id)}
+          onSelect={handleSelect}
         />
       ))}
     </div>

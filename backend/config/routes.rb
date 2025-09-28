@@ -18,6 +18,8 @@ Rails.application.routes.draw do
 
       resources :subjects
 
+      resources :tutorings
+
     end
   end
 end

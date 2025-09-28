@@ -1,9 +1,9 @@
 import { useSearchParams } from "react-router-dom";
 import { useUser } from "@context/UserContext"; 
-import { useCourse } from "../../../courses/hooks/useCourse";
+import { useCourse } from "../../courses/hooks/useCourse";
 import { createTutoringByTutor } from "../services/tutoringService";
 
-import { AuthLayout } from "../../../users/components/AuthLayout.jsx";
+import { AuthLayout } from "../../users/components/AuthLayout.jsx";
 import { Input } from "@components/Input";
 import { Textarea } from "@components/Textarea";
 import { ErrorAlert } from "@components/ErrorAlert";
@@ -43,18 +43,14 @@ export default function CreateTutoringByTutor() {
 
   const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
 
-  // Cambia los nombres de los campos a snake_case para el backend
   const { form, setField } = useFormState({
-    user_id: user?.id ?? "",
-    course_id: courseId,
-    subject_ids: selectedSubjects ?? [],
     title: "",
     description: "",
     date: "",
     start_time: "",
     end_time: "",
     mode: "virtual",
-    limit: "",
+    limit: "20",
   });
 
   const { errors, validate } = useValidation(validators);
@@ -71,14 +67,30 @@ export default function CreateTutoringByTutor() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate(form)) {
-      onSubmit(form);
+      const scheduled_at = `${form.date}T${form.start_time}:00`;
+      const [startH, startM] = form.start_time.split(":").map(Number);
+      const [endH, endM] = form.end_time.split(":").map(Number);
+      const duration_mins = (endH * 60 + endM) - (startH * 60 + startM);
+
+      const payload = {
+        title: form.title,
+        description: form.description,
+        scheduled_at,
+        duration_mins,
+        modality: form.mode,
+        capacity: parseInt(form.limit, 10),
+        tutor_id: user.id,
+        course_id: course.id,
+        subject_ids: selectedSubjects,
+      };
+      onSubmit(payload);
       localStorage.removeItem("selectedSubjects");
     }
   };
 
   return (
     <AuthLayout
-      title={`Crear Tutoría para ${course.name}`}
+      title={`Tutoría para ${course.name}`}
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
         <Input
@@ -118,43 +130,45 @@ export default function CreateTutoringByTutor() {
           )}
         </div>
 
-        <div className="flex flex-row gap-4">
-          <div className="flex flex-col flex-1">
-            <label
-              htmlFor="start_time"
-              className="text-gray-600 text-xs font-medium mb-1"
-            >
-              Hora de inicio
-            </label>
-            <input
-              id="start_time"
-              type="time"
-              value={form.start_time}
-              onChange={(e) => setField("start_time", e.target.value)}
-              className="p-1 border rounded-md text-sm"
-            />
-            {errors.start_time && (
-              <span className="text-red-500 text-xs">{errors.start_time}</span>
-            )}
+        <div>
+          <div className="flex flex-row gap-4">
+            <div className="flex flex-col flex-1">
+              <label
+                htmlFor="start_time"
+                className="text-gray-600 text-xs font-medium mb-1"
+              >
+                Hora de inicio
+              </label>
+              <input
+                id="start_time"
+                type="time"
+                value={form.start_time}
+                onChange={(e) => setField("start_time", e.target.value)}
+                className="p-1 border rounded-md text-sm"
+              />
+            </div>
+            <div className="flex flex-col flex-1">
+              <label
+                htmlFor="end_time"
+                className="text-gray-600 text-xs font-medium mb-1"
+              >
+                Hora de fin
+              </label>
+              <input
+                id="end_time"
+                type="time"
+                value={form.end_time}
+                onChange={(e) => setField("end_time", e.target.value)}
+                className="p-1 border rounded-md text-sm"
+              />
+            </div>
           </div>
-          <div className="flex flex-col flex-1">
-            <label
-              htmlFor="end_time"
-              className="text-gray-600 text-xs font-medium mb-1"
-            >
-              Hora de fin
-            </label>
-            <input
-              id="end_time"
-              type="time"
-              value={form.end_time}
-              onChange={(e) => setField("end_time", e.target.value)}
-              className="p-1 border rounded-md text-sm"
-            />
-            {errors.end_time && (
-              <span className="text-red-500 text-xs">{errors.end_time}</span>
-            )}
-          </div>
+          {errors.start_time && (
+            <span className="text-red-500 text-xs">{errors.start_time}</span>
+          )}
+          {!errors.start_time && errors.end_time && (
+            <span className="text-red-500 text-xs">{errors.end_time}</span>
+          )}
         </div>
 
         <div className="flex items-center gap-4">
@@ -192,7 +206,6 @@ export default function CreateTutoringByTutor() {
             pattern="[0-9]*"
             value={form.limit}
             onChange={(e) => setField("limit", e.target.value.replace(/[^0-9]/g, ""))}
-            placeholder="20"
             error={errors.limit}
             className="flex-1"
             autoComplete="off"

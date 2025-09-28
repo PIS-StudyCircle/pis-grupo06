@@ -8,8 +8,8 @@ import ProfilePage from "@/features/users/pages/Profile";
 import CoursePage from "@/features/courses/pages/CoursePage";
 import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
 import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
-import SelectTutoringByTutor from "@/features/subjects/tutoring/pages/SelectTutoringByTutor";
-import CreateTutoringByTutor from "@/features/subjects/tutoring/pages/CreateTutoringByTutor";
+import SelectTutoringByTutor from "@/features/tutoring/pages/SelectTutoringByTutor";
+import CreateTutoringByTutor from "@/features/tutoring/pages/CreateTutoringByTutor";
 
 
 export function AppRoutes() {

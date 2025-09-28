@@ -192,4 +192,26 @@ Subject.find_or_create_by!(name: "Aplicaciones a física e ingeniería", course:
   s.creator = creator
 end
 
+# ------ TUTORIAS ------
 
+# Tutoría 1 creada por tutor, con 2 temas
+creator = User.find_by!(email: "anaperez@gmail.com")
+course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
+
+# Elegir entre 1 y 3 subjects al azar
+subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
+tutoring = Tutoring.find_or_create_by!(
+  # title: "Tutoría de GAL1"
+  # description: "Tutoría de 2 temas de Gal 1 para preparar el examen"
+  scheduled_at: 6.days.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 10,
+)
+
+subjects.each do |subject|
+  tutoring.subject_tutorings.create!(subject: subject)
+end
+
+tutoring.user_tutorings.create!(user: creator)

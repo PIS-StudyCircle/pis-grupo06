@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Footer from "@components/Footer";
-import { useCourse } from "../../../courses/hooks/useCourse";
-import SubjectPage from "../../../subjects/pages/SubjectPage";
+import { useCourse } from "../../courses/hooks/useCourse";
+import SubjectPage from "../../subjects/pages/SubjectPage";
 
 export default function CreateTutoringByTutor() {
   const [searchParams] = useSearchParams();
@@ -47,7 +47,7 @@ export default function CreateTutoringByTutor() {
                 </button>
               </form>
 
-              <SubjectPage courseId={courseId} showCheckbox={true} showButton={true} onSelectionChange={setSelectedSubjects} />
+              <SubjectPage courseId={courseId} showButton={true} selectedSubjects={selectedSubjects} onSelectionChange={setSelectedSubjects} />
 
             </div>
           </div>
