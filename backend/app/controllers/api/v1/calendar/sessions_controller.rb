@@ -27,12 +27,12 @@ class Api::V1::Calendar::SessionsController < ApplicationController
     )
 
     tutoring_events = result.items.select do |event|
-      event.extended_properties&.private&.dig('tutoring_id').present?
+      event.extended_properties&.private&.[]("app") == "tutorias"
     end
 
     sessions = tutoring_events.map do |event|
       {
-        id: event.extended_properties.private['tutoring_id'],
+        id: event.extended_properties.private["tutoring_id"].presence || event.id,
         subject: event.summary,
         tutor: user.name, 
         date: event.start.date_time || event.start.date,
@@ -43,9 +43,9 @@ class Api::V1::Calendar::SessionsController < ApplicationController
       }
     end
 
-    if sessions.empty?
-        sessions = data
-    end
+    # if sessions.empty?
+    #     sessions = data
+    # end
 
     render json: sessions
   rescue => e
@@ -67,10 +67,11 @@ class Api::V1::Calendar::SessionsController < ApplicationController
       end:   { date_time: params[:end_time],   time_zone: 'America/Montevideo' },
       attendees: (params[:attendees] || []).map { |a| { email: a[:email] } },
       extended_properties: {
-        private: {
-          tutoring_id: params[:tutoring_id].to_s  
-        }
+      private: {
+        "tutoring_id" => params[:tutoring_id].to_s,
+        "app" => "tutorias"   
       }
+    }
     )
 
     result = service.insert_event('primary', event)
