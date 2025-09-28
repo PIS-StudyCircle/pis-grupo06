@@ -8,7 +8,7 @@ export default function TutoringList({ tutorings, loading, error, mode = "" }) {
   return(
     <div className="flex flex-col">
       {tutorings.map((tutoring) => (
-        <TutoringCard key={tutoring.id} tutoring={tutoring} mode={mode} />
+        <TutoringCard key={tutoring.id} tutoring={tutoring} mode={(mode(tutoring))}  />
       ))}
     </div>
     );

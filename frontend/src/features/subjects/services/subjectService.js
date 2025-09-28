@@ -16,6 +16,19 @@ export const getSubjects = async (courseId, page = 1, perPage = 10, search = "")
   return await response.json();
 };
 
+export const getSubject = async (subjectId) => {
+  const response = await fetch(`${API_BASE}/subjects/${subjectId}`, {
+    credentials: "include",
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || "Error al obtener el tema");
+  }
+  
+  return await response.json();
+};
+
 export const createSubject = async ({ name, course_id}) => {
 
   const body = { subject: { name, course_id} };

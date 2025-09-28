@@ -27,26 +27,10 @@ module Api
       def show
         subject = Subject.find(params[:id])
 
-        active_tutorings = subject.tutorings
-                                  .upcoming
-                                  .order(:scheduled_at)
-
         data = {
           id: subject.id,
           name: subject.name,
-          course_id: subject.course_id,
-          tutorings: active_tutorings.map do |t|
-            {
-              id: t.id,
-              scheduled_at: t.scheduled_at,
-              duration_mins: t.duration_mins,
-              modality: t.modality,
-              capacity: t.capacity,
-              enrolled: t.enrolled,
-              seats_left: t.capacity - t.enrolled,
-              tutor_id: t.tutor_id
-            }
-          end
+          due_date: subject.due_date
         }
 
         success_response(message: "Tema y tutorias cargadas con exito", data: data)

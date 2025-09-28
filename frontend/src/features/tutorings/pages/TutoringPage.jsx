@@ -1,11 +1,37 @@
 import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";    
 import Pagination from "@components/Pagination";
-
+import { useUser } from "@context/UserContext";
 
 export default function TutoringPage({filters = {}, mode = ""}) {
-  const { tutorings, loading, error, pagination, page, setPage } = useTutorings(1, 20, filters);
+  const hookResult = useTutorings(1, 20, filters);
+  
+    
+  const { tutorings, loading, error, pagination, page, setPage } = hookResult;
   const totalPages = pagination.last || 1;
+  const { user } = useUser();
+  
+  const getModeForTutoring = (tutoring) => {
+    if (tutoring.tutor_id === user.id) {
+      return "misTutorias";
+    }
+    
+    if (tutoring.enrolled_students.some(student => student.id === user.id)) {
+      return "misTutorias";
+    }
+    
+    if (tutoring.capacity > tutoring.enrolled && tutoring.tutor_id) {
+      return "unirme";
+    }
+  
+    if(tutoring.capacity > tutoring.enrolled){
+      return "ambos";
+    }
+    if(!tutoring.tutor_id){
+      return "serTutor"
+    }
+    return "completo"
+  };
 
 
   return (
@@ -16,7 +42,7 @@ export default function TutoringPage({filters = {}, mode = ""}) {
             Tutorías Disponibles
           </h1>
 
-          <TutoringList tutorings={tutorings} mode = {mode} loading={loading} error={error} />
+          <TutoringList tutorings={tutorings} mode = {getModeForTutoring} loading={loading} error={error} />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>

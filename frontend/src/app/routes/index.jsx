@@ -3,6 +3,7 @@ import PrivateRoute from "./PrivateRoute";
 import { CoursePage, CourseDetailPage } from "@/features/courses";
 import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow } from "@/features/users";
 import { SubjectPage } from "@/features/subjects";
+import SubjectDetailPage from "@/features/subjects/pages/SubjectDetailPage";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 import { TutoringPage } from "@/features/tutorings";
 
@@ -21,8 +22,8 @@ export function AppRoutes() {
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
       <Route path="/materias/:courseId" element={<CourseDetailPage />} />
+      <Route path="/temas/:subjectId" element={<SubjectDetailPage />} />
       <Route path="/tutores" element={<TutorPage />} />
-      <Route path="/materias/:courseId" element={<CourseDetailPage />} />
     </Routes>
   );
 }
