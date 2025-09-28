@@ -74,12 +74,9 @@ export default function SessionList({ userId }) {
   }
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 p-6 w-full transition hover:ring-2 hover:ring-blue-200">
+    <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-200 p-6 w-full transition">
       <div className="flex items-center gap-2 mb-6 justify-center">
         <h2 className="text-xl font-bold text-gray-800">Próximas Sesiones</h2>
-        <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-          {sessions.length}
-        </span>
       </div>
 
       <div className="space-y-4 w-full">
