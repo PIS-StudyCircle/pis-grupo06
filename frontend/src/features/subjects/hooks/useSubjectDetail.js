@@ -3,7 +3,6 @@ import { getSubject } from "../services/subjectService";
 
 export const useSubjectDetail = (subjectId) => {
   const [subject, setSubject] = useState(null);
-  const [tutorings, setTutorings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -39,5 +38,5 @@ export const useSubjectDetail = (subjectId) => {
     fetchSubjectDetail();
   }, [subjectId]);
 
-  return { subject, tutorings, loading, error };
+  return { subject, loading, error };
 };

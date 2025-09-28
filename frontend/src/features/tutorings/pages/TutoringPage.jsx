@@ -3,7 +3,7 @@ import TutoringList from "../components/TutoringList";
 import Pagination from "@components/Pagination";
 import { useUser } from "@context/UserContext";
 
-export default function TutoringPage({filters = {}, mode = ""}) {
+export default function TutoringPage({filters = {}}) {
   const hookResult = useTutorings(1, 20, filters);
   
     

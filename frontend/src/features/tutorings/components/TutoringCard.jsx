@@ -37,13 +37,13 @@ export default function TutoringCard({ tutoring, mode }) {
           </div>
         </div>
 
-        {/* Botones con nuevo estilo */}
+        {/* Botones */}
         <div className="flex flex-col gap-3 md:pr-3">
           {mode === "serTutor" && (
             <button
               type="button"
               className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-              onClick={onBecomeTutor}
+              onClick={() => {}}
             >
               Ser tutor
             </button>
@@ -53,7 +53,7 @@ export default function TutoringCard({ tutoring, mode }) {
             <button
               type="button"
               className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-              onClick={""}
+              onClick={() => {}}
             >
               Unirme
             </button>
@@ -64,14 +64,14 @@ export default function TutoringCard({ tutoring, mode }) {
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={""}
+                onClick={() => {}}
               >
                 Ser tutor
               </button>
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={""}
+                onClick={() => {}}
               >
                 Unirme
               </button>
@@ -82,7 +82,7 @@ export default function TutoringCard({ tutoring, mode }) {
             <button
               type="button"
               className="btn w-full bg-red-500 hover:bg-red-600 text-white"
-              onClick={""}
+              onClick={() => {}}
             >
               Desuscribirme
             </button>

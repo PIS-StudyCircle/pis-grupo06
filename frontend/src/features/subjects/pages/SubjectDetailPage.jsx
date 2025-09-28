@@ -6,9 +6,8 @@ import { TutoringPage } from "@/features/tutorings";
 
 export default function SubjectDetailPage() {
   const { subjectId } = useParams();
-  const navigate = useNavigate();
  
-  const { subject, tutorings, loading, error } = useSubjectDetail(subjectId);
+  const { subject, loading, error } = useSubjectDetail(subjectId);
 
   
   return (
