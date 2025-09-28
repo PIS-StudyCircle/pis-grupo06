@@ -1,8 +1,11 @@
-import { Calendar, Clock, User, MapPin } from "lucide-react";
+import { Calendar, Clock, User, MapPin, Users } from "lucide-react";
 import { deleteEvent } from "../services/calendarApi";
 import { showSuccess, showError, showConfirm } from "@utils/toastService";
+import { useState } from "react";
 
 export default function SessionCard({ session, refresh }) {
+  const [showAttendees, setShowAttendees] = useState(false);
+
   const formatDate = (date) => {
     return date.toLocaleDateString("es-ES", {
       weekday: "long",
@@ -44,6 +47,7 @@ export default function SessionCard({ session, refresh }) {
         return status;
     }
   };
+
   const handleCancel = (sessionId, refresh) => {
     showConfirm(
       "¿Seguro que deseas cancelar esta tutoría?",
@@ -64,7 +68,7 @@ export default function SessionCard({ session, refresh }) {
 
   return (
     <div className="bg-white border border-gray-300 rounded-xl p-6 shadow-lg hover:shadow-xl hover:scale-[1.01] transition transform">
-
+      {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="font-semibold text-gray-900 text-lg">
@@ -84,7 +88,7 @@ export default function SessionCard({ session, refresh }) {
         </div>
       </div>
 
-     
+      {/* Detalles */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-gray-600">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4" />
@@ -102,6 +106,7 @@ export default function SessionCard({ session, refresh }) {
         </div>
       </div>
 
+      {/* Temas */}
       {session.topics && session.topics.length > 0 && (
         <div className="mt-3">
           <p className="text-sm text-gray-500 mb-2">Temas a tratar:</p>
@@ -118,7 +123,48 @@ export default function SessionCard({ session, refresh }) {
         </div>
       )}
 
+      {/* Asistentes */}
+      {session.attendees && session.attendees.length > 0 && (
+        <div className="mt-4">
+          <button
+            onClick={() => setShowAttendees(!showAttendees)}
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
+          >
+            <Users className="w-4 h-4" />
+            {showAttendees ? "Ocultar participantes" : "Ver participantes"}
+          </button>
 
+          {showAttendees && (
+            <ul className="mt-2 space-y-1 text-sm">
+              {session.attendees.map((attendee, idx) => (
+                <li
+                  key={idx}
+                  className="flex justify-between items-center bg-gray-50 px-3 py-1 rounded"
+                >
+                  <span className="text-gray-700">{attendee.email}</span>
+                  <span
+                    className={
+                      attendee.status === "confirmada"
+                        ? "text-green-600 font-medium"
+                        : attendee.status === "tentativa"
+                        ? "text-yellow-600 font-medium"
+                        : attendee.status === "rechazada"
+                        ? "text-red-600 font-medium"
+                        : attendee.status === "pendiente"
+                        ? "text-gray-500 font-medium"
+                        : "text-gray-400"
+                    }
+                  >
+                    {attendee.status}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {/* Acciones */}
       <div className="flex gap-2 mt-6 pt-4 border-t border-gray-200">
         {session.status === "pendiente" && (
           <button className="text-green-600 hover:text-green-800 text-sm font-semibold hover:underline">
