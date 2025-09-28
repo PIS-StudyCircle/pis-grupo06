@@ -11,6 +11,7 @@ import {
   ForgotPasswordPage,
   ResetPasswordPage,
   UserProfilePage,
+  NotificationsPage,
 } from "@/features/users";
 import { SubjectPage } from "@/features/subjects";
 import { RequireGuestRoute } from "./RequireGuestRoute";
@@ -41,6 +42,7 @@ export function AppRoutes() {
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/tutores" element={<TutorPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
+        <Route path="/notificaciones" element={<NotificationsPage />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/materias" replace />} />

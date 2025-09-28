@@ -4,7 +4,7 @@ import { Calendar } from "lucide-react";
 import { getSessionsByUser } from "../services/calendarApi";
 import { showError } from "@utils/toastService";
 
-export default function SessionList({ userId }) {
+export default function SessionList({ userId, onCountChange }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,9 +21,11 @@ export default function SessionList({ userId }) {
         .sort((a, b) => a.date - b.date);
 
       setSessions(parsed);
+      if (onCountChange) onCountChange(parsed.length);
     } catch (err) {
       showError("Error al cargar sesiones: " + err.message);
       setSessions([]);
+      if (onCountChange) onCountChange(0);
     } finally {
       setLoading(false);
     }
@@ -84,7 +86,7 @@ export default function SessionList({ userId }) {
           <SessionCard
             key={session.id}
             session={session}
-            refresh={fetchSessions} 
+            refresh={fetchSessions}
           />
         ))}
       </div>
