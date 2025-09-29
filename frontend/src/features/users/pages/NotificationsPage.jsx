@@ -18,6 +18,7 @@ export default function Notifications() {
         <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full border border-gray-200">
           <SessionListPage
             userId={user.id}
+            type="invited"
             onCountChange={(n) => setNotifications(n)}
           />
         </div>

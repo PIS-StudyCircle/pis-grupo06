@@ -48,15 +48,17 @@ export const deleteEvent = async (eventId) => {
 };
 
 // Función para obtener las sesiones de un usuario por su ID
-export async function getSessionsByUser(userId) {
-  const res = await fetch(`${API_BASE}/calendar/sessions?user_id=${userId}`, {
-    credentials: "include",
-  });
+export async function getSessionsByUser(userId, type = "all") {
+  const res = await fetch(
+    `${API_BASE}/calendar/sessions?user_id=${userId}&type=${type}`,
+    { credentials: "include" }
+  );
 
   if (!res.ok) throw new Error("Error al obtener sesiones del usuario");
 
   return res.json();
 }
+
 
 // Función para obtener los eventos de un tutor por su ID (O sea los horarios disponibles)
 export const getTutorEvents = async (tutorId) => {

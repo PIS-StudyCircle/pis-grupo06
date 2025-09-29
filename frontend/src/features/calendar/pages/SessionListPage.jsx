@@ -1,48 +1,25 @@
-import { useState, useEffect, useCallback } from "react";
-import SessionCard from "../components/SessionCard";
 import { Calendar } from "lucide-react";
-import { getSessionsByUser } from "../services/calendarApi";
-import { showError } from "@utils/toastService";
+import SessionCard from "../components/SessionCard";
+import { useSessions } from "../hooks/useSessions";
+import { useLocation } from "react-router-dom";
 
-export default function SessionList({ userId, onCountChange }) {
-  const [sessions, setSessions] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function SessionList({ userId, onCountChange, type="all" }) {
+  const { sessions, loading, refresh } = useSessions(userId, onCountChange, type);
+  const location = useLocation();
 
-  const fetchSessions = useCallback(async () => {
-    if (!userId) return;
-    setLoading(true);
-    try {
-      const data = await getSessionsByUser(userId);
-      const parsed = data
-        .map((s) => ({
-          ...s,
-          date: new Date(s.date),
-        }))
-        .sort((a, b) => a.date - b.date);
+  // Detectar ruta actual
+  const isInbox = location.pathname.includes("/notificaciones")
 
-      setSessions(parsed);
-      if (onCountChange) onCountChange(parsed.length);
-    } catch (err) {
-      showError("Error al cargar sesiones: " + err.message);
-      setSessions([]);
-      if (onCountChange) onCountChange(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    fetchSessions();
-  }, [fetchSessions]);
+  const emptyMessage = isInbox
+    ? { title: "No tienes invitaciones", subtitle: "Cuando te inviten a una tutoría, aparecerá aquí." }
+    : { title: "No tienes sesiones programadas", subtitle: "¡Agenda una tutoría para comenzar a aprender!" };
 
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center gap-2 mb-4">
           <Calendar className="w-5 h-5 text-blue-600" />
-          <h2 className="text-xl font-semibold text-gray-900">
-            Próximas Sesiones
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900">Próximas Sesiones</h2>
         </div>
         <div className="space-y-4">
           {[...Array(3)].map((_, index) => (
@@ -60,16 +37,12 @@ export default function SessionList({ userId, onCountChange }) {
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center gap-2 mb-4">
           <Calendar className="w-5 h-5 text-blue-600" />
-          <h2 className="text-xl font-semibold text-gray-900">
-            Próximas Sesiones
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900">Próximas Sesiones</h2>
         </div>
         <div className="text-center py-8">
           <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No tienes sesiones programadas</p>
-          <p className="text-sm text-gray-400 mt-1">
-            ¡Agenda una tutoría para comenzar a aprender!
-          </p>
+          <p className="text-gray-500">{emptyMessage.title}</p>
+          <p className="text-sm text-gray-400 mt-1">{emptyMessage.subtitle}</p>
         </div>
       </div>
     );
@@ -83,11 +56,7 @@ export default function SessionList({ userId, onCountChange }) {
 
       <div className="space-y-4 w-full">
         {sessions.map((session) => (
-          <SessionCard
-            key={session.id}
-            session={session}
-            refresh={fetchSessions}
-          />
+          <SessionCard key={session.id} session={session} refresh={refresh} />
         ))}
       </div>
     </div>

@@ -58,7 +58,7 @@ export default function Profile() {
           </div>
 
           <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full  border border-gray-200">
-            <SessionListPage userId={user.id} />
+            <SessionListPage userId={user.id}/>
           </div>
         </div>
 

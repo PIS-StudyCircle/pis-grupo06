@@ -40,36 +40,43 @@ export default function AppointPage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validate(form)) {
-      return;
+  if (!validate(form)) {
+    return;
+  }
+
+  try {
+    const attendeesArr = form.attendees
+      .split(",")
+      .map((email) => ({ email: email.trim() }))
+      .filter((a) => a.email);
+
+    const start = new Date(toGoogleDateTime(form.date, form.start_time));
+    let end = new Date(toGoogleDateTime(form.date, form.end_time));
+
+    if (end <= start) {
+      end.setDate(end.getDate() + 1);
     }
 
-    try {
-      const attendeesArr = form.attendees
-        .split(",")
-        .map((email) => ({ email: email.trim() }))
-        .filter((a) => a.email);
-      console.log(attendeesArr);
-      const eventData = {
-        title: form.title,
-        description: form.description,
-        start: toGoogleDateTime(form.date, form.start_time),
-        end: toGoogleDateTime(form.date, form.end_time),
-        attendees: attendeesArr,
-      };
+    const eventData = {
+      title: form.title,
+      description: form.description,
+      start: start.toISOString(),
+      end: end.toISOString(),
+      attendees: attendeesArr,
+    };
 
-      const event = await createClassEvent(eventData);
+    const event = await createClassEvent(eventData);
 
-      console.log("Evento creado exitosamente:", event);
-      showSuccess("¡Evento creado exitosamente!"); 
-      navigate("/perfil");
-    } catch (error) {
-      console.error("Error al crear el evento:", error);
-      showError(`Error al crear el evento: ${error.message}`); 
-    }
-  };
+    console.log("Evento creado exitosamente:", event);
+    showSuccess("¡Evento creado exitosamente!");
+    navigate("/perfil");
+  } catch (error) {
+    console.error("Error al crear el evento:", error);
+    showError(`Error al crear el evento: ${error.message}`);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6">

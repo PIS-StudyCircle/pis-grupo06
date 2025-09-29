@@ -1,7 +1,4 @@
 export default function TutorSchedulePage({ tutor }) {
-
-  
-
   const availability = [
     {
       day: "Lunes",

@@ -26,6 +26,22 @@ module Api
       def respond_to_on_destroy
         success_response(message: 'Logged out successfully.', status: :ok)
       end
+      
+      # Para crear el calendario de StudyCircle si no existe
+      def ensure_study_circle_calendar(user, service)
+        return user.study_circle_calendar_id if user.study_circle_calendar_id.present?
+
+        calendar = Google::Apis::CalendarV3::Calendar.new(
+          summary: "StudyCircle",
+          description: "Calendario dedicado a las tutorías de StudyCircle",
+          time_zone: "America/Montevideo"
+        )
+
+        result = service.insert_calendar(calendar)
+        user.update!(study_circle_calendar_id: result.id)
+
+        result.id
+      end
     end
   end
 end

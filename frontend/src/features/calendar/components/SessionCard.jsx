@@ -72,8 +72,16 @@ export default function SessionCard({ session, refresh }) {
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="font-semibold text-gray-900 text-lg">
-            {session.subject}
+            <a
+              href={session.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-800"
+            >
+              {session.subject}
+            </a>
           </h3>
+
           <div className="flex items-center gap-2 text-gray-500 mt-1">
             <User className="w-4 h-4" />
             <span className="text-sm">{session.tutor}</span>
