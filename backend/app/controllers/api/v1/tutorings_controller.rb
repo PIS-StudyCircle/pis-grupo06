@@ -67,17 +67,27 @@ module Api
         tutoring.tutor_id      = params[:tutoring][:tutor_id]
         tutoring.course_id     = params[:tutoring][:course_id]
 
+        if tutoring.tutor_id.present? && tutoring.scheduled_at.present? && tutoring.duration_mins.present?
+          start_time = tutoring.scheduled_at
+          end_time = start_time + tutoring.duration_mins.minutes
+
+          overlapping = Tutoring.where(tutor_id: tutoring.tutor_id)
+            .where.not(id: tutoring.id)
+            .where("scheduled_at < ? AND (scheduled_at + INTERVAL '1 minute' * duration_mins) > ?", end_time, start_time)
+            .exists?
+
+          if overlapping
+            render json: { errors: ["Ya existe una tutoría suya que comprende ese intervalo"] }, status: :unprocessable_entity
+            return
+          end
+        end
+
         if tutoring.save
-          # Asocia los temas seleccionados
           if params[:tutoring][:subject_ids]
             params[:tutoring][:subject_ids].each do |subject_id|
               tutoring.subject_tutorings.create(subject_id: subject_id)
             end
           end
-
-          # Se debe asociar el tutor como user_tutoring o esto es solo para los estudiantes que asisten?
-          # tutoring.user_tutorings.create(user_id: tutoring.tutor_id)
-
           render json: { tutoring: tutoring }, status: :created
         else
           render json: { errors: tutoring.errors.full_messages }, status: :unprocessable_entity
