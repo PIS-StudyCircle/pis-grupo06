@@ -41,7 +41,7 @@ class Api::V1::Calendar::SessionsController < ApplicationController
         single_events: true,
         order_by: 'startTime',
         time_min: Time.now.iso8601,
-        fields: 'items(id,summary,description,start,end,attendees,organizer,creator,status,location,htmlLink)'
+        fields: 'items(id,summary,description,start,end,attendees,organizer,creator,status,location,htmlLink,extendedProperties)'
       )
       all_events.concat(events.items)
     end
@@ -64,12 +64,13 @@ class Api::V1::Calendar::SessionsController < ApplicationController
     end
 
     sessions = filtered_events.map do |event|
+      props = event.extended_properties&.private || {}
       attendee_status = event.attendees&.map do |a|
         { email: a.email, status: translate_response_status(a.response_status) }
       end
 
       {
-        id: event.id,
+        id: props["tutoring_id"].presence || event.id,
         subject: event.summary,
         tutor: event.organizer&.display_name || event.organizer&.email || "Desconocido",
         date: event.start.date_time || event.start.date,
@@ -84,7 +85,8 @@ class Api::V1::Calendar::SessionsController < ApplicationController
         status: session_status(event, attendee_status),
         attendees: attendee_status,
         topics: event.description.present? ? [event.description] : [],
-        url: event.html_link
+        url: event.html_link,
+        app: props["app"]
       }
     end
 
@@ -108,8 +110,15 @@ class Api::V1::Calendar::SessionsController < ApplicationController
       description: params[:description] || "",
       start: { date_time: params[:start_time], time_zone: 'America/Montevideo' },
       end:   { date_time: params[:end_time],   time_zone: 'America/Montevideo' },
-      attendees: (params[:attendees] || []).map { |a| { email: a[:email] } }
+      attendees: (params[:attendees] || []).map { |a| { email: a[:email] } },
+      extended_properties: Google::Apis::CalendarV3::Event::ExtendedProperties.new(
+        private: {
+          "tutoring_id" => params[:tutoring_id].to_s,
+          "app" => "tutorias"
+        }
+      )
     )
+
 
     result = service.insert_event(calendar_id, event)
     Rails.logger.info "Evento creado en #{calendar_id}: #{result.to_h}"
@@ -117,6 +126,38 @@ class Api::V1::Calendar::SessionsController < ApplicationController
   rescue => e
     render json: { success: false, error: e.message }, status: :unprocessable_content
   end
+
+  # PUT /api/v1/calendar/sessions/:id
+  def update
+    user = current_user
+    access_token = refresh_google_token(user) if user.google_expires_at.nil? || user.google_expires_at < Time.now
+
+    service = Google::Apis::CalendarV3::CalendarService.new
+    service.authorization = user.google_access_token || access_token
+
+    calendar_id = user_is_organizer?(user, event_id) ? ensure_calendar(user, service) : "primary"
+    event_id = params[:id]
+    new_status = params[:response] 
+
+    event = service.get_event(calendar_id, event_id)
+
+    if event.attendees
+      attendee = event.attendees.find { |a| a.email == user.email }
+      if attendee
+        attendee.response_status = new_status
+      else
+        return render json: { error: "Usuario no es invitado de este evento" }, status: :unprocessable_entity
+      end
+    end
+
+    updated_event = service.update_event(calendar_id, event_id, event)
+
+    render json: { success: true, event: updated_event }
+  rescue => e
+    render json: { success: false, error: e.message }, status: :unprocessable_content
+  end
+
+
 
   def destroy
     user = current_user
@@ -167,4 +208,20 @@ class Api::V1::Calendar::SessionsController < ApplicationController
     user.update!(calendar_id: result.id)
     result.id
   end
+
+  def user_is_organizer?(user, event_id)
+    service = Google::Apis::CalendarV3::CalendarService.new
+    service.authorization = user.google_access_token || refresh_google_token(user)
+
+    # Usamos el calendario del usuario (el de StudyCircle si existe, sino primary)
+    calendar_id = user.calendar_id.presence || "primary"
+    event = service.get_event(calendar_id, event_id)
+
+    # Chequear si el organizador del evento coincide con el email del usuario
+    event.organizer&.email == user.email
+  rescue Google::Apis::ClientError => e
+    Rails.logger.warn "No se pudo obtener evento #{event_id} para #{user.email}: #{e.message}"
+    false
+  end
+
 end

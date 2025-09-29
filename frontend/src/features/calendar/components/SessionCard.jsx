@@ -1,26 +1,26 @@
 import { Calendar, Clock, User, MapPin, Users } from "lucide-react";
-import { deleteEvent } from "../services/calendarApi";
+import { deleteEvent, respondToEvent } from "../services/calendarApi";
 import { showSuccess, showError, showConfirm } from "@utils/toastService";
 import { useState } from "react";
+import { useUser } from "@context/UserContext";
 
 export default function SessionCard({ session, refresh }) {
   const [showAttendees, setShowAttendees] = useState(false);
+  const { user } = useUser();
 
-  const formatDate = (date) => {
-    return date.toLocaleDateString("es-ES", {
+  const formatDate = (date) =>
+    date.toLocaleDateString("es-ES", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-  };
 
-  const formatTime = (date) => {
-    return date.toLocaleTimeString("es-ES", {
+  const formatTime = (date) =>
+    date.toLocaleTimeString("es-ES", {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -35,20 +35,7 @@ export default function SessionCard({ session, refresh }) {
     }
   };
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case "confirmada":
-        return "Confirmada";
-      case "pendiente":
-        return "Pendiente";
-      case "cancelada":
-        return "Cancelada";
-      default:
-        return status;
-    }
-  };
-
-  const handleCancel = (sessionId, refresh) => {
+  const handleCancel = (sessionId) => {
     showConfirm(
       "¿Seguro que deseas cancelar esta tutoría?",
       async () => {
@@ -60,11 +47,27 @@ export default function SessionCard({ session, refresh }) {
           showError("Error al cancelar: " + err.message);
         }
       },
-      () => {
-        console.log("Cancelado por el usuario");
-      }
+      () => console.log("Cancelado por el usuario")
     );
   };
+
+  const handleRespond = async (response) => {
+    try {
+      await respondToEvent(session.id, response);
+      showSuccess(
+        response === "accepted"
+          ? "¡Has confirmado tu asistencia!"
+          : response === "declined"
+          ? "Has rechazado el evento"
+          : "Has marcado asistencia tentativa"
+      );
+      if (refresh) refresh();
+    } catch (err) {
+      showError("Error al actualizar: " + err.message);
+    }
+  };
+
+  const isOrganizer = user?.email === session.tutor;
 
   return (
     <div className="bg-white border border-gray-300 rounded-xl p-6 shadow-lg hover:shadow-xl hover:scale-[1.01] transition transform">
@@ -81,7 +84,6 @@ export default function SessionCard({ session, refresh }) {
               {session.subject}
             </a>
           </h3>
-
           <div className="flex items-center gap-2 text-gray-500 mt-1">
             <User className="w-4 h-4" />
             <span className="text-sm">{session.tutor}</span>
@@ -92,7 +94,7 @@ export default function SessionCard({ session, refresh }) {
             session.status
           )}`}
         >
-          {getStatusText(session.status)}
+          {session.status}
         </div>
       </div>
 
@@ -114,24 +116,6 @@ export default function SessionCard({ session, refresh }) {
         </div>
       </div>
 
-      {/* Temas */}
-      {session.topics && session.topics.length > 0 && (
-        <div className="mt-3">
-          <p className="text-sm text-gray-500 mb-2">Temas a tratar:</p>
-          <div className="flex flex-wrap gap-2">
-            {session.topics.map((topic, index) => (
-              <span
-                key={index}
-                className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700"
-              >
-                {topic}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Asistentes */}
       {session.attendees && session.attendees.length > 0 && (
         <div className="mt-4">
           <button
@@ -174,19 +158,41 @@ export default function SessionCard({ session, refresh }) {
 
       {/* Acciones */}
       <div className="flex gap-2 mt-6 pt-4 border-t border-gray-200">
-        {session.status === "pendiente" && (
-          <button className="text-green-600 hover:text-green-800 text-sm font-semibold hover:underline">
-            Confirmar
-          </button>
-        )}
-        {session.status !== "cancelada" && (
-          <button
-            onClick={() => handleCancel(session.id, refresh)}
-            className="ml-auto text-red-600 hover:text-red-800 text-sm font-semibold hover:underline"
-          >
-            Cancelar
-          </button>
-        )}
+        <div className="ml-auto flex gap-2">
+          {isOrganizer ? (
+            <button
+              onClick={() => handleCancel(session.id)}
+              className="text-red-600 hover:text-red-800 text-sm font-semibold hover:underline"
+            >
+              Cancelar
+            </button>
+          ) : (
+            <>
+              {session.status === "pendiente" && (
+                <>
+                  <button
+                    onClick={() => handleRespond("accepted")}
+                    className="text-green-600 hover:text-green-800 text-sm font-semibold hover:underline"
+                  >
+                    Confirmar
+                  </button>
+                  <button
+                    onClick={() => handleRespond("declined")}
+                    className="text-red-600 hover:text-red-800 text-sm font-semibold hover:underline"
+                  >
+                    Rechazar
+                  </button>
+                  <button
+                    onClick={() => handleRespond("tentative")}
+                    className="text-yellow-600 hover:text-yellow-800 text-sm font-semibold hover:underline"
+                  >
+                    Tentativa
+                  </button>
+                </>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
