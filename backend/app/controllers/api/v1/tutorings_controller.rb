@@ -72,12 +72,16 @@ module Api
           end_time = start_time + tutoring.duration_mins.minutes
 
           overlapping = Tutoring.where(tutor_id: tutoring.tutor_id)
-            .where.not(id: tutoring.id)
-            .where("scheduled_at < ? AND (scheduled_at + INTERVAL '1 minute' * duration_mins) > ?", end_time, start_time)
-            .exists?
+                                .where.not(id: tutoring.id)
+                                .exists?([
+                                  "scheduled_at < ? AND (scheduled_at + INTERVAL '1 minute' * duration_mins) > ?",
+                                  end_time, start_time
+                                ])
 
           if overlapping
-            render json: { errors: ["Ya existe una tutoría suya que comprende ese intervalo"] }, status: :unprocessable_entity
+            render json: {
+              errors: ["Ya existe una tutoría suya que comprende ese intervalo"]
+            }, status: :unprocessable_entity
             return
           end
         end
@@ -97,7 +101,7 @@ module Api
       private
 
       def tutoring_params
-        params.require(:tutoring).permit(:scheduled_at, :duration_mins, :modality, :capacity)
+        params.expect(tutoring: [:scheduled_at, :duration_mins, :modality, :capacity])
       end
     end
   end
