@@ -20,3 +20,44 @@ export const getTutorings = async (page = 1, perPage = 20, filters = {} ) => {
   return await response.json();
 
 };
+
+export const createTutoringByTutor = async ({
+  scheduled_at,
+  duration_mins,
+  modality,
+  capacity,
+  creator_id,
+  tutor_id,
+  course_id,
+  subject_ids,
+}) => {
+  const body = {
+    tutoring: {
+      scheduled_at,
+      duration_mins,
+      modality,
+      capacity,
+      creator_id,
+      tutor_id,
+      course_id,
+      subject_ids,
+    }
+  };
+
+  const resp = await fetch(`${API_BASE}/tutorings`, {
+    method: 'POST',
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await resp.json().catch(() => null);
+
+  if (!resp.ok) {
+    throw data || { message: "Error al crear la tutoría" };
+  }
+
+  return data;
+};

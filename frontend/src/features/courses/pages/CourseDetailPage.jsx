@@ -1,11 +1,11 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Footer from "@components/Footer";
 import { useCourse } from "../hooks/useCourse";
 import SubjectPage from "@/features/subjects/pages/SubjectPage";
 
-
 export default function CourseDetailPage() {
   const { courseId } = useParams();
+  const navigate = useNavigate();
   const { course, loading, error } = useCourse(courseId);
 
   return (
@@ -59,23 +59,27 @@ export default function CourseDetailPage() {
                   <button
                     type="button"
                     className="btn w-full"
-                     // onClick={() => navigate(`/tutor/registrarse?course=${course.id}`)}
+                    onClick={() => navigate(`/tutorias/buscar_tutor/${course.id}`)}
                   >
-                    Ser tutor
+                    Brindar tutoría
                   </button>
                   <button
                     type="button"
                     className="btn w-full"
-                    // onClick={() => navigate(`/tutoria/solicitar?course=${course.id}`)}
+                    // onClick={() => navigate(`/tutoria/solicitar?${course.id}`)}
                   >
                     Recibir tutoría
                   </button>
                 </div>
               </div>
 
-             {/*El mostrar los temas de la materia se delega a SubjectPage*/}
-             <SubjectPage courseId={course.id} showCheckbox = {false} showButton={false} />
-
+              {/*El mostrar los temas de la materia se delega a SubjectPage*/}
+              <SubjectPage
+                courseId={course.id}
+                showCreate={false}
+                type=""
+                //onButtonClick={(subjectId) => navigate(`/temas/${subjectId}`)}
+              />
             </div>
           </div>
         )}

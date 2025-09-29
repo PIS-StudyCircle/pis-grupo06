@@ -5,7 +5,7 @@ import { CoursePage, CourseDetailPage } from "@/features/courses";
 import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow, ForgotPasswordPage, ResetPasswordPage, UserProfilePage} from "@/features/users";
 import { SubjectPage } from "@/features/subjects";
 import { RequireGuestRoute } from "./RequireGuestRoute";
-import { TutoringPage } from "@/features/tutorings";
+import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor } from "@/features/tutorings";
 
 export function AppRoutes() {
   return (
@@ -19,6 +19,9 @@ export function AppRoutes() {
       </Route>
      <Route element={<PrivateRoute />}>
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
+        <Route path="/tutorias/buscar_tutor/:courseId" element={<TutoringPage filters={{}} mode="serTutor" />} />
+        <Route path="/tutorias/elegir_temas/:courseId" element={<SelectSubjectsByTutor />} />
+        <Route path="/tutorias/crear/:courseId" element={<CreateTutoringByTutor />} />
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/tutores" element={<TutorPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />

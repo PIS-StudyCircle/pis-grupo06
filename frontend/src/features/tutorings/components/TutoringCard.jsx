@@ -1,6 +1,8 @@
-import {formatDateTime} from "@shared/utils/FormatDate";
+import { formatDateTime } from "@shared/utils/FormatDate";
+//import { useNavigate } from "react-router-dom";
 
 export default function TutoringCard({ tutoring, mode }) {
+  //const navigate = useNavigate();
   return (
     <div className="w-full bg-white rounded-lg shadow p-4 my-4 flex items-center justify-between gap-2">
       <div className="flex w-full gap-4">
@@ -37,7 +39,12 @@ export default function TutoringCard({ tutoring, mode }) {
         </div>
 
         <div className="flex-none w-[20%] flex flex-col justify-start items-end pr-3">
-          {mode === "serTutor" && <button className="btn btn-primary tutoring-card-button">Ser tutor</button>}
+          {mode === "serTutor" && 
+            <button
+              className="btn btn-primary tutoring-card-button"
+              //onClick={() => navigate(`/tutorias/brindar/${course.id}`)}
+            >Ser tutor</button>
+          }
           {mode === "unirme" && <button className="btn btn-primary tutoring-card-button">Unirme</button>}
           {mode === "misTutorias" && <button className="btn btn-primary tutoring-card-button">Desuscribirme</button>}
         </div>

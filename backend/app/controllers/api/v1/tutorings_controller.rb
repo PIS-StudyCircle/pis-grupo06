@@ -60,6 +60,35 @@ module Api
           pagination: pagy_metadata(@pagy)
         }
       end
+
+      def create
+        tutoring = Tutoring.new(tutoring_params)
+        tutoring.created_by_id = params[:tutoring][:creator_id]
+        tutoring.tutor_id      = params[:tutoring][:tutor_id]
+        tutoring.course_id     = params[:tutoring][:course_id]
+
+        if tutoring.save
+          # Asocia los temas seleccionados
+          if params[:tutoring][:subject_ids]
+            params[:tutoring][:subject_ids].each do |subject_id|
+              tutoring.subject_tutorings.create(subject_id: subject_id)
+            end
+          end
+
+          # Se debe asociar el tutor como user_tutoring o esto es solo para los estudiantes que asisten?
+          # tutoring.user_tutorings.create(user_id: tutoring.tutor_id)
+
+          render json: { tutoring: tutoring }, status: :created
+        else
+          render json: { errors: tutoring.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+
+      private
+
+      def tutoring_params
+        params.require(:tutoring).permit(:scheduled_at, :duration_mins, :modality, :capacity)
+      end
     end
   end
 end
