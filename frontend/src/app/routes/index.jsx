@@ -6,10 +6,6 @@ import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow, ForgotPa
 import { SubjectPage } from "@/features/subjects";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 
-
-
-
-import SelectTutoringByTutor from "@/features/tutoring/pages/SelectTutoringByTutor";
 import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, ListTutoringsOfCourse, CreateTutoringByStudent } from "@/features/tutorings";
 
 export function AppRoutes() {
