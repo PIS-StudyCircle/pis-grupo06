@@ -38,13 +38,13 @@ export default function TutoringPage({filters, mode = ""}) {
   useEffect(() => {
     const t = setTimeout(() => {
       setSearch(query);
-      setPage(1);
+      if (page !== 1) setPage(1);
     }, 400);
     return () => clearTimeout(t);
   }, [query, setSearch, setPage]);
 
   useEffect(() => {
-    setPage(1);
+    if (page !== 1) setPage(1);
   }, [searchBy, setPage]);
 
   return (
