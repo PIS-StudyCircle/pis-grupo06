@@ -86,9 +86,9 @@ class Tutoring < ApplicationRecord
 
   def request_due_at_before_scheduled_at
     return if request_due_at.blank? || scheduled_at.blank?
+
     if request_due_at > scheduled_at
       errors.add(:request_due_at, "must be before scheduled_at")
     end
   end
-
 end

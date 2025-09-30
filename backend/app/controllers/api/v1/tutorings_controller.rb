@@ -68,8 +68,7 @@ module Api
         tutoring = Tutoring.new(tutoring_params)
         tutoring.created_by_id = params[:tutoring][:created_by_id]
         tutoring.tutor_id      = params[:tutoring][:tutor_id]
-        tutoring.course_id     = params[:tutoring][:course_id] 
-       
+        tutoring.course_id     = params[:tutoring][:course_id]
 
         if tutoring.tutor_id.present? && tutoring.scheduled_at.present? && tutoring.duration_mins.present?
           start_time = tutoring.scheduled_at
@@ -106,20 +105,21 @@ module Api
       private
 
       def tutoring_params
-        #params.expect(tutoring: [:scheduled_at, :duration_mins, :modality, :capacity])
         # Strong params clásicos con todos los campos que envía el front
-        params.require(:tutoring).permit(
-          :scheduled_at,
-          :duration_mins,
-          :modality,
-          :capacity,
-          :course_id,
-          :tutor_id,
-          :request_due_at,
-          :request_comment,
-          subject_ids: []
+        params.expect(
+          tutoring: [
+            :scheduled_at,
+            :duration_mins,
+            :modality,
+            :capacity,
+            :course_id,
+            :tutor_id,
+            :request_due_at,
+            :request_comment,
+            { subject_ids: [] }
+          ]
         )
-       end
+      end
     end
   end
 end
