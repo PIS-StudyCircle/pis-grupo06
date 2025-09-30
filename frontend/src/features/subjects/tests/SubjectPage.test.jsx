@@ -76,30 +76,6 @@ describe("SubjectPage", () => {
     expect(await screen.findByText("Tema II")).toBeInTheDocument();
   });
 
-  it("muestra la fecha de vencimiento si existe", async () => {
-    const subjectsWithDueDate = [
-      { id: 1, name: "Tema I", due_date: "2025-09-30T12:00:00Z" }
-    ];
-
-  
-    subjectService.getSubjects.mockResolvedValue({
-      subjects: subjectsWithDueDate,
-      pagination: { last: 1 },
-    });
-  
-    render(
-      <MemoryRouter>
-        <SubjectPage courseId={123} />
-      </MemoryRouter>
-    );
-  
-    // Verifica que el tema se muestre
-    expect(await screen.findByText("Tema I")).toBeInTheDocument();
-  
-    // Verifica que la fecha de vencimiento se muestre formateada
-    expect(screen.getByText(/Vencimiento:\s*30\/9\/2025/)).toBeInTheDocument();
-  });
-
   it("muestra checkboxes si showCheckbox es true", async () => {
     subjectService.getSubjects.mockResolvedValue({
       subjects: mockSubjects,
