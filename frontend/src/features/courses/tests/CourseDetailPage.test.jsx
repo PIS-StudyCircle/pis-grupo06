@@ -130,7 +130,7 @@ describe("CourseDetailPage", () => {
     const heading = await screen.findByRole("heading", { level: 1 });
     expect(heading).toHaveTextContent("Curso Accesible");
   
-    expect(screen.getByRole("button", { name: /Ser tutor/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Brindar tutoría/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Recibir tutoría/i })).toBeInTheDocument();
   });
 
