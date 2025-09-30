@@ -22,6 +22,13 @@ class User < ApplicationRecord
            inverse_of: :creator,
            dependent: :nullify
 
+  # tutorías creadas
+  has_many :created_tutorings,
+           class_name: 'Tutoring',
+           foreign_key: 'created_by_id',
+           inverse_of: :creator,
+           dependent: :nullify
+
   belongs_to :faculty
 
   # validaciones
@@ -61,5 +68,9 @@ class User < ApplicationRecord
     end
 
     user
+  end
+
+  def devise_mailer
+    UserMailer
   end
 end

@@ -1,35 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SubjectCard from "./SubjectCard";
 import { createSubject } from "../services/subjectService";
 import { useValidation } from "@hooks/useValidation";
-import { validateRequired, validateDate } from "@utils/validation";
-import { useUser } from "@context/UserContext"; //lo pongo para que funcione con la seed que estoy utilizando y no cambiar mucho, pero esto no iria
+import { validateRequired } from "@utils/validation";
 
 export default function SubjectList({
   subjects,
   loading,
   error,
-  showButton = false,
+  showCreate = false,
+  type = "button",
   courseId,
   onCreated = () => {},
-  selectedSubjects = [],
   onSelectionChange = () => {},
+  onButtonClick,
+  selectedSubjects = [],
 }) {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newName, setNewName] = useState("");
-  const [newDate, setNewDate] = useState("");
-  const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
-  const { user } = useUser(); //lo pongo para que funcione con la seed que estoy utilizando y no cambiar mucho, pero esto no iria
+  const [selectedIds, setSelectedIds] = useState(selectedSubjects);
 
-  // --- Validaciones ---
   const validators = {
     subjectName: (value) => validateRequired(value, "Nombre"),
-    dueDate: (value) => validateDate(value, "Fecha de vencimiento"),
   };
   const { errors, validate } = useValidation(validators);
 
-  // --- Early returns ---
+  useEffect(() => {
+    if (type === "selectable") {
+      onSelectionChange(selectedIds);
+    }
+  }, [selectedIds, onSelectionChange, type]);
+
+  useEffect(() => {
+    if (type === "selectable") {
+      setSelectedIds(selectedSubjects);
+    }
+  }, [selectedSubjects, type]);
+
   if (loading) return <div>Cargando temas...</div>;
   if (error) return <div>Error al cargar los temas.</div>;
   if (!subjects || subjects.length === 0)
@@ -37,27 +45,20 @@ export default function SubjectList({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const form = { subjectName: newName, dueDate: newDate };
+    const form = { subjectName: newName };
     if (!validate(form)) return;
 
     try {
       const created = await createSubject({
         name: newName,
         course_id: courseId,
-        due_date: newDate || null,
-        creator_id: user?.id, // lo pongo para que funcione con la seed que estoy utilizando y no cambiar mucho, pero esto no iria
       });
 
       onCreated?.();
-
       setShowNewForm(false);
       setNewName("");
-      setNewDate("");
-
-      // Agrega el nuevo tema a la selección global
-      if (showButton) {
-        onSelectionChange([...selectedSubjects, created.id]);
+      if (type === "selectable") {
+        setSelectedIds((prev) => [...prev, created.id]);
       }
     } catch (err) {
       const msg =
@@ -67,23 +68,20 @@ export default function SubjectList({
               .join(" | ")
           : err?.message || "No se pudo crear el tema.";
       setFormError(msg);
-    } finally {
-      setSaving(false);
     }
   };
 
   const handleSelect = (id) => {
-    if (!onSelectionChange) return;
-    if (selectedSubjects.includes(id)) {
-      onSelectionChange(selectedSubjects.filter((sid) => sid !== id));
-    } else {
-      onSelectionChange([...selectedSubjects, id]);
+    if (type === "selectable") {
+      setSelectedIds((prev) =>
+        prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+      );
     }
   };
 
   return (
     <div className="flex flex-col gap-2">
-      {showButton && !showNewForm && (
+      {showCreate && !showNewForm && (
         <button
           onClick={() => setShowNewForm(true)}
           className="p-2 border rounded-md bg-blue-100 text-blue-700 text-sm hover:bg-blue-200 text-left"
@@ -118,27 +116,6 @@ export default function SubjectList({
             )}
           </div>
 
-          <div className="flex flex-col text-left">
-            <label
-              htmlFor="dueDate"
-              className="text-gray-600 text-xs font-medium mb-1"
-            >
-              Fecha de vencimiento
-            </label>
-            <input
-              id="dueDate"
-              type="date"
-              value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
-              className="p-1 border rounded-md text-sm"
-            />
-            {errors.dueDate && (
-              <span className="text-red-500 text-xs mt-1">
-                {errors.dueDate}
-              </span>
-            )}
-          </div>
-
           {formError && <p className="text-red-600 text-xs">{formError}</p>}
           <div className="flex gap-2 mt-2">
             <button
@@ -153,7 +130,6 @@ export default function SubjectList({
               onClick={() => {
                 setShowNewForm(false);
                 setNewName("");
-                setNewDate("");
               }}
             >
               Cancelar
@@ -165,9 +141,10 @@ export default function SubjectList({
         <SubjectCard
           key={subject.id}
           subject={subject}
-          selectable={showButton}
-          selected={selectedSubjects.includes(subject.id)}
+          selected={type === "selectable" ? selectedIds.includes(subject.id) : false}
           onSelect={handleSelect}
+          type={type}
+          onButtonClick={onButtonClick}
         />
       ))}
     </div>

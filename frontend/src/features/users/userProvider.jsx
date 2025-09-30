@@ -3,6 +3,7 @@ import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut } from 
 import { getItem, saveItem, removeItem } from "@/shared/utils/storage";
 import { API_BASE } from "@/shared/config";
 import { Ctx } from "@context/UserContext";
+import { resetPassword as apiResetPassword } from "./services/auth.api";
 
 export default function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -11,20 +12,23 @@ export default function UserProvider({ children }) {
   useEffect(() => { hydrate(); }, []);
 
   async function hydrate() {
+    const cached = getItem("user", null);
+    if (cached) setUser(cached);
+
     try {
-      const cached = getItem("user", null);
-      if (cached) setUser(cached);
-
       const res = await fetch(`${API_BASE}/users/me`, { credentials: "include" });
-
       if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-        saveItem("user", data.user);
+        const { user: fetchedUser } = await res.json();
+        setUser(fetchedUser);
+        saveItem("user", fetchedUser);
       } else {
         setUser(null);
         removeItem("user");
       }
+    } catch (err) {
+      console.error("Error al obtener el usuario:", err);
+      setUser(null);
+      removeItem("user");
     } finally {
       setBooting(false);
     }
@@ -44,14 +48,37 @@ export default function UserProvider({ children }) {
   async function signOut() {
     try {
       await apiSignOut();
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
     } finally {
       removeItem("user");
       setUser(null);
     }
   }
 
+  const forgotPassword = async (formData) => {
+    const response = await fetch(`${API_BASE}/users/password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user: { email: formData.email } }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "La solicitud falló");
+    }
+  };
+
+  const resetPassword = async (formData) => {
+    const data = await apiResetPassword(formData);
+    const unpackedUser = data.user.data.attributes;
+    setUser(unpackedUser);
+    saveItem("user", unpackedUser);
+    saveItem("token", data.token);
+  };
+  
   return (
-    <Ctx.Provider value={{ user, booting, signIn, signup, signOut }}>
+    <Ctx.Provider value={{ user, booting, signIn, signup, signOut, forgotPassword, resetPassword }}>
       {children}
     </Ctx.Provider>
   );

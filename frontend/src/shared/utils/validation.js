@@ -25,7 +25,7 @@ export function validatePasswordConfirmation(password, confirmation) {
 export function validateDate(date) {
   if (!date) return "Fecha es obligatoria";
 
-  // Parsear manualmente la fecha en formato YYYY-MM-DD
+  // Parsear manualmente la fecha en formato YYYY-MM-DD para validar en cualquier zona horaria
   const [year, month, day] = date.split("-").map(Number);
   const inputDate = new Date(year, month - 1, day);
   const today = new Date();
@@ -49,7 +49,6 @@ export function validateHours(date, startTime, endTime) {
 
   // Si se pasa la fecha, validar que la hora de inicio sea al menos 3 horas después de ahora
   if (date) {
-    // Parsear la fecha en formato YYYY-MM-DD
     const [year, month, day] = date.split("-").map(Number);
     const inputDate = new Date(year, month - 1, day);
     const today = new Date();

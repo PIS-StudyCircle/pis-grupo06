@@ -31,6 +31,39 @@ students = [
   { name: "Diego", last_name: "Martínez", email: "diegomartinez@gmail.com" },
   { name: "Sofía", last_name: "García", email: "sofiagarcia@gmail.com" },
   { name: "Martín", last_name: "Ramírez", email: "martinramirez@gmail.com" },
+
+  { name: "Clara", last_name: "Suárez", email: "clarasuarez@gmail.com" },
+  { name: "Andrés", last_name: "Méndez", email: "andresmendez@gmail.com" },
+  { name: "Paula", last_name: "Castro", email: "paulacastro@gmail.com" },
+  { name: "Jorge", last_name: "Vega", email: "jorgevega@gmail.com" },
+  { name: "Valentina", last_name: "Silva", email: "valentinasilva@gmail.com" },
+  { name: "Rodrigo", last_name: "Torres", email: "rodrigotorres@gmail.com" },
+  { name: "Florencia", last_name: "Pintos", email: "florenciapintos@gmail.com" },
+  { name: "Mateo", last_name: "Ramos", email: "mateoramos@gmail.com" },
+  { name: "Camila", last_name: "Sosa", email: "camilasosa@gmail.com" },
+  { name: "Bruno", last_name: "Acosta", email: "brunoacosta@gmail.com" },
+
+  { name: "Elena", last_name: "Domínguez", email: "elenadominguez@gmail.com" },
+  { name: "Tomás", last_name: "Garrido", email: "tomasgarrido@gmail.com" },
+  { name: "Natalia", last_name: "Guerra", email: "nataliaguerra@gmail.com" },
+  { name: "Sebastián", last_name: "Aguilar", email: "sebastianaguilar@gmail.com" },
+  { name: "Laura", last_name: "Maldonado", email: "lauramaldonado@gmail.com" },
+  { name: "Ignacio", last_name: "Ferrer", email: "ignacioferrer@gmail.com" },
+  { name: "Carolina", last_name: "Bermúdez", email: "carolinabermudez@gmail.com" },
+  { name: "Pablo", last_name: "Villar", email: "pablovillar@gmail.com" },
+  { name: "Agustina", last_name: "Benítez", email: "agustinabenitez@gmail.com" },
+  { name: "Federico", last_name: "Cardozo", email: "federicocardozo@gmail.com" },
+
+  { name: "Verónica", last_name: "Giménez", email: "veronicagimenez@gmail.com" },
+  { name: "Esteban", last_name: "Peralta", email: "estebanperalta@gmail.com" },
+  { name: "Rocío", last_name: "Vázquez", email: "rociovazquez@gmail.com" },
+  { name: "Gabriel", last_name: "Correa", email: "gabrielcorrea@gmail.com" },
+  { name: "Julieta", last_name: "Machado", email: "julietamachado@gmail.com" },
+  { name: "Fernando", last_name: "Núñez", email: "fernandonunez@gmail.com" },
+  { name: "Cecilia", last_name: "Morales", email: "ceciliamorales@gmail.com" },
+  { name: "Ricardo", last_name: "Mujica", email: "ricardomujica@gmail.com" },
+  { name: "Daniela", last_name: "Ruiz", email: "danielaruiz@gmail.com" },
+  { name: "Gustavo", last_name: "Ortega", email: "gustavoortega@gmail.com" }
 ]
 
 students.each do |student_data|
@@ -129,89 +162,3 @@ end
 Subject.find_or_create_by!(name: "Autovalores y autovectores", course: course) do |s|
   s.creator = creator
 end
-
-creator = User.find_by(email: "luciafernandez@gmail.com") || User.first
-
-Subject.find_or_create_by!(name: "Autovalores y autovectores", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Espacios vectoriales", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Subespacios y bases", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Transformaciones lineales", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Núcleo e imagen", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Producto escalar y ortogonalidad", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Diagonalización de matrices", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Formas cuadráticas", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Aplicaciones a geometría", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Eigenespacios", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Cambio de base", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Determinantes avanzados", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Sistemas homogéneos", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Teorema espectral", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Aplicaciones a física e ingeniería", course: course) do |s|
-  s.creator = creator
-end
-
-# ------ TUTORIAS ------
-
-# Tutoría 1 creada por tutor, con 2 temas
-creator = User.find_by!(email: "anaperez@gmail.com")
-course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-
-# Elegir entre 1 y 3 subjects al azar
-subjects = Subject.where(course: course).shuffle.take(rand(1..3))
-
-tutoring = Tutoring.find_or_create_by!(
-  # title: "Tutoría de GAL1"
-  # description: "Tutoría de 2 temas de Gal 1 para preparar el examen"
-  scheduled_at: 6.days.from_now,
-  duration_mins: 60,
-  modality: "virtual",
-  capacity: 10,
-)
-
-subjects.each do |subject|
-  tutoring.subject_tutorings.create!(subject: subject)
-end
-
-tutoring.user_tutorings.create!(user: creator)

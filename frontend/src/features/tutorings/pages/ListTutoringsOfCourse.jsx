@@ -10,7 +10,6 @@ export default function ListTutoringsOfCourse() {
     
 <div className="min-h-screen bg-gray-50 text-gray-900">
   <div className="p-6 max-w-3xl mx-auto">
-    {/* Encabezado + botón en la misma fila */}
     <div className="flex items-center justify-between mb-4">
       <h1 className="text-2xl font-bold">
         Tutorías disponibles para el curso {courseId}
@@ -20,7 +19,7 @@ export default function ListTutoringsOfCourse() {
         type="button"
         className="btn"
         onClick={() =>
-           navigate(`/tutoria/nueva/${courseId}`)
+           navigate(`/tutorias/elegir_temas/estudiante/${courseId}`)
         }
       >
         Solicitar nueva tutoría
@@ -28,7 +27,6 @@ export default function ListTutoringsOfCourse() {
     </div>
 
     <div className="mt-4 rounded-lg border border-gray-300 p-4 bg-white">
-      {/* Aquí iría la lista de tutorías */}
       <p>Acá se listarían todas las tutorías existentes con tutor asignado</p>
     </div>
   </div>

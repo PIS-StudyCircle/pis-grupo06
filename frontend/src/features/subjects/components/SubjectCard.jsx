@@ -1,27 +1,37 @@
 export default function SubjectCard({
   subject,
-  selectable = false,
   selected = false,
   onSelect,
+  type = "button",
+  onButtonClick,
 }) {
+  const handleClick = () => {
+    if (type === "button" && onButtonClick) {
+      onButtonClick(subject.id);
+    } else if (type === "selectable" && onSelect) {
+      onSelect(subject.id);
+    }
+  };
+
+  const isSelectable = type === "selectable";
+  const isButton = type === "button";
+
   return (
     <button
-      type={selectable ? "button" : undefined}
-      onClick={selectable ? () => onSelect?.(subject.id) : undefined}
-      className={`flex items-center justify-between p-2 pl-4 border rounded-md text-sm h-15 transition-colors
-        ${selected
-          ? "bg-blue-500 text-white border-blue-700"
-          : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-blue-50 hover:border-blue-400"}
-      `}
-      style={{ width: "100%" }}
+      type="button"
+      className={`flex items-center justify-between p-2 pl-4 border rounded-md text-sm h-15 w-full transition-colors
+        ${isSelectable && selected ? "bg-blue-600 text-white" : "bg-gray-50 text-gray-800 hover:bg-gray-100"}
+        ${isButton || isSelectable ? "cursor-pointer" : "cursor-default opacity-70"}`}
+      onClick={handleClick}
+      style={{ cursor: isButton || isSelectable ? "pointer" : "default" }}
     >
-      <div className="flex flex-col text-left">
-        <span className={`font-medium transition-colors ${selected ? "text-white" : "text-gray-800"}`}>
+      <div className="flex flex-col text-left w-full">
+        <span className={`font-medium transition-colors ${isSelectable && selected ? "text-white" : "text-gray-800"}`}>
           {subject.name}
         </span>
         {subject.due_date && (
-          <span className={`text-xs transition-colors ${selected ? "text-white" : "text-gray-800"}`}>
-            Vencimiento: {new Date(subject.due_date).toLocaleDateString()}
+          <span className={`text-xs transition-colors ${isSelectable && selected ? "text-blue-100" : "text-gray-500"}`}>
+            Vencimiento: {new Date(subject.due_date).toLocaleDateString("es-ES")}
           </span>
         )}
       </div>

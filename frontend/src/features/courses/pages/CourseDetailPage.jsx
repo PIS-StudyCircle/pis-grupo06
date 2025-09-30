@@ -3,11 +3,10 @@ import Footer from "@components/Footer";
 import { useCourse } from "../hooks/useCourse";
 import SubjectPage from "@/features/subjects/pages/SubjectPage";
 
-
 export default function CourseDetailPage() {
   const { courseId } = useParams();
-  const { course, loading, error } = useCourse(courseId);
   const navigate = useNavigate();
+  const { course, loading, error } = useCourse(courseId);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -60,7 +59,7 @@ export default function CourseDetailPage() {
                   <button
                     type="button"
                     className="btn w-full"
-                    onClick={() => navigate(`/tutoria/elegir_temas?curso=${course.id}`)}
+                    onClick={() => navigate(`/tutorias/buscar_tutor/${course.id}`)}
                   >
                     Brindar tutoría
                   </button>
@@ -68,7 +67,7 @@ export default function CourseDetailPage() {
                     type="button"
                     className="btn w-full"
                     onClick={() =>
-                     navigate(`/tutoria/${courseId}`) // ← Cambiar a query parameter
+                     navigate(`/tutorias/materia/${courseId}`)
                       }
                   >
                     Recibir tutoría
@@ -76,9 +75,13 @@ export default function CourseDetailPage() {
                 </div>
               </div>
 
-             {/*El mostrar los temas de la materia se delega a SubjectPage*/}
-             <SubjectPage courseId={course.id} showButton={false} />
-
+              {/*El mostrar los temas de la materia se delega a SubjectPage*/}
+              <SubjectPage
+                courseId={course.id}
+                showCreate={false}
+                type=""
+                //onButtonClick={(subjectId) => navigate(`/temas/${subjectId}`)}
+              />
             </div>
           </div>
         )}

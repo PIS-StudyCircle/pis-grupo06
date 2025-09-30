@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_23_171815) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_30_051816) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -59,7 +59,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_171815) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "course_id", null: false
-    t.bigint "creator_id", null: false
+    t.bigint "creator_id"
     t.date "due_date"
     t.index ["course_id", "name"], name: "index_subjects_on_course_id_and_name", unique: true
     t.index ["course_id"], name: "index_subjects_on_course_id"
@@ -67,12 +67,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_171815) do
   end
 
   create_table "tutorings", force: :cascade do |t|
-    t.datetime "scheduled_at", null: false
+    t.datetime "scheduled_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "duration_mins", default: 60, null: false
+    t.integer "duration_mins", default: 60
     t.string "modality", null: false
-    t.integer "capacity", null: false
+    t.integer "capacity"
+    t.bigint "created_by_id"
+    t.bigint "tutor_id"
+    t.integer "enrolled", default: 0, null: false
+    t.bigint "course_id", null: false
+    t.integer "state", default: 0, null: false
+    t.text "request_comment"
+    t.datetime "request_due_at"
+    t.index ["course_id"], name: "index_tutorings_on_course_id"
+    t.index ["created_by_id"], name: "index_tutorings_on_created_by_id"
+    t.index ["state"], name: "index_tutorings_on_state"
+    t.index ["tutor_id"], name: "index_tutorings_on_tutor_id"
   end
 
   create_table "universities", force: :cascade do |t|
@@ -122,7 +133,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_171815) do
   add_foreign_key "subject_tutorings", "subjects"
   add_foreign_key "subject_tutorings", "tutorings"
   add_foreign_key "subjects", "courses"
-  add_foreign_key "subjects", "users", column: "creator_id"
+  add_foreign_key "subjects", "users", column: "creator_id", on_delete: :nullify
+  add_foreign_key "tutorings", "courses"
+  add_foreign_key "tutorings", "users", column: "created_by_id"
+  add_foreign_key "tutorings", "users", column: "tutor_id"
   add_foreign_key "user_tutorings", "tutorings"
   add_foreign_key "user_tutorings", "users"
   add_foreign_key "users", "faculties"

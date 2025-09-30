@@ -1,17 +1,16 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
-import { SignInPage, RegisterPage } from "@/features/users";
+
+import { CoursePage, CourseDetailPage } from "@/features/courses";
+import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow, ForgotPasswordPage, ResetPasswordPage, UserProfilePage} from "@/features/users";
+import { SubjectPage } from "@/features/subjects";
 import { RequireGuestRoute } from "./RequireGuestRoute";
-import ProfilePage from "@/features/users/pages/Profile";
 
 
-import CoursePage from "@/features/courses/pages/CoursePage";
-import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
-import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
+
+
 import SelectTutoringByTutor from "@/features/tutoring/pages/SelectTutoringByTutor";
-import CreateTutoringByTutor from "@/features/tutoring/pages/CreateTutoringByTutor";
-import ListTutoringsOfCourse from "@/features/tutoring/pages/ListTutoringsOfCourse";
-import CreateTutoringByStudent from "@/features/tutoring/pages/CreateTutoringByStudent";
+import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, ListTutoringsOfCourse, CreateTutoringByStudent } from "@/features/tutorings";
 
 export function AppRoutes() {
   return (
@@ -20,20 +19,24 @@ export function AppRoutes() {
         <Route path="/iniciar_sesion" element={<SignInPage />} />
         <Route path="/registrarse" element={<RegisterPage />} />
         <Route path="/flujo-visitante" element={<VisitorFlow />} />
+        <Route path="/olvide_contrasena" element={<ForgotPasswordPage />} />
+        <Route path="/restablecer_contrasena" element={<ResetPasswordPage />} />
       </Route>
-
-      <Route path="/" element={<Navigate to="/materias" replace />} />
-
-      <Route path="/materias" element={<CoursePage />} />
-      <Route element={<PrivateRoute />}>
-        <Route path="/materias/:courseId" element={<CourseDetailPage />} />
+     <Route element={<PrivateRoute />}>
+        <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
+        <Route path="/tutorias/buscar_tutor/:courseId" element={<TutoringPage filters={{}} mode="serTutor" />} />
+        <Route path="/tutorias/elegir_temas/:mode/:courseId" element={<SelectSubjectsByTutor />} />
+        <Route path="/tutorias/crear/:courseId" element={<CreateTutoringByTutor />} />
+        <Route path="/tutorias/solicitar/:courseId" element={<CreateTutoringByStudent />} />
         <Route path="/perfil" element={<ProfilePage />} />
-        <Route path="/tutoria/elegir_temas" element={<SelectTutoringByTutor />} />
-        <Route path="/tutoria/crear_tutoria" element={<CreateTutoringByTutor />} />
-        <Route path="/tutoria/:courseId" element={<ListTutoringsOfCourse />} />
-        <Route path="/tutoria/nueva/:courseId" element={<CreateTutoringByStudent />} />
-       </Route>
-
+        <Route path="/tutores" element={<TutorPage />} />
+        <Route path="/usuarios/:id" element={<UserProfilePage />} />
+        <Route path="/tutorias/materia/:courseId" element={<ListTutoringsOfCourse />} />
+      </Route>
+      <Route path="/" element={<Navigate to="/materias" replace />} />
+      <Route path="/materias" element={<CoursePage />} />
+      <Route path="/materias/:courseId" element={<CourseDetailPage />} />
+      <Route path="/tutores" element={<TutorPage />} />
     </Routes>
   );
 }
