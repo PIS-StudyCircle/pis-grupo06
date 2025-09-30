@@ -33,7 +33,7 @@ export default function TutoringPage({filters = {}, mode = ""}) {
                 onChange={(e) => setShowWithoutTutor(e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-gray-700">Mostrar solo sin tutor</span>
+              <span className="text-gray-700">Tutor Indefinido</span>
             </label>
           </div>
           <TutoringList tutorings={tutorings} mode = {mode} loading={loading} error={error} />
