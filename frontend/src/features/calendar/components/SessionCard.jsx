@@ -1,6 +1,4 @@
 import { Calendar, Clock, User, MapPin, Users } from "lucide-react";
-import { deleteEvent, respondToEvent } from "../services/calendarApi";
-import { showSuccess, showError, showConfirm } from "@utils/toastService";
 import { useState } from "react";
 import { useUser } from "@context/UserContext";
 
@@ -35,37 +33,6 @@ export default function SessionCard({ session, refresh }) {
     }
   };
 
-  const handleCancel = (sessionId) => {
-    showConfirm(
-      "¿Seguro que deseas cancelar esta tutoría?",
-      async () => {
-        try {
-          await deleteEvent(sessionId);
-          showSuccess("Evento cancelado correctamente");
-          if (refresh) refresh();
-        } catch (err) {
-          showError("Error al cancelar: " + err.message);
-        }
-      },
-      () => console.log("Cancelado por el usuario")
-    );
-  };
-
-  const handleRespond = async (response) => {
-    try {
-      await respondToEvent(session.id, response);
-      showSuccess(
-        response === "accepted"
-          ? "¡Has confirmado tu asistencia!"
-          : response === "declined"
-          ? "Has rechazado el evento"
-          : "Has marcado asistencia tentativa"
-      );
-      if (refresh) refresh();
-    } catch (err) {
-      showError("Error al actualizar: " + err.message);
-    }
-  };
 
   const isOrganizer = user?.email === session.tutor;
 
@@ -155,45 +122,6 @@ export default function SessionCard({ session, refresh }) {
           )}
         </div>
       )}
-
-      {/* Acciones */}
-      <div className="flex gap-2 mt-6 pt-4 border-t border-gray-200">
-        <div className="ml-auto flex gap-2">
-          {isOrganizer ? (
-            <button
-              onClick={() => handleCancel(session.id)}
-              className="text-red-600 hover:text-red-800 text-sm font-semibold hover:underline"
-            >
-              Cancelar
-            </button>
-          ) : (
-            <>
-              {session.status === "pendiente" && (
-                <>
-                  <button
-                    onClick={() => handleRespond("accepted")}
-                    className="text-green-600 hover:text-green-800 text-sm font-semibold hover:underline"
-                  >
-                    Confirmar
-                  </button>
-                  <button
-                    onClick={() => handleRespond("declined")}
-                    className="text-red-600 hover:text-red-800 text-sm font-semibold hover:underline"
-                  >
-                    Rechazar
-                  </button>
-                  <button
-                    onClick={() => handleRespond("tentative")}
-                    className="text-yellow-600 hover:text-yellow-800 text-sm font-semibold hover:underline"
-                  >
-                    Tentativa
-                  </button>
-                </>
-              )}
-            </>
-          )}
-        </div>
       </div>
-    </div>
   );
 }

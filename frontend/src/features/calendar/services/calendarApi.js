@@ -1,25 +1,18 @@
 import { API_BASE } from "@/shared/config";
-
 const API_URL = `${API_BASE}/calendar/sessions`;
-// Función para crear una sesion de clase
-export const createClassEvent = async ({
-  title,
-  description,
-  start,
-  end,
-  attendees,
-}) => {
+
+// Crear una sesión de clase (el tutor crea el evento)
+export const createClassEvent = async ({ tutoringId, title, description, start, end }) => {
   const response = await fetch(API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({
+      tutoring_id: tutoringId,
       title,
       description,
       start_time: start,
       end_time: end,
-      attendees,
     }),
   });
 
@@ -27,59 +20,66 @@ export const createClassEvent = async ({
     const errorData = await response.json();
     throw new Error(errorData.error || "Error al crear el evento");
   }
-
   return await response.json();
 };
 
-// Función para eliminar un evento por su ID
-export const deleteEvent = async (eventId) => {
-  const response = await fetch(`${API_URL}/${eventId}`, {
+// Unirse a una sesión (el estudiante se agrega como attendee)
+export const joinClassEvent = async (tutoringId) => {
+  console.log("Joining tutoring with ID:", tutoringId); // Log para depuración
+  const response = await fetch(`${API_URL}/${tutoringId}/join`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Error al unirse al evento");
+  }
+  return await response.json();
+};
+
+// Ver un evento puntual
+export const getClassEvent = async (tutoringId) => {
+  const response = await fetch(`${API_URL}/${tutoringId}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Error al obtener el evento");
+  }
+  return await response.json();
+};
+
+// Obtener los próximos 10 eventos del calendario del usuario actual
+export const getUpcomingEvents = async () => {
+  const response = await fetch(`${API_URL}/upcoming`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Error al obtener próximos eventos");
+  }
+  return await response.json();
+};
+
+// Eliminar un evento
+export const deleteClassEvent = async (tutoringId) => {
+  const response = await fetch(`${API_URL}/${tutoringId}`, {
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
   });
 
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Error al eliminar el evento");
   }
-
   return await response.json();
-};
-
-// Función para responder a una invitación de evento
-export const respondToEvent = async (eventId, status) => {
-  const responseApi = await fetch(`${API_URL}/${eventId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ response: status }), 
-  });
-
-  if (!responseApi.ok) {
-    const errorData = await responseApi.json();
-    throw new Error(errorData.error || "Error al responder al evento");
-  }
-
-  return await responseApi.json();
-};
-
-
-// Función para obtener las sesiones de un usuario por su ID
-export async function getSessionsByUser(userId, type = "all") {
-  const res = await fetch(
-    `${API_URL}?user_id=${userId}&type=${type}`,
-    { credentials: "include" }
-  );
-
-  if (!res.ok) throw new Error("Error al obtener sesiones del usuario");
-
-  return res.json();
-}
-
-// Función para obtener los eventos de un tutor por su ID (O sea los horarios disponibles)
-export const getTutorEvents = async (tutorId) => {
-  const res = await fetch(`${API_BASE}/calendar/events?tutor_id=${tutorId}`);
-  if (!res.ok) throw new Error("Error al obtener eventos");
-  return await res.json();
 };

@@ -1,4 +1,4 @@
-import { deleteEvent } from "../services/calendarApi";
+import { deleteClassEvent } from "../services/calendarApi";
 import { showSuccess, showError, showConfirm } from "@utils/toastService";
 
 export const handleCancel = (sessionId, refresh) => {
@@ -6,7 +6,7 @@ export const handleCancel = (sessionId, refresh) => {
     "¿Seguro que deseas cancelar esta tutoría?",
     async () => {
       try {
-        await deleteEvent(sessionId);
+        await deleteClassEvent(sessionId);
         showSuccess("Evento cancelado correctamente");
         if (refresh) refresh();
       } catch (err) {

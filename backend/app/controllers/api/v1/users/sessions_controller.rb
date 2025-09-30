@@ -16,6 +16,11 @@ module Api
       private
 
       def respond_with(resource, _opt = {})
+      service = Google::Apis::CalendarV3::CalendarService.new
+      service.authorization = resource.google_access_token || refresh_google_token(resource)
+
+      ensure_study_circle_calendar(resource, service)
+
         success_response(
           message: 'Logged in successfully.',
           data: { user: UserSerializer.new(resource).serializable_hash[:data][:attributes] },
@@ -29,7 +34,7 @@ module Api
       
       # Para crear el calendario de StudyCircle si no existe
       def ensure_study_circle_calendar(user, service)
-        return user.study_circle_calendar_id if user.study_circle_calendar_id.present?
+        return user.calendar_id if user.calendar_id.present?
 
         calendar = Google::Apis::CalendarV3::Calendar.new(
           summary: "StudyCircle",
@@ -41,6 +46,24 @@ module Api
         user.update!(study_circle_calendar_id: result.id)
 
         result.id
+      end
+
+      def refresh_google_token(user)
+        client = Signet::OAuth2::Client.new(
+          client_id: ENV['GOOGLE_CLIENT_ID'],
+          client_secret: ENV['GOOGLE_CLIENT_SECRET'],
+          token_credential_uri: 'https://oauth2.googleapis.com/token',
+          refresh_token: user.google_refresh_token,
+        )
+
+        client.fetch_access_token!
+
+        user.update!(
+          google_access_token: client.access_token,
+          google_expires_at: Time.now + client.expires_in
+        )
+
+        client.access_token
       end
     end
   end

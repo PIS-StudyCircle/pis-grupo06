@@ -22,8 +22,12 @@ Rails.application.routes.draw do
       resources :subjects
       resources :tutorings
 
-      namespace :calendar do
-        resources :sessions, only: [:index, :create, :destroy, :update]
+      resource :calendar, only: [] do
+        post   "sessions",          to: "calendar#create"
+        post   "sessions/:id/join", to: "calendar#join"
+        get    "sessions/upcoming", to: "calendar#upcoming"
+        get    "sessions/:id",      to: "calendar#show"
+        delete "sessions/:id",      to: "calendar#destroy"
       end
     end
   end

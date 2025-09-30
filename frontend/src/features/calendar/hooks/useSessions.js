@@ -1,34 +1,27 @@
-import { useState, useEffect, useCallback } from "react";
-import { getSessionsByUser } from "../services/calendarApi";
-import { showError } from "@utils/toastService";
+import { useEffect, useState } from "react";
+import { getUpcomingEvents } from "../services/calendarApi";
 
-export function useSessions(userId, onCountChange, type="all") {
+export function useSessions(userId) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const fetchSessions = useCallback(async () => {
-    if (!userId) return;
-    setLoading(true);
-    try {
-      const data = await getSessionsByUser(userId, type);
-      const parsed = data
-        .map((s) => ({ ...s, date: new Date(s.date) }))
-        .sort((a, b) => a.date - b.date);
-
-      setSessions(parsed);
-      if (onCountChange) onCountChange(parsed.length);
-    } catch (err) {
-      showError("Error al cargar sesiones: " + err.message);
-      setSessions([]);
-      if (onCountChange) onCountChange(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId, onCountChange]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchSessions();
-  }, [fetchSessions]);
+    if (!userId) return; // evita llamada si no hay usuario
 
-  return { sessions, loading, refresh: fetchSessions };
+    setLoading(true);
+    setError(null);
+
+    getUpcomingEvents()
+      .then((data) => {
+        setSessions(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching sessions:", err);
+        setError(err.message);
+      })
+      .finally(() => setLoading(false));
+  }, [userId]);
+
+  return { sessions, loading, error };
 }

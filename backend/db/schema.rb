@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_29_021435) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_29_213643) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -77,6 +77,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_021435) do
     t.bigint "tutor_id"
     t.integer "enrolled", default: 0, null: false
     t.bigint "course_id", null: false
+    t.string "event_id"
     t.index ["course_id"], name: "index_tutorings_on_course_id"
     t.index ["created_by_id"], name: "index_tutorings_on_created_by_id"
     t.index ["tutor_id"], name: "index_tutorings_on_tutor_id"

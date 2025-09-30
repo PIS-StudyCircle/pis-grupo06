@@ -3,8 +3,8 @@ import SessionCard from "../components/SessionCard";
 import { useSessions } from "../hooks/useSessions";
 import { useLocation } from "react-router-dom";
 
-export default function SessionList({ userId, onCountChange, type="all" }) {
-  const { sessions, loading, refresh } = useSessions(userId, onCountChange, type);
+export default function SessionList({ userId }) {
+  const { sessions, loading, error } = useSessions(userId);
   const location = useLocation();
 
   // Detectar ruta actual
@@ -56,7 +56,7 @@ export default function SessionList({ userId, onCountChange, type="all" }) {
 
       <div className="space-y-4 w-full">
         {sessions.map((session) => (
-          <SessionCard key={session.id} session={session} refresh={refresh} />
+          <SessionCard key={session.id} session={session} />
         ))}
       </div>
     </div>

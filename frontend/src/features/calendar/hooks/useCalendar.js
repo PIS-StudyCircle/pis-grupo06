@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { getTutorEvents } from "../services/calendarApi";
+import { getUpcomingEvents } from "../services/calendarApi";
 
-export function useCalendar(tutorId) {
+export function useCalendar(userId) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTutorEvents(tutorId)
+    getUpcomingEvents(userId)
       .then(data => setEvents(data))
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
-  }, [tutorId]);
+  }, [userId]);
 
   return { events, loading };
 }
