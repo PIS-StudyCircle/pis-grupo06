@@ -100,7 +100,7 @@ describe("SubjectPage", () => {
     expect(screen.getByText(/Vencimiento:\s*30\/9\/2025/)).toBeInTheDocument();
   });
 
-  it("muestra checkboxes si showCheckbox es true", async () => {
+  it("permite seleccionar temas si type='selectable'", async () => {
     subjectService.getSubjects.mockResolvedValue({
       subjects: mockSubjects,
       pagination: { last: 1 },
@@ -108,15 +108,21 @@ describe("SubjectPage", () => {
 
     render(
       <MemoryRouter>
-        <SubjectPage courseId={123} showCheckbox={true} />
+        <SubjectPage courseId={123} type="selectable" />
       </MemoryRouter>
     );
 
-    expect(await screen.findByText("Tema I")).toBeInTheDocument();
-    expect(await screen.findByText("Tema II")).toBeInTheDocument();
+    const tema1Text  = await screen.findByText("Tema I");
+    const tema2Text  = await screen.findByText("Tema II");
 
-    const checkboxes = screen.getAllByRole("checkbox");
-    expect(checkboxes).toHaveLength(2);
+    const tema1Btn = tema1Text.closest("button");
+    const tema2Btn = tema2Text.closest("button");
+
+    fireEvent.click(tema1Btn);
+    fireEvent.click(tema2Btn);
+
+    expect(tema1Btn).toHaveClass("bg-blue-600 text-white");
+    expect(tema2Btn).toHaveClass("bg-blue-600 text-white");
   });
 
   it("muestra mensaje de carga inicialmente", () => {
@@ -151,7 +157,7 @@ describe("SubjectPage", () => {
 
     render(
       <MemoryRouter>
-        <SubjectPage courseId={123} showButton={true} />
+        <SubjectPage courseId={123} showCreate={true} />
       </MemoryRouter>
     );
 
@@ -161,7 +167,7 @@ describe("SubjectPage", () => {
 
     // Validación requerida
     fireEvent.click(screen.getByText("Guardar"));
-    expect(await screen.findByText(/El Nombre es obligatorio/i)).toBeInTheDocument();
+    expect(await screen.findByText(/El campo Nombre es obligatorio/i)).toBeInTheDocument();
   });
 
   it("llama a createSubject y resetea el formulario", async () => {
@@ -183,7 +189,7 @@ describe("SubjectPage", () => {
   
     render(
       <MemoryRouter>
-        <SubjectPage courseId={123} showButton={true} />
+        <SubjectPage courseId={123} showCreate={true} />
       </MemoryRouter>
     );
   
@@ -217,7 +223,7 @@ describe("SubjectPage", () => {
 
     render(
       <MemoryRouter>
-        <SubjectPage courseId={123} showButton={true} />
+        <SubjectPage courseId={123} showCreate={true} />
       </MemoryRouter>
     );
 
@@ -226,27 +232,6 @@ describe("SubjectPage", () => {
     fireEvent.click(screen.getByText("Guardar"));
 
     expect(await screen.findByText(/Fallo API/i)).toBeInTheDocument();
-  });
-
-  it("maneja la selección de checkboxes si showCheckbox es true", async () => {
-    subjectService.getSubjects.mockResolvedValue({
-      subjects: mockSubjects,
-      pagination: { last: 1 },
-    });
-
-    render(
-      <MemoryRouter>
-        <SubjectPage courseId={123} showCheckbox={true} />
-      </MemoryRouter>
-    );
-
-    const checkboxes = await screen.findAllByRole("checkbox");
-
-    fireEvent.click(checkboxes[0]);
-    fireEvent.click(checkboxes[1]);
-
-    expect(checkboxes[0]).toBeChecked();
-    expect(checkboxes[1]).toBeChecked();
   });
   
   it("actualiza search y resetea page cuando cambia la query (debounce)", async () => {
@@ -298,7 +283,7 @@ describe("SubjectPage", () => {
   
     render(
       <MemoryRouter>
-        <SubjectPage courseId={123} showButton={true} initialPage={2} />
+        <SubjectPage courseId={123} showCreate={true} initialPage={2} />
       </MemoryRouter>
     );
   
