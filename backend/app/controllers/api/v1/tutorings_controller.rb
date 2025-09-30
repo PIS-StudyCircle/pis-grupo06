@@ -34,8 +34,8 @@ module Api
 
         tutorings =
           case search_by
-          when "subject"  then tutorings.search_by_subject_name(q)
-          else                 tutorings.search_by_course_name(q)
+          when "subject" then tutorings.search_by_subject_name(q)
+          else tutorings.search_by_course_name(q)
           end
 
         # por defecto muestro las futuras
