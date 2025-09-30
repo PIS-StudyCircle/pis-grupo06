@@ -3,16 +3,23 @@ import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import TutoringPage from "../pages/TutoringPage";
 
 const setPageMock = jest.fn();
+
 jest.mock("../hooks/useTutorings", () => ({
   useTutorings: jest.fn(),
 }));
+
+jest.mock("@context/UserContext", () => ({
+  useUser: jest.fn(),
+}));
+
 import { useTutorings } from "../hooks/useTutorings";
+import { useUser } from "@context/UserContext";
 
 // 2) Mock de TutoringList (solo muestra algo mínimo y expone props en data-* para asserts)
 const TutoringListMock = ({ tutorings = [], mode = "", loading, error }) => (
   <div
     data-testid="tutoring-list"
-    data-mode={mode}
+    data-mode-type={typeof mode}
     data-loading={String(!!loading)}
     data-error={error || ""}
   >
@@ -34,7 +41,9 @@ jest.mock("../../../shared/components/Pagination", () => ({
       <button onClick={() => setPage(page - 1)} disabled={page <= 1}>
         Prev
       </button>
-      <span>Page {page} / {totalPages}</span>
+      <span>
+        Page {page} / {totalPages}
+      </span>
       <button onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
         Next
       </button>
@@ -66,6 +75,10 @@ const mockUseTutorings = ({
 };
 
 describe("TutoringPage", () => {
+  beforeEach(() => {
+    useUser.mockReturnValue({ user: { id: 99, name: "Test User" } });
+  });
+
   test("renderiza el título y pasa props correctas a TutoringList", () => {
     mockUseTutorings({
       tutorings: [
@@ -76,7 +89,7 @@ describe("TutoringPage", () => {
       page: 1,
     });
 
-    render(<TutoringPage mode="select" filters={{ subject: "math" }} />);
+    render(<TutoringPage filters={{ subject: "math" }} />);
 
     // Título
     expect(
@@ -85,7 +98,7 @@ describe("TutoringPage", () => {
 
     // TutoringList: chequeo de props pasadas
     const list = screen.getByTestId("tutoring-list");
-    expect(list).toHaveAttribute("data-mode", "select");
+    expect(list).toHaveAttribute("data-mode-type", "function");
     expect(list).toHaveAttribute("data-loading", "false");
     expect(list).toHaveAttribute("data-error", "");
     expect(screen.getByText("Cálculo I")).toBeInTheDocument();
