@@ -43,7 +43,7 @@ class Tutoring < ApplicationRecord
   scope :search_by_course_name, ->(q) {
     return all if q.blank?
 
-   joins(:course).where("unaccent(courses.name) ILIKE unaccent(?)", "%#{q}%")
+    joins(:course).where("unaccent(courses.name) ILIKE unaccent(?)", "%#{q}%")
   }
 
   scope :search_by_subject_name, ->(q) {

@@ -7,14 +7,12 @@ import Pagination from "@components/Pagination";
 
 export default function TutoringPage({filters, mode = ""}) {
 
-  const baseFilters = filters ?? {};
-
   const [searchBy, setSearchBy] = useState("course");
 
-  const mergedFilters = useMemo(
-    () => ({ ...baseFilters, search_by: searchBy }),
-    [baseFilters, searchBy]
-  );
+  const mergedFilters = useMemo(() => {
+    const baseFilters = filters ?? {};
+    return { ...baseFilters, search_by: searchBy };
+  }, [filters, searchBy]);
 
   const {
     tutorings, 
@@ -41,11 +39,11 @@ export default function TutoringPage({filters, mode = ""}) {
       if (page !== 1) setPage(1);
     }, 400);
     return () => clearTimeout(t);
-  }, [query, setSearch, setPage]);
+  }, [query, page, setSearch, setPage]);
 
   useEffect(() => {
     if (page !== 1) setPage(1);
-  }, [searchBy, setPage]);
+  }, [searchBy, page, setPage]);
 
   return (
     <div className="flex flex-col ">
