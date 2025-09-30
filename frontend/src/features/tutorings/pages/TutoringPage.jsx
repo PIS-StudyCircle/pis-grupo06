@@ -1,12 +1,51 @@
+import { useState, useEffect, useMemo } from "react";
 import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";    
+import TutoringSearchBar from "../components/TutoringSearchBar";
 import Pagination from "@components/Pagination";
 
 
-export default function TutoringPage({filters = {}, mode = ""}) {
-  const { tutorings, loading, error, pagination, page, setPage } = useTutorings(1, 20, filters);
+export default function TutoringPage({filters, mode = ""}) {
+
+  const baseFilters = filters ?? {};
+
+  const [searchBy, setSearchBy] = useState("course");
+
+  const mergedFilters = useMemo(
+    () => ({ ...baseFilters, search_by: searchBy }),
+    [baseFilters, searchBy]
+  );
+
+  const {
+    tutorings, 
+    loading, 
+    error, 
+    pagination, 
+    page, 
+    setPage,
+    search,
+    setSearch,
+  } = useTutorings(1, 20, mergedFilters);
+
   const totalPages = pagination.last || 1;
 
+  const [query, setQuery] = useState(search);
+
+  useEffect(() => {
+    setQuery(search);
+  }, [search]);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(query);
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [query, setSearch, setPage]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchBy, setPage]);
 
   return (
     <div className="flex flex-col ">
@@ -15,6 +54,18 @@ export default function TutoringPage({filters = {}, mode = ""}) {
           <h1 className="text-2xl font-bold p-2 mb-4 text-black">
             Tutorías Disponibles
           </h1>
+
+          <TutoringSearchBar
+            query={query}
+            onQueryChange={(e) => setQuery(e.target.value)}
+            searchBy={searchBy}
+            onSearchByChange={setSearchBy}
+            placeholder={
+              searchBy === "course"
+                ? "Buscar por materia..."
+                : "Buscar por tema..."
+            }
+          />
 
           <TutoringList tutorings={tutorings} mode = {mode} loading={loading} error={error} />
 
