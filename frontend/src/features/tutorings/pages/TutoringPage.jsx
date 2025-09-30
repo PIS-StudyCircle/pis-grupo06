@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";    
 import Pagination from "@components/Pagination";
@@ -19,6 +19,11 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
 
   const totalPages = pagination.last || 1;
 
+  const handleCreateTutoring = useCallback(() => {
+    navigate(`/tutorias/elegir_temas/${courseId}`);
+  }, [navigate, courseId]);
+
+
   return (
     <div className="flex flex-col">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
@@ -30,7 +35,7 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
           {mode === "serTutor" && (
             <button
               className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-              onClick={() => navigate(`/tutorias/elegir_temas/${courseId}`)}
+              onClick={handleCreateTutoring}
             >
               Crear Tutoría
             </button>

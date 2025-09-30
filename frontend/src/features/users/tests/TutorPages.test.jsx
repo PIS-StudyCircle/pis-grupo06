@@ -17,12 +17,16 @@ describe("TutorPage", () => {
     jest.clearAllMocks();
   });
 
-  it("muestra loading", () => {
+  it("muestra loading", async () => {
     usersServices.getUsers.mockResolvedValueOnce({ users: [], pagination: {} });
 
     render(<TutorPage />);
-    expect(screen.getByText(/cargando/i)).toBeInTheDocument();
+    // Espera a que el componente actualice su estado después del fetch
+    await waitFor(() => {
+      expect(screen.getByText(/cargando/i)).toBeInTheDocument();
+    });
   });
+
 
   it("muestra mensaje de error", async () => {
     usersServices.getUsers.mockRejectedValueOnce(
@@ -30,10 +34,14 @@ describe("TutorPage", () => {
     );
 
     render(<TutorPage />);
-    expect(await screen.findByText(/Error al cargar los usuarios/i)).toBeInTheDocument();
+
+    await waitFor(async () => {
+      expect(await screen.findByText(/Error al cargar los usuarios/i)).toBeInTheDocument();
+    });
   });
 
   it("muestra la lista de tutores con sus imágenes o iniciales", async () => {
+    // Devuelve un objeto completo para que useUsers no falle
     usersServices.getUsers.mockResolvedValueOnce({
       users: [
         {
@@ -54,8 +62,10 @@ describe("TutorPage", () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText("Juan Pérez")).toBeInTheDocument();
-    expect(await screen.findByText("Ana Gómez")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Juan Pérez")).toBeInTheDocument();
+      expect(screen.getByText("Ana Gómez")).toBeInTheDocument();
+    });
 
     expect(screen.getByAltText("Juan Pérez")).toHaveAttribute(
       "src",
@@ -76,7 +86,9 @@ describe("TutorPage", () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText(/No hay tutores disponibles./i)).toBeInTheDocument();
+    await waitFor(async () => {
+      expect(await screen.findByText(/No hay tutores disponibles./i)).toBeInTheDocument();
+    });
   });
 
   it("actualiza la búsqueda al escribir", async () => {
@@ -89,7 +101,9 @@ describe("TutorPage", () => {
     );
 
     const input = screen.getByPlaceholderText(/buscar tutor/i);
-    await userEvent.type(input, "Ana");
+    await waitFor(async () => {
+      await userEvent.type(input, "Ana");
+    });
 
     await waitFor(() => {
       expect(usersServices.getUsers).toHaveBeenCalledWith(1, 20, "Ana", "tutor");
@@ -109,7 +123,9 @@ describe("TutorPage", () => {
     );
 
     const nextPage = await screen.findByRole("button", { name: /2/i });
-    await userEvent.click(nextPage);
+    await waitFor(async () => {
+      await userEvent.click(nextPage);
+    });
 
     await waitFor(() => {
       expect(usersServices.getUsers).toHaveBeenCalledWith(2, 20, "", "tutor");
