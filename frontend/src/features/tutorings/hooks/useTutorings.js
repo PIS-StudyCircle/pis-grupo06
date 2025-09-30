@@ -12,8 +12,8 @@ export const useTutorings = (initialPage = 1, perPage = 20, filters = {}) => {
     const fetchTutorings = async () => {
       setLoading(true);
       try {
-        const response = await getTutorings(page, perPage, filters); 
-        setTutorings(response.tutorings);   
+        const response = await getTutorings(page, perPage, filters);
+        setTutorings(response.tutorings);
         setPagination(response.pagination);
       } catch (err) {
         console.error("Error fetching tutorings:", err);

@@ -279,7 +279,8 @@ tutoring_offered = Tutoring.find_or_create_by!(
   enrolled: 0,
   course: course,
   created_by_id: creator.id,
-  tutor_id: creator.id
+  tutor_id: creator.id,
+  tutor_name: creator.name + " " + creator.last_name
 )
 SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTutorings } from "../hooks/useTutorings";
-import TutoringList from "../components/TutoringList";    
+import TutoringList from "../components/TutoringList";
 import Pagination from "@components/Pagination";
 
 
