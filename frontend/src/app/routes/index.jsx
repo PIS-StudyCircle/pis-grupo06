@@ -10,7 +10,8 @@ import VisitorFlow from "@/features/visitors/pages/VisitorFlow";
 import CourseDetailPage from "@/features/courses/pages/CourseDetailPage";
 import SelectTutoringByTutor from "@/features/tutoring/pages/SelectTutoringByTutor";
 import CreateTutoringByTutor from "@/features/tutoring/pages/CreateTutoringByTutor";
-
+import ListTutoringsOfCourse from "@/features/tutoring/pages/ListTutoringsOfCourse";
+import CreateTutoringByStudent from "@/features/tutoring/pages/CreateTutoringByStudent";
 
 export function AppRoutes() {
   return (
@@ -29,7 +30,9 @@ export function AppRoutes() {
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/tutoria/elegir_temas" element={<SelectTutoringByTutor />} />
         <Route path="/tutoria/crear_tutoria" element={<CreateTutoringByTutor />} />
-      </Route>
+        <Route path="/tutoria/:courseId" element={<ListTutoringsOfCourse />} />
+        <Route path="/tutoria/nueva/:courseId" element={<CreateTutoringByStudent />} />
+       </Route>
 
     </Routes>
   );
