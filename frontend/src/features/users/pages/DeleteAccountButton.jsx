@@ -37,7 +37,7 @@ export default function DeleteAccountButton() {
       {!confirming ? (
         <button
           onClick={() => setConfirming(true)}
-          className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition"
+          className="w-full bg-transparent text-red-600 font-semibold py-2 px-4 rounded-lg hover:underline hover:bg-gray-200"
         >
           Eliminar cuenta
         </button>
@@ -64,14 +64,18 @@ export default function DeleteAccountButton() {
                 </ErrorAlert>
               )}
 
-              <div className="flex justify-between">
-                <SubmitButton text="Sí, eliminar" />
-                <button
-                  onClick={() => setConfirming(false)}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold shadow-md transition"
-                >
-                  Cancelar
-                </button>
+              <div className="flex gap-4 mt-4">
+                <div className="flex-1">
+                  <SubmitButton text="Sí, eliminar" className="w-full" />
+                </div>
+                <div className="flex-1">
+                  <button
+                    onClick={() => setConfirming(false)}
+                    className="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold shadow-md transition"
+                  >
+                    Cancelar
+                  </button>
+                </div>
               </div>
             </div>
           </form>
