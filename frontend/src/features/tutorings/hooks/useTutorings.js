@@ -11,6 +11,8 @@ export const useTutorings = (initialPage = 1, perPage = 20, filters = {}) => {
   useEffect(() => {
     const fetchTutorings = async () => {
       setLoading(true);
+
+
       try {
         const response = await getTutorings(page, perPage, filters); 
         setTutorings(response.tutorings);

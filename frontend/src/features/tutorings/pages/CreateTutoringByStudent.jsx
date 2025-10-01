@@ -63,17 +63,14 @@ export default function CreateTutoringByStudent() {
       // Campos de la solicitud
       request_comment: form.request_comment.trim() || undefined,
       request_due_at,
-
-      // Relación/Contexto
+      tutor_id: user.id,
       created_by_id: user.id,      // quien solicita
       tutor_id: null,              // aún sin tutor asignado
       course_id: course.id,
       subject_ids: selectedSubjects,
-      capacity: parseInt(1, 10),     
-      // Defaults para pasar validaciones del modelo (no se muestran en UI)
-      modality: "virtual",
+      modality: form.mode,
     };
-
+ 
     onSubmit(payload);
     localStorage.removeItem("selectedSubjects");
   };
@@ -137,6 +134,32 @@ export default function CreateTutoringByStudent() {
           {errs.request_comment && (
             <span className="text-red-500 text-xs mt-1">{errs.request_comment}</span>
           )}
+        </div>
+
+         <div className="flex items-center gap-4">
+          <span className="font-medium">Modalidad:</span>
+          <button
+            type="button"
+            className={`px-4 py-2 rounded font-medium transition-colors ${
+              form.mode === "virtual"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-800"
+            }`}
+            onClick={() => setField("mode", "virtual")}
+          >
+            Virtual
+          </button>
+          <button
+            type="button"
+            className={`px-4 py-2 rounded font-medium transition-colors ${
+              form.mode === "presencial"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-800"
+            }`}
+            onClick={() => setField("mode", "presencial")}
+          >
+            Presencial
+          </button>
         </div>
 
         {error.length > 0 && (

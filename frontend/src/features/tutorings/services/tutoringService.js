@@ -26,7 +26,7 @@ export const createTutoringByTutor = async ({
   duration_mins,
   modality,
   capacity,
-  creator_by_id, // cambio (estaba como: creator_id)
+  created_by_id,
   tutor_id,
   course_id,
   subject_ids,
@@ -37,7 +37,7 @@ export const createTutoringByTutor = async ({
       duration_mins,
       modality,
       capacity,
-      creator_by_id, // cambio (estaba como: creator_id)
+      created_by_id,
       tutor_id,
       course_id,
       subject_ids,
@@ -67,9 +67,8 @@ export const createTutoringByStudent = async ({
   request_due_at,
   request_comment,
   created_by_id,
-  course_id,
+  course_id, 
   subject_ids,
-  capacity,
   modality,
   // defaults para pasar validaciones del backend:
 }) => {
@@ -77,12 +76,10 @@ export const createTutoringByStudent = async ({
     tutoring: {
       request_due_at,
       request_comment: request_comment?.trim() || undefined,
-      created_by_id, // mandamos el correcto
-      tutor_id: null,
+      created_by_id,
       course_id,
       subject_ids,
       modality,
-      capacity,
     },
   };
   const resp = await fetch(`${API_BASE}/tutorings`, {

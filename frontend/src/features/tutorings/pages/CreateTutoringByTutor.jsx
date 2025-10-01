@@ -153,7 +153,7 @@ export default function CreateTutoringByTutor() {
             <span className="text-red-500 text-xs">{errors.end_time}</span>
           )}
         </div>
-
+ 
         <div className="flex items-center gap-4">
           <span className="font-medium">Modalidad:</span>
           <button
