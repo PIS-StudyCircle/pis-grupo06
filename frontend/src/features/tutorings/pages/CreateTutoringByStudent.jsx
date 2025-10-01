@@ -16,17 +16,15 @@ export default function CreateTutoringByStudent() {
   const { courseId } = useParams();
   const { course, loadingCourse, errorCourse } = useCourse(courseId);
 
-  const selectedSubjects =
-    JSON.parse(localStorage.getItem("selectedSubjects")) || [];
-
+  
   const { form, setField } = useFormState({
     request_due_date: "",
     request_due_time: "",
     request_comment: "",
   });
 
-  // Reutilizamos tu hook de submit
-  const { error, onSubmit } = useFormSubmit(createTutoringByStudent, "/");
+  
+  const { error, onSubmit } = useFormSubmit(createTutoringByStudent, "/perfil");
 
   if (userLoading) return <p className="text-center mt-10">Cargando usuario...</p>;
   if (userError)   return <p className="text-center mt-10">Error al cargar perfil.</p>;
@@ -45,22 +43,24 @@ export default function CreateTutoringByStudent() {
     return errs;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) {
-      // Mostramos errores debajo de cada input sin romper tu flujo
+      // Mostramos errores debajo de cada input
       setField("_errors", errs);
       return;
     }
 
-    // Construir request_due_at en ISO (UTC)
+    const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
+    console.log("🔍 selectedSubjects in handleSubmit:", selectedSubjects);
+
+    // Construir request_due_at
     const dueLocal = new Date(`${form.request_due_date}T${form.request_due_time}:00`);
     const request_due_at = dueLocal.toISOString();
 
     const payload = {
       // Campos de la solicitud
-      state: "pending",
       request_comment: form.request_comment.trim() || undefined,
       request_due_at,
 
@@ -69,10 +69,9 @@ export default function CreateTutoringByStudent() {
       tutor_id: null,              // aún sin tutor asignado
       course_id: course.id,
       subject_ids: selectedSubjects,
-
+      capacity: parseInt(1, 10),     
       // Defaults para pasar validaciones del modelo (no se muestran en UI)
       modality: "virtual",
-      capacity: 20,
     };
 
     onSubmit(payload);

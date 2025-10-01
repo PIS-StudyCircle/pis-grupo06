@@ -6,7 +6,7 @@ import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow, ForgotPa
 import { SubjectPage } from "@/features/subjects";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 
-import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, ListTutoringsOfCourse, CreateTutoringByStudent } from "@/features/tutorings";
+import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent } from "@/features/tutorings";
 
 export function AppRoutes() {
   return (
@@ -27,7 +27,7 @@ export function AppRoutes() {
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/tutores" element={<TutorPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
-        <Route path="/tutorias/materia/:courseId" element={<ListTutoringsOfCourse />} />
+        <Route path="/tutorias/materia/:courseId" element={<TutoringPage filters={{}} mode="serEstudiante" />} />
       </Route>
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />

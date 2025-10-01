@@ -67,19 +67,17 @@ export const createTutoringByStudent = async ({
   request_due_at,
   request_comment,
   created_by_id,
-  creator_id,
   course_id,
   subject_ids,
+  capacity,
+  modality,
   // defaults para pasar validaciones del backend:
-  modality = "virtual",
-  capacity = 20,
 }) => {
   const body = {
     tutoring: {
-      state: "pending",
       request_due_at,
       request_comment: request_comment?.trim() || undefined,
-      created_by_id: created_by_id ?? creator_id, // mandamos el correcto
+      created_by_id, // mandamos el correcto
       tutor_id: null,
       course_id,
       subject_ids,

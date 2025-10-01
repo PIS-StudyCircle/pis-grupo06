@@ -90,12 +90,6 @@ module Api
         end
 
         if tutoring.save
-          if params[:tutoring][:subject_ids]
-            params[:tutoring][:subject_ids].each do |subject_id|
-              tutoring.subject_tutorings.create(subject_id: subject_id)
-            end
-          end
-
           render json: { tutoring: tutoring }, status: :created
         else
           render json: { errors: tutoring.errors.full_messages }, status: :unprocessable_entity
@@ -112,8 +106,10 @@ module Api
             :duration_mins,
             :modality,
             :capacity,
+            :enrolled,
             :course_id,
             :tutor_id,
+            :created_by_id,
             :request_due_at,
             :request_comment,
             { subject_ids: [] }

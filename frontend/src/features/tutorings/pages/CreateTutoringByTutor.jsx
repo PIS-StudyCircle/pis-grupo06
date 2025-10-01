@@ -49,7 +49,7 @@ export default function CreateTutoringByTutor() {
   });
 
   const { errors, validate } = useValidation(validators);
-  const { error, onSubmit } = useFormSubmit(createTutoringByTutor, "/");
+  const { error, onSubmit } = useFormSubmit(createTutoringByTutor, "/perfil");
 
   if (userLoading) return <p className="text-center mt-10">Cargando usuario...</p>;
   if (userError) return <p className="text-center mt-10">Error al cargar perfil.</p>;

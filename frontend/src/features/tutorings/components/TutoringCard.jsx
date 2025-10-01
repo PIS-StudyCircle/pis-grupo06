@@ -13,17 +13,8 @@ export default function TutoringCard({ tutoring, mode }) {
             {tutoring.course.name}
           </p>
 
-          <p className="tutoring-card-title mt-1">
-            <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)} 
-          </p>
-          <p className="tutoring-card-title mt-1">
-            <b>Duración: </b> {tutoring.duration_mins} minutos
-          </p>
-          <p className="tutoring-card-title mt-1"><b>Modalidad: </b> {tutoring.modality}</p>
-          <p className="text-gray-600 text-sm mt-1">
-            <b>Cupos disponibles: </b> {tutoring.capacity - tutoring.enrolled}
-          </p>
-          <p className="tutoring-card-titlemt-1"><b>Temas:</b></p>
+          
+          <p className="tutoring-card-title mt-1"><b>Temas:</b></p>
           <div className="flex flex-wrap gap-2 mt-1">
             {tutoring.subjects.slice(0, 3).map((subject) => (
               <span
@@ -48,7 +39,7 @@ export default function TutoringCard({ tutoring, mode }) {
               //onClick={() => navigate(`/tutorias/brindar/${course.id}`)}
             >Ser tutor</button>
           }
-          {mode === "unirme" && <button className="btn btn-primary tutoring-card-button">Unirme</button>}
+          {mode === "serEstudiante" && <button className="btn btn-primary tutoring-card-button">Unirme</button>}
           {mode === "misTutorias" && <button className="btn btn-primary tutoring-card-button">Desuscribirme</button>}
         </div>
       </div>
