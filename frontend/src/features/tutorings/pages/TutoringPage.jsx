@@ -12,6 +12,8 @@ export default function TutoringPage({filters = {}}) {
   const { user } = useUser();
   
   const getModeForTutoring = (tutoring) => {
+
+    if (!user) return "ambos";
     if (tutoring.tutor_id === user.id) {
       return "misTutorias";
     }

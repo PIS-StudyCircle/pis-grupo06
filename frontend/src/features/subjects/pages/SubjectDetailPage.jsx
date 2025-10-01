@@ -35,14 +35,7 @@ export default function SubjectDetailPage() {
                   <h1 className="text-3xl font-bold text-gray-900 mb-4">
                     {subject.name}
                   </h1>
-                  <div className="space-y-1 pl-[2px]">                   
-                    {subject.due_date && (
-                      <p className="text-gray-700">
-                        <span className="font-semibold">Vencimiento:</span>{" "}
-                        {subject.due_date}
-                      </p>
-                    )}
-                  </div>                  
+                                    
                 </div>
               </div>
 
