@@ -34,9 +34,9 @@ module Api
           tutorings = tutorings.past
         else
           tutorings = tutorings.where(
-           '(scheduled_at > ? AND scheduled_at IS NOT NULL) OR (scheduled_at IS NULL AND tutor_id IS NULL)',
-           Time.current
-        )
+            '(scheduled_at > ? AND scheduled_at IS NOT NULL) OR (scheduled_at IS NULL AND tutor_id IS NULL)',
+            Time.current
+          )
         end
 
         @pagy, @tutorings = pagy(tutorings, items: params[:per_page] || 20)
