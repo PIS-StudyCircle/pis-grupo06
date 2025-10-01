@@ -49,7 +49,7 @@ class Tutoring < ApplicationRecord
   scope :search_by_subject_name, ->(q) {
     return all if q.blank?
 
-    left_joins(:subjects).where("subjects.name ILIKE ?", "%#{q}%").distinct
+    left_joins(:subjects).where("unaccent(subjects.name) ILIKE unaccent(?)", "%#{q}%").distinct
   }
 
   scope :search_by_modality, ->(q) {
