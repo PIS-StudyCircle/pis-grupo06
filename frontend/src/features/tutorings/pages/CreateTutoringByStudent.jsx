@@ -63,7 +63,6 @@ export default function CreateTutoringByStudent() {
       // Campos de la solicitud
       request_comment: form.request_comment.trim() || undefined,
       request_due_at,
-      tutor_id: user.id,
       created_by_id: user.id,      // quien solicita
       tutor_id: null,              // aún sin tutor asignado
       course_id: course.id,

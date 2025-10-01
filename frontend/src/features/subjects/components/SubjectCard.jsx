@@ -29,11 +29,6 @@ export default function SubjectCard({
         <span className={`font-medium transition-colors ${isSelectable && selected ? "text-white" : "text-gray-800"}`}>
           {subject.name}
         </span>
-        {subject.due_date && (
-          <span className={`text-xs transition-colors ${isSelectable && selected ? "text-blue-100" : "text-gray-500"}`}>
-            Vencimiento: {new Date(subject.due_date).toLocaleDateString("es-ES")}
-          </span>
-        )}
       </div>
     </button>
   );
