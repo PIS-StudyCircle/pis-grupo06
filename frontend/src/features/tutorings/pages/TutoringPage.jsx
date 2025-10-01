@@ -7,7 +7,7 @@ export default function TutoringPage({filters = {}}) {
   const hookResult = useTutorings(1, 20, filters);
   
     
-  const { tutorings, loading, error, pagination, page, setPage } = hookResult;
+  const { tutorings, loading, error, pagination = {}, page, setPage } = hookResult;
   const totalPages = pagination.last || 1;
   const { user } = useUser();
   
