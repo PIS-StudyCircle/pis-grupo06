@@ -33,9 +33,9 @@ module Api
         if params[:past].present? && ActiveModel::Type::Boolean.new.cast(params[:past])
           tutorings = tutorings.past
         else
-         tutorings = tutorings.where(
-          '(scheduled_at > ? AND scheduled_at IS NOT NULL) OR (scheduled_at IS NULL AND tutor_id IS NULL)', 
-          Time.current
+          tutorings = tutorings.where(
+           '(scheduled_at > ? AND scheduled_at IS NOT NULL) OR (scheduled_at IS NULL AND tutor_id IS NULL)',
+           Time.current
         )
         end
 
@@ -74,7 +74,7 @@ module Api
         tutoring.course_id     = params[:tutoring][:course_id]
 
         if tutoring.tutor_id.nil? && tutoring.capacity.nil?
-          tutoring.capacity = 1  # Valor por defecto para solicitudes pendientes
+          tutoring.capacity = 1 # Valor por defecto para solicitudes pendientes
         end
         if tutoring.tutor_id.present? && tutoring.scheduled_at.present? && tutoring.duration_mins.present?
           start_time = tutoring.scheduled_at
