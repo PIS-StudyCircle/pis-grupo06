@@ -32,7 +32,6 @@ students = [
   { name: "Sofía", last_name: "García", email: "sofiagarcia@gmail.com" },
   { name: "Martín", last_name: "Ramírez", email: "martinramirez@gmail.com" },
 
-  
   { name: "Clara", last_name: "Suárez", email: "clarasuarez@gmail.com" },
   { name: "Andrés", last_name: "Méndez", email: "andresmendez@gmail.com" },
   { name: "Paula", last_name: "Castro", email: "paulacastro@gmail.com" },
@@ -197,7 +196,6 @@ Subject.find_or_create_by!(name: "Resonancia en Circuitos RLC", course: course) 
   s.due_date = 6.months.from_now
 end
 
-
 # ========================
 course = Course.find_by(id: 145) # Física I
 creator = User.find_by(email: "sofiagarcia@gmail.com") || User.first
@@ -321,7 +319,7 @@ Subject.find_or_create_by!(name: "Aplicaciones a física e ingeniería", course:
 end
 
 # ========================
-course = Course.find_by(id: 3) #Administración de Infraestructuras
+course = Course.find_by(id: 3) # Administración de Infraestructuras
 creator = User.find_by(email: "anaperez@gmail.com") || User.first
 # ========================
 
@@ -346,7 +344,7 @@ Subject.find_or_create_by!(name: "Monitoreo y Mantenimiento", course: course) do
 end
 
 # ========================
-course = Course.find_by(id: 5) #Administración de Operaciones
+course = Course.find_by(id: 5) # Administración de Operaciones
 creator = User.find_by(email: "luisgomez@gmail.com") || User.first
 # ========================
 
@@ -371,7 +369,7 @@ Subject.find_or_create_by!(name: "Logística y Cadena de Suministro", course: co
 end
 
 # ========================
-course = Course.find_by(id: 8) #Agrimensura Legal 1
+course = Course.find_by(id: 8) # Agrimensura Legal 1
 creator = User.find_by(email: "luisgomez@gmail.com") || User.first
 # ========================
 
@@ -396,7 +394,7 @@ Subject.find_or_create_by!(name: "Documentación Legal y Escrituras", course: co
 end
 
 # ========================
-course = Course.find_by(id: 13) #Algoritmos Evolutivos
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
 creator = User.find_by(email: "mariarodriguez@gmail.com") || User.first
 # ========================
 
@@ -626,7 +624,6 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-
 # Tutoría 9 creada por estudiante dictandola
 creator = User.find_by!(email: "pablovillar@gmail.com")
 course = Course.find_by(id: 443) # PIS
@@ -709,7 +706,7 @@ end
 
 # Tutoría 13 creada por estudiante dictandola
 creator = User.find_by!(email: "tomasgarrido@gmail.com")
-course = Course.find_by(id: 13) #Algoritmos Evolutivos
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
 # Elegir entre 1 y 4 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..4))
 tutoring_offered = Tutoring.find_or_create_by!(
@@ -729,7 +726,7 @@ end
 
 # Tutoría 14 creada por estudiante dictandola
 creator = User.find_by!(email: "lauramaldonado@gmail.com")
-course = Course.find_by(id: 13) #Algoritmos Evolutivos
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
 # Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
 tutoring_offered = Tutoring.find_or_create_by!(
@@ -749,7 +746,7 @@ end
 
 # Tutoría 15 creada por estudiante dictandola
 creator = User.find_by!(email: "lauramaldonado@gmail.com")
-course = Course.find_by(id: 13) #Algoritmos Evolutivos
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
 # Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
 tutoring_offered = Tutoring.find_or_create_by!(
@@ -769,7 +766,7 @@ end
 
 # Tutoría 16 creada por estudiante dictandola
 creator = User.find_by!(email: "tomasgarrido@gmail.com")
-course = Course.find_by(id: 13) #Algoritmos Evolutivos
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
 # Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
 tutoring_offered = Tutoring.find_or_create_by!(
@@ -789,7 +786,7 @@ end
 
 # Tutoría 17 creada por estudiante dictandola
 creator = User.find_by!(email: "luisgomez@gmail.com")
-course = Course.find_by(id: 13) #Algoritmos Evolutivos
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
 # Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
 tutoring_offered = Tutoring.find_or_create_by!(
@@ -809,7 +806,7 @@ end
 
 # Tutoría 17 creada por estudiante dictandola
 creator = User.find_by!(email: "sofiagarcia@gmail.com")
-course = Course.find_by(id: 8) #Agrimensura Legal 1
+course = Course.find_by(id: 8) # Agrimensura Legal 1
 # Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
 tutoring_offered = Tutoring.find_or_create_by!(
@@ -829,7 +826,7 @@ end
 
 # Tutoría 18 creada por estudiante dictandola
 creator = User.find_by!(email: "paulacastro@gmail.com")
-course = Course.find_by(id: 8) #Agrimensura Legal 1
+course = Course.find_by(id: 8) # Agrimensura Legal 1
 # Elegir entre 1 y 3 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..3))
 tutoring_offered = Tutoring.find_or_create_by!(
@@ -849,7 +846,7 @@ end
 
 # Tutoría 19 creada por estudiante dictandola
 creator = User.find_by!(email: "martadaluz@gmail.com")
-course = Course.find_by(id: 8) #Agrimensura Legal 1
+course = Course.find_by(id: 8) # Agrimensura Legal 1
 # Elegir entre 1 y 3 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..3))
 tutoring_offered = Tutoring.find_or_create_by!(
@@ -866,7 +863,6 @@ tutoring_offered = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
-
 
 # Tutoría 20 creada por estudiante dictandola
 creator = User.find_by!(email: "clarasuarez@gmail.com")
