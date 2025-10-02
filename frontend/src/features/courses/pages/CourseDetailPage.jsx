@@ -59,7 +59,7 @@ export default function CourseDetailPage() {
                   <button
                     type="button"
                     className="btn w-full"
-                    onClick={() => navigate(`/tutorias/buscar_tutor/${course.id}`)}
+                    onClick={() => navigate(`/tutorias/ser_tutor/${course.id}`)}
                   >
                     Brindar tutoría
                   </button>

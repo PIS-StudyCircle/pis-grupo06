@@ -30,6 +30,7 @@ export const createTutoringByTutor = async ({
   tutor_id,
   course_id,
   subject_ids,
+  location,
 }) => {
   const body = {
     tutoring: {
@@ -41,6 +42,7 @@ export const createTutoringByTutor = async ({
       tutor_id,
       course_id,
       subject_ids,
+      location,
     }
   };
 
@@ -70,7 +72,7 @@ export const createTutoringByStudent = async ({
   course_id, 
   subject_ids,
   modality,
-  // defaults para pasar validaciones del backend:
+  location,
 }) => {
   const body = {
     tutoring: {
@@ -80,6 +82,7 @@ export const createTutoringByStudent = async ({
       course_id,
       subject_ids,
       modality,
+      location,
     },
   };
   const resp = await fetch(`${API_BASE}/tutorings`, {

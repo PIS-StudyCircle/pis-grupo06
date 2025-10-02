@@ -12,7 +12,7 @@ class Tutoring < ApplicationRecord
                        inverse_of: :created_tutorings
   belongs_to :tutor, class_name: 'User', optional: true
 
-  enum :state, { pending: 0, active: 1, finished: 3 }
+  enum :state, { pending: 0, active: 1, finished: 2, canceled: 3 }, default: :pending
 
   # Tutorías en las que un usuario está inscripto
   scope :enrolled_by, ->(user) {
@@ -59,6 +59,7 @@ class Tutoring < ApplicationRecord
   validate :capacity_not_less_than_enrolled
 
   validates :request_comment, length: { maximum: 500 }, allow_blank: true
+  validates :location, length: { maximum: 255 }, allow_blank: true
   validate  :request_due_at_before_scheduled_at
   # --- Métodos auxiliares ---
 

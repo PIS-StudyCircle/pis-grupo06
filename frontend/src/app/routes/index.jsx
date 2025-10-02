@@ -20,7 +20,7 @@ export function AppRoutes() {
       </Route>
      <Route element={<PrivateRoute />}>
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
-        <Route path="/tutorias/buscar_tutor/:courseId" element={<TutoringPage filters={{}} mode="serTutor" />} />
+        <Route path="/tutorias/ser_tutor/:courseId" element={<TutoringPage filters={{}} mode="serTutor" />} />
         <Route path="/tutorias/elegir_temas/:mode/:courseId" element={<SelectSubjectsByTutor />} />
         <Route path="/tutorias/crear/:courseId" element={<CreateTutoringByTutor />} />
         <Route path="/tutorias/solicitar/:courseId" element={<CreateTutoringByStudent />} />

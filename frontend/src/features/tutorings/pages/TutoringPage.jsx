@@ -37,7 +37,7 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
                   navigate(`/tutorias/elegir_temas/tutor/${courseId}`)
                 }
               >
-                Solicitar nueva tutoría
+                Crear nueva tutoría
               </button>
             )}
 

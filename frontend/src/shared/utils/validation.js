@@ -23,7 +23,7 @@ export function validatePasswordConfirmation(password, confirmation) {
 }
 
 export function validateDate(date) {
-  if (!date) return "Fecha es obligatoria";
+  if (!date) return "La fecha es obligatoria";
 
   // Parsear manualmente la fecha en formato YYYY-MM-DD para validar en cualquier zona horaria
   const [year, month, day] = date.split("-").map(Number);
@@ -31,21 +31,21 @@ export function validateDate(date) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  if (isNaN(inputDate.getTime())) return "Fecha no válida";
-  if (inputDate < today) return "Fecha no puede ser anterior a hoy";
+  if (isNaN(inputDate.getTime())) return "La fecha no es válida";
+  if (inputDate < today) return "La fecha no puede ser anterior a hoy";
 
   return null;
 }
 
-export function validateHours(date, startTime, endTime) {
+export function validateHoursTutoring(date, startTime, endTime) {
   if (!startTime || !endTime) return null;
-  if (endTime <= startTime) return "Hora de fin debe ser posterior a la de inicio";
+  if (endTime <= startTime) return "La hora de fin debe ser posterior a la de inicio";
 
   const [startH, startM] = startTime.split(":").map(Number);
   const [endH, endM] = endTime.split(":").map(Number);
   const start = startH * 60 + startM;
   const end = endH * 60 + endM;
-  if (end - start < 60) return "Sesión debe durar al menos 1 hora";
+  if (end - start < 60) return "La sesión debe durar al menos 1 hora";
 
   // Si se pasa la fecha, validar que la hora de inicio sea al menos 3 horas después de ahora
   if (date) {
@@ -68,7 +68,7 @@ export function validateHours(date, startTime, endTime) {
 }
 
 export function validateInteger(value, fieldName = "Valor") {
-  if (!value) return `${fieldName} es obligatorio`;
-  if (parseInt(value, 10) < 1) return `${fieldName} debe ser mayor a 0`;
+  if (!value) return `El campo ${fieldName} es obligatorio`;
+  if (parseInt(value, 10) < 1) return `El campo ${fieldName} debe ser mayor a 0`;
   return null;
 }

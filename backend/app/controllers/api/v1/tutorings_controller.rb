@@ -34,7 +34,7 @@ module Api
           tutorings = tutorings.past
         else
           tutorings = tutorings.where(
-            '(scheduled_at > ? AND scheduled_at IS NOT NULL) OR (scheduled_at IS NULL AND tutor_id IS NULL)',
+            '(scheduled_at IS NOT NULL AND scheduled_at > ?) OR (scheduled_at IS NULL AND tutor_id IS NULL)',
             Time.current
           )
         end
@@ -89,7 +89,7 @@ module Api
 
           if overlapping
             render json: {
-              errors: ["Ya existe una tutoría suya que comprende ese intervalo"]
+              errors: ["Ya tienes una tutoría programada en esa fecha y horario"]
             }, status: :unprocessable_entity
             return
           end
@@ -105,21 +105,19 @@ module Api
       private
 
       def tutoring_params
-        # Strong params clásicos con todos los campos que envía el front
-        params.expect(
-          tutoring: [
-            :scheduled_at,
-            :duration_mins,
-            :modality,
-            :capacity,
-            :enrolled,
-            :course_id,
-            :tutor_id,
-            :created_by_id,
-            :request_due_at,
-            :request_comment,
-            { subject_ids: [] }
-          ]
+        params.require(:tutoring).permit(
+          :scheduled_at,
+          :duration_mins,
+          :modality,
+          :capacity,
+          :enrolled,
+          :course_id,
+          :tutor_id,
+          :created_by_id,
+          :request_due_at,
+          :request_comment,
+          :location,
+          subject_ids: []
         )
       end
     end

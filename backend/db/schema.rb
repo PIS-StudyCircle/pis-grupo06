@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_30_051816) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_02_154329) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -80,6 +80,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_30_051816) do
     t.integer "state", default: 0, null: false
     t.text "request_comment"
     t.datetime "request_due_at"
+    t.string "location"
     t.index ["course_id"], name: "index_tutorings_on_course_id"
     t.index ["created_by_id"], name: "index_tutorings_on_created_by_id"
     t.index ["state"], name: "index_tutorings_on_state"

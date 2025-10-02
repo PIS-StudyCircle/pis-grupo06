@@ -11,7 +11,7 @@ import { useFormState } from "@utils/UseFormState";
 import {
   validateRequired,
   validateDate,
-  validateHours,
+  validateHoursTutoring,
   validateInteger,
 } from "@utils/validation";
 import { useValidation } from "@hooks/useValidation";
@@ -25,7 +25,7 @@ const validators = {
     if (required) return required;
     // Solo valida relación si ambas horas están presentes
     if (form.date && form.start_time && form.end_time) {
-      return validateHours(form.date, form.start_time, form.end_time);
+      return validateHoursTutoring(form.date, form.start_time, form.end_time);
     }
     return null;
   },
@@ -46,6 +46,7 @@ export default function CreateTutoringByTutor() {
     end_time: "",
     mode: "virtual",
     limit: "20",
+    location: "",
   });
 
   const { errors, validate } = useValidation(validators);
@@ -80,6 +81,7 @@ export default function CreateTutoringByTutor() {
         tutor_id: user.id,
         course_id: course.id,
         subject_ids: selectedSubjects,
+        location: form.mode === "presencial" ? form.location : "",
       };
       onSubmit(payload);
       localStorage.removeItem("selectedSubjects");
@@ -179,6 +181,29 @@ export default function CreateTutoringByTutor() {
             Presencial
           </button>
         </div>
+
+        {form.mode === "presencial" && (
+          <div className="flex flex-col text-left">
+            <label htmlFor="location" className="text-gray-600 text-xs font-medium mb-1">
+              Lugar de la tutoría (opcional)
+            </label>
+            <textarea
+              id="location"
+              rows={2}
+              maxLength={255}
+              value={form.location}
+              onChange={(e) => setField("location", e.target.value)}
+              className="p-2 border rounded-md text-sm"
+              placeholder="Ej.: Departamento, Ciudad, Calle."
+            />
+            <div className={`text-xs mt-1 ${form.location.length === 255 ? "text-red-600" : "text-gray-500"}`}>
+              {form.location.length}/{255}
+            </div>
+            {form.location.length > 255 && (
+              <span className="text-red-500 text-xs mt-1">Máximo 255 caracteres.</span>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center">
           <span className="font-medium mr-2">Cupos:</span>

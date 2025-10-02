@@ -9,21 +9,22 @@ import { SubmitButton } from "@components/SubmitButton";
 import { useFormState } from "@utils/UseFormState";
 import { useFormSubmit } from "@utils/UseFormSubmit";
 
-const MAX = 500;
+const MAX_REQUEST_COMMENT = 500;
+const MAX_LOCATION_COMMENT = 255;
 
 export default function CreateTutoringByStudent() {
   const { user, userLoading, userError } = useUser();
   const { courseId } = useParams();
   const { course, loadingCourse, errorCourse } = useCourse(courseId);
 
-  
   const { form, setField } = useFormState({
     request_due_date: "",
     request_due_time: "",
     request_comment: "",
+    mode: "virtual",
+    location: "",
   });
 
-  
   const { error, onSubmit } = useFormSubmit(createTutoringByStudent, "/perfil");
 
   if (userLoading) return <p className="text-center mt-10">Cargando usuario...</p>;
@@ -38,8 +39,10 @@ export default function CreateTutoringByStudent() {
     const errs = {};
     if (!form.request_due_date) errs.request_due_date = "La fecha límite es obligatoria.";
     if (!form.request_due_time) errs.request_due_time = "La hora límite es obligatoria.";
-    if (form.request_comment.length > MAX)
-      errs.request_comment = `Máximo ${MAX} caracteres.`;
+    if (form.request_comment.length > MAX_REQUEST_COMMENT)
+      errs.request_comment = `Máximo ${MAX_REQUEST_COMMENT} caracteres.`;
+    if (form.location.length > MAX_LOCATION_COMMENT)
+      errs.location = `Máximo ${MAX_LOCATION_COMMENT} caracteres.`;
     return errs;
   };
 
@@ -47,27 +50,24 @@ export default function CreateTutoringByStudent() {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) {
-      // Mostramos errores debajo de cada input
       setField("_errors", errs);
       return;
     }
 
     const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
-    console.log("🔍 selectedSubjects in handleSubmit:", selectedSubjects);
 
-    // Construir request_due_at
     const dueLocal = new Date(`${form.request_due_date}T${form.request_due_time}:00`);
     const request_due_at = dueLocal.toISOString();
 
     const payload = {
-      // Campos de la solicitud
       request_comment: form.request_comment.trim() || undefined,
       request_due_at,
-      created_by_id: user.id,      // quien solicita
-      tutor_id: null,              // aún sin tutor asignado
+      created_by_id: user.id,
+      tutor_id: null,
       course_id: course.id,
       subject_ids: selectedSubjects,
       modality: form.mode,
+      location: form.mode === "presencial" ? form.location.trim() : "",
     };
  
     onSubmit(payload);
@@ -79,10 +79,9 @@ export default function CreateTutoringByStudent() {
   return (
     <AuthLayout title={`Solicitar tutoría para ${course.name}`}>
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
-        {/* Fecha límite */}
         <div className="flex flex-col text-left">
           <label htmlFor="request_due_date" className="text-gray-600 text-xs font-medium mb-1">
-            Fecha límite para recibir propuestas
+            Fecha límite para recibir la tutoría
           </label>
           <input
             id="request_due_date"
@@ -96,7 +95,6 @@ export default function CreateTutoringByStudent() {
           )}
         </div>
 
-        {/* Hora límite */}
         <div className="flex flex-col text-left">
           <label htmlFor="request_due_time" className="text-gray-600 text-xs font-medium mb-1">
             Hora límite
@@ -113,7 +111,6 @@ export default function CreateTutoringByStudent() {
           )}
         </div>
 
-        {/* Comentario (≤ 500) */}
         <div className="flex flex-col text-left">
           <label htmlFor="request_comment" className="text-gray-600 text-xs font-medium mb-1">
             Comentario para el tutor (opcional)
@@ -121,14 +118,14 @@ export default function CreateTutoringByStudent() {
           <textarea
             id="request_comment"
             rows={4}
-            maxLength={MAX}
+            maxLength={MAX_REQUEST_COMMENT}
             value={form.request_comment}
             onChange={(e) => setField("request_comment", e.target.value)}
             className="p-2 border rounded-md text-sm"
             placeholder="Ej.: Preferiría viernes 18hs; temas 1 y 2…"
           />
-          <div className={`text-xs mt-1 ${form.request_comment.length === MAX ? "text-red-600" : "text-gray-500"}`}>
-            {form.request_comment.length}/{MAX}
+          <div className={`text-xs mt-1 ${form.request_comment.length === MAX_REQUEST_COMMENT ? "text-red-600" : "text-gray-500"}`}>
+            {form.request_comment.length}/{MAX_REQUEST_COMMENT}
           </div>
           {errs.request_comment && (
             <span className="text-red-500 text-xs mt-1">{errs.request_comment}</span>
@@ -161,6 +158,29 @@ export default function CreateTutoringByStudent() {
           </button>
         </div>
 
+        {form.mode === "presencial" && (
+          <div className="flex flex-col text-left">
+            <label htmlFor="location" className="text-gray-600 text-xs font-medium mb-1">
+              Lugar de la tutoría (opcional)
+            </label>
+            <textarea
+              id="location"
+              rows={2}
+              maxLength={MAX_LOCATION_COMMENT}
+              value={form.location}
+              onChange={(e) => setField("location", e.target.value)}
+              className="p-2 border rounded-md text-sm"
+              placeholder="Ej.: Departamento, Ciudad, Calle."
+            />
+            <div className={`text-xs mt-1 ${form.location.length === MAX_LOCATION_COMMENT ? "text-red-600" : "text-gray-500"}`}>
+              {form.location.length}/{MAX_LOCATION_COMMENT}
+            </div>
+            {errs.location && (
+              <span className="text-red-500 text-xs mt-1">{errs.location}</span>
+            )}
+          </div>
+        )}
+
         {error.length > 0 && (
           <ErrorAlert>
             {error.map((err, idx) => (
@@ -168,7 +188,6 @@ export default function CreateTutoringByStudent() {
             ))}
           </ErrorAlert>
         )}
-
 
         <SubmitButton text="Enviar solicitud" />
       </form>
