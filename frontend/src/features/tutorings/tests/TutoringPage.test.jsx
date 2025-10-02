@@ -618,7 +618,9 @@ describe("TutoringPage", () => {
     // La última llamada a useTutorings debe incluir no_tutor: true
     expect(useTutorings).toHaveBeenCalled();
     const [, , filtrosLlamada] = useTutorings.mock.calls.at(-1);
-    expect(filtrosLlamada).toEqual({ ...baseFilters, no_tutor: true });
+    expect(filtrosLlamada).toMatchObject({ ...baseFilters, no_tutor: true });
+    expect(filtrosLlamada.enrolled).toBe(true);
+    expect(filtrosLlamada.course_id).toBe("MAT101");
   });
 
   test("al desmarcar 'Tutor Indefinido' vuelve a los filtros originales", () => {
@@ -639,14 +641,15 @@ describe("TutoringPage", () => {
     fireEvent.click(cb);
     expect(cb).toBeChecked();
     let call = useTutorings.mock.calls.at(-1);
-    expect(call[2]).toEqual({ ...baseFilters, no_tutor: true });
+    expect(call[2]).toMatchObject({ ...baseFilters, no_tutor: true });
 
     // 2) Desmarcar -> vuelve a filtros originales
     useTutorings.mockClear();
     fireEvent.click(cb);
     expect(cb).not.toBeChecked();
     call = useTutorings.mock.calls.at(-1);
-    expect(call[2]).toEqual(baseFilters);
+    expect(call[2]).toMatchObject(baseFilters);
+    expect(call[2]).not.toHaveProperty("no_tutor");
   });
 
   test("conserva otros filtros al activar 'Tutor Indefinido'", () => {
@@ -664,6 +667,8 @@ describe("TutoringPage", () => {
     fireEvent.click(screen.getByLabelText(/Tutor Indefinido/i));
 
     const [, , filtrosLlamada] = useTutorings.mock.calls.at(-1);
-    expect(filtrosLlamada).toEqual({ ...baseFilters, no_tutor: true });
+    expect(filtrosLlamada).toMatchObject({ ...baseFilters, no_tutor: true });
+    expect(filtrosLlamada.created_by_user).toBe("7");
+    expect(filtrosLlamada.course_id).toBe("FISICA1");
   });
 });
