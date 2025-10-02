@@ -8,6 +8,10 @@ jest.mock("@context/UserContext", () => ({
   useUser: jest.fn(),
 }));
 
+jest.mock("../services/tutoringService", () => ({
+  getTutorings: jest.fn(),
+}));
+
 beforeEach(() => {
   useUser.mockReturnValue({ user: { id: 99, name: "Test User" } });
 });
@@ -19,7 +23,7 @@ afterEach(() => {
 
 describe("TutoringPage", () => {
   it("renderiza el título y muestra tutorías desde el service", async () => {
-    tutoringService.getTutorings = jest.fn().mockResolvedValue({
+    tutoringService.getTutorings.mockResolvedValue({
       tutorings: [
         {
           id: 1,
@@ -53,9 +57,6 @@ describe("TutoringPage", () => {
 
     expect(screen.getByRole("heading", { name: /Tutorías Disponibles/i })).toBeInTheDocument();
 
-    // Matcher seguro para modalidad aunque tenga <b>
-    await waitFor(() => screen.getByText("Cálculo I"));
-
     const firstCard = screen.getAllByText(/Materia:/)[0].closest("div.w-full");
     expect(within(firstCard).getByText("Virtual")).toBeInTheDocument();
 
@@ -64,7 +65,7 @@ describe("TutoringPage", () => {
   });
 
   it("usa totalPages=1 cuando pagination.last es falsy", async () => {
-    tutoringService.getTutorings = jest.fn().mockResolvedValue({
+    tutoringService.getTutorings.mockResolvedValue({
       tutorings: [],
       pagination: {}
     });
@@ -99,12 +100,11 @@ describe("TutoringPage", () => {
       pagination: { last: 3 }
     };
   
-    tutoringService.getTutorings = jest.fn().mockResolvedValue(mockData);
+    tutoringService.getTutorings.mockResolvedValue(mockData);
   
     render(<TutoringPage />);
     await waitFor(() => screen.getByText(/Estructuras de Datos/));
 
-    // Limpiamos llamadas iniciales
     tutoringService.getTutorings.mockClear();
 
     const nextButton = screen.getByLabelText("Next page");
@@ -116,7 +116,7 @@ describe("TutoringPage", () => {
   });
 
   it("propaga estados de loading y error correctamente", async () => {
-    tutoringService.getTutorings = jest.fn().mockRejectedValue(new Error("Algo salió mal"));
+    tutoringService.getTutorings.mockRejectedValue(new Error("Algo salió mal"));
 
     render(<TutoringPage />);
     await waitFor(() => screen.getByText(/Error al cargar las tutorías/));
@@ -125,7 +125,7 @@ describe("TutoringPage", () => {
   });
 
   it("muestra sin tutorías si no hay datos", async () => {
-    tutoringService.getTutorings = jest.fn().mockResolvedValue({
+    tutoringService.getTutorings.mockResolvedValue({
       tutorings: [],
       pagination: { last: 1 }
     });
@@ -136,7 +136,7 @@ describe("TutoringPage", () => {
   });
 
   it("muestra una tutoring card con botón Ser tutor", async () => {
-    tutoringService.getTutorings = jest.fn().mockResolvedValue({
+    tutoringService.getTutorings.mockResolvedValue({
       tutorings: [
         {
           id: 1,
@@ -158,19 +158,15 @@ describe("TutoringPage", () => {
   
     render(<TutoringPage />);
   
-    // Materia
     const materiaLabel = await screen.findByText("Materia:", { selector: "b" });
     expect(materiaLabel.parentElement).toHaveTextContent("Matemática I");
   
-    // Modalidad
     const modalidadLabel = screen.getByText("Modalidad:", { selector: "b" });
     expect(modalidadLabel.parentElement).toHaveTextContent("Virtual");
   
-    // Cupos
     const cuposLabel = screen.getByText("Cupos disponibles:", { selector: "b" });
     expect(cuposLabel.parentElement).toHaveTextContent("5");
   
-    // Botón Ser tutor
     expect(screen.getByRole("button", { name: "Ser tutor" })).toBeInTheDocument();
   });
 });
