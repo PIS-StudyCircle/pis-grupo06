@@ -25,7 +25,7 @@ export default function CreateTutoringByStudent() {
     location: "",
   });
 
-  const { error, onSubmit } = useFormSubmit(createTutoringByStudent, "/perfil");
+  const { error, onSubmit } = useFormSubmit(createTutoringByStudent, "/");
 
   if (userLoading) return <p className="text-center mt-10">Cargando usuario...</p>;
   if (userError)   return <p className="text-center mt-10">Error al cargar perfil.</p>;

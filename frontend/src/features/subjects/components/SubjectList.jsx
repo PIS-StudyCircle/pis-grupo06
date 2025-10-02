@@ -81,7 +81,7 @@ export default function SubjectList({
 
   return (
     <div className="flex flex-col gap-2">
-      {showCreate && !showNewForm && (
+      {showCreate && (
         <button
           onClick={() => setShowNewForm(true)}
           className="p-2 border rounded-md bg-blue-100 text-blue-700 text-sm hover:bg-blue-200 text-left"

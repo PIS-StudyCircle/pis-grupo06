@@ -134,7 +134,7 @@ describe("CourseDetailPage", () => {
     expect(screen.getByRole("button", { name: /Recibir tutoría/i })).toBeInTheDocument();
   });
 
-  /*it("los botones navegan a las páginas correctas", async () => {
+  it("los botones navegan a las páginas correctas", async () => {
     jest.spyOn(courseService, "getCourseByID").mockResolvedValue({
       id: 1,
       name: "Curso Test",
@@ -147,16 +147,16 @@ describe("CourseDetailPage", () => {
   
     // Esperamos que el curso cargue
     await screen.findByText("Curso Test");
-  
-    // Botón "Ser tutor"
-    const tutorButton = screen.getByText(/Ser tutor/i);
+
+    // Botón "Brindar tutoría"
+    const tutorButton = screen.getByText(/Brindar tutoría/i);
     tutorButton.click();
-    expect(mockedNavigate).toHaveBeenCalledWith("/tutor/registrarse?course=1");
+    expect(mockedNavigate).toHaveBeenCalledWith("/tutorias/ser_tutor/1");
   
     // Botón "Recibir tutoría"
     const tutoriaButton = screen.getByText(/Recibir tutoría/i);
     tutoriaButton.click();
-    expect(mockedNavigate).toHaveBeenCalledWith("/tutoria/solicitar?course=1");
-  });*/
+    expect(mockedNavigate).toHaveBeenCalledWith("/tutorias/materia/1");
+  });
   
 });
