@@ -62,7 +62,7 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
     <div className="flex flex-col">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
         <div className="max-w-5xl mx-auto">
-          <div className="flex justify-between items-center mb-4 p-2">
+          <div className="mb-4 p-2">
             <h1 className="text-2xl font-bold p-2 mb-4 text-black">
               Tutorías Disponibles
             </h1>
