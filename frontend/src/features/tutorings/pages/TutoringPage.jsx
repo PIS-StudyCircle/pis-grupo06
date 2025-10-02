@@ -1,32 +1,87 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from "react";
 import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";
+import TutoringSearchBar from "../components/TutoringSearchBar";
 import Pagination from "@components/Pagination";
 
-
-export default function TutoringPage({filters = {}, mode = ""}) {
+export default function TutoringPage({ filters = {}, mode = "" }) {
+  const [searchBy, setSearchBy] = useState("course");
   const [showWithoutTutor, setShowWithoutTutor] = useState(false);
-  const activeFilters = useMemo(() => {
-    const filtros = { ...filters };
+
+  // combine filters (search + showWithoutTutor)
+  const mergedFilters = useMemo(() => {
+    const baseFilters = { ...filters };
+
+    // add toggle
     if (showWithoutTutor) {
-      filtros.no_tutor = true;
+      baseFilters.no_tutor = true;
     }
-    return filtros;
-  }, [filters, showWithoutTutor]);
 
-  const { tutorings, loading, error, pagination, page, setPage } = useTutorings(1, 20, activeFilters);
-  const totalPages = pagination.last || 1;
+    // add searchBy param (we set search separately)
+    baseFilters.search_by = searchBy;
 
+    return baseFilters;
+  }, [filters, searchBy, showWithoutTutor]);
+
+  const {
+    tutorings,
+    loading,
+    error,
+    pagination,
+    page,
+    setPage,
+    search,
+    setSearch,
+  } = useTutorings(1, 20, mergedFilters);
+
+  const totalPages = pagination?.last || 1;
+
+  // controlled input for search bar
+  const [query, setQuery] = useState(search);
+
+  // keep local query in sync with hook’s search
+  useEffect(() => {
+    setQuery(search);
+  }, [search]);
+
+  // debounce search updates
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(query);
+      if (page !== 1) setPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [query, page, setSearch, setPage]);
+
+  // reset page when searchBy changes
+  useEffect(() => {
+    if (page !== 1) setPage(1);
+  }, [searchBy, page, setPage]);
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
         <div className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center mb-4 p-2">
-          <h1 className="text-2xl font-bold p-2 mb-4 text-black">
-            Tutorías Disponibles
-          </h1>
-          <label className="flex items-center gap-2 cursor-pointer">
+            <h1 className="text-2xl font-bold p-2 mb-4 text-black">
+              Tutorías Disponibles
+            </h1>
+
+            {/* Search bar */}
+            <TutoringSearchBar
+              query={query}
+              onQueryChange={(e) => setQuery(e.target.value)}
+              searchBy={searchBy}
+              onSearchByChange={setSearchBy}
+              placeholder={
+                searchBy === "course"
+                  ? "Buscar por materia..."
+                  : "Buscar por tema..."
+              }
+            />
+
+            {/* Filter toggle */}
+            <label className="flex items-center gap-2 cursor-pointer ml-4">
               <input
                 type="checkbox"
                 checked={showWithoutTutor}
@@ -36,7 +91,8 @@ export default function TutoringPage({filters = {}, mode = ""}) {
               <span className="text-gray-700">Tutor Indefinido</span>
             </label>
           </div>
-          <TutoringList tutorings={tutorings} mode = {mode} loading={loading} error={error} />
+
+          <TutoringList tutorings={tutorings} mode={mode} loading={loading} error={error} />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>

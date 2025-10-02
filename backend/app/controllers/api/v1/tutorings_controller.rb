@@ -29,6 +29,15 @@ module Api
           tutorings = tutorings.without_tutor
         end
 
+        q = params[:search].to_s
+        search_by = params[:search_by].presence_in(%w[course subject]) || "course"
+
+        tutorings =
+          case search_by
+          when "subject" then tutorings.search_by_subject_name(q)
+          else tutorings.search_by_course_name(q)
+          end
+
         # por defecto muestro las futuras
         if params[:past].present? && ActiveModel::Type::Boolean.new.cast(params[:past])
           tutorings = tutorings.past

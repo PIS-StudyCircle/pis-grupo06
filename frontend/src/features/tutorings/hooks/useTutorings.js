@@ -7,12 +7,13 @@ export const useTutorings = (initialPage = 1, perPage = 20, filters = {}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(initialPage);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchTutorings = async () => {
       setLoading(true);
       try {
-        const response = await getTutorings(page, perPage, filters);
+        const response = await getTutorings(page, perPage, { ...filters, search });
         setTutorings(response.tutorings);
         setPagination(response.pagination);
       } catch (err) {
@@ -24,7 +25,7 @@ export const useTutorings = (initialPage = 1, perPage = 20, filters = {}) => {
     };
 
     fetchTutorings();
-  }, [page, perPage, filters]);
+  }, [page, perPage, filters, search]);
 
-  return { tutorings, loading, error, pagination, page, setPage };
+  return { tutorings, loading, error, pagination, page, setPage, search, setSearch };
 };

@@ -8,16 +8,46 @@ jest.mock("../hooks/useTutorings", () => ({
 }));
 import { useTutorings } from "../hooks/useTutorings";
 
-// 2) Mock de TutoringList (solo muestra algo mínimo y expone props en data-* para asserts)
+// 2) Mock de TutoringSearchBar
+const TutoringSearchBarMock = ({ query, onQueryChange, searchBy, onSearchByChange, placeholder }) => (
+  <div data-testid="tutoring-search-bar">
+    <input
+      data-testid="query-input"
+      value={query ?? ""}
+      onChange={(e) => onQueryChange(e)}
+      placeholder={placeholder}
+    />
+    <select
+      data-testid="search-by-select"
+      value={searchBy}
+      onChange={(e) => onSearchByChange(e.target.value)}
+    >
+      <option value="course">Materia</option>
+      <option value="subject">Tema</option>
+    </select>
+  </div>
+);
+jest.mock("../components/TutoringSearchBar", () => ({
+  __esModule: true,
+  default: (props) => <div>{TutoringSearchBarMock(props)}</div>,
+}));
+
+// 3) Mock de TutoringList (solo muestra algo mínimo y expone props en data-* para asserts)
 const TutoringListMock = ({ tutorings = [], mode = "", loading, error }) => (
-  <div
-    data-testid="tutoring-list"
-    data-mode={mode}
-    data-loading={String(!!loading)}
-    data-error={error || ""}
-  >
+  <div data-testid="tutoring-list" data-mode={mode} data-loading={String(!!loading)} data-error={error || ""}>
     {tutorings.map((t) => (
-      <div key={t.id}>{t.title}</div>
+      <div key={t.id}>
+        <div>
+          <b>Materia: </b>
+          {t.course?.name}
+        </div>
+        <div>
+          <b>Temas:</b>
+          {t.subjects?.map((s) => (
+            <span key={s.id}>{s.name}</span>
+          ))}
+        </div>
+      </div>
     ))}
   </div>
 );
@@ -26,7 +56,7 @@ jest.mock("../components/TutoringList", () => ({
   default: (props) => <div>{TutoringListMock(props)}</div>,
 }));
 
-// 3) Mock de Pagination (renderiza botones básicos para simular interacción)
+// 4) Mock de Pagination (renderiza botones básicos para simular interacción)
 jest.mock("../../../shared/components/Pagination", () => ({
   __esModule: true,
   default: ({ page, setPage, totalPages }) => (
@@ -54,9 +84,27 @@ const mockUseTutorings = ({
   pagination = {},
   page = 1,
   setPage = setPageMock,
+  query = "",
+  searchBy = "course",
 } = {}) => {
+  // Filtrado simulado
+  let filtered = tutorings;
+  const normalize = (str) =>
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  if (query) {
+    if (searchBy === "course") {
+      filtered = tutorings.filter(t =>
+        normalize(t.course.name).includes(normalize(query))
+      );
+    } else {
+      filtered = tutorings.filter(t =>
+        t.subjects.some(s => normalize(s.name).includes(normalize(query)))
+      );
+    }
+  }
   useTutorings.mockReturnValue({
-    tutorings,
+    tutorings: filtered,
     loading,
     error,
     pagination,
@@ -65,12 +113,40 @@ const mockUseTutorings = ({
   });
 };
 
+const countMateria = (materia) => {
+  const list = screen.getByTestId("tutoring-list");
+  // Busca todos los divs hijos directos (cada tutoría)
+  return Array.from(list.children).filter((tutDiv) =>
+    Array.from(tutDiv.children).some(
+      (child) =>
+        child.textContent &&
+        child.textContent.replace(/\s+/g, " ").includes(`Materia: ${materia}`)
+    )
+  ).length;
+};
+
+const countTema = (tema) => {
+  const list = screen.getByTestId("tutoring-list");
+  return Array.from(list.querySelectorAll("span")).filter(
+    (span) => span.textContent.trim() === tema
+  ).length;
+};
+
 describe("TutoringPage", () => {
+  const baseTutorings = [
+    { id: 1, course: { name: "Cálculo 1" }, subjects: [{ id: 1, name: "Derivadas" }] },
+    { id: 2, course: { name: "Cálculo 1" }, subjects: [{ id: 1, name: "Derivadas" }] },
+    { id: 3, course: { name: "Cálculo 1" }, subjects: [{ id: 1, name: "Derivadas" }, { id: 2, name: "Integrales" }] },
+    { id: 4, course: { name: "Cálculo 2" }, subjects: [{ id: 3, name: "Derivadas" }] },
+    { id: 5, course: { name: "Programación 2" }, subjects: [{ id: 4, name: "Mecánica" }, {id: 5, name: "Robótica"}] },
+    { id: 6, course: { name: "Robótica" }, subjects: [{ id: 6, name: "Mecánica" }] },
+  ];
+
   test("renderiza el título y pasa props correctas a TutoringList", () => {
     mockUseTutorings({
       tutorings: [
-        { id: 1, title: "Cálculo I" },
-        { id: 2, title: "Programación II" },
+        { id: 1, course: { name: "Cálculo 1" }, subjects: [{ id: 1, name: "Derivadas" }] },
+        { id: 2, course: { name: "Programación 2" }, subjects: [{ id: 2, name: "Listas" }] },
       ],
       pagination: { last: 5 },
       page: 1,
@@ -88,8 +164,8 @@ describe("TutoringPage", () => {
     expect(list).toHaveAttribute("data-mode", "select");
     expect(list).toHaveAttribute("data-loading", "false");
     expect(list).toHaveAttribute("data-error", "");
-    expect(screen.getByText("Cálculo I")).toBeInTheDocument();
-    expect(screen.getByText("Programación II")).toBeInTheDocument();
+    expect(countMateria("Cálculo 1")).toBe(1);
+    expect(countMateria("Programación 2")).toBe(1);
 
     // Pagination renderizada con totalPages=5
     const pagination = screen.getByTestId("pagination");
@@ -113,7 +189,7 @@ describe("TutoringPage", () => {
 
   test("hace setPage al avanzar con la paginación", () => {
     mockUseTutorings({
-      tutorings: [{ id: 10, title: "Estructuras de Datos" }],
+      tutorings: [{ id: 4, course: {name: "Programación 1"}, subjects: [{id: 3, name: "Estructura de Datos"}] }],
       pagination: { last: 3 },
       page: 1,
     });
@@ -139,6 +215,371 @@ describe("TutoringPage", () => {
     const list = screen.getByTestId("tutoring-list");
     expect(list).toHaveAttribute("data-loading", "true");
     expect(list).toHaveAttribute("data-error", "Algo salió mal");
+  });
+
+  test("filtra todas las tutorías por materia", () => {
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "",
+      searchBy: "course",
+    });
+
+    render(<TutoringPage />);
+
+    const searchBar = screen.getByTestId("tutoring-search-bar");
+    expect(searchBar).toBeInTheDocument();
+    const queryInput = screen.getByTestId("query-input");
+    const searchBySelect = screen.getByTestId("search-by-select");
+
+    expect(queryInput).toHaveValue("");
+    expect(searchBySelect).toHaveValue("course");
+
+    expect(countMateria("Cálculo")).toBe(4);
+    expect(countMateria("Cálculo 1")).toBe(3);
+    expect(countMateria("Cálculo 2")).toBe(1);
+    expect(countMateria("Programación 2")).toBe(1);
+    expect(countMateria("Robótica")).toBe(1);
+    
+  });
+
+  test("filtra varias tutorías por materia", () => {
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "",
+      searchBy: "course",
+    });
+
+    render(<TutoringPage />);
+
+    const searchBar = screen.getByTestId("tutoring-search-bar");
+    expect(searchBar).toBeInTheDocument();
+    const queryInput = screen.getByTestId("query-input");
+    const searchBySelect = screen.getByTestId("search-by-select");
+
+    expect(queryInput).toHaveValue("");
+    expect(searchBySelect).toHaveValue("course");
+
+    expect(countMateria("Cálculo")).toBe(4);
+    expect(countMateria("Cálculo 1")).toBe(3);
+    expect(countMateria("Cálculo 2")).toBe(1);
+    expect(countMateria("Programación 2")).toBe(1);
+    expect(countMateria("Robótica")).toBe(1);
+    
+    fireEvent.change(queryInput, { target: { value: "calc" } });
+    expect(queryInput).toHaveValue("calc");
+
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "calc",
+      searchBy: "course",
+    });
+    cleanup();
+    render(<TutoringPage />);
+
+    expect(countMateria("Cálculo")).toBe(4);
+    expect(countMateria("Cálculo 1")).toBe(3);
+    expect(countMateria("Cálculo 2")).toBe(1);
+    expect(countMateria("Programación II")).toBe(0);
+    expect(countMateria("Robótica")).toBe(0);
+    
+  });
+
+  test("filtra una tutoría por materia", () => {
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "",
+      searchBy: "course",
+    });
+
+    render(<TutoringPage />);
+
+    const searchBar = screen.getByTestId("tutoring-search-bar");
+    expect(searchBar).toBeInTheDocument();
+
+    const queryInput = screen.getByTestId("query-input");
+    const searchBySelect = screen.getByTestId("search-by-select");
+    expect(queryInput).toHaveValue("");
+    expect(searchBySelect).toHaveValue("course");
+
+    fireEvent.change(queryInput, { target: { value: "Robótica" } });
+    expect(queryInput).toHaveValue("Robótica");
+
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "Robótica",
+      searchBy: "course",
+    });
+    cleanup();
+    render(<TutoringPage />);
+
+    expect(countMateria("Cálculo")).toBe(0);
+    expect(countMateria("Programación 2")).toBe(0);
+    expect(countMateria("Robótica")).toBe(1);
+  });
+
+   test("No filtra tutoría por materia", () => {
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "",
+      searchBy: "course",
+    });
+
+    render(<TutoringPage />);
+
+    const searchBar = screen.getByTestId("tutoring-search-bar");
+    expect(searchBar).toBeInTheDocument();
+
+    const queryInput = screen.getByTestId("query-input");
+    const searchBySelect = screen.getByTestId("search-by-select");
+    expect(queryInput).toHaveValue("");
+    expect(searchBySelect).toHaveValue("course");
+
+    fireEvent.change(queryInput, { target: { value: "Mecánica" } });
+    expect(queryInput).toHaveValue("Mecánica");
+
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "Mecánica",
+      searchBy: "course",
+    });
+    cleanup();
+    render(<TutoringPage />);
+
+    expect(countMateria("Cálculo")).toBe(0);
+    expect(countMateria("Programación 2")).toBe(0);
+    expect(countMateria("Robótica")).toBe(0);
+  });
+
+  test("filtra todas las tutorías por tema", () => {
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "",
+      searchBy: "course",
+    });
+
+    render(<TutoringPage />);
+
+    const searchBar = screen.getByTestId("tutoring-search-bar");
+    expect(searchBar).toBeInTheDocument();
+
+    const queryInput = screen.getByTestId("query-input");
+    expect(queryInput).toHaveValue("");
+
+    const searchBySelect = screen.getByTestId("search-by-select");
+    fireEvent.change(searchBySelect, { target: { value: "subject" } });
+    expect(searchBySelect).toHaveValue("subject");
+
+    expect(countTema("Derivadas")).toBe(4);
+    expect(countTema("Integrales")).toBe(1);
+    expect(countTema("Mecánica")).toBe(2);
+    expect(countTema("Robótica")).toBe(1);
+    
+  });
+
+  test("filtra varias tutorías por tema", () => {
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "",
+      searchBy: "course",
+    });
+
+    render(<TutoringPage />);
+
+    const searchBar = screen.getByTestId("tutoring-search-bar");
+    expect(searchBar).toBeInTheDocument();
+
+    expect(countTema("Derivadas")).toBe(4);
+    expect(countTema("Integrales")).toBe(1);
+    expect(countTema("Mecánica")).toBe(2);
+    expect(countTema("Robótica")).toBe(1);
+
+    const queryInput = screen.getByTestId("query-input");
+    const searchBySelect = screen.getByTestId("search-by-select");
+    fireEvent.change(searchBySelect, { target: { value: "subject" } });
+    expect(searchBySelect).toHaveValue("subject");
+    fireEvent.change(queryInput, { target: { value: "meca" } });
+    expect(queryInput).toHaveValue("meca");
+
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "meca",
+      searchBy: "subject",
+    });
+    cleanup();
+    render(<TutoringPage />);
+
+    expect(countTema("Derivadas")).toBe(0);
+    expect(countTema("Integrales")).toBe(0);
+    expect(countTema("Mecánica")).toBe(2);
+    expect(countTema("Robótica")).toBe(1);
+  });
+
+  test("filtra una tutoría por tema", () => {
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "",
+      searchBy: "course",
+    });
+
+    render(<TutoringPage />);
+
+    const searchBar = screen.getByTestId("tutoring-search-bar");
+    expect(searchBar).toBeInTheDocument();
+
+    const queryInput = screen.getByTestId("query-input");
+    const searchBySelect = screen.getByTestId("search-by-select");
+    expect(queryInput).toHaveValue("");
+    expect(searchBySelect).toHaveValue("course");
+
+    fireEvent.change(queryInput, { target: { value: "robo" } });
+    expect(queryInput).toHaveValue("robo");
+    fireEvent.change(searchBySelect, { target: { value: "subject" } });
+    expect(searchBySelect).toHaveValue("subject");
+
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "robo",
+      searchBy: "subject",
+    });
+    cleanup();
+    render(<TutoringPage />);
+
+    expect(countTema("Derivadas")).toBe(0);
+    expect(countTema("Integrales")).toBe(0);
+    expect(countTema("Mecánica")).toBe(1);
+    expect(countTema("Robótica")).toBe(1);
+  });
+
+  test("no filtra ninguna tutoría por tema", () => {
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "",
+      searchBy: "course",
+    });
+
+    render(<TutoringPage />);
+
+    const searchBar = screen.getByTestId("tutoring-search-bar");
+    expect(searchBar).toBeInTheDocument();
+
+    const queryInput = screen.getByTestId("query-input");
+    const searchBySelect = screen.getByTestId("search-by-select");
+    expect(searchBySelect).toHaveValue("course");
+    expect(queryInput).toHaveValue("");
+
+    fireEvent.change(queryInput, { target: { value: "Programación 2" } });
+    expect(queryInput).toHaveValue("Programación 2");
+    fireEvent.change(searchBySelect, { target: { value: "subject" } });
+    expect(searchBySelect).toHaveValue("subject");
+
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "Programación 2",
+      searchBy: "subject",
+    });
+    cleanup();
+    render(<TutoringPage />);
+
+    expect(countTema("Derivadas")).toBe(0);
+    expect(countTema("Integrales")).toBe(0);
+    expect(countTema("Mecánica")).toBe(0);
+    expect(countTema("Robótica")).toBe(0);
+  });
+
+  test("Cambio de materia a temas y viceversa", () => {
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "",
+      searchBy: "course",
+    });
+
+    render(<TutoringPage />);
+
+    const searchBar = screen.getByTestId("tutoring-search-bar");
+    expect(searchBar).toBeInTheDocument();
+    const queryInput = screen.getByTestId("query-input");
+    const searchBySelect = screen.getByTestId("search-by-select");
+
+    expect(queryInput).toHaveValue("");
+    expect(searchBySelect).toHaveValue("course");
+
+    expect(countMateria("Cálculo")).toBe(4);
+    expect(countMateria("Cálculo 1")).toBe(3);
+    expect(countMateria("Cálculo 2")).toBe(1);
+    expect(countMateria("Programación 2")).toBe(1);
+    expect(countMateria("Robótica")).toBe(1);
+
+    fireEvent.change(searchBySelect, { target: { value: "subject" } });
+    expect(searchBySelect).toHaveValue("subject");
+    fireEvent.change(queryInput, { target: { value: "meca" } });
+    expect(queryInput).toHaveValue("meca");
+
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "meca",
+      searchBy: "subject",
+    });
+    cleanup();
+    render(<TutoringPage />);
+
+    expect(countTema("Derivadas")).toBe(0);
+    expect(countTema("Integrales")).toBe(0);
+    expect(countTema("Mecánica")).toBe(2);
+    expect(countTema("Robótica")).toBe(1);
+
+    fireEvent.change(searchBySelect, { target: { value: "course" } });
+    expect(searchBySelect).toHaveValue("course");
+    fireEvent.change(queryInput, { target: { value: "Robótica" } });
+    expect(queryInput).toHaveValue("Robótica");
+
+    mockUseTutorings({
+      tutorings: baseTutorings,
+      pagination: { last: 1 },
+      page: 1,
+      query: "Robótica",
+      searchBy: "course",
+    });
+    cleanup();
+    render(<TutoringPage />);
+
+    expect(countMateria("Cálculo")).toBe(0);
+    expect(countMateria("Cálculo 1")).toBe(0);
+    expect(countMateria("Cálculo 2")).toBe(0);
+    expect(countMateria("Programación 2")).toBe(0);
+    expect(countMateria("Robótica")).toBe(1);
+    
   });
 
 
