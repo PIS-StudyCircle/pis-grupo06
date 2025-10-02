@@ -15,7 +15,7 @@ json_data.each do |entry|
     name: entry['nombre'],
     code: entry['codigo'],
     institute: entry['instituto'],
-    faculty: fing,
+    faculty: fing
   )
 end
 
@@ -130,22 +130,7 @@ end
 course = Course.find_by(id: 116) # Electrotécnica I
 creator = User.find_by(email: "martinramirez@gmail.com") || User.first
 # ========================
-
-Subject.find_or_create_by!(name: "Circuitos Eléctricos Básicos", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Ley de Ohm y Leyes de Kirchhoff", course: course) do |s|
-  s.creator = creator
-  s.due_date = 3.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Resistencias y Asociación de Resistencias", course: course) do |s|
-  s.creator = creator
-  s.due_date = 4.months.from_now
-end
-
+# ========================
 Subject.find_or_create_by!(name: "Circuitos Eléctricos Básicos", course: course) do |s|
   s.creator = creator
   s.due_date = 6.months.from_now
@@ -257,10 +242,6 @@ Subject.find_or_create_by!(name: "Autovalores y autovectores", course: course) d
 end
 
 creator = User.find_by(email: "luciafernandez@gmail.com") || User.first
-
-Subject.find_or_create_by!(name: "Autovalores y autovectores", course: course) do |s|
-  s.creator = creator
-end
 
 Subject.find_or_create_by!(name: "Espacios vectoriales", course: course) do |s|
   s.creator = creator
@@ -417,16 +398,13 @@ Subject.find_or_create_by!(name: "Optimización Multiobjetivo", course: course) 
   s.creator = creator
   s.due_date = 6.months.from_now
 end
+# ------------------ TUTORIAS ------------------ #
 
-# ------------------TUTORIAS------------------ #
+# ---- SIN TUTOR ---- #
 
-#----SIN TUTOR----#
-
-# Tutoría 1 creada por estudiante solicitandola, con 3 temas
-
+# Tutoría 1 creada por estudiante solicitándola, con 3 temas
 creator = User.find_by!(email: "luisgomez@gmail.com")
 course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-# Elegir entre 1 y 3 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..3))
 
 tutoring_request = Tutoring.find_or_create_by!(
@@ -449,10 +427,9 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_request
 )
 
-# Tutoría 2 creada por estudiante solicitandola, con 1 tema
+# Tutoría 2 creada por estudiante solicitándola, con 1 tema
 creator = User.find_by!(email: "juanperez@gmail.com")
-course = Course.find_by(id: 145) # Fisica I
-# Elegir 1 subjects al azar
+course = Course.find_by(id: 145) # Física I
 subject = course.subjects.sample(1).first
 
 tutoring_request = Tutoring.find_or_create_by!(
@@ -473,10 +450,9 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_request
 )
 
-# Tutoría 3 creada por estudiante solicitandola, con 5 temas
+# Tutoría 3 creada por estudiante solicitándola, con 5 temas
 creator = User.find_by!(email: "anaperez@gmail.com")
 course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-# Elegir entre 1 y 5 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..5))
 
 tutoring_request = Tutoring.find_or_create_by!(
@@ -499,10 +475,9 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_request
 )
 
-# Tutoría 3 creada por estudiante solicitandola, con 5 temas
+# Tutoría 3 repetida con 5 temas
 creator = User.find_by!(email: "anaperez@gmail.com")
 course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-# Elegir entre 1 y 5 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..5))
 
 tutoring_request = Tutoring.find_or_create_by!(
@@ -525,13 +500,13 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_request
 )
 
-#----CON TUTOR = USUARIO QUE LA CREA----#
+# ---- CON TUTOR = USUARIO QUE LA CREA ---- #
 
-# Tutoría 4 creada por estudiante dictandola
+# Tutoría 4 creada por estudiante dictándola
 creator = User.find_by!(email: "anaperez@gmail.com")
 course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
-# Elegir 1 subject al azar
 subject = course.subjects.sample(1).first
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 5.days.from_now,
   duration_mins: 60,
@@ -542,13 +517,14 @@ tutoring_offered = Tutoring.find_or_create_by!(
   created_by_id: creator.id,
   tutor_id: creator.id
 )
+
 SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 
-# Tutoría 5 creada por estudiante dictandola
+# Tutoría 5 creada por estudiante dictándola
 creator = User.find_by!(email: "martadaluz@gmail.com")
 course = Course.find_by(id: 116) # Electrotécnica I
-# Elegir entre 1 y 7 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..7))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 7.days.from_now,
   duration_mins: 60,
@@ -564,11 +540,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 6 creada por estudiante dictandola
+# Tutoría 6 creada por estudiante dictándola
 creator = User.find_by!(email: "veronicagimenez@gmail.com")
 course = Course.find_by(id: 116) # Electrotécnica I
-# Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 7.days.from_now,
   duration_mins: 60,
@@ -584,11 +560,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 7 creada por estudiante dictandola
+# Tutoría 7 creada por estudiante dictándola
 creator = User.find_by!(email: "veronicagimenez@gmail.com")
 course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
-# Elegir entre 1 y 3 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 10.days.from_now,
   duration_mins: 60,
@@ -604,11 +580,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 8 creada por estudiante dictandola
+# Tutoría 8 creada por estudiante dictándola
 creator = User.find_by!(email: "rociovazquez@gmail.com")
 course = Course.find_by(id: 443) # PIS
-# Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 2.days.from_now,
   duration_mins: 60,
@@ -624,11 +600,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 9 creada por estudiante dictandola
+# Tutoría 9 creada por estudiante dictándola
 creator = User.find_by!(email: "pablovillar@gmail.com")
 course = Course.find_by(id: 443) # PIS
-# Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 5.days.from_now,
   duration_mins: 60,
@@ -644,11 +620,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 10 creada por estudiante dictandola
+# Tutoría 10 creada por estudiante dictándola
 creator = User.find_by!(email: "agustinabenitez@gmail.com")
 course = Course.find_by(id: 145) # Física I
-# Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 3.days.from_now,
   duration_mins: 60,
@@ -664,11 +640,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 11 creada por estudiante dictandola
+# Tutoría 11 creada por estudiante dictándola
 creator = User.find_by!(email: "agustinabenitez@gmail.com")
 course = Course.find_by(id: 145) # Física I
-# Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 7.days.from_now,
   duration_mins: 60,
@@ -684,11 +660,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 12 creada por estudiante dictandola
+# Tutoría 12 creada por estudiante dictándola
 creator = User.find_by!(email: "tomasgarrido@gmail.com")
 course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-# Elegir entre 1 y 3 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 2.days.from_now,
   duration_mins: 60,
@@ -704,11 +680,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 13 creada por estudiante dictandola
+# Tutoría 13 creada por estudiante dictándola
 creator = User.find_by!(email: "tomasgarrido@gmail.com")
 course = Course.find_by(id: 13) # Algoritmos Evolutivos
-# Elegir entre 1 y 4 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..4))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 5.days.from_now,
   duration_mins: 30,
@@ -724,11 +700,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 14 creada por estudiante dictandola
+# Tutoría 14 creada por estudiante dictándola
 creator = User.find_by!(email: "lauramaldonado@gmail.com")
 course = Course.find_by(id: 13) # Algoritmos Evolutivos
-# Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 7.days.from_now,
   duration_mins: 60,
@@ -744,11 +720,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 15 creada por estudiante dictandola
+# Tutoría 15 creada por estudiante dictándola
 creator = User.find_by!(email: "lauramaldonado@gmail.com")
 course = Course.find_by(id: 13) # Algoritmos Evolutivos
-# Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 5.days.from_now,
   duration_mins: 45,
@@ -764,11 +740,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 16 creada por estudiante dictandola
+# Tutoría 16 creada por estudiante dictándola
 creator = User.find_by!(email: "tomasgarrido@gmail.com")
 course = Course.find_by(id: 13) # Algoritmos Evolutivos
-# Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 10.days.from_now,
   duration_mins: 60,
@@ -784,11 +760,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 17 creada por estudiante dictandola
+# Tutoría 17 creada por estudiante dictándola
 creator = User.find_by!(email: "luisgomez@gmail.com")
 course = Course.find_by(id: 13) # Algoritmos Evolutivos
-# Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 8.days.from_now,
   duration_mins: 30,
@@ -804,11 +780,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 17 creada por estudiante dictandola
+# Tutoría 18 creada por estudiante dictándola
 creator = User.find_by!(email: "sofiagarcia@gmail.com")
 course = Course.find_by(id: 8) # Agrimensura Legal 1
-# Elegir entre 1 y 2 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 5.days.from_now,
   duration_mins: 60,
@@ -824,11 +800,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 18 creada por estudiante dictandola
+# Tutoría 19 creada por estudiante dictándola
 creator = User.find_by!(email: "paulacastro@gmail.com")
 course = Course.find_by(id: 8) # Agrimensura Legal 1
-# Elegir entre 1 y 3 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 3.days.from_now,
   duration_mins: 60,
@@ -844,35 +820,15 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
-# Tutoría 19 creada por estudiante dictandola
+# Tutoría 20 creada por estudiante dictándola
 creator = User.find_by!(email: "martadaluz@gmail.com")
 course = Course.find_by(id: 8) # Agrimensura Legal 1
-# Elegir entre 1 y 3 subjects al azar
 subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 3.days.from_now,
   duration_mins: 60,
   modality: "presencial",
-  capacity: 10,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-# Tutoría 20 creada por estudiante dictandola
-creator = User.find_by!(email: "clarasuarez@gmail.com")
-course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
-# Elegir entre 1 y 3 subjects al azar
-subjects = Subject.where(course: course).shuffle.take(rand(1..3))
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 3.days.from_now,
-  duration_mins: 40,
-  modality: "virtual",
   capacity: 10,
   enrolled: 0,
   course: course,
