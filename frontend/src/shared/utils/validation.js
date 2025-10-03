@@ -34,10 +34,14 @@ export function validateDate(date) {
   return null;
 }
 
-export function validateCharacters(value, fieldName = "This field"){
-  if (validateRequired(value, fieldName) !== null) {
-    return this.validateRequired(value, fieldName);
+export function validateCharacters(value, fieldName = "This field") {
+  const requiredError = validateRequired(value, fieldName);
+  if (requiredError !== null) {
+    return requiredError;
   }
-  const regex = /^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\-]+$/; //agrego el character guion (-) por apellidos compuestos
-  return regex.test(value) ? null : `El campo ${fieldName} contiene caracteres no válidos`;
+  const regex = /^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\-]+$/;
+  return regex.test(value)
+    ? null
+    : `El ${fieldName} contiene caracteres no válidos`;
 }
+
