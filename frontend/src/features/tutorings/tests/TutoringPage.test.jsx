@@ -599,4 +599,94 @@ describe("TutoringPage", () => {
     expect(countMateria("Robótica")).toBe(1);
     
   });
+
+
+  test("muestra el checkbox 'Tutor Indefinido' y arranca desmarcado", () => {
+    mockUseTutorings({
+      tutorings: [],
+      pagination: { last: 1 },
+      page: 1,
+    });
+
+    render(<TutoringPage filters={{}} mode="" />);
+
+    const cb = screen.getByLabelText(/Tutor Indefinido/i);
+    expect(cb).toBeInTheDocument();
+    expect(cb).not.toBeChecked();
+  });
+
+  test("al marcar 'Tutor Indefinido' agrega no_tutor=true a los filtros enviados al hook", () => {
+    const baseFilters = { enrolled: true, course_id: "MAT101" };
+
+    mockUseTutorings({
+      tutorings: [],
+      pagination: { last: 1 },
+      page: 1,
+    });
+
+    render(<TutoringPage filters={baseFilters} mode="select" />);
+
+    // Nos quedamos solo con las llamadas disparadas por el toggle
+    useTutorings.mockClear();
+
+    const cb = screen.getByLabelText(/Tutor Indefinido/i);
+    fireEvent.click(cb); // marcar
+    expect(cb).toBeChecked();
+
+    // La última llamada a useTutorings debe incluir no_tutor: true
+    expect(useTutorings).toHaveBeenCalled();
+    const [, , filtrosLlamada] = useTutorings.mock.calls.at(-1);
+    expect(filtrosLlamada).toMatchObject({ ...baseFilters, no_tutor: true });
+    expect(filtrosLlamada.enrolled).toBe(true);
+    expect(filtrosLlamada.course_id).toBe("MAT101");
+  });
+
+  test("al desmarcar 'Tutor Indefinido' vuelve a los filtros originales", () => {
+    const baseFilters = { enrolled: false, created_by_user: "42" };
+
+    mockUseTutorings({
+      tutorings: [],
+      pagination: { last: 2 },
+      page: 1,
+    });
+
+    render(<TutoringPage filters={baseFilters} mode="view" />);
+
+    const cb = screen.getByLabelText(/Tutor Indefinido/i);
+
+    // 1) Marcar -> agrega no_tutor
+    useTutorings.mockClear();
+    fireEvent.click(cb);
+    expect(cb).toBeChecked();
+    let call = useTutorings.mock.calls.at(-1);
+    expect(call[2]).toMatchObject({ ...baseFilters, no_tutor: true });
+
+    // 2) Desmarcar -> vuelve a filtros originales
+    useTutorings.mockClear();
+    fireEvent.click(cb);
+    expect(cb).not.toBeChecked();
+    call = useTutorings.mock.calls.at(-1);
+    expect(call[2]).toMatchObject(baseFilters);
+    expect(call[2]).not.toHaveProperty("no_tutor");
+  });
+
+  test("conserva otros filtros al activar 'Tutor Indefinido'", () => {
+    const baseFilters = { enrolled: true, created_by_user: "7", course_id: "FISICA1" };
+
+    mockUseTutorings({
+      tutorings: [],
+      pagination: { last: 3 },
+      page: 1,
+    });
+
+    render(<TutoringPage filters={baseFilters} mode="misTutorias" />);
+
+    useTutorings.mockClear();
+    fireEvent.click(screen.getByLabelText(/Tutor Indefinido/i));
+
+    const [, , filtrosLlamada] = useTutorings.mock.calls.at(-1);
+    expect(filtrosLlamada).toMatchObject({ ...baseFilters, no_tutor: true });
+    expect(filtrosLlamada.created_by_user).toBe("7");
+    expect(filtrosLlamada.course_id).toBe("FISICA1");
+  });
 });

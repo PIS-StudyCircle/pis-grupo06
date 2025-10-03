@@ -11,12 +11,20 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
 
   // selector de búsqueda (por materia/tema) proveniente de origin/dev
   const [searchBy, setSearchBy] = useState("course");
+  const [showWithoutTutor, setShowWithoutTutor] = useState(false);
 
   // 1) aseguramos course_id + 2) agregamos search_by
   const mergedFilters = useMemo(() => {
-    const base = filters ?? {};
-    return { ...base, course_id: courseId, search_by: searchBy };
-  }, [filters, courseId, searchBy]);
+    const baseFilters = { ...filters };
+
+    if (showWithoutTutor) {
+      baseFilters.no_tutor = true;
+    }
+
+    baseFilters.search_by = searchBy;
+
+    return baseFilters;
+  }, [filters, searchBy, showWithoutTutor]);
 
   const {
     tutorings,
@@ -29,7 +37,7 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
     setSearch,
   } = useTutorings(1, 20, mergedFilters, mode);
 
-  const totalPages = (pagination && pagination.last) || 1;
+  const totalPages = pagination?.last || 1;
 
   // query local con debounce
   const [query, setQuery] = useState(search);
@@ -106,12 +114,19 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
               placeholder={"Buscar por tema..."}
             />
           )}
-          <TutoringList
-            tutorings={tutorings}
-            mode={mode}
-            loading={loading}
-            error={error}
-          />
+
+            {/* Filter toggle */}
+            <label className="flex items-center gap-2 cursor-pointer ml-4">
+              <input
+                type="checkbox"
+                checked={showWithoutTutor}
+                onChange={(e) => setShowWithoutTutor(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-gray-700">Tutor Indefinido</span>
+            </label>
+
+          <TutoringList tutorings={tutorings} mode={mode} loading={loading} error={error} />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>

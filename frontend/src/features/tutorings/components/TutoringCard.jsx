@@ -2,29 +2,33 @@ import { formatDateTime } from "@shared/utils/FormatDate";
 
 export default function TutoringCard({ tutoring, mode }) {
   return (
-    <div className="w-full bg-white rounded-lg shadow p-4 my-4 flex items-center justify-between gap-2">
-      <div className="flex w-full gap-4">
-
-        <div className="flex-none w-[80%] flex flex-col text-left">
+    <div className="w-full bg-white rounded-lg shadow p-4 my-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        
+        {/* Información de la tutoría - sin cambios */}
+        <div className="flex-1 flex flex-col text-left">
           <p className="tutoring-card-title">
             <b>Materia: </b>
             {tutoring.course.name}
           </p>
-
           {tutoring.scheduled_at && (
             <p className="tutoring-card-title mt-1">
               <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)}
             </p>
           )}
-
           {tutoring.duration_mins && (
             <p className="tutoring-card-title mt-1">
               <b>Duración: </b> {tutoring.duration_mins} minutos
             </p>
           )}
-
           <p className="tutoring-card-title mt-1"><b>Modalidad: </b> {tutoring.modality}</p>
-
+          {tutoring.tutor_id !== null ? (
+            <>
+              <p className="tutoring-card-title mt-1">
+                <b>Tutor: </b> {tutoring.tutor_name + " " + tutoring.tutor_last_name}
+              </p>
+            </>
+          ) : null}
           {tutoring.capacity && (
             <p className="text-gray-600 text-sm mt-1">
               <b>Cupos disponibles: </b> {tutoring.capacity - tutoring.enrolled}
@@ -48,25 +52,68 @@ export default function TutoringCard({ tutoring, mode }) {
           </div>
         </div>
 
-        <div className="flex-none w-[20%] flex flex-col justify-start items-end pr-3">
-          {mode === "serTutor" && 
-            <button className="btn btn-primary tutoring-card-button">
+        {/* Botones */}
+        <div className="flex flex-col gap-3 md:pr-3">
+          {mode === "serTutor" && (
+            <button
+              type="button"
+              className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+              onClick={() => {}}
+            >
+              Ser tutor
+            </button>
+          )}
+
+          {mode === "serEstudiante" && (
+            <button
+              type="button"
+              className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+              onClick={() => {}}
+            >
+              Unirme
+            </button>
+          )}
+
+          {mode === "ambos" && (
+            <>
+              <button
+                type="button"
+                className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+                onClick={() => {}}
+              >
                 Ser tutor
-            </button>
-          }
-          {mode === "serEstudiante" &&
-            <button className="btn btn-primary tutoring-card-button">
+              </button>
+              <button
+                type="button"
+                className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+                onClick={() => {}}
+              >
                 Unirme
-            </button>
-          }
-          {mode === "misTutorias" && 
-            <button className="btn btn-primary tutoring-card-button">
+              </button>
+            </>
+          )}
+
+          {mode === "misTutorias" && (
+            <button
+              type="button"
+              className="btn w-full bg-red-500 hover:bg-red-600 text-white"
+              onClick={() => {}}
+            >
               Desuscribirme
             </button>
-          }
+          )}
+
+          {mode === "completo" && (
+            <button
+              type="button"
+              className="btn w-full bg-gray-400 text-gray-700 cursor-not-allowed"
+              disabled={true}
+            >
+              Completo
+            </button>
+          )}
         </div>
       </div>
-
     </div>
   );
 }
