@@ -13,9 +13,18 @@ export default function TutoringCard({ tutoring, mode }) {
           </p>
 
           <p className="tutoring-card-title mt-1">
-            <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)} 
+            <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)}
           </p>
-          <p className="tutoring-card-title mt-1"><b>Modalidad: </b> {tutoring.modality}</p>
+          <p className="tutoring-card-title mt-1">
+            <b>Modalidad: </b> {tutoring.modality}
+          </p>
+          {tutoring.tutor_id !== null ? (
+            <>
+              <p className="tutoring-card-title mt-1">
+                <b>Tutor: </b> {tutoring.tutor_name + " " + tutoring.tutor_last_name}
+              </p>
+            </>
+          ) : null}
           <p className="text-gray-600 text-sm mt-1">
             <b>Cupos disponibles: </b> {tutoring.capacity - tutoring.enrolled}
           </p>

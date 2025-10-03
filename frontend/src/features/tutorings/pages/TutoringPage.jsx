@@ -1,31 +1,37 @@
 import { useState, useEffect, useMemo } from "react";
 import { useTutorings } from "../hooks/useTutorings";
-import TutoringList from "../components/TutoringList";    
+import TutoringList from "../components/TutoringList";
 import TutoringSearchBar from "../components/TutoringSearchBar";
 import Pagination from "@components/Pagination";
 
-
-export default function TutoringPage({filters, mode = ""}) {
-
+export default function TutoringPage({ filters = {}, mode = "" }) {
   const [searchBy, setSearchBy] = useState("course");
+  const [showWithoutTutor, setShowWithoutTutor] = useState(false);
 
   const mergedFilters = useMemo(() => {
-    const baseFilters = filters ?? {};
-    return { ...baseFilters, search_by: searchBy };
-  }, [filters, searchBy]);
+    const baseFilters = { ...filters };
+
+    if (showWithoutTutor) {
+      baseFilters.no_tutor = true;
+    }
+
+    baseFilters.search_by = searchBy;
+
+    return baseFilters;
+  }, [filters, searchBy, showWithoutTutor]);
 
   const {
-    tutorings, 
-    loading, 
-    error, 
-    pagination, 
-    page, 
+    tutorings,
+    loading,
+    error,
+    pagination,
+    page,
     setPage,
     search,
     setSearch,
   } = useTutorings(1, 20, mergedFilters);
 
-  const totalPages = pagination.last || 1;
+  const totalPages = pagination?.last || 1;
 
   const [query, setQuery] = useState(search);
 
@@ -46,26 +52,40 @@ export default function TutoringPage({filters, mode = ""}) {
   }, [searchBy, page, setPage]);
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold p-2 mb-4 text-black">
-            Tutorías Disponibles
-          </h1>
+          <div className="mb-4 p-2">
+            <h1 className="text-2xl font-bold p-2 mb-4 text-black">
+              Tutorías Disponibles
+            </h1>
 
-          <TutoringSearchBar
-            query={query}
-            onQueryChange={(e) => setQuery(e.target.value)}
-            searchBy={searchBy}
-            onSearchByChange={setSearchBy}
-            placeholder={
-              searchBy === "course"
-                ? "Buscar por materia..."
-                : "Buscar por tema..."
-            }
-          />
+            {/* Search bar */}
+            <TutoringSearchBar
+              query={query}
+              onQueryChange={(e) => setQuery(e.target.value)}
+              searchBy={searchBy}
+              onSearchByChange={setSearchBy}
+              placeholder={
+                searchBy === "course"
+                  ? "Buscar por materia..."
+                  : "Buscar por tema..."
+              }
+            />
 
-          <TutoringList tutorings={tutorings} mode = {mode} loading={loading} error={error} />
+            {/* Filter toggle */}
+            <label className="flex items-center gap-2 cursor-pointer ml-4">
+              <input
+                type="checkbox"
+                checked={showWithoutTutor}
+                onChange={(e) => setShowWithoutTutor(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-gray-700">Tutor Indefinido</span>
+            </label>
+          </div>
+
+          <TutoringList tutorings={tutorings} mode={mode} loading={loading} error={error} />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>

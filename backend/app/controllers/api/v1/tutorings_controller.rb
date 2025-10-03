@@ -77,7 +77,9 @@ module Api
                 }
               end,
               created_by_id: t.created_by_id,
-              tutor_id: t.tutor_id
+              tutor_id: t.tutor_id,
+              tutor_name: t.tutor&.name,
+              tutor_last_name: t.tutor&.last_name
             }
           end,
           pagination: pagy_metadata(@pagy)
