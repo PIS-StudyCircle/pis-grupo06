@@ -10,13 +10,14 @@ import {
   validateEmail,
   validatePassword,
   validatePasswordConfirmation,
+  validateCharacters
 } from "@utils/validation";
 import { useValidation } from "@hooks/useValidation";
 import { useFormSubmit } from "@utils/UseFormSubmit";
 
 const validators = {
-  name: (value) => validateRequired(value, "Nombre"),
-  last_name: (value) => validateRequired(value, "Apellido"),
+  name: (value) => validateCharacters(value, "Nombre"),
+  last_name: (value) => validateCharacters(value, "Apellido"),
   email: validateEmail,
   password: validatePassword,
   password_confirmation: (value, form) =>
