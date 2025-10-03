@@ -12,7 +12,7 @@ export const useTutorings = (initialPage = 1, perPage = 20, filters = {}, mode =
   // Si cambian los filtros o el modo, volvemos a la página 1
   useEffect(() => {
     setPage(initialPage);
-  }, [filters, mode]);
+  }, [filters, mode, initialPage]);
 
   useEffect(() => {
     const fetchTutorings = async () => {

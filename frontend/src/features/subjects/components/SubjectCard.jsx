@@ -5,7 +5,6 @@ export default function SubjectCard({
   selected = false,
   onSelect,
   type = "button",
-  onButtonClick,
 }) {
   const navigate = useNavigate();
   const { courseId } = useParams();

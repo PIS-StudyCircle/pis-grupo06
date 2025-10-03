@@ -13,7 +13,6 @@ export default function SubjectList({
   courseId,
   onCreated = () => {},
   onSelectionChange = () => {},
-  onButtonClick,
   selectedSubjects = [],
 }) {
   const [showNewForm, setShowNewForm] = useState(false);
@@ -147,7 +146,6 @@ export default function SubjectList({
           selected={type === "selectable" ? selectedIds.includes(subject.id) : false}
           onSelect={handleSelect}
           type={type}
-          onButtonClick={onButtonClick}
         />
       ))}
     </div>

@@ -9,7 +9,6 @@ export default function SubjectPage({
   showCreate = false,
   type = "button",
   onSelectionChange,
-  onButtonClick,
   selectedSubjects = [],
 }) {
   const {
@@ -59,7 +58,6 @@ export default function SubjectPage({
             courseId={courseId}
             onCreated={handleCreated}
             onSelectionChange={onSelectionChange}
-            onButtonClick={onButtonClick}
             selectedSubjects={selectedSubjects}
           />
 
