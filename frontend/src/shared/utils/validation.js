@@ -1,6 +1,6 @@
-export function validateRequired(value, fieldName = "This field") {
+export function validateRequired(value, fieldName = "") {
   if (!value || value.trim() === "") {
-    return `El ${fieldName} es obligatorio`;
+    return `El campo ${fieldName} es obligatorio`;
   }
   return null;
 }
@@ -34,7 +34,7 @@ export function validateDate(date) {
   return null;
 }
 
-export function validateCharacters(value, fieldName = "This field") {
+export function validateCharacters(value, fieldName = "") {
   const requiredError = validateRequired(value, fieldName);
   if (requiredError !== null) {
     return requiredError;
@@ -42,6 +42,6 @@ export function validateCharacters(value, fieldName = "This field") {
   const regex = /^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ-]+$/;
   return regex.test(value)
     ? null
-    : `El ${fieldName} contiene caracteres no válidos`;
+    : `El campo ${fieldName} contiene caracteres no válidos`;
 }
 
