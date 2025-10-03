@@ -64,7 +64,8 @@ module Api
               subjects: t.subjects.map { |s| { id: s.id, name: s.name } },
               created_by_id: t.created_by_id,
               tutor_id: t.tutor_id,
-              tutor_name: t.tutor_name
+              tutor_name: t.tutor&.name,
+              tutor_last_name: t.tutor&.last_name
             }
           end,
           pagination: pagy_metadata(@pagy)

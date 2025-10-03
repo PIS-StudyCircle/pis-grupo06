@@ -20,7 +20,7 @@ export default function TutoringCard({ tutoring, mode }) {
           {tutoring.tutor_id !== null ? (
             <>
               <p className="tutoring-card-title mt-1">
-                <b>Tutor: </b> {tutoring.tutor_name}
+                <b>Tutor: </b> {tutoring.tutor_name + " " + tutoring.tutor_last_name}
               </p>
             </>
           ) : null}
