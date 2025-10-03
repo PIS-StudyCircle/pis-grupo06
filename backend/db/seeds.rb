@@ -15,7 +15,7 @@ json_data.each do |entry|
     name: entry['nombre'],
     code: entry['codigo'],
     institute: entry['instituto'],
-    faculty: fing,
+    faculty: fing
   )
 end
 
@@ -81,84 +81,761 @@ end
 # ------ TEMAS DE MATERIAS ------
 
 # Crear subjects para un curso
+# ========================
 course = Course.find_by(id: 443) # PIS
 creator = User.find_by(email: "anaperez@gmail.com") || User.first
+# ========================
 
 Subject.find_or_create_by!(name: "Análisis de Requerimientos", course: course) do |s|
   s.creator = creator
+  s.due_date = 3.months.from_now
 end
 
 Subject.find_or_create_by!(name: "Gestión de Riesgos", course: course) do |s|
   s.creator = creator
+  s.due_date = 4.months.from_now
 end
 
 Subject.find_or_create_by!(name: "Casos de Uso", course: course) do |s|
   s.creator = creator
+  s.due_date = 5.months.from_now
 end
 
+# ========================
 course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
 creator = User.find_by(email: "martadaluz@gmail.com") || User.first
+# ========================
 
 Subject.find_or_create_by!(name: "Conjuntos", course: course) do |s|
   s.creator = creator
+  s.due_date = 6.months.from_now
 end
+
 Subject.find_or_create_by!(name: "Derivadas", course: course) do |s|
   s.creator = creator
+  s.due_date = 3.months.from_now
 end
+
 Subject.find_or_create_by!(name: "Integrales simples", course: course) do |s|
   s.creator = creator
+  s.due_date = 4.months.from_now
 end
+
 Subject.find_or_create_by!(name: "Axiomas", course: course) do |s|
   s.creator = creator
+  s.due_date = 5.months.from_now
 end
 
+# ========================
 course = Course.find_by(id: 116) # Electrotécnica I
 creator = User.find_by(email: "martinramirez@gmail.com") || User.first
-
+# ========================
+# ========================
 Subject.find_or_create_by!(name: "Circuitos Eléctricos Básicos", course: course) do |s|
   s.creator = creator
-end
-Subject.find_or_create_by!(name: "Ley de Ohm y Leyes de Kirchhoff", course: course) do |s|
-  s.creator = creator
-end
-Subject.find_or_create_by!(name: "Resistencias y Asociación de Resistencias", course: course) do |s|
-  s.creator = creator
+  s.due_date = 6.months.from_now
 end
 
-course = Course.find_by(id: 145) # Fisica I
+Subject.find_or_create_by!(name: "Leyes de Ohm y de Kirchhoff", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Potencia y Energía Eléctrica", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Generadores de Corriente Continua", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Motores de Corriente Continua", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Transformadores Eléctricos", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Medidas Eléctricas y Multímetros", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Protecciones y Seguridad Eléctrica", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Corriente Alterna: Magnitudes y Ondas", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Resonancia en Circuitos RLC", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+# ========================
+course = Course.find_by(id: 145) # Física I
 creator = User.find_by(email: "sofiagarcia@gmail.com") || User.first
+# ========================
 
 Subject.find_or_create_by!(name: "MCU", course: course) do |s|
   s.creator = creator
-end
-Subject.find_or_create_by!(name: "MRU", course: course) do |s|
-  s.creator = creator
-end
-Subject.find_or_create_by!(name: "Peso y masa", course: course) do |s|
-  s.creator = creator
+  s.due_date = 5.months.from_now
 end
 
+Subject.find_or_create_by!(name: "MRU", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Peso y masa", course: course) do |s|
+  s.creator = creator
+  s.due_date = 3.months.from_now
+end
+
+# ========================
 course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
 creator = User.find_by(email: "luciafernandez@gmail.com") || User.first
+# ========================
 
 Subject.find_or_create_by!(name: "Geometría y Álgebra Lineal 1", course: course) do |s|
   s.creator = creator
+  s.due_date = 4.months.from_now
 end
+
 Subject.find_or_create_by!(name: "Operaciones con vectores", course: course) do |s|
   s.creator = creator
+  s.due_date = 5.months.from_now
 end
+
 Subject.find_or_create_by!(name: "Matrices y determinantes", course: course) do |s|
   s.creator = creator
+  s.due_date = 6.months.from_now
 end
+
 Subject.find_or_create_by!(name: "Base y dimensión", course: course) do |s|
   s.creator = creator
+  s.due_date = 3.months.from_now
 end
+
 Subject.find_or_create_by!(name: "Sistemas de ecuaciones lineales", course: course) do |s|
   s.creator = creator
+  s.due_date = 4.months.from_now
 end
+
 Subject.find_or_create_by!(name: "Método de Gauss y Gauss-Jordan", course: course) do |s|
   s.creator = creator
+  s.due_date = 5.months.from_now
 end
+
 Subject.find_or_create_by!(name: "Autovalores y autovectores", course: course) do |s|
   s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+creator = User.find_by(email: "luciafernandez@gmail.com") || User.first
+
+Subject.find_or_create_by!(name: "Espacios vectoriales", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Subespacios y bases", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Transformaciones lineales", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Núcleo e imagen", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Producto escalar y ortogonalidad", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Diagonalización de matrices", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Formas cuadráticas", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Aplicaciones a geometría", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Eigenespacios", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Cambio de base", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Determinantes avanzados", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Sistemas homogéneos", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Teorema espectral", course: course) do |s|
+  s.creator = creator
+end
+
+Subject.find_or_create_by!(name: "Aplicaciones a física e ingeniería", course: course) do |s|
+  s.creator = creator
+end
+
+# ========================
+course = Course.find_by(id: 3) # Administración de Infraestructuras
+creator = User.find_by(email: "anaperez@gmail.com") || User.first
+# ========================
+
+Subject.find_or_create_by!(name: "Gestión de Servidores", course: course) do |s|
+  s.creator = creator
+  s.due_date = 3.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Redes y Comunicaciones", course: course) do |s|
+  s.creator = creator
+  s.due_date = 4.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Seguridad en Infraestructura", course: course) do |s|
+  s.creator = creator
+  s.due_date = 5.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Monitoreo y Mantenimiento", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+# ========================
+course = Course.find_by(id: 5) # Administración de Operaciones
+creator = User.find_by(email: "luisgomez@gmail.com") || User.first
+# ========================
+
+Subject.find_or_create_by!(name: "Gestión de Procesos", course: course) do |s|
+  s.creator = creator
+  s.due_date = 3.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Planificación de la Producción", course: course) do |s|
+  s.creator = creator
+  s.due_date = 4.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Gestión de la Calidad", course: course) do |s|
+  s.creator = creator
+  s.due_date = 5.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Logística y Cadena de Suministro", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+# ========================
+course = Course.find_by(id: 8) # Agrimensura Legal 1
+creator = User.find_by(email: "luisgomez@gmail.com") || User.first
+# ========================
+
+Subject.find_or_create_by!(name: "Levantamiento Topográfico", course: course) do |s|
+  s.creator = creator
+  s.due_date = 3.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Catastro y Planimetría", course: course) do |s|
+  s.creator = creator
+  s.due_date = 4.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Límites y Propiedad", course: course) do |s|
+  s.creator = creator
+  s.due_date = 5.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Documentación Legal y Escrituras", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+
+# ========================
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
+creator = User.find_by(email: "mariarodriguez@gmail.com") || User.first
+# ========================
+
+Subject.find_or_create_by!(name: "Introducción a Algoritmos Evolutivos", course: course) do |s|
+  s.creator = creator
+  s.due_date = 3.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Algoritmos Genéticos", course: course) do |s|
+  s.creator = creator
+  s.due_date = 4.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Algoritmos de Enjambre", course: course) do |s|
+  s.creator = creator
+  s.due_date = 5.months.from_now
+end
+
+Subject.find_or_create_by!(name: "Optimización Multiobjetivo", course: course) do |s|
+  s.creator = creator
+  s.due_date = 6.months.from_now
+end
+# ------------------ TUTORIAS ------------------ #
+
+# ---- SIN TUTOR ---- #
+
+# Tutoría 1 creada por estudiante solicitándola, con 3 temas
+creator = User.find_by!(email: "luisgomez@gmail.com")
+course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
+subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
+tutoring_request = Tutoring.find_or_create_by!(
+  scheduled_at: 6.days.from_now,
+  duration_mins: 90,
+  modality: "virtual",
+  capacity: 3,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: nil
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
+end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_request
+)
+
+# Tutoría 2 creada por estudiante solicitándola, con 1 tema
+creator = User.find_by!(email: "juanperez@gmail.com")
+course = Course.find_by(id: 145) # Física I
+subject = course.subjects.sample(1).first
+
+tutoring_request = Tutoring.find_or_create_by!(
+  scheduled_at: 3.days.from_now,
+  duration_mins: 90,
+  modality: "virtual",
+  capacity: 1,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: nil
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_request
+)
+
+# Tutoría 3 creada por estudiante solicitándola, con 5 temas
+creator = User.find_by!(email: "anaperez@gmail.com")
+course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
+subjects = Subject.where(course: course).shuffle.take(rand(1..5))
+
+tutoring_request = Tutoring.find_or_create_by!(
+  scheduled_at: 4.days.from_now,
+  duration_mins: 90,
+  modality: "virtual",
+  capacity: 1,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: nil
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
+end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_request
+)
+
+# Tutoría 3 repetida con 5 temas
+creator = User.find_by!(email: "anaperez@gmail.com")
+course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
+subjects = Subject.where(course: course).shuffle.take(rand(1..5))
+
+tutoring_request = Tutoring.find_or_create_by!(
+  scheduled_at: 7.days.from_now,
+  duration_mins: 180,
+  modality: "virtual",
+  capacity: 1,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: nil
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
+end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_request
+)
+
+# ---- CON TUTOR = USUARIO QUE LA CREA ---- #
+
+# Tutoría 4 creada por estudiante dictándola
+creator = User.find_by!(email: "anaperez@gmail.com")
+course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
+subject = course.subjects.sample(1).first
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 5.days.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 2,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+
+# Tutoría 5 creada por estudiante dictándola
+creator = User.find_by!(email: "martadaluz@gmail.com")
+course = Course.find_by(id: 116) # Electrotécnica I
+subjects = Subject.where(course: course).shuffle.take(rand(1..7))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 7.days.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 5,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 6 creada por estudiante dictándola
+creator = User.find_by!(email: "veronicagimenez@gmail.com")
+course = Course.find_by(id: 116) # Electrotécnica I
+subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 7.days.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 5,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 7 creada por estudiante dictándola
+creator = User.find_by!(email: "veronicagimenez@gmail.com")
+course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
+subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 10.days.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 5,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 8 creada por estudiante dictándola
+creator = User.find_by!(email: "rociovazquez@gmail.com")
+course = Course.find_by(id: 443) # PIS
+subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 2.days.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 5,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 9 creada por estudiante dictándola
+creator = User.find_by!(email: "pablovillar@gmail.com")
+course = Course.find_by(id: 443) # PIS
+subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 5.days.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 14,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 10 creada por estudiante dictándola
+creator = User.find_by!(email: "agustinabenitez@gmail.com")
+course = Course.find_by(id: 145) # Física I
+subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 3.days.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 20,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 11 creada por estudiante dictándola
+creator = User.find_by!(email: "agustinabenitez@gmail.com")
+course = Course.find_by(id: 145) # Física I
+subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 7.days.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 10,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 12 creada por estudiante dictándola
+creator = User.find_by!(email: "tomasgarrido@gmail.com")
+course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
+subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 2.days.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 10,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 13 creada por estudiante dictándola
+creator = User.find_by!(email: "tomasgarrido@gmail.com")
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
+subjects = Subject.where(course: course).shuffle.take(rand(1..4))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 5.days.from_now,
+  duration_mins: 30,
+  modality: "virtual",
+  capacity: 10,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 14 creada por estudiante dictándola
+creator = User.find_by!(email: "lauramaldonado@gmail.com")
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
+subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 7.days.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 10,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 15 creada por estudiante dictándola
+creator = User.find_by!(email: "lauramaldonado@gmail.com")
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
+subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 5.days.from_now,
+  duration_mins: 45,
+  modality: "presencial",
+  capacity: 10,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 16 creada por estudiante dictándola
+creator = User.find_by!(email: "tomasgarrido@gmail.com")
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
+subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 10.days.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 15,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 17 creada por estudiante dictándola
+creator = User.find_by!(email: "luisgomez@gmail.com")
+course = Course.find_by(id: 13) # Algoritmos Evolutivos
+subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 8.days.from_now,
+  duration_mins: 30,
+  modality: "virtual",
+  capacity: 15,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 18 creada por estudiante dictándola
+creator = User.find_by!(email: "sofiagarcia@gmail.com")
+course = Course.find_by(id: 8) # Agrimensura Legal 1
+subjects = Subject.where(course: course).shuffle.take(rand(1..2))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 5.days.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 15,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 19 creada por estudiante dictándola
+creator = User.find_by!(email: "paulacastro@gmail.com")
+course = Course.find_by(id: 8) # Agrimensura Legal 1
+subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 3.days.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 10,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+# Tutoría 20 creada por estudiante dictándola
+creator = User.find_by!(email: "martadaluz@gmail.com")
+course = Course.find_by(id: 8) # Agrimensura Legal 1
+subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 3.days.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 10,
+  enrolled: 0,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
