@@ -1,14 +1,30 @@
 import { API_BASE } from "@/shared/config";
 
-export const getTutorings = async (page = 1, perPage = 20, filters = {}) => {
+const filtersFromMode = (mode) => {
+  switch (mode) {
+    case "serTutor":
+      return { no_tutor: true };
+    case "serEstudiante":
+      return { with_tutor: true };
+    case "misTutorias":
+      return { enrolled: true };
+    default:
+      return {};
+  }
+};
+
+export const getTutorings = async (page = 1, perPage = 20, filters = {}, mode = "") => {
+  // merge de filtros del mode + filtros adicionales que vengan de la UI
+  const finalFilters = { ...filters, ...filtersFromMode(mode) };
+
   const params = new URLSearchParams({
     page,
     per_page: perPage,
   });
 
-  // agregar filtros dinámicamente
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
+
+  Object.entries(finalFilters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
       params.append(key, value);
     }
   });
@@ -16,10 +32,11 @@ export const getTutorings = async (page = 1, perPage = 20, filters = {}) => {
   const response = await fetch(`${API_BASE}/tutorings?${params}`, {
     credentials: "include",
   });
+
   if (!response.ok) throw new Error("Error al cargar las tutorías");
   return await response.json();
-
 };
+
 
 export const createTutoringByTutor = async ({
   scheduled_at,
@@ -69,7 +86,7 @@ export const createTutoringByStudent = async ({
   request_due_at,
   request_comment,
   created_by_id,
-  course_id, 
+  course_id,
   subject_ids,
   modality,
   location,

@@ -5,8 +5,9 @@ import { CoursePage, CourseDetailPage } from "@/features/courses";
 import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow, ForgotPasswordPage, ResetPasswordPage, UserProfilePage} from "@/features/users";
 import { SubjectPage } from "@/features/subjects";
 import { RequireGuestRoute } from "./RequireGuestRoute";
-
 import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent } from "@/features/tutorings";
+import { Error404Page } from "@components/Error404";
+
 
 export function AppRoutes() {
   return (
@@ -33,6 +34,7 @@ export function AppRoutes() {
       <Route path="/materias" element={<CoursePage />} />
       <Route path="/materias/:courseId" element={<CourseDetailPage />} />
       <Route path="/tutores" element={<TutorPage />} />
+      <Route path="*" element={<Error404Page />} />
     </Routes>
   );
 }

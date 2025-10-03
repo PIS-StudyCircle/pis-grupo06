@@ -36,11 +36,34 @@ class Tutoring < ApplicationRecord
     where(tutor_id: nil)
   }
 
+  # Tutorías con tutor asignado
+  scope :with_tutor, -> {
+    where.not(tutor_id: nil)
+  }
+
   # Ya pasó (scheduled_at < ahora)
   scope :past, -> { where(scheduled_at: ...Time.current) }
 
   # Futuras (scheduled_at >= ahora)
   scope :upcoming, -> { where(scheduled_at: Time.current..) }
+
+  scope :search_by_course_name, ->(q) {
+    return all if q.blank?
+
+    joins(:course).where("unaccent(courses.name) ILIKE unaccent(?)", "%#{q}%")
+  }
+
+  scope :search_by_subject_name, ->(q) {
+    return all if q.blank?
+
+    left_joins(:subjects).where("unaccent(subjects.name) ILIKE unaccent(?)", "%#{q}%").distinct
+  }
+
+  scope :search_by_modality, ->(q) {
+    return all if q.blank?
+
+    where("tutorings.modality ILIKE ?", "%#{q}%")
+  }
 
   # --- Validaciones ---
   validate :scheduled_at_cannot_be_in_past

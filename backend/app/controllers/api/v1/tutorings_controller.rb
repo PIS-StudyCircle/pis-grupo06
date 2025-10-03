@@ -29,12 +29,26 @@ module Api
           tutorings = tutorings.without_tutor
         end
 
-        # por defecto muestro las futuras
+        # los que ya tienen tutor asignado
+        if params[:with_tutor].present? && ActiveModel::Type::Boolean.new.cast(params[:with_tutor])
+          tutorings = tutorings.with_tutor
+        end
+
+        q = params[:search].to_s
+        search_by = params[:search_by].presence_in(%w[course subject]) || "course"
+
+        tutorings =
+          case search_by
+          when "subject" then tutorings.search_by_subject_name(q)
+          else tutorings.search_by_course_name(q)
+          end
+
+        # por defecto muestro las futuras o las que no tienen fecha asignada (así el tutor puede verlas y asignarse)
         if params[:past].present? && ActiveModel::Type::Boolean.new.cast(params[:past])
           tutorings = tutorings.past
         else
           tutorings = tutorings.where(
-            '(scheduled_at IS NOT NULL AND scheduled_at > ?) OR (scheduled_at IS NULL AND tutor_id IS NULL)',
+            'scheduled_at IS NULL OR scheduled_at > ?',
             Time.current
           )
         end
