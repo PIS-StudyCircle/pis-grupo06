@@ -119,20 +119,23 @@ module Api
       private
 
       def tutoring_params
-        params.require(:tutoring).permit(
-          :scheduled_at,
-          :duration_mins,
-          :modality,
-          :capacity,
-          :enrolled,
-          :course_id,
-          :tutor_id,
-          :created_by_id,
-          :request_due_at,
-          :request_comment,
-          :location,
-          { subject_ids: [] }
+        params.expect(
+          tutoring: [
+            :scheduled_at,
+            :duration_mins,
+            :modality,
+            :capacity,
+            :enrolled,
+            :course_id,
+            :tutor_id,
+            :created_by_id,
+            :request_due_at,
+            :request_comment,
+            :location,
+            { subject_ids: [] }
+          ]
         )
+      end
       end
     end
   end
