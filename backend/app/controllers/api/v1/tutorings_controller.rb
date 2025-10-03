@@ -131,7 +131,7 @@ module Api
           :request_due_at,
           :request_comment,
           :location,
-          subject_ids: []
+          { subject_ids: [] }
         )
       end
     end
