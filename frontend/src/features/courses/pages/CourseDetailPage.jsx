@@ -59,16 +59,14 @@ export default function CourseDetailPage() {
                   <button
                     type="button"
                     className="btn w-full"
-                    onClick={() => navigate(`/tutorias/ser_tutor/${course.id}`)}
+                    onClick={() => navigate(`/tutorias/ser_tutor/${courseId}`)}
                   >
                     Brindar tutoría
                   </button>
                   <button
                     type="button"
                     className="btn w-full"
-                    onClick={() =>
-                     navigate(`/tutorias/materia/${courseId}`)
-                      }
+                    onClick={() => navigate(`/tutorias/materia/${courseId}`)}
                   >
                     Recibir tutoría
                   </button>
@@ -77,10 +75,7 @@ export default function CourseDetailPage() {
 
               {/*El mostrar los temas de la materia se delega a SubjectPage*/}
               <SubjectPage
-                courseId={course.id}
-                showCreate={false}
-                type=""
-                //onButtonClick={(subjectId) => navigate(`/temas/${subjectId}`)}
+                courseId={courseId}
               />
             </div>
           </div>

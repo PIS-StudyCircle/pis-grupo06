@@ -1,3 +1,5 @@
+import { useParams, useNavigate } from "react-router-dom";
+
 export default function SubjectCard({
   subject,
   selected = false,
@@ -5,9 +7,12 @@ export default function SubjectCard({
   type = "button",
   onButtonClick,
 }) {
+  const navigate = useNavigate();
+  const { courseId } = useParams();
+
   const handleClick = () => {
-    if (type === "button" && onButtonClick) {
-      onButtonClick(subject.id);
+    if (type === "button") {
+      navigate(`/materias/${courseId}/temas/${subject.id}`);
     } else if (type === "selectable" && onSelect) {
       onSelect(subject.id);
     }

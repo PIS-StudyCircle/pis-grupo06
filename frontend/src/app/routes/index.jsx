@@ -34,7 +34,7 @@ export function AppRoutes() {
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
       <Route path="/materias/:courseId" element={<CourseDetailPage />} />
-      <Route path="/materias/:courseId/temas/:subjectId" element={<SubjectDetailPage />} />
+      <Route path="/materias/:courseId/temas/:subjectId" element={<SubjectDetailPage/>} />
       <Route path="/tutores" element={<TutorPage />} />
       <Route path="*" element={<Error404Page />} />
     </Routes>

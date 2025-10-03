@@ -40,7 +40,7 @@ export default function SubjectDetailPage() {
               </div>
 
              {/*El mostrar los temas de la materia se delega a SubjectPage*/}
-             <TutoringPage filters={{ subject_id: subject.id }}  showCheckbox = {false} showButton={false} />
+             <TutoringPage filters={{ subject_id: subject.id }}  showCreate={false} mode="ambos" />
 
             </div>
           </div>
