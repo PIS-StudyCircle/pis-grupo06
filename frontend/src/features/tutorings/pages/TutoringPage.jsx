@@ -8,16 +8,13 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
   const [searchBy, setSearchBy] = useState("course");
   const [showWithoutTutor, setShowWithoutTutor] = useState(false);
 
-  // combine filters (search + showWithoutTutor)
   const mergedFilters = useMemo(() => {
     const baseFilters = { ...filters };
 
-    // add toggle
     if (showWithoutTutor) {
       baseFilters.no_tutor = true;
     }
 
-    // add searchBy param (we set search separately)
     baseFilters.search_by = searchBy;
 
     return baseFilters;
@@ -36,15 +33,12 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
 
   const totalPages = pagination?.last || 1;
 
-  // controlled input for search bar
   const [query, setQuery] = useState(search);
 
-  // keep local query in sync with hook’s search
   useEffect(() => {
     setQuery(search);
   }, [search]);
 
-  // debounce search updates
   useEffect(() => {
     const t = setTimeout(() => {
       setSearch(query);
@@ -53,7 +47,6 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
     return () => clearTimeout(t);
   }, [query, page, setSearch, setPage]);
 
-  // reset page when searchBy changes
   useEffect(() => {
     if (page !== 1) setPage(1);
   }, [searchBy, page, setPage]);
