@@ -82,6 +82,7 @@ export default function SubjectList({
           showCheckbox={showCheckbox}
           onCheckboxChange={handleCheckboxChange}
           checked={selectedIds.includes(subject.id)}
+          courseId={courseId}
         />
       ))}
 

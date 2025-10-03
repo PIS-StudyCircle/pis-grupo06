@@ -6,8 +6,6 @@ module Api
       def index
         tutorings = Tutoring.all
 
-        tutorings = tutorings.includes(:course, :subjects)
-
         # tutorias en las que el usuario esta inscripto
         if params[:enrolled].present? && ActiveModel::Type::Boolean.new.cast(params[:enrolled])
           tutorings = tutorings.enrolled_by(current_user)
@@ -16,6 +14,11 @@ module Api
         # tutorias de una materia especifica (porid de curso)
         if params[:course_id].present?
           tutorings = tutorings.by_course_id(params[:course_id])
+        end
+
+        # tutorias de una materia especifica (por id de subject)
+        if params[:subject_id].present?
+          tutorings = tutorings.joins(:subjects).where(subjects: { id: params[:subject_id] })
         end
 
         # tutorias creadas por el usuario indicado (no current_user,
@@ -47,8 +50,13 @@ module Api
 
         @pagy, @tutorings = pagy(tutorings, items: params[:per_page] || 20)
 
+        tutoring_ids = @tutorings.pluck(:id)
+        @tutorings_with_includes = Tutoring.where(id: tutoring_ids)
+                                           .includes(:course, :subjects)
+                                           .order(:id)
+
         render json: {
-          tutorings: @tutorings.map do |t|
+          tutorings: @tutorings_with_includes.map do |t|
             {
               id: t.id,
               scheduled_at: t.scheduled_at,
@@ -56,12 +64,18 @@ module Api
               modality: t.modality,
               capacity: t.capacity,
               enrolled: t.enrolled,
+
               course: {
                 id: t.course.id,
                 name: t.course.name,
                 code: t.course.code
               },
               subjects: t.subjects.map { |s| { id: s.id, name: s.name } },
+              enrolled_students: t.users.map do |user|
+                {
+                  id: user.id,
+                }
+              end,
               created_by_id: t.created_by_id,
               tutor_id: t.tutor_id,
               tutor_name: t.tutor&.name,
