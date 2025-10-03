@@ -40,8 +40,6 @@ export default function SubjectList({
 
   if (loading) return <div>Cargando temas...</div>;
   if (error) return <div>Error al cargar los temas.</div>;
-  if (!subjects || subjects.length === 0)
-    return <div>No hay temas disponibles.</div>;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,7 +79,7 @@ export default function SubjectList({
 
   return (
     <div className="flex flex-col gap-2">
-      {showCreate && (
+      {showCreate && !showNewForm && (
         <button
           onClick={() => setShowNewForm(true)}
           className="p-2 border rounded-md bg-blue-100 text-blue-700 text-sm hover:bg-blue-200 text-left"
@@ -137,6 +135,11 @@ export default function SubjectList({
           </div>
         </form>
       )}
+
+      {!subjects || subjects.length === 0 ? (
+        <div>No hay temas disponibles.</div>
+      ) : null}
+
       {subjects.map((subject) => (
         <SubjectCard
           key={subject.id}
