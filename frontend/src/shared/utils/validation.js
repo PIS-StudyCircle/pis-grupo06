@@ -39,7 +39,7 @@ export function validateCharacters(value, fieldName = "This field") {
   if (requiredError !== null) {
     return requiredError;
   }
-  const regex = /^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\-]+$/;
+  const regex = /^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ-]+$/;
   return regex.test(value)
     ? null
     : `El ${fieldName} contiene caracteres no válidos`;

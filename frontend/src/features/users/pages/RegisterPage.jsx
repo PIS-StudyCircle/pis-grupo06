@@ -6,7 +6,6 @@ import { ErrorAlert } from "@components/ErrorAlert";
 import { SubmitButton } from "@components/SubmitButton";
 import { useFormState } from "@utils/UseFormState";
 import {
-  validateRequired,
   validateEmail,
   validatePassword,
   validatePasswordConfirmation,
