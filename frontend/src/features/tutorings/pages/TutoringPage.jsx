@@ -3,7 +3,6 @@ import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";    
 import TutoringSearchBar from "../components/TutoringSearchBar";
 import Pagination from "@components/Pagination";
-import { useUser } from "@context/UserContext";
 
 
 export default function TutoringPage({filters, mode = ""}) {
@@ -27,31 +26,6 @@ export default function TutoringPage({filters, mode = ""}) {
   } = useTutorings(1, 20, mergedFilters);
 
   const totalPages = pagination.last || 1;
-  const { user } = useUser();
-  
-  const getModeForTutoring = (tutoring) => {
-
-    if (!user) return "ambos";
-    if (tutoring.tutor_id === user.id) {
-      return "misTutorias";
-    }
-    
-    if (tutoring.enrolled_students.some(student => student.id === user.id)) {
-      return "misTutorias";
-    }
-    
-    if (tutoring.capacity > tutoring.enrolled && tutoring.tutor_id) {
-      return "unirme";
-    }
-  
-    if(tutoring.capacity > tutoring.enrolled){
-      return "ambos";
-    }
-    if(!tutoring.tutor_id){
-      return "serTutor"
-    }
-    return "completo"
-  };
 
   const [query, setQuery] = useState(search);
 
