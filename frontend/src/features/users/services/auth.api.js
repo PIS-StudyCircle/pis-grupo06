@@ -38,15 +38,19 @@ export async function signOut() {
   removeItem("user");
 }
 
-export async function deleteAccount(form) {
+export async function validatePasswordForDeletion(password) {
   const body = {
-    user: {
-      password: form.password,
-    },
+    user: { password },
   };
+  await http("/users/validate_password", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function deleteAccount() {
   await http("/users", { 
     method: "DELETE", 
-    body: JSON.stringify(body) 
   });
   removeItem("user");
   removeItem("token");

@@ -13,19 +13,13 @@ module Api
       before_action :configure_sign_up_params, only: [:create]
       after_action :stash_jwt_and_csrf_cookies, only: :create, if: -> { resource.persisted? }
       rescue_from ActionController::ParameterMissing, with: :render_bad_request
-
+      before_action :authenticate_user!, only: [:destroy]
+  
       def destroy
-        unless current_user
-          render json: { error: "No autenticado" }, status: :unauthorized and return
-        end
-
-        unless current_user.valid_password?(params.dig(:user, :password))
-          render json: { error: "Contraseña incorrecta" }, status: :unauthorized and return
-        end
-
-        current_user.destroy
-        Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
-        render json: { message: "Cuenta eliminada con éxito" }, status: :ok
+        resource = current_user
+        sign_out(resource_name)
+        resource.destroy
+        render json: { message: "Tu cuenta ha sido eliminada con éxito." }, status: :ok
       end
 
       private
