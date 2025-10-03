@@ -1,13 +1,31 @@
+import { useState, useEffect, useMemo } from "react";
 import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";    
+import TutoringSearchBar from "../components/TutoringSearchBar";
 import Pagination from "@components/Pagination";
 import { useUser } from "@context/UserContext";
 
-export default function TutoringPage({filters = {}}) {
-  const hookResult = useTutorings(1, 20, filters);
-  
-    
-  const { tutorings, loading, error, pagination = {}, page, setPage } = hookResult;
+
+export default function TutoringPage({filters, mode = ""}) {
+
+  const [searchBy, setSearchBy] = useState("course");
+
+  const mergedFilters = useMemo(() => {
+    const baseFilters = filters ?? {};
+    return { ...baseFilters, search_by: searchBy };
+  }, [filters, searchBy]);
+
+  const {
+    tutorings, 
+    loading, 
+    error, 
+    pagination, 
+    page, 
+    setPage,
+    search,
+    setSearch,
+  } = useTutorings(1, 20, mergedFilters);
+
   const totalPages = pagination.last || 1;
   const { user } = useUser();
   
@@ -35,6 +53,23 @@ export default function TutoringPage({filters = {}}) {
     return "completo"
   };
 
+  const [query, setQuery] = useState(search);
+
+  useEffect(() => {
+    setQuery(search);
+  }, [search]);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(query);
+      if (page !== 1) setPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [query, page, setSearch, setPage]);
+
+  useEffect(() => {
+    if (page !== 1) setPage(1);
+  }, [searchBy, page, setPage]);
 
   return (
     <div className="flex flex-col ">
@@ -44,7 +79,19 @@ export default function TutoringPage({filters = {}}) {
             Tutorías Disponibles
           </h1>
 
-          <TutoringList tutorings={tutorings} mode = {getModeForTutoring} loading={loading} error={error} />
+          <TutoringSearchBar
+            query={query}
+            onQueryChange={(e) => setQuery(e.target.value)}
+            searchBy={searchBy}
+            onSearchByChange={setSearchBy}
+            placeholder={
+              searchBy === "course"
+                ? "Buscar por materia..."
+                : "Buscar por tema..."
+            }
+          />
+
+          <TutoringList tutorings={tutorings} mode = {mode} loading={loading} error={error} />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>
