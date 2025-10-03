@@ -137,7 +137,7 @@ describe("SubjectPage", () => {
 
     // Validación requerida
     fireEvent.click(screen.getByText("Guardar"));
-    expect(await screen.findByText(/El Nombre es obligatorio/i)).toBeInTheDocument();
+    expect(await screen.findByText(/El campo Nombre es obligatorio/i)).toBeInTheDocument();
   });
 
   it("llama a createSubject y resetea el formulario", async () => {
