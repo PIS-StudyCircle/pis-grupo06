@@ -33,7 +33,7 @@ export const createSubject = async ({ name, course_id}) => {
 
   const body = { subject: { name, course_id} };
 
-  const resp = await fetch(`${API_BASE}/subjects`, {
+  const resp = await fetch(`${API_BASE}/courses/${course_id}/subjects`, {
     method: 'POST',
     credentials: "include",
     headers: {
