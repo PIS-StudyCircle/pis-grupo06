@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 import SubjectList from "../components/SubjectList";
-
 import { useSubjects } from "../hooks/useSubjects";
 import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
 
-export default function SubjectPage({courseId, showCheckbox = false, showButton = false, onSelectionChange}) {
-  
+export default function SubjectPage({
+  courseId,
+  showCreate = false,
+  type = "button",
+  onSelectionChange,
+  selectedSubjects = [],
+}) {
   const {
     subjects,
     loading,
@@ -16,14 +20,14 @@ export default function SubjectPage({courseId, showCheckbox = false, showButton 
     setPage,
     search,
     setSearch,
-    refetch
+    refetch,
   } = useSubjects(courseId);
   const totalPages = pagination.last || 1;
 
   const handleCreated = () => {
     if (page !== 1) setPage(1);
-    else refetch();  
-  }
+    else refetch();
+  };
   const [query, setQuery] = useState(search);
 
   useEffect(() => {
@@ -38,17 +42,24 @@ export default function SubjectPage({courseId, showCheckbox = false, showButton 
     <div className="flex flex-col ">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold p-2 mb-4 text-black">
-            Temas
-          </h1>
+          <h1 className="text-2xl font-bold p-2 mb-4 text-black">Temas</h1>
 
           <SearchInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar tema..."
           />
-
-          <SubjectList subjects={subjects} loading={loading} error={error} showCheckbox={showCheckbox} showButton={showButton} courseId={courseId} onCreated={handleCreated} onSelectionChange={onSelectionChange} />
+          <SubjectList
+            subjects={subjects}
+            loading={loading}
+            error={error}
+            showCreate={showCreate}
+            type={type}
+            courseId={courseId}
+            onCreated={handleCreated}
+            onSelectionChange={onSelectionChange}
+            selectedSubjects={selectedSubjects}
+          />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>

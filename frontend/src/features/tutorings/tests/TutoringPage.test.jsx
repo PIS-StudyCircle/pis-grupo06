@@ -1,6 +1,14 @@
 import React from "react";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import TutoringPage from "../pages/TutoringPage";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
+
+// ------------------- mocks -------------------
+const mockedNavigate = jest.fn();
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => mockedNavigate,
+}));
 
 const setPageMock = jest.fn();
 jest.mock("../hooks/useTutorings", () => ({
@@ -53,7 +61,7 @@ const TutoringListMock = ({ tutorings = [], mode = "", loading, error }) => (
 );
 jest.mock("../components/TutoringList", () => ({
   __esModule: true,
-  default: (props) => <div>{TutoringListMock(props)}</div>,
+  default: (props) => <TutoringListMock {...props} />,
 }));
 
 // 4) Mock de Pagination (renderiza botones básicos para simular interacción)
@@ -64,7 +72,9 @@ jest.mock("../../../shared/components/Pagination", () => ({
       <button onClick={() => setPage(page - 1)} disabled={page <= 1}>
         Prev
       </button>
-      <span>Page {page} / {totalPages}</span>
+      <span>
+        Page {page} / {totalPages}
+      </span>
       <button onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
         Next
       </button>
@@ -72,6 +82,7 @@ jest.mock("../../../shared/components/Pagination", () => ({
   ),
 }));
 
+// ------------------- helpers -------------------
 afterEach(() => {
   cleanup();
   jest.clearAllMocks();
@@ -113,6 +124,16 @@ const mockUseTutorings = ({
   });
 };
 
+function renderWithRouter(courseId = "123", mode = "serTutor") {
+  return render(
+    <MemoryRouter initialEntries={[`/tutorings/${courseId}`]}>
+      <Routes>
+        <Route path="/tutorings/:courseId" element={<TutoringPage mode={mode} />} />
+      </Routes>
+    </MemoryRouter>
+  );
+}
+
 const countMateria = (materia) => {
   const list = screen.getByTestId("tutoring-list");
   // Busca todos los divs hijos directos (cada tutoría)
@@ -151,17 +172,14 @@ describe("TutoringPage", () => {
       pagination: { last: 5 },
       page: 1,
     });
-
-    render(<TutoringPage mode="select" filters={{ subject: "math" }} />);
+    renderWithRouter();
 
     // Título
-    expect(
-      screen.getByRole("heading", { name: /Tutorías Disponibles/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Tutorías Disponibles/i })).toBeInTheDocument();
 
     // TutoringList: chequeo de props pasadas
     const list = screen.getByTestId("tutoring-list");
-    expect(list).toHaveAttribute("data-mode", "select");
+    expect(list).toHaveAttribute("data-mode", "serTutor");
     expect(list).toHaveAttribute("data-loading", "false");
     expect(list).toHaveAttribute("data-error", "");
     expect(countMateria("Cálculo 1")).toBe(1);
@@ -180,7 +198,7 @@ describe("TutoringPage", () => {
       page: 1,
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     const pagination = screen.getByTestId("pagination");
     expect(pagination).toHaveAttribute("data-totalpages", "1");
@@ -194,7 +212,7 @@ describe("TutoringPage", () => {
       page: 1,
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     fireEvent.click(screen.getByRole("button", { name: /Next/i }));
     expect(setPageMock).toHaveBeenCalledTimes(1);
@@ -210,7 +228,7 @@ describe("TutoringPage", () => {
       page: 1,
     });
 
-    render(<TutoringPage mode="view" />);
+    renderWithRouter();
 
     const list = screen.getByTestId("tutoring-list");
     expect(list).toHaveAttribute("data-loading", "true");
