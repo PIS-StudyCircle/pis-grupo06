@@ -12,7 +12,6 @@ export default function SubjectDetailPage() {
   
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <main className="flex-1">
         {loading && (
           <div className="p-6 max-w-3xl mx-auto">Cargando tema...</div>
         )}
@@ -45,8 +44,6 @@ export default function SubjectDetailPage() {
             </div>
           </div>
         )}
-      </main>
-      <Footer />
     </div>
   );
 }

@@ -4,10 +4,12 @@
  * - Sidebar (desktop) colapsable
  * - Drawer (mobile) que se abre/cierra con botón o gesto de swipe
  * - Contenido principal con margen dinámico según estado del sidebar
+ * - Footer fijo abajo
  */
 import { useEffect, useRef, useState } from "react";
 import Sidebar from "./SideBar";
 import NavBar from "./NavBar";
+import Footer from "../Footer";
 
 export default function Layout({ children }) {
   // Estado del sidebar en escritorio: colapsado por defecto (w-16) / expandido (w-64)
@@ -87,7 +89,7 @@ export default function Layout({ children }) {
   }, [mobileOpen]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       {/* Navbar fija. En móvil, el avatar invoca la apertura del drawer */}
       <NavBar toggleSidebar={() => setMobileOpen(true)} />
 
@@ -104,12 +106,13 @@ export default function Layout({ children }) {
           - pb-14 en móvil: deja espacio si hubiera bottom bar (ajustable)
           - Margen izquierdo según estado del sidebar en todas las pantallas */}
       <main
-        className={`pt-16 pb-14 lg:pb-0 transition-all duration-300 ${
+        className={`flex-1 pt-16 lg:pb-0 transition-all duration-300 ${
           sidebarOpen ? "sm:ml-64" : "sm:ml-16"
         }`}
       >
         {children}
       </main>
+      <Footer />
     </div>
   );
 }
