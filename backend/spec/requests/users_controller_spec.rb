@@ -108,7 +108,10 @@ RSpec.describe "Api::V1::Users::UsersController", type: :request do
   end
 
   describe "cuando se filtran solo tutores" do
-    let!(:tutor_user) { User.create!(name: "Tito", last_name: "Tutorino", email: "tito.tutorino@example.com", password: password, password_confirmation: password, faculty: faculty) }
+    let!(:tutor_user) {
+      User.create!(name: "Tito", last_name: "Tutorino", email: "tito.tutorino@example.com", password: password,
+                   password_confirmation: password, faculty: faculty)
+    }
     before do
       # Finge que el unico tutor es Tito
       allow(User).to receive(:tutors).and_return(User.where(id: tutor_user.id))
@@ -124,7 +127,7 @@ RSpec.describe "Api::V1::Users::UsersController", type: :request do
 
     it "devuelve array vacío si no hay tutores" do
       # Mockeamos el scope ANTES de llamar al endpoint
-      allow(User).to receive(:tutors).and_return(User.where(id: [])) 
+      allow(User).to receive(:tutors).and_return(User.where(id: []))
 
       get "#{base_url}.json", params: { role: "tutor" }
 
