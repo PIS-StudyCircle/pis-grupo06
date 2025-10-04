@@ -38,6 +38,10 @@ class User < ApplicationRecord
   validates :password_confirmation, presence: true, on: :create
   validates :description, length: { maximum: 500 }, allow_blank: true
 
+  scope :tutors, -> {
+    where(id: UserTutoring.select(:user_id).distinct)
+  }
+
   def self.from_omniauth(auth)
     user = find_by(provider: auth.provider, uid: auth.uid) || find_by(email: auth.info.email)
 

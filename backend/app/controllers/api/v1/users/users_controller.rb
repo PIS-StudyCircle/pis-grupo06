@@ -7,7 +7,13 @@ module Api
         before_action :authenticate_user!, except: [:index]
 
         def index
-          users = User.all
+          if params[:role].present?
+            if params[:role] == "tutor"
+              users = User.tutors
+            end
+          else
+            users = User.all
+          end
 
           if params[:search].present?
             search = params[:search].strip.squeeze(" ")
@@ -16,8 +22,6 @@ module Api
               "%#{search}%"
             )
           end
-
-          # users = users.where(role: params[:role]) if params[:role].present?
 
           @pagy, @users = pagy(users, items: params[:per_page] || 20)
 
