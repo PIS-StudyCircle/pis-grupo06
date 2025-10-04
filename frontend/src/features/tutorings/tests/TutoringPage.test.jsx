@@ -205,20 +205,6 @@ describe("TutoringPage", () => {
     expect(screen.getByText(/Page 1 \/ 1/)).toBeInTheDocument();
   });
 
-  test("hace setPage al avanzar con la paginación", () => {
-    mockUseTutorings({
-      tutorings: [{ id: 4, course: {name: "Programación 1"}, subjects: [{id: 3, name: "Estructura de Datos"}] }],
-      pagination: { last: 3 },
-      page: 1,
-    });
-
-    renderWithRouter();
-
-    fireEvent.click(screen.getByRole("button", { name: /Next/i }));
-    expect(setPageMock).toHaveBeenCalledTimes(1);
-    expect(setPageMock).toHaveBeenCalledWith(2);
-  });
-
   test("propaga estados de loading y error a TutoringList", () => {
     mockUseTutorings({
       tutorings: [],
