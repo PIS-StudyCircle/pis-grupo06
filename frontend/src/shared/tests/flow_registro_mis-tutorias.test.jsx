@@ -1,4 +1,3 @@
-// src/app/tests/flow.register-to-my-tutorings.int.test.jsx
 import React from "react";
 import {
   MemoryRouter,
@@ -10,10 +9,8 @@ import {
 } from "react-router-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-// --- Usamos TutoringPage real ---
 import TutoringPage from "@features/tutorings/pages/TutoringPage";
 
-// --- Mocks mínimos coherentes con tus otros tests ---
 const setPageMock = jest.fn();
 const mockUseTutorings = jest.fn();
 
@@ -39,7 +36,6 @@ jest.mock("@components/Pagination", () => ({ page, setPage, totalPages }) => (
   </div>
 ));
 
-// --- Mocks de páginas intermedias del flujo (UI mínima + navegación) ---
 
 // /registrarse
 function RegisterPageMock() {
@@ -70,7 +66,7 @@ function SelectSubjectsMock() {
   );
 }
 
-// /tutorias/crear/estudiante
+// tutorias/crear/estudiante
 function CreateTutoringByStudentMock() {
   const navigate = useNavigate();
   return (
@@ -90,7 +86,7 @@ function CreateTutoringByStudentMock() {
   );
 }
 
-// /perfil
+// perfil
 function ProfilePageMock() {
   const navigate = useNavigate();
   return (
@@ -117,7 +113,7 @@ describe("Flujo de integración: Registro → Selección → Crear tutoría (est
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Primer tramo: al publicar solicitud y llegar a /tutorias
+    // Al publicar solicitud y llegar a /tutorias
     mockUseTutorings.mockReturnValue({
       tutorings: [{ id: 101, title: "Solicitud publicada (estudiante)" }],
       loading: false,
@@ -139,7 +135,7 @@ describe("Flujo de integración: Registro → Selección → Crear tutoría (est
               path="/tutorias/crear/estudiante"
               element={<CreateTutoringByStudentMock />}
             />
-            {/* Listado general de tutorías (real) */}
+            {/* Listado general de tutorías*/}
             <Route
               path="/tutorias"
               element={<TutoringPage filters={{}} mode="unirme" />}
@@ -149,7 +145,7 @@ describe("Flujo de integración: Registro → Selección → Crear tutoría (est
             <Route
               path="/mis-tutorias"
               element={
-                // Podés ajustar los filtros; acá asumimos “enrolled: true”
+                // “enrolled: true”
                 <TutoringPage filters={{ enrolled: true }} mode="misTutorias" />
               }
             />
@@ -182,16 +178,15 @@ describe("Flujo de integración: Registro → Selección → Crear tutoría (est
     fireEvent.change(screen.getByLabelText(/Capacidad/i), { target: { value: "3" } });
     fireEvent.click(screen.getByRole("button", { name: /Publicar solicitud/i }));
 
-    // Llega a TutoringPage (real) en modo “unirme”
+    // Llega a TutoringPage
     expect(
       screen.getByRole("heading", { name: /Tutorías Disponibles/i })
     ).toBeInTheDocument();
 
-    // El hook fue llamado con (1, 20, filtros). Permitimos extras con objectContaining
     const lastCallGeneral = mockUseTutorings.mock.calls.at(-1);
     expect(lastCallGeneral[0]).toBe(1);
     expect(lastCallGeneral[1]).toBe(20);
-    expect(lastCallGeneral[2]).toEqual(expect.objectContaining({})); // sin filtros forzosos aquí
+    expect(lastCallGeneral[2]).toEqual(expect.objectContaining({}));
 
     // Paginación visible e interacción
     expect(screen.getByTestId("pagination")).toHaveAttribute("data-totalpages", "2");
@@ -202,8 +197,7 @@ describe("Flujo de integración: Registro → Selección → Crear tutoría (est
     fireEvent.click(screen.getByRole("link", { name: /Ir al Perfil/i }));
     expect(screen.getByRole("heading", { name: /Perfil/i })).toBeInTheDocument();
 
-    // Ver "Mis tutorías" (usa TutoringPage real con filtros)
-    // Ajustamos el retorno del hook para ese tramo:
+    // Ver "Mis tutorías"
     mockUseTutorings.mockReturnValueOnce({
       tutorings: [{ id: 202, title: "Mi tutoría inscrita" }],
       loading: false,
@@ -215,7 +209,7 @@ describe("Flujo de integración: Registro → Selección → Crear tutoría (est
 
     fireEvent.click(screen.getByRole("button", { name: /Ver mis tutorías/i }));
 
-    // Mis tutorías (real)
+    // Mis tutorías
     expect(
       screen.getByRole("heading", { name: /Tutorías Disponibles/i })
     ).toBeInTheDocument();
