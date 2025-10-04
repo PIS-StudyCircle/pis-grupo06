@@ -39,7 +39,7 @@ class User < ApplicationRecord
   validates :description, length: { maximum: 500 }, allow_blank: true
 
   scope :tutors, -> {
-    where(id: UserTutoring.select(:user_id).distinct)
+    where(id: Tutoring.select(:tutor_id).distinct)
   }
 
   def self.from_omniauth(auth)
