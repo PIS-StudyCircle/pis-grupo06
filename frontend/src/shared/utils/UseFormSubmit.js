@@ -20,4 +20,3 @@ export function useFormSubmit(action, redirectTo = "/") {
 
   return { error, onSubmit, submitted };
 }
-

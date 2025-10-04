@@ -1,4 +1,5 @@
 import { useUser } from "@context/UserContext"; 
+import DeleteAccountButton from "./DeleteAccountButton";
 import { DEFAULT_PHOTO } from "@/shared/config";
 export default function Profile() {
   const { user, loading, error } = useUser(); 
@@ -54,6 +55,10 @@ export default function Profile() {
               />
             </div>
           )}
+        </div>
+        {/* Botón eliminar cuenta */}
+        <div className="mt-6">
+          <DeleteAccountButton />
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut } from "./services/auth.api";
+import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut, validatePasswordForDeletion, deleteAccount as apiDeleteAccount } from "./services/auth.api";
 import { getItem, saveItem, removeItem } from "@/shared/utils/storage";
 import { API_BASE } from "@/shared/config";
 import { Ctx } from "@context/UserContext";
@@ -56,6 +56,12 @@ export default function UserProvider({ children }) {
     }
   }
 
+  const deleteAccount = async (form) => {
+    await validatePasswordForDeletion(form.password);
+    await apiDeleteAccount();
+    setUser(null); 
+  };
+  
   const forgotPassword = async (formData) => {
     const response = await fetch(`${API_BASE}/users/password`, {
       method: "POST",
