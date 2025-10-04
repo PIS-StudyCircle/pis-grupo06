@@ -1,4 +1,4 @@
-import {formatDateTime} from "@shared/utils/FormatDate";
+import { formatDateTime } from "@shared/utils/FormatDate";
 
 export default function TutoringCard({ tutoring, mode }) {
   return (
@@ -11,13 +11,17 @@ export default function TutoringCard({ tutoring, mode }) {
             <b>Materia: </b>
             {tutoring.course.name}
           </p>
-
-          <p className="tutoring-card-title mt-1">
-            <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)}
-          </p>
-          <p className="tutoring-card-title mt-1">
-            <b>Modalidad: </b> {tutoring.modality}
-          </p>
+          {tutoring.scheduled_at && (
+            <p className="tutoring-card-title mt-1">
+              <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)}
+            </p>
+          )}
+          {tutoring.duration_mins && (
+            <p className="tutoring-card-title mt-1">
+              <b>Duración: </b> {tutoring.duration_mins} minutos
+            </p>
+          )}
+          <p className="tutoring-card-title mt-1"><b>Modalidad: </b> {tutoring.modality}</p>
           {tutoring.tutor_id !== null ? (
             <>
               <p className="tutoring-card-title mt-1">
@@ -25,9 +29,11 @@ export default function TutoringCard({ tutoring, mode }) {
               </p>
             </>
           ) : null}
-          <p className="text-gray-600 text-sm mt-1">
-            <b>Cupos disponibles: </b> {tutoring.capacity - tutoring.enrolled}
-          </p>
+          {tutoring.capacity && (
+            <p className="text-gray-600 text-sm mt-1">
+              <b>Cupos disponibles: </b> {tutoring.capacity - tutoring.enrolled}
+            </p>
+          )}
           <p className="tutoring-card-title mt-1"><b>Temas:</b></p>
           <div className="flex flex-wrap gap-2 mt-1">
             {tutoring.subjects.slice(0, 3).map((subject) => (
@@ -58,7 +64,7 @@ export default function TutoringCard({ tutoring, mode }) {
             </button>
           )}
 
-          {mode === "unirme" && (
+          {mode === "serEstudiante" && (
             <button
               type="button"
               className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"

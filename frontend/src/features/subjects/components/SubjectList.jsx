@@ -8,37 +8,40 @@ export default function SubjectList({
   subjects,
   loading,
   error,
-  showCheckbox = false,
-  showButton = false,
+  showCreate = false,
+  type = "button",
   courseId,
   onCreated = () => {},
   onSelectionChange = () => {},
+  selectedSubjects = [],
 }) {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newName, setNewName] = useState("");
-  const [selectedIds, setSelectedIds] = useState([]); // Para crear tutorías
   const [formError, setFormError] = useState("");
+  const [selectedIds, setSelectedIds] = useState(selectedSubjects);
 
-  // --- Validaciones ---
   const validators = {
     subjectName: (value) => validateRequired(value, "Nombre"),
   };
   const { errors, validate } = useValidation(validators);
 
-  // --- Notificar cambios de selección ---
   useEffect(() => {
-    onSelectionChange(selectedIds);
-  }, [selectedIds, onSelectionChange]);
+    if (type === "selectable") {
+      onSelectionChange(selectedIds);
+    }
+  }, [selectedIds, onSelectionChange, type]);
 
-  // --- Early returns ---
+  useEffect(() => {
+    if (type === "selectable") {
+      setSelectedIds(selectedSubjects);
+    }
+  }, [selectedSubjects, type]);
+
   if (loading) return <div>Cargando temas...</div>;
   if (error) return <div>Error al cargar los temas.</div>;
-  if (!subjects || subjects.length === 0)
-    return <div>No hay temas disponibles.</div>;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const form = { subjectName: newName };
     if (!validate(form)) return;
 
@@ -49,11 +52,9 @@ export default function SubjectList({
       });
 
       onCreated?.();
-
       setShowNewForm(false);
       setNewName("");
-
-      if (showCheckbox) {
+      if (type === "selectable") {
         setSelectedIds((prev) => [...prev, created.id]);
       }
     } catch (err) {
@@ -67,26 +68,17 @@ export default function SubjectList({
     }
   };
 
-  const handleCheckboxChange = (id, checked) => {
-    setSelectedIds((prev) =>
-      checked ? [...prev, id] : prev.filter((sid) => sid !== id)
-    );
+  const handleSelect = (id) => {
+    if (type === "selectable") {
+      setSelectedIds((prev) =>
+        prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+      );
+    }
   };
 
   return (
     <div className="flex flex-col gap-2">
-      {subjects.map((subject) => (
-        <SubjectCard
-          key={subject.id}
-          subject={subject}
-          showCheckbox={showCheckbox}
-          onCheckboxChange={handleCheckboxChange}
-          checked={selectedIds.includes(subject.id)}
-          courseId={courseId}
-        />
-      ))}
-
-      {showButton && !showNewForm && (
+      {showCreate && !showNewForm && (
         <button
           onClick={() => setShowNewForm(true)}
           className="p-2 border rounded-md bg-blue-100 text-blue-700 text-sm hover:bg-blue-200 text-left"
@@ -142,6 +134,20 @@ export default function SubjectList({
           </div>
         </form>
       )}
+
+      {!subjects || subjects.length === 0 ? (
+        <div>No hay temas disponibles.</div>
+      ) : null}
+
+      {subjects.map((subject) => (
+        <SubjectCard
+          key={subject.id}
+          subject={subject}
+          selected={type === "selectable" ? selectedIds.includes(subject.id) : false}
+          onSelect={handleSelect}
+          type={type}
+        />
+      ))}
     </div>
   );
 }
