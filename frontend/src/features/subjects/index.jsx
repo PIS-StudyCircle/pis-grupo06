@@ -1,0 +1,1 @@
+export { default as SubjectPage } from "./pages/SubjectPage";

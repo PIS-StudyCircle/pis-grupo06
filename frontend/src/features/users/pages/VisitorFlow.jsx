@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 
-const VisitorFlow = () => {
+export default function VisitorFlow() {
     const navigate = useNavigate();
 
   return (
@@ -51,6 +51,3 @@ const VisitorFlow = () => {
     </div>
   );
 };
-
-export default VisitorFlow;
-  

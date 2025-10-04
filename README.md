@@ -17,3 +17,6 @@ Las versiones que se usaron en momento de creación son
 Ruby → 3.4.5
 Rails → 8.0.2.1
 npm → 10.9.2
+
+Agregar al archivo .env de la carpeta backend: SMTP_PASS=jnfb fevk nttt uyby 
+

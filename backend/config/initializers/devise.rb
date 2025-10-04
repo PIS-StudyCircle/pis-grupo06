@@ -26,6 +26,9 @@ Devise.setup do |config|
   # with default "from" parameter.
   config.mailer_sender = 'please-change-me-at-config-initializers-devise@example.com'
 
+  # Usar tu propio mailer en lugar del default
+  config.mailer = "UserMailer"
+
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Devise::Mailer'
 

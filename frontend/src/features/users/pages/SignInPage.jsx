@@ -59,13 +59,10 @@ export default function SignInPage() {
           error={errors.password}
         />
 
-        {/* Opciones extra: Olvidé contraseña */}
-        <div className="flex items-center justify-center text-sm">
-          <a
-            href="#"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
-          >
-            ¿Olvidaste tu contraseña?
+        {/* Opciones extra: Recordar y Olvidé contraseña */}
+        <div className="flex items-center justify-between text-sm">
+          <a href="/olvide_contrasena" className="font-medium text-indigo-600 hover:text-indigo-500">
+            ¿Olvidaste la contraseña?
           </a>
         </div>
 
@@ -84,6 +81,7 @@ export default function SignInPage() {
           className="w-full flex justify-center px-4 py-2 font-semibold text-white bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 mb-4">
           Iniciar sesión con Google
         </a>
+
       </form>
     </AuthLayout>
   );
