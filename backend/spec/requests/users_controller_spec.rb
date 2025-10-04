@@ -106,4 +106,35 @@ RSpec.describe "Api::V1::Users::UsersController", type: :request do
       expect(body["error"]).to eq("No se encontró el usuario solicitado")
     end
   end
+
+  describe "cuando se filtran solo tutores" do
+    let!(:tutor_user) {
+      User.create!(name: "Tito", last_name: "Tutorino", email: "tito.tutorino@example.com", password: password,
+                   password_confirmation: password, faculty: faculty)
+    }
+    before do
+      # Finge que el unico tutor es Tito
+      allow(User).to receive(:tutors).and_return(User.where(id: tutor_user.id))
+    end
+
+    it "devuelve solo los usuarios que son tutores" do
+      get "#{base_url}.json", params: { role: "tutor" }
+      expect(response).to have_http_status(:ok)
+      body = response.parsed_body
+      expect(body["users"].length).to eq(1)
+      expect(body["users"].first["name"]).to eq("Tito")
+    end
+
+    it "devuelve array vacío si no hay tutores" do
+      # Mockeamos el scope ANTES de llamar al endpoint
+      allow(User).to receive(:tutors).and_return(User.where(id: []))
+
+      get "#{base_url}.json", params: { role: "tutor" }
+
+      expect(response).to have_http_status(:ok)
+      body = response.parsed_body
+      expect(body["users"]).to be_empty
+      expect(body["pagination"]["count"]).to eq(0)
+    end
+  end
 end
