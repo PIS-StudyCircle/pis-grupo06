@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-import Footer from "@components/Footer";
 import { useCourse } from "../hooks/useCourse";
 import SubjectPage from "@/features/subjects/pages/SubjectPage";
 
@@ -9,8 +8,7 @@ export default function CourseDetailPage() {
   const { course, loading, error } = useCourse(courseId);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <main className="flex-1">
+    <div className="flex flex-col bg-gray-50">
         {loading && (
           <div className="p-6 max-w-3xl mx-auto">Cargando curso...</div>
         )}
@@ -80,8 +78,6 @@ export default function CourseDetailPage() {
             </div>
           </div>
         )}
-      </main>
-      <Footer />
     </div>
   );
 }
