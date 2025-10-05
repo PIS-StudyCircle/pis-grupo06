@@ -5,7 +5,6 @@ import {
   Route,
   Link,
   useNavigate,
-  useParams,
 } from "react-router-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 

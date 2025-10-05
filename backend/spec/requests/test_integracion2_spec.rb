@@ -30,7 +30,7 @@ RSpec.describe "Flow: Course → CourseDetail → Subject → SubjectDetail → 
   end
 
   def parsed
-    JSON.parse(response.body) rescue {}
+    response.parsed_body rescue {}
   end
 
   def extract_courses(json)
@@ -61,7 +61,7 @@ RSpec.describe "Flow: Course → CourseDetail → Subject → SubjectDetail → 
     # Listar cursos
     get "/api/v1/courses"
     expect(response).to have_http_status(:ok)
-    _courses = extract_courses(parsed) 
+    _courses = extract_courses(parsed)
 
     # Crear un curso
     course = create_course(name: "Física I", code: "FIS101")
@@ -82,7 +82,7 @@ RSpec.describe "Flow: Course → CourseDetail → Subject → SubjectDetail → 
     subjects_payload = parsed
     expect(subjects_payload).to be_a(Hash)
     expect(subjects_payload["subjects"]).to be_a(Array)
-    expect(subjects_payload["subjects"].map { |s| s["id"] }).to include(subject_id)
+    expect(subjects_payload["subjects"].pluck("id")).to include(subject_id)
 
     # SubjectDetailPage
     get "/api/v1/courses/#{course.id}/subjects/#{subject_id}"
@@ -110,12 +110,12 @@ RSpec.describe "Flow: Course → CourseDetail → Subject → SubjectDetail → 
     get "/api/v1/tutorings", params: { course_id: course.id }
     expect(response).to have_http_status(:ok)
     tuts = extract_tutorings(parsed)
-    expect(tuts.map { |t| t["id"] }).to include(tutoring_id)
+    expect(tuts.pluck("id")).to include(tutoring_id)
 
     # Filtrar por mis tutorías creadas
     get "/api/v1/tutorings", params: { created_by_user: tutor.id }
     expect(response).to have_http_status(:ok)
     tuts = extract_tutorings(parsed)
-    expect(tuts.map { |t| t["id"] }).to include(tutoring_id)
+    expect(tuts.pluck("id")).to include(tutoring_id)
   end
 end

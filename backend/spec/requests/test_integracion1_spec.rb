@@ -29,7 +29,7 @@ RSpec.describe "Flow: Registro → Crear tutoría (estudiante) → Listado → P
   end
 
   def parsed
-    JSON.parse(response.body) rescue {}
+    response.parsed_body rescue {}
   end
 
   def tutorings_ids!
@@ -55,7 +55,7 @@ RSpec.describe "Flow: Registro → Crear tutoría (estudiante) → Listado → P
     post "/api/v1/courses/#{course.id}/subjects",
          params: { subject: { name: "Matrices", course_id: course.id } }
     expect(response).to have_http_status(:created)
-    s2_id = parsed["id"]
+    parsed["id"]
 
     # Crear tutoría como estudiante
     post "/api/v1/tutorings",
