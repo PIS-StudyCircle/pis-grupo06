@@ -12,6 +12,8 @@ class Tutoring < ApplicationRecord
                        inverse_of: :created_tutorings
   belongs_to :tutor, class_name: 'User', optional: true
 
+  enum :state, { pending: 0, active: 1, finished: 2, canceled: 3 }, default: :pending
+
   # Tutorías en las que un usuario está inscripto
   scope :enrolled_by, ->(user) {
     return none if user.blank?
@@ -34,11 +36,34 @@ class Tutoring < ApplicationRecord
     where(tutor_id: nil)
   }
 
+  # Tutorías con tutor asignado
+  scope :with_tutor, -> {
+    where.not(tutor_id: nil)
+  }
+
   # Ya pasó (scheduled_at < ahora)
   scope :past, -> { where(scheduled_at: ...Time.current) }
 
   # Futuras (scheduled_at >= ahora)
   scope :upcoming, -> { where(scheduled_at: Time.current..) }
+
+  scope :search_by_course_name, ->(q) {
+    return all if q.blank?
+
+    joins(:course).where("unaccent(courses.name) ILIKE unaccent(?)", "%#{q}%")
+  }
+
+  scope :search_by_subject_name, ->(q) {
+    return all if q.blank?
+
+    left_joins(:subjects).where("unaccent(subjects.name) ILIKE unaccent(?)", "%#{q}%").distinct
+  }
+
+  scope :search_by_modality, ->(q) {
+    return all if q.blank?
+
+    where("tutorings.modality ILIKE ?", "%#{q}%")
+  }
 
   # --- Validaciones ---
   validate :scheduled_at_cannot_be_in_past
@@ -56,6 +81,9 @@ class Tutoring < ApplicationRecord
             numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 100 }
   validate :capacity_not_less_than_enrolled
 
+  validates :request_comment, length: { maximum: 500 }, allow_blank: true
+  validates :location, length: { maximum: 255 }, allow_blank: true
+  validate  :request_due_at_before_scheduled_at
   # --- Métodos auxiliares ---
 
   def enrolled
@@ -77,6 +105,14 @@ class Tutoring < ApplicationRecord
 
     if enrolled > capacity
       errors.add(:capacity, :less_than_enrolled)
+    end
+  end
+
+  def request_due_at_before_scheduled_at
+    return if request_due_at.blank? || scheduled_at.blank?
+
+    if request_due_at > scheduled_at
+      errors.add(:request_due_at, "must be before scheduled_at")
     end
   end
 end

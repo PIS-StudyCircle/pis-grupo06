@@ -18,9 +18,11 @@ Rails.application.routes.draw do
       # index y show de UsersController
       resources :users, module: :users, only: [:index, :show]
 
-      resources :courses
-      resources :subjects
-      resources :tutorings do
+
+      resources :courses do
+        resources :subjects
+      end
+      resources :tutorings
         member do
           post :confirm_schedule
         end
@@ -32,6 +34,7 @@ Rails.application.routes.draw do
         get    "sessions/:id",      to: "calendar#show"
         delete "sessions/:id",      to: "calendar#destroy"
       end
+
     end
   end
 end

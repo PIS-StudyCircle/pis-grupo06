@@ -16,10 +16,10 @@ RSpec.describe "Api::V1::Subjects", type: :request do
     sign_in user
   end
 
-  describe "POST /api/v1/subjects" do
+  describe "POST /api/v1/courses/:course_id/subjects" do
     it "crea un subject con due_date a 3 meses desde ahora" do
       expect {
-        post "/api/v1/subjects", params: {
+        post "/api/v1/courses/#{course.id}/subjects", params: {
           subject: { name: "Nuevo Tema", course_id: course.id }
         }
       }.to change(Subject, :count).by(1)

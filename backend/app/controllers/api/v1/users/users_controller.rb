@@ -9,7 +9,13 @@ module Api
         def index
           users = User.all
 
-          users = users.where("unaccent(name) ILIKE unaccent(?)", "%#{params[:search]}%") if params[:search].present?
+          if params[:search].present?
+            search = params[:search].strip.squeeze(" ")
+            users = users.where(
+              "unaccent(name || ' ' || last_name) ILIKE unaccent(?)",
+              "%#{search}%"
+            )
+          end
 
           # users = users.where(role: params[:role]) if params[:role].present?
 
