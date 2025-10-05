@@ -48,15 +48,15 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
   useEffect(() => {
     const t = setTimeout(() => {
       setSearch(query);
-      if (page !== 1) setPage(1);
+      setPage(1);
     }, 400);
     return () => clearTimeout(t);
-  }, [query, page, setSearch, setPage]);
+  }, [query, setSearch, setPage]);
 
   // si cambia el modo de búsqueda, volvemos a la página 1
   useEffect(() => {
-    if (page !== 1) setPage(1);
-  }, [searchBy, page, setPage]);
+    setPage(1);
+  }, [searchBy, setPage]);
 
   return (
     <div className="flex flex-col">
