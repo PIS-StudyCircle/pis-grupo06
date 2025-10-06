@@ -27,7 +27,7 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
     baseFilters.search_by = searchBy;
 
     return baseFilters;
-  }, [filters, searchBy, showWithoutTutor]);
+  }, [filters, searchBy, showWithoutTutor, courseId]);
 
   const {
     tutorings,
