@@ -109,9 +109,10 @@ module Api
 
       def create
         tutoring = Tutoring.new(tutoring_params)
-        tutoring.created_by_id = params[:tutoring][:created_by_id]
-        tutoring.tutor_id      = params[:tutoring][:tutor_id]
-        tutoring.course_id     = params[:tutoring][:course_id]
+
+        tutoring.created_by_id = params.dig(:tutoring, :created_by_id)
+        tutoring.tutor_id      = params.dig(:tutoring, :tutor_id)
+        tutoring.course_id     = params.dig(:tutoring, :course_id)
 
         if tutoring.tutor_id.nil? && tutoring.capacity.nil?
           tutoring.capacity = 1 # Valor por defecto para solicitudes pendientes
@@ -136,6 +137,7 @@ module Api
         end
 
         if tutoring.save
+          # create_user_tutoring(tutoring)
           render json: { tutoring: tutoring }, status: :created
         else
           render json: { errors: tutoring.errors.full_messages }, status: :unprocessable_entity
@@ -143,6 +145,12 @@ module Api
       end
 
       private
+
+      def create_user_tutoring(tutoring)
+        return unless params.dig(:tutoring, :tutor_id).nil?
+
+        UserTutoring.create!(user: current_user, tutoring:)
+      end
 
       def tutoring_params
         params.expect(
