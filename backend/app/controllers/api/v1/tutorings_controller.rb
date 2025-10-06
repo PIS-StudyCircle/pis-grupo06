@@ -118,6 +118,8 @@ module Api
           tutoring.capacity = 1 # Valor por defecto para solicitudes pendientes
         end
         if tutoring.tutor_id.present? && tutoring.scheduled_at.present? && tutoring.duration_mins.present?
+          tutoring.state = 1 # cuando la tutoria es creada por el tutor la creamos como activa
+
           start_time = tutoring.scheduled_at
           end_time = start_time + tutoring.duration_mins.minutes
 
