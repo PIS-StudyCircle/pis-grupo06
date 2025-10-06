@@ -3,6 +3,8 @@ module Api
     class TutoringsController < ApplicationController
       include Pagy::Backend
 
+      before_action :authenticate_user!
+
       def index
         tutorings = Tutoring.all
 
@@ -30,11 +32,19 @@ module Api
         # los que aun no tienen tutor asignado
         if params[:no_tutor].present? && ActiveModel::Type::Boolean.new.cast(params[:no_tutor])
           tutorings = tutorings.without_tutor
+
+          # no aparecen las tutorias creadas por el usuario
+          tutorings = tutorings.where.not(created_by_id: current_user.id)
         end
 
-        # los que ya tienen tutor asignado
+        # los que ya tienen tutor asignado y no estan pending
         if params[:with_tutor].present? && ActiveModel::Type::Boolean.new.cast(params[:with_tutor])
-          tutorings = tutorings.with_tutor
+          tutorings = tutorings.with_tutor.where.not(state: "pending")
+
+          # no aparecen las tutorias creadas por el usuario ni las que el usuario es tutor
+          tutorings = tutorings
+                      .where.not(created_by_id: current_user.id)
+                      .where.not(tutor_id:      current_user.id)
         end
 
         q = params[:search].to_s

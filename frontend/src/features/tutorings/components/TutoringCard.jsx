@@ -36,7 +36,7 @@ export default function TutoringCard({ tutoring, mode }) {
           )}
           <p className="tutoring-card-title mt-1"><b>Temas:</b></p>
           <div className="flex flex-wrap gap-2 mt-1">
-            {tutoring.subjects.slice(0, 3).map((subject) => (
+            {tutoring.subjects.map((subject) => (
               <span
                 key={subject.id}
                 className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full"

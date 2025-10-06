@@ -14,6 +14,8 @@ RSpec.describe "Tutorings search", type: :request do
     )
   end
 
+  before { sign_in user }
+
   let!(:calculo)    { Course.create!(name: "Cálculo I", code: "CALC1", faculty: faculty) }
   let!(:fisica)     { Course.create!(name: "Física", code: "FIS1", faculty: faculty) }
 

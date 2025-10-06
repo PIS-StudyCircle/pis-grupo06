@@ -12,6 +12,7 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
   // selector de búsqueda (por materia/tema) proveniente de origin/dev
   const [searchBy, setSearchBy] = useState("course");
   const [showWithoutTutor, setShowWithoutTutor] = useState(false);
+  const forceSubjectSearch = mode === "serTutor" || mode === "serEstudiante";
 
   // 1) aseguramos course_id + 2) agregamos search_by
   const mergedFilters = useMemo(() => {
@@ -21,10 +22,12 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
       baseFilters.no_tutor = true;
     }
 
+    if (courseId) baseFilters.course_id = courseId;
+
     baseFilters.search_by = searchBy;
 
     return baseFilters;
-  }, [filters, searchBy, showWithoutTutor]);
+  }, [filters, searchBy, showWithoutTutor, courseId]);
 
   const {
     tutorings,
@@ -58,6 +61,10 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
     setPage(1);
   }, [searchBy, setPage]);
 
+  useEffect(() => {
+    if (forceSubjectSearch) setSearchBy("subject");
+  }, [forceSubjectSearch, setSearchBy]);
+
   return (
     <div className="flex flex-col">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
@@ -67,64 +74,55 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
               Tutorías Disponibles
             </h1>
 
-            {mode === "serTutor" && (
-              <button
-                type="button"
-                className="btn"
-                onClick={() => navigate(`/tutorias/elegir_temas/tutor/${courseId}`)}
-              >
-                Crear nueva tutoría
-              </button>
-            )}
-
-            {mode === "serEstudiante" && (
+            {["serTutor", "serEstudiante"].includes(mode) && (
               <button
                 type="button"
                 className="btn"
                 onClick={() =>
-                  navigate(`/tutorias/elegir_temas/estudiante/${courseId}`)
+                  navigate(
+                    `/tutorias/elegir_temas/${
+                      mode === "serTutor" ? "tutor" : "estudiante"
+                    }/${courseId}`
+                  )
                 }
               >
-                Solicitar nueva tutoría
+                {mode === "serTutor" ? "Crear nueva tutoría" : "Solicitar nueva tutoría"}
               </button>
             )}
           </div>
 
-          {/* Si llegamos sin modo, puede buscar por materia o tema */}
-          {mode === "" && (
-            <TutoringSearchBar
-              query={query}
-              onQueryChange={(e) => setQuery(e.target.value)}
-              searchBy={searchBy}
-              onSearchByChange={setSearchBy}
-              placeholder={
-                searchBy === "course"
-                  ? "Buscar por materia..."
-                  : "Buscar por tema..."
-              }
-            />
-          )}
-          {/* Si llegamos desde la materia específica, solo puede filtrar por tema */}
-          {(mode === "serTutor" || mode === "serEstudiante") && (
-            <TutoringSearchBar
-              query={query}
-              onQueryChange={(e) => setQuery(e.target.value)}
-              searchBy={"subject"}
-              onSearchByChange={setSearchBy}
-              placeholder={"Buscar por tema..."}
-            />
-          )}
+          <TutoringSearchBar
+            query={query}
+            onQueryChange={(e) => setQuery(e.target.value)}
+            searchBy={forceSubjectSearch ? "subject" : searchBy}
+            onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
+            options={
+              forceSubjectSearch
+                ? [{ value: "subject", label: "Tema" }]
+                : [
+                    { value: "course", label: "Materia" },
+                    { value: "subject", label: "Tema" },
+                  ]
+            }
+            placeholder={
+              (forceSubjectSearch ? "subject" : searchBy) === "course"
+                ? "Buscar por materia..."
+                : "Buscar por tema..."
+            }
+          />
 
             {/* Filter toggle */}
-            <label className="flex items-center gap-2 cursor-pointer ml-4">
-              <input
-                type="checkbox"
-                checked={showWithoutTutor}
-                onChange={(e) => setShowWithoutTutor(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Tutor Indefinido</span>
-            </label>
+            {mode !== "serTutor" && mode !== "serEstudiante" && (
+              <label className="flex items-center gap-2 cursor-pointer ml-4">
+                <input
+                  type="checkbox"
+                  checked={showWithoutTutor}
+                  onChange={(e) => setShowWithoutTutor(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-gray-700">Tutor Indefinido</span>
+              </label>
+            )}
 
           <TutoringList tutorings={tutorings} mode={mode} loading={loading} error={error} />
 
