@@ -16,6 +16,13 @@ es:
         duration_mins: "Duración (minutos)"
         modality: "Modalidad"
         capacity: "Capacidad"
+        request_due_at: "Fecha límite para solicitudes"
+        request_comment: "Comentario de la solicitud"
+        location: "Ubicación"
+        course: "Curso"
+        subjects: "Materias"
+        tutor: "Tutor"
+        created_by: "Creador"
     errors:
       models:
         tutoring:
