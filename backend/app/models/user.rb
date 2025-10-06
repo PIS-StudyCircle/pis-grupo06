@@ -22,6 +22,13 @@ class User < ApplicationRecord
            inverse_of: :creator,
            dependent: :nullify
 
+  # tutorías creadas
+  has_many :created_tutorings,
+           class_name: 'Tutoring',
+           foreign_key: 'created_by_id',
+           inverse_of: :creator,
+           dependent: :nullify
+
   belongs_to :faculty
 
   # validaciones
@@ -30,6 +37,10 @@ class User < ApplicationRecord
   validates :last_name, presence: true
   validates :password_confirmation, presence: true, on: :create
   validates :description, length: { maximum: 500 }, allow_blank: true
+
+  scope :tutors, -> {
+    where(id: Tutoring.select(:tutor_id).distinct)
+  }
 
   def self.from_omniauth(auth)
     user = find_by(provider: auth.provider, uid: auth.uid) || find_by(email: auth.info.email)
@@ -61,5 +72,9 @@ class User < ApplicationRecord
     end
 
     user
+  end
+
+  def devise_mailer
+    UserMailer
   end
 end

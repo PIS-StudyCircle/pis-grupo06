@@ -6,6 +6,7 @@ Rails.application.routes.draw do
                  controllers: {
                    sessions: 'api/v1/users/sessions',
                    registrations: 'api/v1/users/registrations',
+                   passwords: 'api/v1/users/passwords',
                    omniauth_callbacks: 'api/v1/users/omniauth_callbacks'
                  }
 
@@ -14,7 +15,13 @@ Rails.application.routes.draw do
         get :me, to: 'me#show'
       end
 
-      resources :courses
+      # index y show de UsersController
+      resources :users, module: :users, only: [:index, :show]
+
+      resources :courses do
+        resources :subjects
+      end
+      resources :tutorings
     end
   end
 end
