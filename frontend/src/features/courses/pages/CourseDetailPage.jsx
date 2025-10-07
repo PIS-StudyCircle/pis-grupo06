@@ -1,17 +1,14 @@
-import { useParams/*, useNavigate*/ } from "react-router-dom";
-import Footer from "@components/Footer";
+import { useParams, useNavigate } from "react-router-dom";
 import { useCourse } from "../hooks/useCourse";
-import CourseTopics from "../components/Topics";
-
+import SubjectPage from "@/features/subjects/pages/SubjectPage";
 
 export default function CourseDetailPage() {
   const { courseId } = useParams();
+  const navigate = useNavigate();
   const { course, loading, error } = useCourse(courseId);
-  //const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <main className="flex-1">
+    <div className="flex flex-col bg-gray-50">
         {loading && (
           <div className="p-6 max-w-3xl mx-auto">Cargando curso...</div>
         )}
@@ -60,28 +57,27 @@ export default function CourseDetailPage() {
                   <button
                     type="button"
                     className="btn w-full"
-                     // onClick={() => navigate(`/tutor/registrarse?course=${course.id}`)}
+                    onClick={() => navigate(`/tutorias/ser_tutor/${courseId}`)}
                   >
-                    Ser tutor
+                    Brindar tutoría
                   </button>
                   <button
                     type="button"
                     className="btn w-full"
-                    // onClick={() => navigate(`/tutoria/solicitar?course=${course.id}`)}
+                    onClick={() => navigate(`/tutorias/materia/${courseId}`)}
                   >
                     Recibir tutoría
                   </button>
                 </div>
               </div>
 
-             {/*Busco los temas de la materia*/}
-             <CourseTopics subjects={course?.subjects ?? []} />
-
+              {/*El mostrar los temas de la materia se delega a SubjectPage*/}
+              <SubjectPage
+                courseId={courseId}
+              />
             </div>
           </div>
         )}
-      </main>
-      <Footer />
     </div>
   );
 }

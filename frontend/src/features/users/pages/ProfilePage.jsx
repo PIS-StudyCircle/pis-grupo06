@@ -1,6 +1,7 @@
 import { useUser } from "@context/UserContext"; 
 import DeleteAccountButton from "./DeleteAccountButton";
 
+import { DEFAULT_PHOTO } from "@/shared/config";
 export default function Profile() {
   const { user, loading, error } = useUser(); 
 
@@ -16,14 +17,15 @@ export default function Profile() {
     return <p className="text-center mt-10">No hay usuario cargado.</p>;
   }
 
+  const photoUrl = user.photo || DEFAULT_PHOTO;
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-[#001F54] text-white rounded-3xl shadow-xl w-full max-w-md p-6">
-        <h2 className="text-xl font-bold mb-4">Perfil</h2>
 
         <div className="flex flex-col items-center mb-6">
           <img
-            src="/avatar.png"
+            src={photoUrl}
             alt="avatar"
             className="w-24 h-24 rounded-full border-4 border-white shadow-md"
           />

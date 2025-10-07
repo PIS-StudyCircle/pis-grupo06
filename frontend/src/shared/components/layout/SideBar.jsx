@@ -9,13 +9,14 @@ import {
   Menu,
   User as UserIcon,
   LogOut,
+  SquareUser,
 } from "lucide-react";
 
 const Sidebar = ({
-  isOpen,              // desktop: expandido/colapsado (w-64 / w-16)
-  onToggleDesktop,     // desktop: toggle con el botón
-  mobileOpen,          // mobile: drawer abierto/cerrado
-  onMobileClose,       // mobile: cerrar drawer
+  isOpen, // desktop: expandido/colapsado (w-64 / w-16)
+  onToggleDesktop, // desktop: toggle con el botón
+  mobileOpen, // mobile: drawer abierto/cerrado
+  onMobileClose, // mobile: cerrar drawer
 }) => {
   const { user, signOut } = useUser();
   const location = useLocation();
@@ -24,36 +25,37 @@ const Sidebar = ({
   const authedItems = [
     { title: "Inicio", path: "/", Icon: Home },
     { title: "Clases", path: "#", Icon: BookOpen },
-    { title: "Tutorías", path: "#", Icon: Users },
+    { title: "Tutorías", path: "/tutorias", Icon: Users },
     { title: "Materias", path: "/materias", Icon: GraduationCap },
+    { title: "Tutores", path: "/tutores", Icon: SquareUser },
   ];
   const guestItems = [
     { title: "Inicio", path: "/flujo-visitante", Icon: Home },
     { title: "Materias", path: "/materias", Icon: GraduationCap },
   ];
+
   const menuItems = user ? authedItems : guestItems;
 
   // Función helper para obtener todos los items del drawer móvil
   const getMobileMenuItems = () => {
     if (!user) return menuItems;
-    
+
     // Crear una copia y insertar "Ver perfil" después del primer elemento
     const items = [...menuItems];
-    items.splice(1, 0, { 
-      title: "Ver perfil", 
-      path: "/perfil", 
+    items.splice(1, 0, {
+      title: "Ver perfil",
+      path: "/perfil",
       Icon: UserIcon,
-      id: "perfil",  // ID único para este item
+      id: "perfil", // ID único para este item
     });
     return items;
   };
 
-  const isActive = (p) => 
+  const isActive = (p) =>
     !!p && (location.pathname === p || location.pathname.startsWith(p + "/"));
   // Ahora el sidebar se puede expandir en todas las pantallas
   const widthCls = isOpen ? "w-64" : "w-16";
 
- 
   async function handleLogout() {
     try {
       await signOut();
@@ -96,7 +98,20 @@ const Sidebar = ({
               aria-label="Cerrar sidebar"
               title="Cerrar sidebar"
             >
-              ✕
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           )}
         </div>
@@ -112,7 +127,9 @@ const Sidebar = ({
                 <li key={item.title}>
                   <Link
                     to={item.path}
-                    className={`sidebar-link ${active ? "sidebar-link--active" : ""}`}
+                    className={`sidebar-link ${
+                      active ? "sidebar-link--active" : ""
+                    }`}
                   >
                     <ItemIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
                     <span
@@ -128,8 +145,6 @@ const Sidebar = ({
             })}
           </ul>
         </nav>
-
-
       </aside>
 
       {/* ===== Mobile drawer ===== */}
@@ -139,12 +154,21 @@ const Sidebar = ({
       >
         {/* Overlay */}
         <div
-          className={`drawer-overlay ${mobileOpen ? "drawer-overlay--open" : ""}`}
+          className={`drawer-overlay ${
+            mobileOpen ? "drawer-overlay--open" : ""
+          }`}
           onClick={onMobileClose}
         />
 
         {/* Panel lateral (mobile) */}
-        <aside className={`drawer-panel ${mobileOpen ? "drawer-panel--open" : ""}`}>
+        <aside
+          className={`drawer-panel ${mobileOpen ? "drawer-panel--open" : ""}`}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+          }}
+        >
           {/* Header con X (mobile) */}
           <div className="drawer-header">
             <span className="text-lg font-semibold">Menú</span>
@@ -154,28 +178,53 @@ const Sidebar = ({
               aria-label="Cerrar"
               title="Cerrar"
             >
-              ✕
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
 
-          {/* Navegación (mobile) */}
-          <nav className="p-2 pb-20">
+          {/* Navegación (mobile) - con scroll y safe area */}
+          <nav 
+            className="p-2 overflow-y-auto flex-1"
+            style={{
+              paddingBottom: `calc(env(safe-area-inset-bottom, 0px) + ${user ? '80px' : '20px'})`
+            }}
+          >
             <ul className="space-y-1">
               {getMobileMenuItems().map((item) => {
                 const active = isActive(item.path);
                 const ItemIcon = item.Icon;
                 // Usar ID único si existe, sino usar title como fallback
                 const keyId = item.id || item.title;
-                
+
                 return (
                   <li key={keyId}>
                     <Link
                       to={item.path}
                       onClick={onMobileClose}
-                      className={`sidebar-link ${active ? "sidebar-link--active" : ""}`}
+                      className={`sidebar-link ${
+                        active ? "sidebar-link--active" : ""
+                      }`}
                     >
-                      <ItemIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
-                      <span className="font-medium whitespace-nowrap">{item.title}</span>
+                      <ItemIcon
+                        className="w-5 h-5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span className="font-medium whitespace-nowrap">
+                        {item.title}
+                      </span>
                     </Link>
                   </li>
                 );
@@ -183,9 +232,14 @@ const Sidebar = ({
             </ul>
           </nav>
 
-          {/* Cerrar sesión (abajo) */}
+          {/* Cerrar sesión (fijo abajo con safe area) */}
           {user && (
-            <div className="drawer-footer">
+            <div 
+              className="drawer-footer"
+              style={{
+                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)'
+              }}
+            >
               <button onClick={handleLogout} className="drawer-logout-btn">
                 <LogOut className="w-5 h-5" aria-hidden="true" />
                 <span className="font-medium">Cerrar sesión</span>

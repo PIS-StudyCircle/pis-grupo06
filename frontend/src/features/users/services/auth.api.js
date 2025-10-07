@@ -55,3 +55,22 @@ export async function deleteAccount() {
   removeItem("user");
   removeItem("token");
 }
+export async function forgotPassword(form) {
+  const body = {
+    user: {
+      email: form.email,
+    },
+  };
+  return await http("/users/password", { method: "POST", body: JSON.stringify(body) });
+}
+
+export async function resetPassword(form) {
+  const body = {
+    user: {
+      reset_password_token: form.reset_password_token,
+      password: form.password,
+      password_confirmation: form.password_confirmation,
+    },
+  };
+  return await http("/users/password", { method: "PUT", body: JSON.stringify(body) });
+}

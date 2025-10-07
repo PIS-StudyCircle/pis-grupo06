@@ -35,5 +35,4 @@
 
 /config/credentials/production.key
 
-# Ignore coverage from testing
 /coverage
