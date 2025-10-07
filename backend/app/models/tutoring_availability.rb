@@ -6,7 +6,7 @@ class TutoringAvailability < ApplicationRecord
   
     scope :available, -> { where(is_booked: false) }
     scope :booked, -> { where(is_booked: true) }
-  
+    
     private
   
     def end_time_after_start_time

@@ -5,6 +5,8 @@ class Tutoring < ApplicationRecord
   has_many :subject_tutorings, dependent: :destroy
   has_many :subjects, through: :subject_tutorings
 
+  has_many :tutoring_availabilities, dependent: :destroy
+
   belongs_to :course
   belongs_to :creator, class_name: 'User',
                        foreign_key: 'created_by_id',
@@ -84,6 +86,9 @@ class Tutoring < ApplicationRecord
   validates :request_comment, length: { maximum: 500 }, allow_blank: true
   validates :location, length: { maximum: 255 }, allow_blank: true
   validate  :request_due_at_before_scheduled_at
+
+
+
   # --- Métodos auxiliares ---
 
   def enrolled
@@ -91,6 +96,7 @@ class Tutoring < ApplicationRecord
   end
 
   private
+
 
   def scheduled_at_cannot_be_in_past
     return if scheduled_at.blank?

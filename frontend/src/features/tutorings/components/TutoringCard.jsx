@@ -1,46 +1,22 @@
 import { formatDateTime } from "@shared/utils/FormatDate";
-<<<<<<< HEAD
 import { JoinTutoringButton } from "@/features/calendar";
-=======
->>>>>>> origin/dev
+
 
 export default function TutoringCard({ tutoring, mode }) {
   mode = "unirme"; // FORZAR MODO unirme PARA PRUEBAS
   return (
-<<<<<<< HEAD
-    <div className="w-full bg-white rounded-lg shadow p-4 my-4 flex items-center justify-between gap-2">
-      <div className="flex w-full gap-4">
-        <div className="flex-none w-[80%] flex flex-col text-left">
-=======
+
     <div className="w-full bg-white rounded-lg shadow p-4 my-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         
         {/* Información de la tutoría - sin cambios */}
         <div className="flex-1 flex flex-col text-left">
->>>>>>> origin/dev
+
           <p className="tutoring-card-title">
             <b>Materia: </b>
             {tutoring.course.name}
           </p>
-<<<<<<< HEAD
 
-          <p className="tutoring-card-title mt-1">
-            <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)}
-          </p>
-
-          <p className="tutoring-card-title mt-1">
-            <b>Modalidad: </b> {tutoring.modality}
-          </p>
-
-          <p className="text-gray-600 text-sm mt-1">
-            <b>Cupos disponibles: </b> {tutoring.capacity - tutoring.enrolled}
-          </p>
-
-          <p className="tutoring-card-title mt-1">
-            <b>Temas:</b>
-          </p>
-
-=======
           {tutoring.scheduled_at && (
             <p className="tutoring-card-title mt-1">
               <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)}
@@ -65,7 +41,7 @@ export default function TutoringCard({ tutoring, mode }) {
             </p>
           )}
           <p className="tutoring-card-title mt-1"><b>Temas:</b></p>
->>>>>>> origin/dev
+
           <div className="flex flex-wrap gap-2 mt-1">
             {tutoring.subjects.slice(0, 3).map((subject) => (
               <span
@@ -83,19 +59,7 @@ export default function TutoringCard({ tutoring, mode }) {
           </div>
         </div>
 
-<<<<<<< HEAD
-        <div className="flex-none w-[20%] flex flex-col justify-start items-end pr-3">
-          {mode === "serTutor" && (
-            <button className="btn btn-primary tutoring-card-button">Ser tutor</button>
-          )}
 
-          {mode === "unirme" && (
-            <JoinTutoringButton tutoringId={tutoring.id} />
-          )}
-
-          {mode === "misTutorias" && (
-            <button className="btn btn-primary tutoring-card-button">Desuscribirme</button>
-=======
         {/* Botones */}
         <div className="flex flex-col gap-3 md:pr-3">
           {mode === "serTutor" && (
@@ -155,7 +119,7 @@ export default function TutoringCard({ tutoring, mode }) {
             >
               Completo
             </button>
->>>>>>> origin/dev
+
           )}
         </div>
       </div>

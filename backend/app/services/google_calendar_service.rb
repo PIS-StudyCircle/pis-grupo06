@@ -33,22 +33,28 @@ class GoogleCalendarService
   # Unirse a un evento (lo usa el estudiante)
   def join_event(tutoring, attendee_email)
     raise "Tutoría no tiene evento en Google Calendar" if tutoring.event_id.blank?
-
-    calendar_id = tutoring.tutor.calendar_id
-    owner = tutoring.tutor # el dueño del calendario
-
+  
+    owner = tutoring.tutor
+    calendar_id = owner.calendar_id
+  
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = owner.google_access_token
-
+  
     event = service.get_event(calendar_id, tutoring.event_id)
-
-    event.attendees ||= ["agustincastro2003@gmail.com"]
+    event.attendees ||= []
+  
+    # Verifica si ya está agregado
     unless event.attendees.any? { |a| a.email == attendee_email }
-      event.attendees << { email: attendee_email, response_status: "accepted" }
+      new_attendee = Google::Apis::CalendarV3::EventAttendee.new(
+        email: attendee_email,
+        response_status: "accepted"
+      )
+      event.attendees << new_attendee
     end
-
+  
     service.update_event(calendar_id, tutoring.event_id, event)
   end
+  
 
 
   # Obtener un evento puntual
