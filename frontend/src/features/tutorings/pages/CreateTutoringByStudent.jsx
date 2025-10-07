@@ -80,8 +80,6 @@ export default function CreateTutoringByStudent() {
     }
   };
 
-  const errs = form._errors || {};
-
   return (
     <AuthLayout title={`Solicitar tutoría para ${course.name}`}>
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
