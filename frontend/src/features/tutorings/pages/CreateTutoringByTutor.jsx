@@ -127,17 +127,14 @@ export default function CreateTutoringByTutor() {
 
     try {
       // Transformar availabilities al formato esperado por el backend
+      // Transformar availabilities al formato esperado por el backend
       const availabilities_attributes = availabilities.map((availability) => {
-        const localDate = new Date(`${availability.date}T${availability.startTime}:00`)
-        const scheduled_at = localDate.toISOString()
-
-        const [startH, startM] = availability.startTime.split(":").map(Number)
-        const [endH, endM] = availability.endTime.split(":").map(Number)
-        const duration_mins = endH * 60 + endM - (startH * 60 + startM)
+        const startDateTime = new Date(`${availability.date}T${availability.startTime}:00`)
+        const endDateTime = new Date(`${availability.date}T${availability.endTime}:00`)
 
         return {
-          scheduled_at,
-          duration_mins,
+          start_time: startDateTime.toISOString(),
+          end_time: endDateTime.toISOString(),
         }
       })
 

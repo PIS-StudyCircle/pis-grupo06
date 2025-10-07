@@ -116,7 +116,6 @@ export default function CreateTutoringByStudent() {
 
     const payload = {
       request_comment: form.request_comment.trim() || undefined,
-      request_due_at,
       created_by_id: user.id,
       tutor_id: null,
       course_id: course.id,
