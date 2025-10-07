@@ -91,6 +91,10 @@ class Tutoring < ApplicationRecord
     user_tutorings.size
   end
 
+  def created_and_confirmed?
+    tutor.present? && enrolled > 0 && scheduled_at.present?
+  end
+
   private
 
   def scheduled_at_cannot_be_in_past
@@ -124,9 +128,4 @@ class Tutoring < ApplicationRecord
       errors.add(:request_due_at, "debe ser posterior a la fecha y hora actual")
     end
   end
-
-  def created_and_confirmed?
-  tutor.present? && enrolled > 0 && scheduled_at.present?
-  end
-
 end

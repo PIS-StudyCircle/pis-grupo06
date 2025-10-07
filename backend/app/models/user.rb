@@ -81,8 +81,10 @@ class User < ApplicationRecord
   before_destroy :handle_tutorings_on_user_deletion
 
   def handle_tutorings_on_user_deletion
-    Tutoring.enrolled_by(self).find_each do |tutoring|
-      
+    Tutoring.left_joins(:user_tutorings)
+            .where("user_tutorings.user_id = :id OR tutor_id = :id OR created_by_id = :id", id: id)
+            .distinct
+            .find_each do |tutoring|
       if tutoring.tutor_id == id
         # CASOS 1 y 3: el usuario era el TUTOR
         if tutoring.users.empty?
@@ -97,16 +99,14 @@ class User < ApplicationRecord
           tutoring.update!(tutor_id: nil)
           # Notificar al estudiante que el tutor eliminó su cuenta
         end
-
       else
-        # el usuario era ESTUDIANTE
+        # CASOS 2 y 4: el usuario era ESTUDIANTE
         if tutoring.users.count == 1
-          # Caso 2 (único estudiante en tutoría) o 4 (pendiente)
           tutoring.destroy
-          if tutoring.tutor.present?
-            # Notificar al tutor que la tutoría fue cancelada
-          end
+          # Notificar al tutor que la tutoría fue cancelada
         end
+        # Si hay más estudiantes en pending, no se hace nada,
+        # porque el estudiante eliminado se remueve automáticamente por `dependent: :destroy` en user_tutorings
       end
     end
 
