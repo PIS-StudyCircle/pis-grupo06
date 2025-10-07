@@ -41,27 +41,24 @@ export function validateStartHourTutoring(date, startTime, waitMinutes=180, fiel
   if (!date || !startTime) return null;
 
   const [startH, startM] = startTime.split(":").map(Number);
-  const start = startH * 60 + startM;
 
-  // Si se pasa la fecha, validar que la hora de inicio sea al menos 3 horas después de ahora
-  if (date) {
-    const [year, month, day] = date.split("-").map(Number);
-    const inputDate = new Date(year, month - 1, day);
-    const today = new Date();
-    if (
-      inputDate.getFullYear() === today.getFullYear() &&
-      inputDate.getMonth() === today.getMonth() &&
-      inputDate.getDate() === today.getDate()
-    ) {
-      const nowMinutes = today.getHours() * 60 + today.getMinutes();
-      if(start < nowMinutes) {
-        return `La ${fieldName} no puede ser anterior a la actual`;
-      }
-      if (start - nowMinutes < waitMinutes) {
-        return `La ${fieldName} debe ser al menos ${waitMinutes / 60} horas mayor que la actual`;
-      }
-    }
+  // Construir Date con fecha + hora en zona local
+  const [year, month, day] = date.split("-").map(Number);
+  const inputDateTime = new Date(year, month - 1, day, startH, startM, 0);
+
+  const now = new Date();
+  const diffMinutes = Math.floor((inputDateTime.getTime() - now.getTime()) / 60000);
+
+  // Si la fecha+hora ya pasó
+  if (diffMinutes < 0) {
+    return `La ${fieldName} no puede ser anterior a la actual`;
   }
+
+  // Validar que la diferencia sea al menos waitMinutes
+  if (diffMinutes < waitMinutes) {
+    return `La ${fieldName} debe ser al menos ${waitMinutes / 60} horas mayor que la actual`;
+  }
+
   return null;
 }
 
