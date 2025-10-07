@@ -4,26 +4,32 @@ import TutoringList from "../components/TutoringList";
 import TutoringSearchBar from "../components/TutoringSearchBar";
 import Pagination from "@components/Pagination";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
 
 export default function TutoringPage({ filters = {}, mode = "" }) {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const courseName = state?.courseName;
 
-  // estados
+  const location = useLocation();
+  const courseName = location.state?.courseName || "";
+
+  // selector de búsqueda (por materia/tema) proveniente de origin/dev
   const [searchBy, setSearchBy] = useState("course");
   const [showWithoutTutor, setShowWithoutTutor] = useState(false);
-  const [query, setQuery] = useState("");
-  const forceSubjectSearch = ["serTutor", "serEstudiante"].includes(mode);
+  const forceSubjectSearch = mode === "serTutor" || mode === "serEstudiante";
 
-  // filtros combinados
+  // 1) aseguramos course_id + 2) agregamos search_by
   const mergedFilters = useMemo(() => {
-    const base = { ...filters, search_by: searchBy };
-    if (showWithoutTutor) base.no_tutor = true;
-    if (courseId) base.course_id = courseId;
-    return base;
+    const baseFilters = { ...filters };
+
+    if (showWithoutTutor) {
+      baseFilters.no_tutor = true;
+    }
+
+    if (courseId) baseFilters.course_id = courseId;
+
+    baseFilters.search_by = searchBy;
+
+    return baseFilters;
   }, [filters, searchBy, showWithoutTutor, courseId]);
 
   const {
@@ -39,172 +45,136 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
 
   const totalPages = pagination?.last || 1;
 
-  // sincronización de búsqueda con debounce
-  useEffect(() => setQuery(search), [search]);
+  // query local con debounce
+  const [query, setQuery] = useState(search);
   useEffect(() => {
-    const timer = setTimeout(() => {
+    setQuery(search);
+  }, [search]);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
       setSearch(query);
       setPage(1);
     }, 400);
-    return () => clearTimeout(timer);
+    return () => clearTimeout(t);
   }, [query, setSearch, setPage]);
 
-  useEffect(() => setPage(1), [searchBy, setPage]);
+  // si cambia el modo de búsqueda, volvemos a la página 1
+  useEffect(() => {
+    setPage(1);
+  }, [searchBy, setPage]);
+
   useEffect(() => {
     if (forceSubjectSearch) setSearchBy("subject");
-  }, [forceSubjectSearch]);
+  }, [forceSubjectSearch, setSearchBy]);
 
-  const goToCreateTutoring = () =>
-    navigate(
-      `/tutorias/elegir_temas/${
-        mode === "serTutor" ? "tutor" : "estudiante"
-      }/${courseId}`
-    );
+  const handleNavigateToTopics = () => {
+    const rolePath = mode === "serTutor" ? "tutor" : "estudiante";
+    navigate(`/tutorias/elegir_temas/${rolePath}/${courseId}`);
+  };
 
-  const showFilterToggle = !["serTutor", "serEstudiante"].includes(mode);
-
-  console.log({ mode, courseName });
-
-  // vista especial si es serTutor y no hay tutorías
-  if (!loading && mode === "serTutor" && tutorings.length === 0) {
+  if (tutorings.length > 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
-        <h1 className="text-2xl font-bold mb-4 text-black text-center">
-          No hay tutorías disponibles para{" "}
-          {courseName ? (
-            <Link
-              to={`/materias/${courseId}`}
-              className="text-blue-600 hover:underline"
-            >
-              {courseName}
-            </Link>
-          ) : (
-            "esta materia"
-          )}
-          .
-        </h1>
-        <button type="button" className="btn" onClick={goToCreateTutoring}>
-          Crear nueva tutoría
-        </button>
-      </div>
-    );
-  }
+      <div className="flex flex-col">
+        <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-2xl font-bold text-gray-900">
+                {mode === "serTutor" || mode === "serEstudiante"
+                  ? `Tutorías Disponibles para ${courseName || ""}`
+                  : "Tutorías Disponibles"}
+              </h1>
 
-  // vista especial si es serEstudiante y no hay tutorías
-  if (!loading && mode === "serEstudiante" && tutorings.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
-        <h1 className="text-2xl font-bold mb-4 text-black text-center">
-          No hay tutorías disponibles para{" "}
-          {courseName ? (
-            <Link
-              to={`/materias/${courseId}`}
-              className="text-blue-600 hover:underline"
-            >
-              {courseName}
-            </Link>
-          ) : (
-            "esta materia"
-          )}
-          .
-        </h1>
+              {["serTutor", "serEstudiante"].includes(mode) && (
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={handleNavigateToTopics}
+                >
+                  {mode === "serTutor"
+                    ? "Crear nueva tutoría"
+                    : "Solicitar nueva tutoría"}
+                </button>
+              )}
+            </div>
 
-        <button type="button" className="btn" onClick={goToCreateTutoring}>
-          Solicitar nueva tutoría
-        </button>
-      </div>
-    );
-  }
+            <TutoringSearchBar
+              query={query}
+              onQueryChange={(e) => setQuery(e.target.value)}
+              searchBy={forceSubjectSearch ? "subject" : searchBy}
+              onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
+              options={
+                forceSubjectSearch
+                  ? [{ value: "subject", label: "Tema" }]
+                  : [
+                      { value: "course", label: "Materia" },
+                      { value: "subject", label: "Tema" },
+                    ]
+              }
+              placeholder={
+                (forceSubjectSearch ? "subject" : searchBy) === "course"
+                  ? "Buscar por materia..."
+                  : "Buscar por tema..."
+              }
+            />
 
-  // layout base (se muestra siempre)
-  return (
-    <div className="flex flex-col">
-      <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold p-2 text-black">
-              {mode === "serTutor"
-                ? `Tutorías disponibles para ${courseName || ""}`
-                : "Tutorías disponibles"}
-            </h1>
-
-            {["serTutor", "serEstudiante"].includes(mode) && (
-              <button
-                type="button"
-                className="btn"
-                onClick={goToCreateTutoring}
-              >
-                {mode === "serTutor"
-                  ? "Crear nueva tutoría"
-                  : "Solicitar nueva tutoría"}
-              </button>
+            {/* Filter toggle */}
+            {mode !== "serTutor" && mode !== "serEstudiante" && (
+              <label className="flex items-center gap-2 cursor-pointer ml-4">
+                <input
+                  type="checkbox"
+                  checked={showWithoutTutor}
+                  onChange={(e) => setShowWithoutTutor(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-gray-700">Tutor Indefinido</span>
+              </label>
             )}
+
+            <TutoringList
+              tutorings={tutorings}
+              mode={mode}
+              loading={loading}
+              error={error}
+            />
+
+            <Pagination page={page} setPage={setPage} totalPages={totalPages} />
           </div>
-
-          {/* Barra de búsqueda */}
-          <TutoringSearchBar
-            query={query}
-            onQueryChange={(e) => setQuery(e.target.value)}
-            searchBy={forceSubjectSearch ? "subject" : searchBy}
-            onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
-            options={
-              forceSubjectSearch
-                ? [{ value: "subject", label: "Tema" }]
-                : [
-                    { value: "course", label: "Materia" },
-                    { value: "subject", label: "Tema" },
-                  ]
-            }
-            placeholder={
-              (forceSubjectSearch ? "subject" : searchBy) === "course"
-                ? "Buscar por materia..."
-                : "Buscar por tema..."
-            }
-          />
-
-          {/* Filtro toggle */}
-          {showFilterToggle && (
-            <label className="flex items-center gap-2 cursor-pointer ml-4 mt-2">
-              <input
-                type="checkbox"
-                checked={showWithoutTutor}
-                onChange={(e) => setShowWithoutTutor(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-gray-700">Tutor indefinido</span>
-            </label>
-          )}
-
-          {/* Contenido principal */}
-          {loading ? (
-            <div className="flex items-center justify-center min-h-[40vh] text-gray-600">
-              Cargando tutorías...
-            </div>
-          ) : tutorings.length === 0 ? (
-            <div className="flex flex-col items-center justify-center min-h-[40vh] text-center text-gray-700">
-              <p className="text-lg font-medium mb-2">
-                No se encontraron tutorías.
-              </p>
-              <p>Probá ajustando los filtros o el término de búsqueda.</p>
-            </div>
-          ) : (
-            <>
-              <TutoringList
-                tutorings={tutorings}
-                mode={mode}
-                loading={loading}
-                error={error}
-              />
-              <Pagination
-                page={page}
-                setPage={setPage}
-                totalPages={totalPages}
-              />
-            </>
-          )}
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+  if (mode === "serTutor" || mode === "serEstudiante") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] px-6 py-8 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          No hay tutorías disponibles para {courseName || "esta materia"}.
+        </h1>
+
+        <p className="text-gray-600 mb-6">
+          {mode === "serTutor"
+            ? "¡Sé el primero en crear una tutoría para esta materia!"
+            : "No hay tutorías disponibles. ¡Solicita una para empezar!"}
+        </p>
+
+        <button type="button" className="btn" onClick={handleNavigateToTopics}>
+          {mode === "serTutor"
+            ? "Crear nueva tutoría"
+            : "Solicitar nueva tutoría"}
+        </button>
+      </div>
+    );
+  } else {
+    return (
+      <div className="flex flex-col">
+        <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
+          <div className="max-w-5xl mx-auto">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              No hay tutorías disponibles
+            </h1>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }

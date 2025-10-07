@@ -77,6 +77,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_02_154329) do
     t.bigint "tutor_id"
     t.integer "enrolled", default: 0, null: false
     t.bigint "course_id", null: false
+    t.string "event_id"
     t.integer "state", default: 0, null: false
     t.text "request_comment"
     t.datetime "request_due_at"
@@ -120,6 +121,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_02_154329) do
     t.bigint "faculty_id"
     t.string "provider"
     t.string "uid"
+    t.string "google_access_token"
+    t.string "google_refresh_token"
+    t.datetime "google_expires_at"
+    t.string "calendar_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true
