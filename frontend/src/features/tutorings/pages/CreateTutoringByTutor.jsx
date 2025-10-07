@@ -25,7 +25,8 @@ const validators = {
   end_time: (value) => validateRequired(value, "Hora de fin"),
   time: (_value, form) => {
     if (form.date && form.start_time) {
-      const startErr = validateStartHourTutoring(form.date, form.start_time, 3 * 60, "hora de inicio");
+      const WAIT_MINUTES = 180; // 3 horas
+      const startErr = validateStartHourTutoring(form.date, form.start_time, WAIT_MINUTES, "hora de inicio");
       if (startErr) return startErr; // solo retorna si hay error
     }
     if (form.start_time && form.end_time) {
@@ -35,6 +36,8 @@ const validators = {
   },
   limit: (value) => validateInteger(value, "Cupos"),
 };
+
+const MAX_LOCATION_COMMENT = 255;
 
 export default function CreateTutoringByTutor() {
   const { user, userLoading, userError } = useUser(); 
@@ -201,14 +204,14 @@ export default function CreateTutoringByTutor() {
             <Textarea
               id="location"
               rows={2}
-              maxLength={255}
+              maxLength={MAX_LOCATION_COMMENT}
               value={form.location}
               onChange={(e) => setField("location", e.target.value)}
               className="p-2 border rounded-md text-sm"
               placeholder="Ej.: Departamento, Ciudad, Calle."
             />
-            <div className={`text-xs mt-1 ${form.location.length === 255 ? "text-red-600" : "text-gray-500"}`}>
-              {form.location.length}/{255}
+            <div className={`text-xs mt-1 ${form.location.length === MAX_LOCATION_COMMENT ? "text-red-600" : "text-gray-500"}`}>
+              {form.location.length}/{MAX_LOCATION_COMMENT}
             </div>
           </div>
         )}

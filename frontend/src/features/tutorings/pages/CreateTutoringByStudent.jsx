@@ -22,7 +22,8 @@ const validators = {
   request_due_time: (value) => validateRequired(value, "Hora límite"),
   time: (_value, form) => {
     if (form.request_due_date && form.request_due_time) {
-      const startErr = validateStartHourTutoring(form.request_due_date, form.request_due_time, 3 * 60, "hora límite");
+      const WAIT_MINUTES = 180; // 3 horas
+      const startErr = validateStartHourTutoring(form.request_due_date, form.request_due_time, WAIT_MINUTES, "hora límite");
       if (startErr) return startErr; // solo retorna si hay error
     }
     return null;
@@ -166,8 +167,8 @@ export default function CreateTutoringByStudent() {
               className="p-2 border rounded-md text-sm"
               placeholder="Ej.: Departamento, Ciudad, Calle."
             />
-            <div className={`text-xs mt-1 ${form.location.length === 255 ? "text-red-600" : "text-gray-500"}`}>
-              {form.location.length}/{255}
+            <div className={`text-xs mt-1 ${form.location.length === MAX_LOCATION_COMMENT ? "text-red-600" : "text-gray-500"}`}>
+              {form.location.length}/{MAX_LOCATION_COMMENT}
             </div>
           </div>
         )}
