@@ -85,9 +85,8 @@ class Tutoring < ApplicationRecord
 
   validates :request_comment, length: { maximum: 500 }, allow_blank: true
   validates :location, length: { maximum: 255 }, allow_blank: true
-  validate  :request_due_at_before_scheduled_at
-
-
+  validate :request_due_at_after_now
+  validate :request_due_at_before_scheduled_at
 
   # --- Métodos auxiliares ---
 
@@ -121,4 +120,14 @@ class Tutoring < ApplicationRecord
       errors.add(:request_due_at, "must be before scheduled_at")
     end
   end
+
+
+  def request_due_at_after_now
+    return if request_due_at.blank?
+
+    if request_due_at <= Time.current
+      errors.add(:request_due_at, "debe ser posterior a la fecha y hora actual")
+    end
+  end
 end
+

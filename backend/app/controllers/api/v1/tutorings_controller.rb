@@ -4,6 +4,8 @@ module Api
       include Pagy::Backend
       before_action :set_tutoring, only: [:show, :update, :destroy, :confirm_schedule]
 
+      before_action :authenticate_user!
+
       def index
         tutorings = Tutoring.all
 
@@ -31,11 +33,19 @@ module Api
         # los que aun no tienen tutor asignado
         if params[:no_tutor].present? && ActiveModel::Type::Boolean.new.cast(params[:no_tutor])
           tutorings = tutorings.without_tutor
+
+          # no aparecen las tutorias creadas por el usuario
+          tutorings = tutorings.where.not(created_by_id: current_user.id)
         end
 
-        # los que ya tienen tutor asignado
+        # los que ya tienen tutor asignado y no estan pending
         if params[:with_tutor].present? && ActiveModel::Type::Boolean.new.cast(params[:with_tutor])
-          tutorings = tutorings.with_tutor
+          tutorings = tutorings.with_tutor.where.not(state: "pending")
+
+          # no aparecen las tutorias creadas por el usuario ni las que el usuario es tutor
+          tutorings = tutorings
+                      .where.not(created_by_id: current_user.id)
+                      .where.not(tutor_id:      current_user.id)
         end
 
         q = params[:search].to_s
@@ -140,25 +150,26 @@ module Api
 
       def create
         tutoring = Tutoring.new(tutoring_params)
-        tutoring.created_by_id = params[:tutoring][:created_by_id]
-        tutoring.tutor_id      = params[:tutoring][:tutor_id]
-        tutoring.course_id     = params[:tutoring][:course_id]
-      
+        tutoring.created_by_id = params.dig(:tutoring, :created_by_id)
+        tutoring.tutor_id      = params.dig(:tutoring, :tutor_id)
+        tutoring.course_id     = params.dig(:tutoring, :course_id)
+        
         if tutoring.tutor_id.nil? && tutoring.capacity.nil?
           tutoring.capacity = 1 # Valor por defecto para solicitudes pendientes
         end
         
         if tutoring.tutor_id.present? && tutoring.scheduled_at.present? && tutoring.duration_mins.present?
+          tutoring.state = 1 # cuando la tutoria es creada por el tutor la creamos como activa
           start_time = tutoring.scheduled_at
           end_time = start_time + tutoring.duration_mins.minutes
-      
+          
           overlapping = Tutoring.where(tutor_id: tutoring.tutor_id)
                                 .where.not(id: tutoring.id)
                                 .exists?([
                                   "scheduled_at < ? AND (scheduled_at + INTERVAL '1 minute' * duration_mins) > ?",
                                   end_time, start_time
                                 ])
-      
+          
           if overlapping
             render json: {
               errors: ["Ya tienes una tutoría programada en esa fecha y horario"]
@@ -166,7 +177,7 @@ module Api
             return
           end
         end
-      
+        
         ActiveRecord::Base.transaction do
           if tutoring.save
             # Crear disponibilidades si vienen en los parámetros
@@ -182,6 +193,7 @@ module Api
               end
             end
             
+            # create_user_tutoring(tutoring)
             render json: { 
               tutoring: tutoring.as_json.merge(
                 availabilities: tutoring.tutoring_availabilities.as_json
@@ -195,12 +207,16 @@ module Api
         render json: { errors: [e.message] }, status: :unprocessable_entity
       end
 
+
+
+
       def update
         if @tutoring.update(tutoring_update_params)
           render json: { 
             message: "Tutoría actualizada exitosamente",
             tutoring: @tutoring
           }
+
         else
           render json: { errors: @tutoring.errors.full_messages }, status: :unprocessable_entity
         end
@@ -414,8 +430,15 @@ module Api
 
       private
 
+
       def set_tutoring
         @tutoring = Tutoring.find(params[:id])
+      end
+      def create_user_tutoring(tutoring)
+        return unless params.dig(:tutoring, :tutor_id).nil?
+
+        UserTutoring.create!(user: current_user, tutoring:)
+
       end
 
       def tutoring_params

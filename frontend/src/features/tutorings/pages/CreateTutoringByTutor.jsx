@@ -143,8 +143,8 @@ export default function CreateTutoringByTutor() {
 
       const payload = {
         modality: form.mode,
-        capacity: Number.parseInt(form.limit, 10),
-        creator_id: user.id,
+        capacity: parseInt(form.limit, 10),
+        created_by_id: user.id,
         tutor_id: user.id,
         course_id: course.id,
         subject_ids: selectedSubjects,
