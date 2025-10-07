@@ -78,7 +78,7 @@ class User < ApplicationRecord
     UserMailer
   end
 
-  after_destroy :handle_tutorings_on_user_deletion
+  before_destroy :handle_tutorings_on_user_deletion
 
   def handle_tutorings_on_user_deletion
     Tutoring.enrolled_by(self).find_each do |tutoring|
@@ -101,7 +101,7 @@ class User < ApplicationRecord
       else
         # el usuario era ESTUDIANTE
         if tutoring.users.count == 1
-          # Caso 2 (único estudiante en tutoría) o 4 (pendiente), si hay más de un estudiante en una tutoría pending no la elimino
+          # Caso 2 (único estudiante en tutoría) o 4 (pendiente)
           tutoring.destroy
           if tutoring.tutor.present?
             # Notificar al tutor que la tutoría fue cancelada
@@ -117,6 +117,4 @@ class User < ApplicationRecord
             .having('COUNT(user_tutorings.id) = 0')
             .destroy_all
   end
-
-
 end
