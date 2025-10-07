@@ -124,4 +124,9 @@ class Tutoring < ApplicationRecord
       errors.add(:request_due_at, "debe ser posterior a la fecha y hora actual")
     end
   end
+
+  def created_and_confirmed?
+  tutor.present? && enrolled > 0 && scheduled_at.present?
+  end
+
 end
