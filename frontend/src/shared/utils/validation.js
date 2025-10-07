@@ -37,15 +37,11 @@ export function validateDate(date) {
   return null;
 }
 
-export function validateHoursTutoring(date, startTime, endTime) {
-  if (!startTime || !endTime) return null;
-  if (endTime <= startTime) return "La hora de fin debe ser posterior a la de inicio";
+export function validateStartHourTutoring(date, startTime, waitMinutes=180, fieldName="hora") {
+  if (!date || !startTime) return null;
 
   const [startH, startM] = startTime.split(":").map(Number);
-  const [endH, endM] = endTime.split(":").map(Number);
   const start = startH * 60 + startM;
-  const end = endH * 60 + endM;
-  if (end - start < 60) return "La sesión debe durar al menos 1 hora";
 
   // Si se pasa la fecha, validar que la hora de inicio sea al menos 3 horas después de ahora
   if (date) {
@@ -58,11 +54,35 @@ export function validateHoursTutoring(date, startTime, endTime) {
       inputDate.getDate() === today.getDate()
     ) {
       const nowMinutes = today.getHours() * 60 + today.getMinutes();
-      if (start - nowMinutes < 180) {
-        return "La hora de inicio debe ser al menos 3 horas mayor que la actual";
+      if(start < nowMinutes) {
+        return `La ${fieldName} no puede ser anterior a la actual`;
+      }
+      if (start - nowMinutes < waitMinutes) {
+        return `La ${fieldName} debe ser al menos ${waitMinutes / 60} horas mayor que la actual`;
       }
     }
   }
+  return null;
+}
+
+export function validateHoursTutoring(startTime, endTime) {
+  // Si falta alguno no validamos la relación aquí (se validan individualmente)
+  if (!startTime || !endTime) return null;
+
+  const [startH, startM] = startTime.split(":").map(Number);
+  const start = startH * 60 + startM;
+  const [endH, endM] = endTime.split(":").map(Number);
+  let end = endH * 60 + endM;
+
+  if (end <= start) {
+    end += 24 * 60;
+  }
+
+  const duration = end - start;
+
+  if (duration < 60) return "La sesión debe durar al menos 1 hora";
+
+  if (duration > (4 * 60)) return "La sesión no puede durar más de 4 horas";
 
   return null;
 }

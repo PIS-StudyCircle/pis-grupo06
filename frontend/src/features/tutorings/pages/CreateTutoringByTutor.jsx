@@ -7,10 +7,12 @@ import { AuthLayout } from "../../users/components/AuthLayout.jsx";
 import { Input } from "@components/Input";
 import { ErrorAlert } from "@components/ErrorAlert";
 import { SubmitButton } from "@components/SubmitButton";
+import { Textarea } from "@components/Textarea";
 import { useFormState } from "@utils/UseFormState";
 import {
   validateRequired,
   validateDate,
+  validateStartHourTutoring,
   validateHoursTutoring,
   validateInteger,
 } from "@utils/validation";
@@ -20,16 +22,18 @@ import { useFormSubmit } from "@utils/UseFormSubmit";
 const validators = {
   date: (value) => validateDate(value, "Fecha de inicio"),
   start_time: (value) => validateRequired(value, "Hora de inicio"),
-  end_time: (value, form) => {
-    const required = validateRequired(value, "Hora de fin");
-    if (required) return required;
-    // Solo valida relación si ambas horas están presentes
-    if (form.date && form.start_time && form.end_time) {
-      return validateHoursTutoring(form.date, form.start_time, form.end_time);
+  end_time: (value) => validateRequired(value, "Hora de fin"),
+  time: (_value, form) => {
+    if (form.date && form.start_time) {
+      const startErr = validateStartHourTutoring(form.date, form.start_time, 3 * 60, "hora de inicio");
+      if (startErr) return startErr; // solo retorna si hay error
+    }
+    if (form.start_time && form.end_time) {
+      return validateHoursTutoring(form.start_time, form.end_time);
     }
     return null;
   },
-  limit: (value) => validateInteger(value, "Límite de estudiantes"),
+  limit: (value) => validateInteger(value, "Cupos"),
 };
 
 export default function CreateTutoringByTutor() {
@@ -63,14 +67,20 @@ export default function CreateTutoringByTutor() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate(form)) {
-      // Crea el objeto Date en la zona local
+      // Crea el objeto Date en la zona local para el inicio
       const localDate = new Date(`${form.date}T${form.start_time}:00`);
       // Convierte a ISO string (UTC)
       const scheduled_at = localDate.toISOString();
 
+      // Calcula duración en minutos considerando posible dia siguiente
       const [startH, startM] = form.start_time.split(":").map(Number);
       const [endH, endM] = form.end_time.split(":").map(Number);
-      const duration_mins = (endH * 60 + endM) - (startH * 60 + startM);
+      const startMinutes = startH * 60 + startM;
+      let endMinutes = endH * 60 + endM;
+      if (endMinutes <= startMinutes) {
+        endMinutes += 24 * 60; // día siguiente
+      }
+      const duration_mins = endMinutes - startMinutes;
 
       const payload = {
         scheduled_at,
@@ -101,18 +111,14 @@ export default function CreateTutoringByTutor() {
           >
             Fecha
           </label>
-          <input
+          <Input
             id="date"
             type="date"
             value={form.date}
             onChange={(e) => setField("date", e.target.value)}
             className="p-1 border rounded-md text-sm"
+            error={errors.date}
           />
-          {errors.date && (
-            <span className="text-red-500 text-xs mt-1">
-              {errors.date}
-            </span>
-          )}
         </div>
 
         <div>
@@ -124,12 +130,13 @@ export default function CreateTutoringByTutor() {
               >
                 Hora de inicio
               </label>
-              <input
+              <Input
                 id="start_time"
                 type="time"
                 value={form.start_time}
                 onChange={(e) => setField("start_time", e.target.value)}
                 className="p-1 border rounded-md text-sm"
+                error={errors.start_time}
               />
             </div>
             <div className="flex flex-col flex-1">
@@ -139,23 +146,27 @@ export default function CreateTutoringByTutor() {
               >
                 Hora de fin
               </label>
-              <input
+              <Input
                 id="end_time"
                 type="time"
                 value={form.end_time}
                 onChange={(e) => setField("end_time", e.target.value)}
                 className="p-1 border rounded-md text-sm"
+                error={errors.end_time}
               />
             </div>
           </div>
-          {errors.start_time && (
-            <span className="text-red-500 text-xs">{errors.start_time}</span>
-          )}
-          {!errors.start_time && errors.end_time && (
-            <span className="text-red-500 text-xs">{errors.end_time}</span>
-          )}
         </div>
  
+        <p
+          id="time-error"
+          role="alert"
+          aria-live="polite"
+          className="mt-1 pl-3 text-sm font-normal text-center text-[#d93025]"
+        >
+          {errors.time}
+        </p>
+
         <div className="flex items-center gap-4">
           <span className="font-medium">Modalidad:</span>
           <button
@@ -187,7 +198,7 @@ export default function CreateTutoringByTutor() {
             <label htmlFor="location" className="text-gray-600 text-xs font-medium mb-1">
               Lugar de la tutoría (opcional)
             </label>
-            <textarea
+            <Textarea
               id="location"
               rows={2}
               maxLength={255}
@@ -199,9 +210,6 @@ export default function CreateTutoringByTutor() {
             <div className={`text-xs mt-1 ${form.location.length === 255 ? "text-red-600" : "text-gray-500"}`}>
               {form.location.length}/{255}
             </div>
-            {form.location.length > 255 && (
-              <span className="text-red-500 text-xs mt-1">Máximo 255 caracteres.</span>
-            )}
           </div>
         )}
 
@@ -212,6 +220,8 @@ export default function CreateTutoringByTutor() {
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
+            minLength={1}
+            maxLength={3}
             value={form.limit}
             onChange={(e) => setField("limit", e.target.value.replace(/[^0-9]/g, ""))}
             error={errors.limit}

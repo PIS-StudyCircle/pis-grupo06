@@ -156,7 +156,7 @@ describe("CourseDetailPage", () => {
     // Botón "Recibir tutoría"
     const tutoriaButton = screen.getByText(/Recibir tutoría/i);
     tutoriaButton.click();
-    expect(mockedNavigate).toHaveBeenCalledWith("/tutorias/materia/1");
+    expect(mockedNavigate).toHaveBeenCalledWith("/tutorias/ser_estudiante/1");
   });
   
 });

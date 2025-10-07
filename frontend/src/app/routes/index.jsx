@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 
 import { CoursePage, CourseDetailPage } from "@/features/courses";
-import { ProfilePage, SignInPage, RegisterPage, TutorPage, VisitorFlow, ForgotPasswordPage, ResetPasswordPage, UserProfilePage} from "@/features/users";
+import { ProfilePage, SignInPage, RegisterPage, TutorListPage, VisitorFlow, ForgotPasswordPage, ResetPasswordPage, UserProfilePage} from "@/features/users";
 import { SubjectPage } from "@/features/subjects";
 import SubjectDetailPage from "@/features/subjects/pages/SubjectDetailPage";
 import { RequireGuestRoute } from "./RequireGuestRoute";
@@ -27,15 +27,15 @@ export function AppRoutes() {
         <Route path="/tutorias/crear/:courseId" element={<CreateTutoringByTutor />} />
         <Route path="/tutorias/solicitar/:courseId" element={<CreateTutoringByStudent />} />
         <Route path="/perfil" element={<ProfilePage />} />
-        <Route path="/tutores" element={<TutorPage />} />
+        <Route path="/tutores" element={<TutorListPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
-        <Route path="/tutorias/materia/:courseId" element={<TutoringPage filters={{}} mode="serEstudiante" />} />
+        <Route path="/tutorias/ser_estudiante/:courseId" element={<TutoringPage filters={{}} mode="serEstudiante" />} />
       </Route>
       <Route path="/" element={<Navigate to="/materias" replace />} />
       <Route path="/materias" element={<CoursePage />} />
       <Route path="/materias/:courseId" element={<CourseDetailPage />} />
       <Route path="/materias/:courseId/temas/:subjectId" element={<SubjectDetailPage/>} />
-      <Route path="/tutores" element={<TutorPage />} />
+      <Route path="/tutores" element={<TutorListPage />} />
       <Route path="*" element={<Error404Page />} />
     </Routes>
   );

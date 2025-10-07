@@ -5,9 +5,29 @@ import { createTutoringByStudent } from "../services/tutoringService";
 
 import { AuthLayout } from "../../users/components/AuthLayout.jsx";
 import { ErrorAlert } from "@components/ErrorAlert";
+import { Input } from "@components/Input";
+import { Textarea } from "@components/Textarea";
 import { SubmitButton } from "@components/SubmitButton";
 import { useFormState } from "@utils/UseFormState";
 import { useFormSubmit } from "@utils/UseFormSubmit";
+import {
+  validateRequired,
+  validateDate,
+  validateStartHourTutoring,
+} from "@utils/validation";
+import { useValidation } from "@hooks/useValidation";
+
+const validators = {
+  request_due_date: (value) => validateDate(value, "Fecha límite"),
+  request_due_time: (value) => validateRequired(value, "Hora límite"),
+  time: (_value, form) => {
+    if (form.request_due_date && form.request_due_time) {
+      const startErr = validateStartHourTutoring(form.request_due_date, form.request_due_time, 3 * 60, "hora límite");
+      if (startErr) return startErr; // solo retorna si hay error
+    }
+    return null;
+  },
+};
 
 const MAX_REQUEST_COMMENT = 500;
 const MAX_LOCATION_COMMENT = 255;
@@ -25,6 +45,7 @@ export default function CreateTutoringByStudent() {
     location: "",
   });
 
+  const { errors, validate } = useValidation(validators);
   const { error, onSubmit } = useFormSubmit(createTutoringByStudent, "/");
 
   if (userLoading) return <p className="text-center mt-10">Cargando usuario...</p>;
@@ -35,43 +56,28 @@ export default function CreateTutoringByStudent() {
   if (errorCourse)   return <p className="text-center mt-10">Error al cargar el curso.</p>;
   if (!course)       return <p className="text-center mt-10">No hay curso cargado.</p>;
 
-  const validate = () => {
-    const errs = {};
-    if (!form.request_due_date) errs.request_due_date = "La fecha límite es obligatoria.";
-    if (!form.request_due_time) errs.request_due_time = "La hora límite es obligatoria.";
-    if (form.request_comment.length > MAX_REQUEST_COMMENT)
-      errs.request_comment = `Máximo ${MAX_REQUEST_COMMENT} caracteres.`;
-    if (form.location.length > MAX_LOCATION_COMMENT)
-      errs.location = `Máximo ${MAX_LOCATION_COMMENT} caracteres.`;
-    return errs;
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length > 0) {
-      setField("_errors", errs);
-      return;
+    if (validate(form)) {
+      const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
+
+      const dueLocal = new Date(`${form.request_due_date}T${form.request_due_time}:00`);
+      const request_due_at = dueLocal.toISOString();
+
+      const payload = {
+        request_comment: form.request_comment.trim() || undefined,
+        request_due_at,
+        created_by_id: user.id,
+        tutor_id: null,
+        course_id: course.id,
+        subject_ids: selectedSubjects,
+        modality: form.mode,
+        location: form.mode === "presencial" ? form.location.trim() : "",
+      };
+
+      onSubmit(payload);
+      localStorage.removeItem("selectedSubjects");
     }
-
-    const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
-
-    const dueLocal = new Date(`${form.request_due_date}T${form.request_due_time}:00`);
-    const request_due_at = dueLocal.toISOString();
-
-    const payload = {
-      request_comment: form.request_comment.trim() || undefined,
-      request_due_at,
-      created_by_id: user.id,
-      tutor_id: null,
-      course_id: course.id,
-      subject_ids: selectedSubjects,
-      modality: form.mode,
-      location: form.mode === "presencial" ? form.location.trim() : "",
-    };
- 
-    onSubmit(payload);
-    localStorage.removeItem("selectedSubjects");
   };
 
   const errs = form._errors || {};
@@ -83,39 +89,35 @@ export default function CreateTutoringByStudent() {
           <label htmlFor="request_due_date" className="text-gray-600 text-xs font-medium mb-1">
             Fecha límite para recibir la tutoría
           </label>
-          <input
+          <Input
             id="request_due_date"
             type="date"
             value={form.request_due_date}
             onChange={(e) => setField("request_due_date", e.target.value)}
             className="p-1 border rounded-md text-sm"
+            error={errors.request_due_date}
           />
-          {errs.request_due_date && (
-            <span className="text-red-500 text-xs mt-1">{errs.request_due_date}</span>
-          )}
         </div>
 
         <div className="flex flex-col text-left">
           <label htmlFor="request_due_time" className="text-gray-600 text-xs font-medium mb-1">
             Hora límite
           </label>
-          <input
+          <Input
             id="request_due_time"
             type="time"
             value={form.request_due_time}
             onChange={(e) => setField("request_due_time", e.target.value)}
             className="p-1 border rounded-md text-sm"
+            error={errors.request_due_time || errors.time}
           />
-          {errs.request_due_time && (
-            <span className="text-red-500 text-xs mt-1">{errs.request_due_time}</span>
-          )}
         </div>
 
         <div className="flex flex-col text-left">
           <label htmlFor="request_comment" className="text-gray-600 text-xs font-medium mb-1">
             Comentario para el tutor (opcional)
           </label>
-          <textarea
+          <Textarea
             id="request_comment"
             rows={4}
             maxLength={MAX_REQUEST_COMMENT}
@@ -124,12 +126,6 @@ export default function CreateTutoringByStudent() {
             className="p-2 border rounded-md text-sm"
             placeholder="Ej.: Preferiría viernes 18hs; temas 1 y 2…"
           />
-          <div className={`text-xs mt-1 ${form.request_comment.length === MAX_REQUEST_COMMENT ? "text-red-600" : "text-gray-500"}`}>
-            {form.request_comment.length}/{MAX_REQUEST_COMMENT}
-          </div>
-          {errs.request_comment && (
-            <span className="text-red-500 text-xs mt-1">{errs.request_comment}</span>
-          )}
         </div>
 
          <div className="flex items-center gap-4">
@@ -163,7 +159,7 @@ export default function CreateTutoringByStudent() {
             <label htmlFor="location" className="text-gray-600 text-xs font-medium mb-1">
               Lugar de la tutoría (opcional)
             </label>
-            <textarea
+            <Textarea
               id="location"
               rows={2}
               maxLength={MAX_LOCATION_COMMENT}
@@ -172,12 +168,9 @@ export default function CreateTutoringByStudent() {
               className="p-2 border rounded-md text-sm"
               placeholder="Ej.: Departamento, Ciudad, Calle."
             />
-            <div className={`text-xs mt-1 ${form.location.length === MAX_LOCATION_COMMENT ? "text-red-600" : "text-gray-500"}`}>
-              {form.location.length}/{MAX_LOCATION_COMMENT}
+            <div className={`text-xs mt-1 ${form.location.length === 255 ? "text-red-600" : "text-gray-500"}`}>
+              {form.location.length}/{255}
             </div>
-            {errs.location && (
-              <span className="text-red-500 text-xs mt-1">{errs.location}</span>
-            )}
           </div>
         )}
 
