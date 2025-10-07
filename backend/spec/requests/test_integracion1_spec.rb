@@ -1,7 +1,7 @@
-# Flujo: Registro → Crear tutoría (estudiante) → Listado → Perfil → Mis tutorías
+# Flujo: Registro → Crear tutoría (estudiante) → Listado (diferentes filtros)
 require "rails_helper"
 
-RSpec.describe "Flow: Registro → Crear tutoría (estudiante) → Listado → Perfil → Mis tutorías", type: :request do
+RSpec.describe "Flow: Registro → Crear tutoría (estudiante) → Listado (diferentes filtros)", type: :request do
   include Devise::Test::IntegrationHelpers
 
   def ensure_faculty
