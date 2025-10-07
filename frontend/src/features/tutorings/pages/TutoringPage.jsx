@@ -43,6 +43,8 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
     setSearch,
   } = useTutorings(1, 20, mergedFilters, mode);
 
+  console.log(tutorings)
+
   const totalPages = pagination?.last || 1;
 
   // query local con debounce
