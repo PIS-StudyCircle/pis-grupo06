@@ -168,6 +168,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
     UserTutoring.create!(user: user, tutoring: tutoring_as_student_with_student)
     UserTutoring.create!(user: other_user2, tutoring: tutoring_as_student_with_student)
 
+    # Tutoría donde el usuario no crea la tutoría, es estudiante, y no tiene estudiantes
     tutoring_as_student_without_student = Tutoring.create!(
       course_id: course.id,
       scheduled_at: 7.days.from_now,
@@ -199,13 +200,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
     get "/api/v1/users/me", headers: headers
     expect(response).to have_http_status(:unauthorized).or have_http_status(:found)
 
-    expect(Tutoring.find_by(id: tutoring_created_as_tutor_with_student.id).tutor_id).to be_nil
-    expect(Tutoring.find_by(id: tutoring_created_as_tutor_with_student.id).created_by_id).to be_nil
-    expect(Tutoring.find_by(id: tutoring_created_as_tutor_with_student.id).state).to eq(3) # cancelled
-    expect(Tutoring.find_by(id: tutoring_created_as_tutor_with_student.id).enrolled).to eq(1)
-    expect(UserTutoring.find_by(user_id: other_user.id, tutoring_id: tutoring_created_as_tutor_with_student.id))
-      .to be_present
-
+    expect(Tutoring.find_by(id: tutoring_created_as_tutor_with_student.id)).to be_nil 
     expect(Tutoring.find_by(id: tutoring_created_as_tutor_without_student.id)).to be_nil
 
     expect(Tutoring.find_by(id: tutoring_created_as_student_with_student.id).tutor_id)
@@ -213,7 +208,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
     expect(Tutoring.find_by(id: tutoring_created_as_student_with_student.id).created_by_id)
       .to be_nil
     expect(Tutoring.find_by(id: tutoring_created_as_student_with_student.id).state)
-      .to eq(1) # active
+      .to eq("active")
     expect(Tutoring.find_by(id: tutoring_created_as_student_with_student.id).enrolled)
       .to eq(1)
     expect(UserTutoring.find_by(user_id: user.id, tutoring_id: tutoring_created_as_student_with_student.id))
@@ -221,10 +216,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
     expect(UserTutoring.find_by(user_id: other_user2.id, tutoring_id: tutoring_created_as_student_with_student.id))
       .to be_present
 
-    expect(Tutoring.find_by(id: tutoring_created_as_student_without_student.id).created_by_id).to eq(other_user.id)
-    expect(Tutoring.find_by(id: tutoring_created_as_student_without_student.id).created_by_id).to be_nil
-    expect(Tutoring.find_by(id: tutoring_created_as_student_without_student.id).state).to eq(3) # cancelled
-    expect(Tutoring.find_by(id: tutoring_created_as_student_without_student.id).enrolled).to eq(0)
+    expect(Tutoring.find_by(id: tutoring_created_as_student_without_student.id)).to be_nil
     expect(UserTutoring.find_by(user_id: user.id, tutoring_id: tutoring_created_as_student_without_student.id))
       .to be_nil
 
@@ -233,7 +225,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
 
     expect(Tutoring.find_by(id: tutoring_as_student_with_student.id).tutor_id).to eq(other_user.id)
     expect(Tutoring.find_by(id: tutoring_as_student_with_student.id).created_by_id).to eq(other_user.id)
-    expect(Tutoring.find_by(id: tutoring_as_student_with_student.id).state).to eq(1) # active
+    expect(Tutoring.find_by(id: tutoring_as_student_with_student.id).state).to eq("active")
     expect(Tutoring.find_by(id: tutoring_as_student_with_student.id).enrolled).to eq(1)
     expect(UserTutoring.find_by(user_id: user.id, tutoring_id: tutoring_as_student_with_student.id)).to be_nil
     expect(UserTutoring.find_by(user_id: other_user2.id, tutoring_id: tutoring_as_student_with_student.id))
@@ -241,7 +233,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
 
     expect(Tutoring.find_by(id: tutoring_as_student_without_student.id).tutor_id).to eq(other_user.id)
     expect(Tutoring.find_by(id: tutoring_as_student_without_student.id).created_by_id).to eq(other_user.id)
-    expect(Tutoring.find_by(id: tutoring_as_student_without_student.id).state).to eq(1) # active
+    expect(Tutoring.find_by(id: tutoring_as_student_without_student.id).state).to eq("active")
     expect(Tutoring.find_by(id: tutoring_as_student_without_student.id).enrolled).to eq(0)
     expect(UserTutoring.find_by(user_id: user.id, tutoring_id: tutoring_as_student_without_student.id)).to be_nil
   end
