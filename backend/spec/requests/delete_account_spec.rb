@@ -200,7 +200,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
     get "/api/v1/users/me", headers: headers
     expect(response).to have_http_status(:unauthorized).or have_http_status(:found)
 
-    expect(Tutoring.find_by(id: tutoring_created_as_tutor_with_student.id)).to be_nil 
+    expect(Tutoring.find_by(id: tutoring_created_as_tutor_with_student.id)).to be_nil
     expect(Tutoring.find_by(id: tutoring_created_as_tutor_without_student.id)).to be_nil
 
     expect(Tutoring.find_by(id: tutoring_created_as_student_with_student.id).tutor_id)

@@ -88,10 +88,9 @@ class User < ApplicationRecord
       if tutoring.tutor_id == id
         # CASOS 1 y 3: el usuario era el TUTOR
         if tutoring.users.empty?
-          # Caso 5*: tutoría con único usuario (el tutor)
-          tutoring.destroy
-        elsif tutoring.created_and_confirmed?
           # Caso 1: tutoría creada con horario confirmado
+          tutoring.destroy
+          # Caso 5*: tutoría con único usuario (el tutor)
           tutoring.destroy
           # Notificar a todos los estudiantes que el tutor canceló la tutoría
         else
