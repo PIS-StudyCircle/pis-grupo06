@@ -17,7 +17,13 @@ jest.mock("../hooks/useTutorings", () => ({
 import { useTutorings } from "../hooks/useTutorings";
 
 // 2) Mock de TutoringSearchBar
-const TutoringSearchBarMock = ({ query, onQueryChange, searchBy, onSearchByChange, placeholder }) => (
+const TutoringSearchBarMock = ({
+  query,
+  onQueryChange,
+  searchBy,
+  onSearchByChange,
+  placeholder,
+}) => (
   <div data-testid="tutoring-search-bar">
     <input
       data-testid="query-input"
@@ -42,7 +48,12 @@ jest.mock("../components/TutoringSearchBar", () => ({
 
 // 3) Mock de TutoringList (solo muestra algo mínimo y expone props en data-* para asserts)
 const TutoringListMock = ({ tutorings = [], mode = "", loading, error }) => (
-  <div data-testid="tutoring-list" data-mode={mode} data-loading={String(!!loading)} data-error={error || ""}>
+  <div
+    data-testid="tutoring-list"
+    data-mode={mode}
+    data-loading={String(!!loading)}
+    data-error={error || ""}
+  >
     {tutorings.map((t) => (
       <div key={t.id}>
         <div>
@@ -101,16 +112,19 @@ const mockUseTutorings = ({
   // Filtrado simulado
   let filtered = tutorings;
   const normalize = (str) =>
-    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
 
   if (query) {
     if (searchBy === "course") {
-      filtered = tutorings.filter(t =>
+      filtered = tutorings.filter((t) =>
         normalize(t.course.name).includes(normalize(query))
       );
     } else {
-      filtered = tutorings.filter(t =>
-        t.subjects.some(s => normalize(s.name).includes(normalize(query)))
+      filtered = tutorings.filter((t) =>
+        t.subjects.some((s) => normalize(s.name).includes(normalize(query)))
       );
     }
   }
@@ -128,7 +142,10 @@ function renderWithRouter(courseId = "123", mode = "serTutor") {
   return render(
     <MemoryRouter initialEntries={[`/tutorings/${courseId}`]}>
       <Routes>
-        <Route path="/tutorings/:courseId" element={<TutoringPage mode={mode} />} />
+        <Route
+          path="/tutorings/:courseId"
+          element={<TutoringPage mode={mode} />}
+        />
       </Routes>
     </MemoryRouter>
   );
@@ -155,19 +172,57 @@ const countTema = (tema) => {
 
 describe("TutoringPage", () => {
   const baseTutorings = [
-    { id: 1, course: { name: "Cálculo 1" }, subjects: [{ id: 1, name: "Derivadas" }] },
-    { id: 2, course: { name: "Cálculo 1" }, subjects: [{ id: 1, name: "Derivadas" }] },
-    { id: 3, course: { name: "Cálculo 1" }, subjects: [{ id: 1, name: "Derivadas" }, { id: 2, name: "Integrales" }] },
-    { id: 4, course: { name: "Cálculo 2" }, subjects: [{ id: 3, name: "Derivadas" }] },
-    { id: 5, course: { name: "Programación 2" }, subjects: [{ id: 4, name: "Mecánica" }, {id: 5, name: "Robótica"}] },
-    { id: 6, course: { name: "Robótica" }, subjects: [{ id: 6, name: "Mecánica" }] },
+    {
+      id: 1,
+      course: { name: "Cálculo 1" },
+      subjects: [{ id: 1, name: "Derivadas" }],
+    },
+    {
+      id: 2,
+      course: { name: "Cálculo 1" },
+      subjects: [{ id: 1, name: "Derivadas" }],
+    },
+    {
+      id: 3,
+      course: { name: "Cálculo 1" },
+      subjects: [
+        { id: 1, name: "Derivadas" },
+        { id: 2, name: "Integrales" },
+      ],
+    },
+    {
+      id: 4,
+      course: { name: "Cálculo 2" },
+      subjects: [{ id: 3, name: "Derivadas" }],
+    },
+    {
+      id: 5,
+      course: { name: "Programación 2" },
+      subjects: [
+        { id: 4, name: "Mecánica" },
+        { id: 5, name: "Robótica" },
+      ],
+    },
+    {
+      id: 6,
+      course: { name: "Robótica" },
+      subjects: [{ id: 6, name: "Mecánica" }],
+    },
   ];
 
   test("renderiza el título y pasa props correctas a TutoringList", () => {
     mockUseTutorings({
       tutorings: [
-        { id: 1, course: { name: "Cálculo 1" }, subjects: [{ id: 1, name: "Derivadas" }] },
-        { id: 2, course: { name: "Programación 2" }, subjects: [{ id: 2, name: "Listas" }] },
+        {
+          id: 1,
+          course: { name: "Cálculo 1" },
+          subjects: [{ id: 1, name: "Derivadas" }],
+        },
+        {
+          id: 2,
+          course: { name: "Programación 2" },
+          subjects: [{ id: 2, name: "Listas" }],
+        },
       ],
       pagination: { last: 5 },
       page: 1,
@@ -175,7 +230,9 @@ describe("TutoringPage", () => {
     renderWithRouter();
 
     // Título
-    expect(screen.getByRole("heading", { name: /Tutorías Disponibles/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /Tutorías Disponibles/i })
+    ).toBeInTheDocument();
 
     // TutoringList: chequeo de props pasadas
     const list = screen.getByTestId("tutoring-list");
@@ -230,7 +287,7 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     const searchBar = screen.getByTestId("tutoring-search-bar");
     expect(searchBar).toBeInTheDocument();
@@ -245,7 +302,6 @@ describe("TutoringPage", () => {
     expect(countMateria("Cálculo 2")).toBe(1);
     expect(countMateria("Programación 2")).toBe(1);
     expect(countMateria("Robótica")).toBe(1);
-    
   });
 
   test("filtra varias tutorías por materia", () => {
@@ -257,7 +313,7 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     const searchBar = screen.getByTestId("tutoring-search-bar");
     expect(searchBar).toBeInTheDocument();
@@ -272,7 +328,7 @@ describe("TutoringPage", () => {
     expect(countMateria("Cálculo 2")).toBe(1);
     expect(countMateria("Programación 2")).toBe(1);
     expect(countMateria("Robótica")).toBe(1);
-    
+
     fireEvent.change(queryInput, { target: { value: "calc" } });
     expect(queryInput).toHaveValue("calc");
 
@@ -284,14 +340,13 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
     cleanup();
-    render(<TutoringPage />);
+    renderWithRouter();
 
     expect(countMateria("Cálculo")).toBe(4);
     expect(countMateria("Cálculo 1")).toBe(3);
     expect(countMateria("Cálculo 2")).toBe(1);
     expect(countMateria("Programación II")).toBe(0);
     expect(countMateria("Robótica")).toBe(0);
-    
   });
 
   test("filtra una tutoría por materia", () => {
@@ -303,7 +358,7 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     const searchBar = screen.getByTestId("tutoring-search-bar");
     expect(searchBar).toBeInTheDocument();
@@ -324,14 +379,14 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
     cleanup();
-    render(<TutoringPage />);
+    renderWithRouter();
 
     expect(countMateria("Cálculo")).toBe(0);
     expect(countMateria("Programación 2")).toBe(0);
     expect(countMateria("Robótica")).toBe(1);
   });
 
-   test("No filtra tutoría por materia", () => {
+  test("No filtra tutoría por materia", () => {
     mockUseTutorings({
       tutorings: baseTutorings,
       pagination: { last: 1 },
@@ -340,7 +395,7 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     const searchBar = screen.getByTestId("tutoring-search-bar");
     expect(searchBar).toBeInTheDocument();
@@ -361,7 +416,7 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
     cleanup();
-    render(<TutoringPage />);
+    renderWithRouter();
 
     expect(countMateria("Cálculo")).toBe(0);
     expect(countMateria("Programación 2")).toBe(0);
@@ -377,7 +432,7 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     const searchBar = screen.getByTestId("tutoring-search-bar");
     expect(searchBar).toBeInTheDocument();
@@ -393,7 +448,6 @@ describe("TutoringPage", () => {
     expect(countTema("Integrales")).toBe(1);
     expect(countTema("Mecánica")).toBe(2);
     expect(countTema("Robótica")).toBe(1);
-    
   });
 
   test("filtra varias tutorías por tema", () => {
@@ -405,7 +459,7 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     const searchBar = screen.getByTestId("tutoring-search-bar");
     expect(searchBar).toBeInTheDocument();
@@ -430,7 +484,7 @@ describe("TutoringPage", () => {
       searchBy: "subject",
     });
     cleanup();
-    render(<TutoringPage />);
+    renderWithRouter();
 
     expect(countTema("Derivadas")).toBe(0);
     expect(countTema("Integrales")).toBe(0);
@@ -447,7 +501,7 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     const searchBar = screen.getByTestId("tutoring-search-bar");
     expect(searchBar).toBeInTheDocument();
@@ -470,7 +524,7 @@ describe("TutoringPage", () => {
       searchBy: "subject",
     });
     cleanup();
-    render(<TutoringPage />);
+    renderWithRouter();
 
     expect(countTema("Derivadas")).toBe(0);
     expect(countTema("Integrales")).toBe(0);
@@ -487,7 +541,7 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     const searchBar = screen.getByTestId("tutoring-search-bar");
     expect(searchBar).toBeInTheDocument();
@@ -510,7 +564,7 @@ describe("TutoringPage", () => {
       searchBy: "subject",
     });
     cleanup();
-    render(<TutoringPage />);
+    renderWithRouter();
 
     expect(countTema("Derivadas")).toBe(0);
     expect(countTema("Integrales")).toBe(0);
@@ -527,7 +581,7 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
 
-    render(<TutoringPage />);
+    renderWithRouter();
 
     const searchBar = screen.getByTestId("tutoring-search-bar");
     expect(searchBar).toBeInTheDocument();
@@ -556,7 +610,7 @@ describe("TutoringPage", () => {
       searchBy: "subject",
     });
     cleanup();
-    render(<TutoringPage />);
+    renderWithRouter();
 
     expect(countTema("Derivadas")).toBe(0);
     expect(countTema("Integrales")).toBe(0);
@@ -576,16 +630,14 @@ describe("TutoringPage", () => {
       searchBy: "course",
     });
     cleanup();
-    render(<TutoringPage />);
+    renderWithRouter();
 
     expect(countMateria("Cálculo")).toBe(0);
     expect(countMateria("Cálculo 1")).toBe(0);
     expect(countMateria("Cálculo 2")).toBe(0);
     expect(countMateria("Programación 2")).toBe(0);
     expect(countMateria("Robótica")).toBe(1);
-    
   });
-
 
   test("muestra el checkbox 'Tutor Indefinido' y arranca desmarcado", () => {
     mockUseTutorings({
@@ -657,7 +709,11 @@ describe("TutoringPage", () => {
   });
 
   test("conserva otros filtros al activar 'Tutor Indefinido'", () => {
-    const baseFilters = { enrolled: true, created_by_user: "7", course_id: "FISICA1" };
+    const baseFilters = {
+      enrolled: true,
+      created_by_user: "7",
+      course_id: "FISICA1",
+    };
 
     mockUseTutorings({
       tutorings: [],
