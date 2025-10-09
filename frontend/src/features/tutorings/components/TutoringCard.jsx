@@ -1,16 +1,22 @@
 import { formatDateTime } from "@shared/utils/FormatDate";
+import { JoinTutoringButton } from "@/features/calendar";
+
 
 export default function TutoringCard({ tutoring, mode }) {
+  mode = "unirme"; // FORZAR MODO unirme PARA PRUEBAS
   return (
+
     <div className="w-full bg-white rounded-lg shadow p-4 my-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         
         {/* Información de la tutoría - sin cambios */}
         <div className="flex-1 flex flex-col text-left">
+
           <p className="tutoring-card-title">
             <b>Materia: </b>
             {tutoring.course.name}
           </p>
+
           {tutoring.scheduled_at && (
             <p className="tutoring-card-title mt-1">
               <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)}
@@ -35,6 +41,7 @@ export default function TutoringCard({ tutoring, mode }) {
             </p>
           )}
           <p className="tutoring-card-title mt-1"><b>Temas:</b></p>
+
           <div className="flex flex-wrap gap-2 mt-1">
             {tutoring.subjects.map((subject) => (
               <span
@@ -51,6 +58,7 @@ export default function TutoringCard({ tutoring, mode }) {
             )}
           </div>
         </div>
+
 
         {/* Botones */}
         <div className="flex flex-col gap-3 md:pr-3">
@@ -111,6 +119,7 @@ export default function TutoringCard({ tutoring, mode }) {
             >
               Completo
             </button>
+
           )}
         </div>
       </div>
