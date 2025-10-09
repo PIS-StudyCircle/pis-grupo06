@@ -3,6 +3,7 @@ import SubjectList from "../components/SubjectList";
 import { useSubjects } from "../hooks/useSubjects";
 import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
+import PageTitulo from "@components/PageTitulo";
 
 export default function SubjectPage({
   courseId,
@@ -42,7 +43,7 @@ export default function SubjectPage({
     <div className="flex flex-col ">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold p-2 mb-4 text-black">Temas</h1>
+          <PageTitulo titulo="Temas" className="subtitulo"></PageTitulo>
 
           <SearchInput
             value={query}

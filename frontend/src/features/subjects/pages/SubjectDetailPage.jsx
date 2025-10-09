@@ -2,6 +2,7 @@ import Footer from "@components/Footer";
 import { useSubjectDetail } from "../hooks/useSubjectDetail";
 import { TutoringPage } from "@/features/tutorings";
 import { useParams } from "react-router-dom";
+import PageTitulo from "@/shared/components/PageTitulo";
 
 
 export default function SubjectDetailPage() {
@@ -31,15 +32,12 @@ export default function SubjectDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Columna izquierda - info */}
                 <div className="md:col-span-2 text-left">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                    {subject.name}
-                  </h1>
-                                    
+                  <PageTitulo titulo={subject.name} className='titulo'></PageTitulo>                                    
                 </div>
               </div>
 
              {/*El mostrar los temas de la materia se delega a SubjectPage*/}
-             <TutoringPage filters={{ subject_id: subject.id }}  showCreate={false} mode="ambos" />
+             <TutoringPage filters={{ subject_id: subject.id }}  showCreate={false} mode="ambos" titleClass = "subtitulo" />
 
             </div>
           </div>
