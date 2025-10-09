@@ -83,10 +83,12 @@ RSpec.describe "Eliminar cuenta", type: :request do
     course = Course.create!(name: "Curso Especial", code: "CE1", faculty: facultad)
     subject = Subject.create!(name: "Tema 1", course: course, creator: user)
 
+    dia = 1.day.from_now
+
     # Tutoría donde el usuario crea la tutoría, es tutor y tiene estudiantes
     tutoring_created_as_tutor_with_student = Tutoring.create!(
       course_id: course.id,
-      scheduled_at: 1.day.from_now,
+      scheduled_at: dia,
       duration_mins: 60,
       modality: "virtual",
       capacity: 5,
@@ -96,11 +98,12 @@ RSpec.describe "Eliminar cuenta", type: :request do
       state: 1, # active
     )
     UserTutoring.create!(user: other_user, tutoring: tutoring_created_as_tutor_with_student)
+    dia += 1.day
 
     # Tutoría donde el usuario crea la tutoría, es tutor y no tiene estudiantes
     tutoring_created_as_tutor_without_student = Tutoring.create!(
       course_id: course.id,
-      scheduled_at: 2.days.from_now,
+      scheduled_at: dia,
       duration_mins: 60,
       modality: "virtual",
       capacity: 5,
@@ -110,10 +113,11 @@ RSpec.describe "Eliminar cuenta", type: :request do
       state: 1, # active
     )
 
+    dia += 1.day
     # Tutoría donde el usuario crea la tutoría, es estudiante y tiene estudiantes
     tutoring_created_as_student_with_student = Tutoring.create!(
       course_id: course.id,
-      scheduled_at: 3.days.from_now,
+      scheduled_at: dia,
       duration_mins: 60,
       modality: "virtual",
       capacity: 5,
@@ -124,11 +128,12 @@ RSpec.describe "Eliminar cuenta", type: :request do
     )
     UserTutoring.create!(user: user, tutoring: tutoring_created_as_student_with_student)
     UserTutoring.create!(user: other_user2, tutoring: tutoring_created_as_student_with_student)
+    dia += 1.day
 
     # Tutoría donde el usuario crea la tutoría, es estudiante y tiene estudiantes
     tutoring_created_as_student_without_student = Tutoring.create!(
       course_id: course.id,
-      scheduled_at: 4.days.from_now,
+      scheduled_at: dia,
       duration_mins: 60,
       modality: "virtual",
       capacity: 5,
@@ -138,11 +143,12 @@ RSpec.describe "Eliminar cuenta", type: :request do
       state: 1, # active
     )
     UserTutoring.create!(user: user, tutoring: tutoring_created_as_student_without_student)
+    dia += 1.day
 
     # Tutoría donde el usuario crea la tutoría, es estudiante y no tiene tutor
     tutoring_created_as_student_without_tutor = Tutoring.create!(
       course_id: course.id,
-      scheduled_at: 5.days.from_now,
+      scheduled_at: dia,
       duration_mins: 60,
       modality: "virtual",
       capacity: 5,
@@ -152,11 +158,43 @@ RSpec.describe "Eliminar cuenta", type: :request do
       state: 0, # pending
     )
     UserTutoring.create!(user: user, tutoring: tutoring_created_as_student_without_tutor)
+    dia += 1.day
+
+    # Tutoría donde el usuario no crea la tutoría, es tutor y tiene estudiantes
+    tutoring_as_tutor_with_student = Tutoring.create!(
+      course_id: course.id,
+      scheduled_at: dia,
+      duration_mins: 60,
+      modality: "virtual",
+      capacity: 5,
+      tutor_id: user.id,
+      created_by_id: other_user.id,
+      enrolled: 2,
+      state: 1, # active
+    )
+    UserTutoring.create!(user: other_user, tutoring: tutoring_as_tutor_with_student)
+    UserTutoring.create!(user: other_user2, tutoring: tutoring_as_tutor_with_student)
+    dia += 1.day
+
+    # Tutoría donde el usuario no crea la tutoría, es tutor y tiene estudiantes
+    tutoring_as_tutor_without_student = Tutoring.create!(
+      course_id: course.id,
+      scheduled_at: dia,
+      duration_mins: 60,
+      modality: "virtual",
+      capacity: 5,
+      tutor_id: user.id,
+      created_by_id: other_user.id,
+      enrolled: 1,
+      state: 1, # active
+    )
+    UserTutoring.create!(user: other_user, tutoring: tutoring_as_tutor_without_student)
+    dia += 1.day
 
     # Tutoría donde el usuario no crea la tutoría, es estudiante
     tutoring_as_student_with_student = Tutoring.create!(
       course_id: course.id,
-      scheduled_at: 6.days.from_now,
+      scheduled_at: dia,
       duration_mins: 60,
       modality: "virtual",
       capacity: 5,
@@ -167,11 +205,12 @@ RSpec.describe "Eliminar cuenta", type: :request do
     )
     UserTutoring.create!(user: user, tutoring: tutoring_as_student_with_student)
     UserTutoring.create!(user: other_user2, tutoring: tutoring_as_student_with_student)
+    dia += 1.day
 
     # Tutoría donde el usuario no crea la tutoría, es estudiante, y no tiene estudiantes
     tutoring_as_student_without_student = Tutoring.create!(
       course_id: course.id,
-      scheduled_at: 7.days.from_now,
+      scheduled_at: dia,
       duration_mins: 60,
       modality: "virtual",
       capacity: 5,
@@ -201,6 +240,7 @@ RSpec.describe "Eliminar cuenta", type: :request do
     expect(response).to have_http_status(:unauthorized).or have_http_status(:found)
 
     expect(Tutoring.find_by(id: tutoring_created_as_tutor_with_student.id)).to be_nil
+
     expect(Tutoring.find_by(id: tutoring_created_as_tutor_without_student.id)).to be_nil
 
     expect(Tutoring.find_by(id: tutoring_created_as_student_with_student.id).tutor_id)
@@ -222,6 +262,16 @@ RSpec.describe "Eliminar cuenta", type: :request do
 
     expect(Tutoring.find_by(id: tutoring_created_as_student_without_tutor.id)).to be_nil
     expect(UserTutoring.find_by(user_id: user.id, tutoring_id: tutoring_created_as_student_without_tutor.id)).to be_nil
+
+    expect(Tutoring.find_by(id: tutoring_as_tutor_with_student.id)).to be_nil
+    expect(UserTutoring.find_by(user_id: other_user.id, tutoring_id: tutoring_as_tutor_with_student.id)).to be_nil
+    expect(UserTutoring.find_by(user_id: other_user2.id, tutoring_id: tutoring_as_tutor_with_student.id)).to be_nil
+
+    expect(Tutoring.find_by(id: tutoring_as_tutor_without_student.id).tutor_id).to be_nil
+    expect(Tutoring.find_by(id: tutoring_as_tutor_without_student.id).created_by_id).to eq(other_user.id)
+    expect(Tutoring.find_by(id: tutoring_as_tutor_without_student.id).state).to eq("pending")
+    expect(Tutoring.find_by(id: tutoring_as_tutor_without_student.id).enrolled).to eq(1)
+    expect(UserTutoring.find_by(user_id: other_user.id, tutoring_id: tutoring_as_tutor_without_student.id)).to be_present
 
     expect(Tutoring.find_by(id: tutoring_as_student_with_student.id).tutor_id).to eq(other_user.id)
     expect(Tutoring.find_by(id: tutoring_as_student_with_student.id).created_by_id).to eq(other_user.id)
