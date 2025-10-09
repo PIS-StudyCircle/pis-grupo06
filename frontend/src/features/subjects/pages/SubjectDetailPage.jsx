@@ -9,16 +9,18 @@ export default function SubjectDetailPage() {
   const { subject, loading, error } = useSubjectDetail(subjectId, courseId);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      {loading && <div className="p-6 max-w-3xl mx-auto">Cargando tema...</div>}
-      {error && (
-        <div className="p-6 max-w-3xl mx-auto text-red-600">
-          Error: {error.message}
-        </div>
-      )}
-      {!loading && !error && !subject && (
-        <div className="p-6 max-w-3xl mx-auto">No se encontró el tema.</div>
-      )}
+    <div className="min-h-screen bg-gray-50">
+        {loading && (
+          <div className="p-6 max-w-3xl mx-auto">Cargando tema...</div>
+        )}
+        {error && (
+          <div className="p-6 max-w-3xl mx-auto text-red-600">
+            Error: {error.message}
+          </div>
+        )}
+        {!loading && !error && !subject && (
+          <div className="p-6 max-w-3xl mx-auto">No se encontró el tema.</div>
+        )}
 
       {!loading && !error && subject && (
         <div className="p-6 max-w-3xl mx-auto space-y-6">
