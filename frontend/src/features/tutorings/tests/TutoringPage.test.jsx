@@ -159,13 +159,6 @@ const countMateria = (materia) => {
   ).length;
 };
 
-const countTema = (tema) => {
-  const list = screen.getByTestId("tutoring-list");
-  return Array.from(list.querySelectorAll("span")).filter(
-    (span) => span.textContent.trim() === tema
-  ).length;
-};
-
 // ------------------- tests -------------------
 describe("TutoringPage", () => {
   const baseTutorings = [
