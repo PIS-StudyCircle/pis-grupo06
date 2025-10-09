@@ -9,7 +9,7 @@ import {
   validateEmail,
   validatePassword,
   validatePasswordConfirmation,
-  validateCharacters
+  validateCharacters,
 } from "@utils/validation";
 import { useValidation } from "@hooks/useValidation";
 import { useFormSubmit } from "@utils/UseFormSubmit";
@@ -33,6 +33,7 @@ export default function RegisterPage() {
     name: "",
     last_name: "",
     description: "",
+    profile_photo: null,
   });
 
   const { errors, validate } = useValidation(validators);
@@ -41,7 +42,7 @@ export default function RegisterPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate(form)) {
-      onSubmit(form); 
+      onSubmit(form);
     }
   };
 
@@ -59,7 +60,7 @@ export default function RegisterPage() {
           value={form.name}
           onChange={(e) => setField("name", e.target.value)}
           placeholder="Nombre"
-          error={errors.name} 
+          error={errors.name}
         />
 
         <Input
@@ -68,7 +69,7 @@ export default function RegisterPage() {
           value={form.last_name}
           onChange={(e) => setField("last_name", e.target.value)}
           placeholder="Apellido"
-          error={errors.last_name} 
+          error={errors.last_name}
         />
 
         <Input
@@ -93,9 +94,7 @@ export default function RegisterPage() {
           id="password_confirmation"
           type="password"
           value={form.password_confirmation}
-          onChange={(e) =>
-            setField("password_confirmation", e.target.value)
-          }
+          onChange={(e) => setField("password_confirmation", e.target.value)}
           placeholder="Confirmación de contraseña"
           error={errors.password_confirmation}
         />
@@ -105,6 +104,13 @@ export default function RegisterPage() {
           value={form.description}
           onChange={(e) => setField("description", e.target.value)}
           placeholder="Descripción"
+        />
+
+        <Input
+          id="profilePhoto"
+          label="Foto de perfil"
+          type="file"
+          onChange={(e) => setField("profile_photo", e.target.files[0])}
         />
 
         {error.length > 0 && (
