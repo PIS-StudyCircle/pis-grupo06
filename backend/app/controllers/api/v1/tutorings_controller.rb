@@ -398,7 +398,7 @@ module Api
         end
 
         render json: {
-          #message: message,
+          # message: message,
           tutoring: {
             id: @tutoring.id,
             scheduled_at: @tutoring.scheduled_at,

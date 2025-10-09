@@ -1,10 +1,8 @@
 import { Calendar, Clock, User, MapPin, Users } from "lucide-react";
 import { useState } from "react";
-import { useUser } from "@context/UserContext";
 
 export default function SessionCard({ session }) {
   const [showAttendees, setShowAttendees] = useState(false);
-  const { user } = useUser();
 
   const formatDate = (date) =>
     date.toLocaleDateString("es-ES", {
