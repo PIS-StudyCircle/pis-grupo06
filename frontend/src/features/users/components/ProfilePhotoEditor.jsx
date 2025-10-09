@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Cropper from "react-easy-crop";
 import { getCroppedImg } from "@utils/cropImage";
 import { RotateCwSquare } from "lucide-react";
@@ -69,12 +69,14 @@ export function ProfilePhotoEditor({ imageSrc, onCancel, onApply }) {
           {/* Fila 2: Cancelar / Aplicar */}
           <div className="flex justify-end gap-3 mt-2 w-full">
             <button
+              type="button"
               onClick={onCancel}
               className="px-4 py-1.5 bg-gray-600 hover:bg-gray-700 rounded-md text-sm"
             >
               Cancelar
             </button>
             <button
+              type="button"
               onClick={handleApply}
               className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 rounded-md text-sm text-white"
             >

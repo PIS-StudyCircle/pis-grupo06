@@ -87,8 +87,10 @@ export default function RegisterPage() {
                 onChange={(e) => {
                   const file = e.target.files[0];
                   if (file) {
+                    if (fileUrl) URL.revokeObjectURL(fileUrl); 
                     setFileUrl(URL.createObjectURL(file));
                     setShowEditor(true);
+                    e.target.value = "";
                   }
                 }}
                 className="absolute inset-0 opacity-0 cursor-pointer"
