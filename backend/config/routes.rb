@@ -13,15 +13,18 @@ Rails.application.routes.draw do
       get "up", to: proc { [200, {}, ['OK']] }
       namespace :users do
         get :me, to: 'me#show'
+        resources :favorite_courses, only: [:index], controller: 'favorite_courses'
       end
 
       # index y show de UsersController
       resources :users, module: :users, only: [:index, :show]
 
       resources :courses do
-        resources :subjects
+        resources :subjects 
+        resource :favorite, only: [:create, :destroy], controller: 'course_favorites'
       end
       resources :tutorings
+      resources :subjects
     end
   end
 end
