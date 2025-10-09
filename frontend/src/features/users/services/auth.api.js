@@ -18,10 +18,7 @@ export async function signup(form) {
   formData.append("user[last_name]", form.last_name);
   formData.append("user[description]", form.description || "");
 
-  console.log("fotooo"  , form.profile_photo);
-
   if (form.profile_photo) {
-    console.log("Appending profile photo to form data");
     formData.append("user[profile_photo]", form.profile_photo); 
   }
 
