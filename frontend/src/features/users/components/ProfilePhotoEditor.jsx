@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
 import { getCroppedImg } from "@utils/cropImage";
 import { RotateCwSquare } from "lucide-react";
