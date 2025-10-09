@@ -271,7 +271,8 @@ RSpec.describe "Eliminar cuenta", type: :request do
     expect(Tutoring.find_by(id: tutoring_as_tutor_without_student.id).created_by_id).to eq(other_user.id)
     expect(Tutoring.find_by(id: tutoring_as_tutor_without_student.id).state).to eq("pending")
     expect(Tutoring.find_by(id: tutoring_as_tutor_without_student.id).enrolled).to eq(1)
-    expect(UserTutoring.find_by(user_id: other_user.id, tutoring_id: tutoring_as_tutor_without_student.id)).to be_present
+    expect(UserTutoring.find_by(user_id: other_user.id, tutoring_id: tutoring_as_tutor_without_student.id))
+      .to be_present
 
     expect(Tutoring.find_by(id: tutoring_as_student_with_student.id).tutor_id).to eq(other_user.id)
     expect(Tutoring.find_by(id: tutoring_as_student_with_student.id).created_by_id).to eq(other_user.id)
