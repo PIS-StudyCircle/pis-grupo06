@@ -96,7 +96,6 @@ class Tutoring < ApplicationRecord
 
   private
 
-
   def scheduled_at_cannot_be_in_past
     return if scheduled_at.blank?
 

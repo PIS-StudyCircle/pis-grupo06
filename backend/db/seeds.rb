@@ -299,7 +299,6 @@ Subject.find_or_create_by!(name: "Aplicaciones a física e ingeniería", course:
   s.creator = creator
 end
 
-
 # ========================
 course = Course.find_by(id: 3) # Administración de Infraestructuras
 creator = User.find_by(email: "anaperez@gmail.com") || User.first
@@ -447,7 +446,6 @@ tutoring_request = Tutoring.find_or_create_by!(
 SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
 create_event_for_tutoring(service, calendar_id, tutoring_request)
 
-
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_request
@@ -472,7 +470,6 @@ tutoring_request = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
 end
-
 
 UserTutoring.find_or_create_by!(
   user: creator,

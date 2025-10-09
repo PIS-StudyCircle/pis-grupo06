@@ -426,7 +426,6 @@ module Api
 
       private
 
-
       def set_tutoring
         @tutoring = Tutoring.find(params[:id])
       end
