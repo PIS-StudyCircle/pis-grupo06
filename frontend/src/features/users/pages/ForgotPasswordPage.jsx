@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
       ) : (
         <div className="text-green-600 text-center">
           <div>El correo puede tardar unos minutos en llegar.</div>
-          <div>Luego de recibirlo, puedes cerrar esta ventana.</div>
+          <div>Puedes cerrar esta ventana.</div>
         </div>
       )}
     </AuthLayout>
