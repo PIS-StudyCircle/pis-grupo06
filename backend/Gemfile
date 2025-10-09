@@ -75,5 +75,3 @@ gem "letter_opener", "~> 1.10"
 group :test do
   gem 'simplecov', require: false
 end
-
-gem "ruby-vips", "~> 2.2"
