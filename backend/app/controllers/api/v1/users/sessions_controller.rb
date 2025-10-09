@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# frozen_string_literal: true
 
 module Api
   module V1
@@ -16,10 +17,10 @@ module Api
       private
 
       def respond_with(resource, _opt = {})
-        service = Google::Apis::CalendarV3::CalendarService.new
-        service.authorization = resource.google_access_token || refresh_google_token(resource)
-
-        ensure_study_circle_calendar(resource, service)
+        # Solo procesar Google Calendar si el usuario tiene OAuth configurado
+        if resource.google_refresh_token.present?
+          setup_google_calendar(resource)
+        end
 
         success_response(
           message: 'Logged in successfully.',
@@ -32,9 +33,19 @@ module Api
         success_response(message: 'Logged out successfully.', status: :ok)
       end
 
+      def setup_google_calendar(user)
+        service = Google::Apis::CalendarV3::CalendarService.new
+        service.authorization = user.google_access_token || refresh_google_token(user)
+
+        ensure_study_circle_calendar(user, service)
+      rescue Google::Auth::AuthorizationError => e
+        Rails.logger.error "Error configurando Google Calendar: #{e.message}"
+        # No fallar el login si hay problemas con Google Calendar
+      end
+
       # Para crear el calendario de StudyCircle si no existe
       def ensure_study_circle_calendar(user, service)
-        return user.calendar_id if user.calendar_id.present?
+        return user.study_circle_calendar_id if user.study_circle_calendar_id.present?
 
         calendar = Google::Apis::CalendarV3::Calendar.new(
           summary: "StudyCircle",
@@ -49,6 +60,8 @@ module Api
       end
 
       def refresh_google_token(user)
+        return nil unless user.google_refresh_token.present?
+
         client = Signet::OAuth2::Client.new(
           client_id: ENV['GOOGLE_CLIENT_ID'],
           client_secret: ENV['GOOGLE_CLIENT_SECRET'],
