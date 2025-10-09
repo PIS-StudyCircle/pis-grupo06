@@ -2,6 +2,7 @@ module Api
   module V1
     class SubjectsController < ApplicationController
       include Pagy::Backend
+      include JsonResponse
 
       before_action :authenticate_user!, only: [:create]
 
@@ -21,6 +22,23 @@ module Api
           subjects: @subjects,
           pagination: pagy_metadata(@pagy)
         }
+      end
+
+      def show
+        course = Course.find(params[:course_id])
+        subject = course.subjects.find(params[:id])
+
+        # subject = Subject.find(params[:id])
+
+        data = {
+          id: subject.id,
+          name: subject.name,
+          due_date: subject.due_date
+        }
+
+        success_response(message: "Tema y tutorias cargadas con exito", data: data)
+      rescue ActiveRecord::RecordNotFound
+        error_response(message: "Tema no encontrado", status: :not_found)
       end
 
       def create

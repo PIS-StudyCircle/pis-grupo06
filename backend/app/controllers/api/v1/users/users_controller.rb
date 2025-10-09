@@ -7,11 +7,21 @@ module Api
         before_action :authenticate_user!, except: [:index]
 
         def index
-          users = User.all
+          if params[:role].present?
+            if params[:role] == "tutor"
+              users = User.tutors
+            end
+          else
+            users = User.all
+          end
 
-          users = users.where("unaccent(name) ILIKE unaccent(?)", "%#{params[:search]}%") if params[:search].present?
-
-          # users = users.where(role: params[:role]) if params[:role].present?
+          if params[:search].present?
+            search = params[:search].strip.squeeze(" ")
+            users = users.where(
+              "unaccent(name || ' ' || last_name) ILIKE unaccent(?)",
+              "%#{search}%"
+            )
+          end
 
           @pagy, @users = pagy(users, items: params[:per_page] || 20)
 

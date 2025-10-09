@@ -18,8 +18,9 @@ Rails.application.routes.draw do
       # index y show de UsersController
       resources :users, module: :users, only: [:index, :show]
 
-      resources :courses
-      resources :subjects
+      resources :courses do
+        resources :subjects
+      end
       resources :tutorings
 
       resource :calendar, only: [] do

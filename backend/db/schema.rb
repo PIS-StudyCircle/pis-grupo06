@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_29_213643) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_03_202955) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -66,6 +66,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_213643) do
     t.index ["creator_id"], name: "index_subjects_on_creator_id"
   end
 
+  create_table "tutoring_availabilities", force: :cascade do |t|
+    t.bigint "tutoring_id", null: false
+    t.datetime "start_time", null: false
+    t.datetime "end_time", null: false
+    t.boolean "is_booked", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tutoring_id", "start_time"], name: "index_availabilities_on_tutoring_and_start"
+    t.index ["tutoring_id"], name: "index_tutoring_availabilities_on_tutoring_id"
+  end
+
   create_table "tutorings", force: :cascade do |t|
     t.datetime "scheduled_at"
     t.datetime "created_at", null: false
@@ -78,8 +89,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_213643) do
     t.integer "enrolled", default: 0, null: false
     t.bigint "course_id", null: false
     t.string "event_id"
+    t.integer "state", default: 0, null: false
+    t.text "request_comment"
+    t.datetime "request_due_at"
+    t.string "location"
     t.index ["course_id"], name: "index_tutorings_on_course_id"
     t.index ["created_by_id"], name: "index_tutorings_on_created_by_id"
+    t.index ["state"], name: "index_tutorings_on_state"
     t.index ["tutor_id"], name: "index_tutorings_on_tutor_id"
   end
 
@@ -135,6 +151,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_29_213643) do
   add_foreign_key "subject_tutorings", "tutorings"
   add_foreign_key "subjects", "courses"
   add_foreign_key "subjects", "users", column: "creator_id", on_delete: :nullify
+  add_foreign_key "tutoring_availabilities", "tutorings"
   add_foreign_key "tutorings", "courses"
   add_foreign_key "tutorings", "users", column: "created_by_id"
   add_foreign_key "tutorings", "users", column: "tutor_id"

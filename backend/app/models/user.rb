@@ -1,3 +1,4 @@
+require 'ostruct'
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
 
@@ -38,6 +39,10 @@ class User < ApplicationRecord
   validates :password_confirmation, presence: true, on: :create
   validates :description, length: { maximum: 500 }, allow_blank: true
 
+  scope :tutors, -> {
+    where(id: Tutoring.select(:tutor_id).distinct)
+  }
+
   def self.from_omniauth(auth)
     user = find_by(provider: auth.provider, uid: auth.uid) || find_by(email: auth.info.email)
 
@@ -67,7 +72,7 @@ class User < ApplicationRecord
     creds = auth.credentials || OpenStruct.new
     user.google_access_token  = creds.token
     user.google_refresh_token = creds.refresh_token || user.google_refresh_token
-    user.google_expires_at    = Time.at(creds.expires_at) if creds.expires_at
+    user.google_expires_at    = Time.zone.at(creds.expires_at) if creds.expires_at
 
     user.save!
     user

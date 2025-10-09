@@ -4,7 +4,7 @@ import { useSessions } from "../hooks/useSessions";
 import { useLocation } from "react-router-dom";
 
 export default function SessionList({ userId }) {
-  const { sessions, loading, error } = useSessions(userId);
+  const { sessions, loading } = useSessions(userId);
   const location = useLocation();
 
   // Detectar ruta actual

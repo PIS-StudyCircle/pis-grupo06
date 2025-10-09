@@ -15,7 +15,7 @@ class GoogleCalendarService
       summary: params[:title],
       description: params[:description] || "",
       start: { date_time: params[:start_time], time_zone: "America/Montevideo" },
-      end:   { date_time: params[:end_time],   time_zone: "America/Montevideo" },
+      end: { date_time: params[:end_time], time_zone: "America/Montevideo" },
       extended_properties: {
         private: {
           "tutoring_id" => tutoring.id.to_s,
@@ -34,22 +34,26 @@ class GoogleCalendarService
   def join_event(tutoring, attendee_email)
     raise "Tutoría no tiene evento en Google Calendar" if tutoring.event_id.blank?
 
-    calendar_id = tutoring.tutor.calendar_id
-    owner = tutoring.tutor # el dueño del calendario
+    owner = tutoring.tutor
+    calendar_id = owner.calendar_id
 
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = owner.google_access_token
 
     event = service.get_event(calendar_id, tutoring.event_id)
+    event.attendees ||= []
 
-    event.attendees ||= ["agustincastro2003@gmail.com"]
+    # Verifica si ya está agregado
     unless event.attendees.any? { |a| a.email == attendee_email }
-      event.attendees << { email: attendee_email, response_status: "accepted" }
+      new_attendee = Google::Apis::CalendarV3::EventAttendee.new(
+        email: attendee_email,
+        response_status: "accepted"
+      )
+      event.attendees << new_attendee
     end
 
     service.update_event(calendar_id, tutoring.event_id, event)
   end
-
 
   # Obtener un evento puntual
   def get_event(tutoring)
@@ -90,7 +94,7 @@ class GoogleCalendarService
 
     user.update!(
       google_access_token: client.access_token,
-      google_expires_at: Time.now + client.expires_in
+      google_expires_at: Time.zone.now + client.expires_in
     )
 
     client.access_token
@@ -113,7 +117,7 @@ class GoogleCalendarService
 
   # Obtener el calendar_id del tutor dueño de la tutoría
   def tutoring_owner_calendar(tutoring)
-    puts tutoring.inspect
+    Rails.logger.debug tutoring.inspect
     tutoring.tutor.calendar_id || ensure_calendar(tutoring.tutor)
   end
 end
