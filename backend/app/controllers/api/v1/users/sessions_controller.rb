@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# frozen_string_literal: true
 
 module Api
   module V1
@@ -60,7 +59,7 @@ module Api
       end
 
       def refresh_google_token(user)
-        return nil unless user.google_refresh_token.present?
+        return nil if user.google_refresh_token.blank?
 
         client = Signet::OAuth2::Client.new(
           client_id: ENV['GOOGLE_CLIENT_ID'],
