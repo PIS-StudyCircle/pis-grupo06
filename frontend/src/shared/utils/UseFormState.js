@@ -4,6 +4,7 @@ export function useFormState(init) {
     const [form, setForm] = useState(init);
 
     function setField(k, v) {
+        console.log(k,v);
         setForm((s) => ({ ...s, [k]: v }));
     }
 

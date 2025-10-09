@@ -39,6 +39,8 @@ module Api
           user: [:email, :password, :password_confirmation, :name, :last_name, :description, :profile_photo]
         )
 
+        Rails.logger.info "PARAMS: #{params.inspect}"
+
         fing = Faculty.find_by(name: "Facultad de Ingeniería")
 
         params_hash[:faculty_id] = fing.id if fing.present?
