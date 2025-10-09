@@ -26,7 +26,7 @@ jest.mock("@components/Input", () => ({
 }));
 
 jest.mock("@components/SubmitButton", () => ({
-  SubmitButton: ({ text = "Crear Evento", fullWidth, ...props }) => (
+  SubmitButton: ({ text = "Crear Evento", ...props }) => (
     <button type="submit" {...props}>{text}</button>
   ),
 }));

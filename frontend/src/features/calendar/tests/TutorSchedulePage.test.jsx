@@ -1,4 +1,3 @@
-// src/features/calendar/tests/TutorSchedulePage.test.jsx
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import TutorSchedulePage from "../pages/TutorSchedulePage";
