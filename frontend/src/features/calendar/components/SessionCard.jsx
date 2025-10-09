@@ -2,7 +2,7 @@ import { Calendar, Clock, User, MapPin, Users } from "lucide-react";
 import { useState } from "react";
 import { useUser } from "@context/UserContext";
 
-export default function SessionCard({ session, refresh }) {
+export default function SessionCard({ session }) {
   const [showAttendees, setShowAttendees] = useState(false);
   const { user } = useUser();
 
@@ -33,8 +33,6 @@ export default function SessionCard({ session, refresh }) {
     }
   };
 
-
-  const isOrganizer = user?.email === session.tutor;
 
   return (
     <div className="bg-white border border-gray-300 rounded-xl p-6 shadow-lg hover:shadow-xl hover:scale-[1.01] transition transform">

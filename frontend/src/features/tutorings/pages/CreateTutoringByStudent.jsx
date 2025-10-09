@@ -69,7 +69,7 @@ export default function CreateTutoringByStudent() {
       return errs // Retornar temprano si hay campos vacíos
     }
   
-    // **NUEVA VALIDACIÓN: Fechas en el pasado**
+    //  Fechas en el pasado
     const now = new Date()
     const hasPastDate = availabilities.some((av) => {
       const avDate = new Date(`${av.date}T${av.startTime}:00`)
@@ -80,7 +80,7 @@ export default function CreateTutoringByStudent() {
       return errs
     }
   
-    // **NUEVA VALIDACIÓN: Solapamientos**
+    // VALIDACIÓN: Solapamientos
     for (let i = 0; i < availabilities.length; i++) {
       const av1Start = new Date(`${availabilities[i].date}T${availabilities[i].startTime}:00`)
       const av1End = new Date(`${availabilities[i].date}T${availabilities[i].endTime}:00`)
@@ -111,8 +111,6 @@ export default function CreateTutoringByStudent() {
 
     const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || []
 
-    const dueLocal = new Date(`${form.request_due_date}T${form.request_due_time}:00`)
-    const request_due_at = dueLocal.toISOString()
 
     const payload = {
       request_comment: form.request_comment.trim() || undefined,

@@ -121,7 +121,6 @@ class Tutoring < ApplicationRecord
     end
   end
 
-
   def request_due_at_after_now
     return if request_due_at.blank?
 
@@ -130,4 +129,3 @@ class Tutoring < ApplicationRecord
     end
   end
 end
-

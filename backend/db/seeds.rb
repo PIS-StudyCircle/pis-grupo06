@@ -299,41 +299,7 @@ Subject.find_or_create_by!(name: "Aplicaciones a física e ingeniería", course:
   s.creator = creator
 end
 
-<<<<<<< HEAD
-# PARA PROBAR GOOGLE CALENDAR 
-user_calendar = User.find_by!(email: "studycircle2025pis@gmail.com")
 
-# Inicializar Google Calendar API con ese usuario
-service = Google::Apis::CalendarV3::CalendarService.new
-service.authorization = user_calendar.google_access_token ||
-                        Signet::OAuth2::Client.new(
-                          client_id: ENV["GOOGLE_CLIENT_ID"],
-                          client_secret: ENV["GOOGLE_CLIENT_SECRET"],
-                          token_credential_uri: "https://oauth2.googleapis.com/token",
-                          refresh_token: user_calendar.google_refresh_token
-                        ).fetch_access_token! && user_calendar.google_access_token
-
-calendar_id = user_calendar.calendar_id
-
-def create_event_for_tutoring(service, calendar_id, tutoring)
-  event = Google::Apis::CalendarV3::Event.new(
-    summary: "Tutoría #{tutoring.course.name}",
-    description: "Tutoría de prueba creada desde seeds",
-    start: { date_time: tutoring.scheduled_at.iso8601, time_zone: "America/Montevideo" },
-    end:   { date_time: (tutoring.scheduled_at + tutoring.duration_mins.minutes).iso8601, time_zone: "America/Montevideo" }
-  )
-
-  result = service.insert_event(calendar_id, event)
-  tutoring.update!(event_id: result.id)
-  puts "Tutoría ##{tutoring.id} → evento creado en Google Calendar (event_id=#{result.id})"
-  puts "   Event ID: #{result.id}"
-end
-
-
-# Tutoría 1
-creator = User.find_by!(email: "luisgomez@gmail.com")
-course = Course.find_by!(id: 185)
-=======
 # ========================
 course = Course.find_by(id: 3) # Administración de Infraestructuras
 creator = User.find_by(email: "anaperez@gmail.com") || User.first
@@ -440,7 +406,6 @@ end
 # Tutoría 1 creada por estudiante solicitándola, con 3 temas
 creator = User.find_by!(email: "luisgomez@gmail.com")
 course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
->>>>>>> origin/dev
 subjects = Subject.where(course: course).shuffle.take(rand(1..3))
 
 tutoring_request = Tutoring.find_or_create_by!(
@@ -458,13 +423,6 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
 end
 
-<<<<<<< HEAD
-create_event_for_tutoring(service, calendar_id, tutoring_request)
-
-# Tutoría 2
-creator = User.find_by!(email: "juanperez@gmail.com")
-course = Course.find_by!(id: 145)
-=======
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_request
@@ -473,7 +431,6 @@ UserTutoring.find_or_create_by!(
 # Tutoría 2 creada por estudiante solicitándola, con 1 tema
 creator = User.find_by!(email: "juanperez@gmail.com")
 course = Course.find_by(id: 145) # Física I
->>>>>>> origin/dev
 subject = course.subjects.sample(1).first
 
 tutoring_request = Tutoring.find_or_create_by!(
@@ -490,30 +447,7 @@ tutoring_request = Tutoring.find_or_create_by!(
 SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
 create_event_for_tutoring(service, calendar_id, tutoring_request)
 
-<<<<<<< HEAD
-# Tutoría 3
-creator = User.find_by!(email: "anaperez@gmail.com")
-course = Course.find_by!(id: 39)
-subject = course.subjects.sample(1).first
 
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 5.days.from_now,
-  duration_mins: 60,
-  modality: "presencial",
-  capacity: 2,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: user_calendar.id
-)
-
-SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-create_event_for_tutoring(service, calendar_id, tutoring_offered)
-
-# Tutoría 4
-creator = User.find_by!(email: "anaperez@gmail.com")
-course = Course.find_by!(id: 185)
-=======
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_request
@@ -522,7 +456,6 @@ UserTutoring.find_or_create_by!(
 # Tutoría 3 creada por estudiante solicitándola, con 5 temas
 creator = User.find_by!(email: "anaperez@gmail.com")
 course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
->>>>>>> origin/dev
 subjects = Subject.where(course: course).shuffle.take(rand(1..5))
 
 tutoring_request = Tutoring.find_or_create_by!(
@@ -540,9 +473,7 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
 end
 
-<<<<<<< HEAD
-create_event_for_tutoring(service, calendar_id, tutoring_request)
-=======
+
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_request
@@ -912,4 +843,3 @@ tutoring_offered = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
->>>>>>> origin/dev

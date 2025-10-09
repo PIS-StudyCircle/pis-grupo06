@@ -31,7 +31,6 @@ Rails.application.routes.draw do
         get    "sessions/:id",      to: "calendar#show"
         delete "sessions/:id",      to: "calendar#destroy"
       end
-
     end
   end
 end

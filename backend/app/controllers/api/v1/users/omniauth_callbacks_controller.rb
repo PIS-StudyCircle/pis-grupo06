@@ -21,7 +21,7 @@ module Api
           redirect_to success_redirect_url, allow_other_host: true
         rescue => e
           Rails.logger.error("[OAuth] Google error: #{e.class}: #{e.message}")
-          redirect_to failure_redirect_url(error: 'oauth_failed')
+          redirect_to failure_redirect_url(error: 'oauth_failed'), allow_other_host: true
         end
 
         def failure

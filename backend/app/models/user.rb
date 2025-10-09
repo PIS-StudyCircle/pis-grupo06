@@ -1,3 +1,4 @@
+require 'ostruct'
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
 
@@ -71,7 +72,7 @@ class User < ApplicationRecord
     creds = auth.credentials || OpenStruct.new
     user.google_access_token  = creds.token
     user.google_refresh_token = creds.refresh_token || user.google_refresh_token
-    user.google_expires_at    = Time.at(creds.expires_at) if creds.expires_at
+    user.google_expires_at    = Time.zone.at(creds.expires_at) if creds.expires_at
 
     user.save!
     user
