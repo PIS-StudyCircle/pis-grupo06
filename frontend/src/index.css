@@ -50,6 +50,16 @@
   }
 }
 
+/* ===== TITULOS ===== */
+.titulo {
+  @apply text-3xl font-bold p-2 my-2 text-black;
+}
+
+.subtitulo {
+  @apply text-2xl font-bold p-2 my-2 text-black;
+}
+
+
 /* ===== COMPONENTES ===== */
 @layer components {
   /* === NAVBAR === */

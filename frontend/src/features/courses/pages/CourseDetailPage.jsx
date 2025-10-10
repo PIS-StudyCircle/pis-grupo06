@@ -58,7 +58,7 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
         {loading && (
           <div className="p-6 max-w-3xl mx-auto">Cargando curso...</div>
         )}
@@ -133,14 +133,14 @@ export default function CourseDetailPage() {
                   <button
                     type="button"
                     className="btn w-full"
-                    onClick={() => navigate(`/tutorias/ser_tutor/${courseId}`)}
+                    onClick={() => navigate(`/tutorias/ser_tutor/${courseId}`, { state: { courseName: course.name } })}
                   >
                     Brindar tutoría
                   </button>
                   <button
                     type="button"
                     className="btn w-full"
-                    onClick={() => navigate(`/tutorias/materia/${courseId}`)}
+                    onClick={() => navigate(`/tutorias/materia/${courseId}`, { state: { courseName: course.name } })}
                   >
                     Recibir tutoría
                   </button>
