@@ -65,8 +65,14 @@ export const renderWithRouter = (ui, path = "/tutorias/123") =>
     const normalize = (str = "") =>
       String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   
-    jest.spyOn(tutoringHooks, "useTutorings").mockImplementation(
-      (initialPage = 1, perPage = 20, mergedFilters = {}, modeArg = "") => {
+      jest.spyOn(tutoringHooks, "useTutorings").mockImplementation(
+        (
+          // eslint-disable-next-line no-unused-vars
+          initialPage = 1, 
+          // eslint-disable-next-line no-unused-vars
+          perPage = 20, 
+          mergedFilters = {}
+        ) => {
         const [internalQuery, setInternalQuery] = React.useState(query);
         const [internalSearchBy, setInternalSearchBy] = React.useState(searchBy);
         const [internalPage, setInternalPage] = React.useState(page);
@@ -90,28 +96,28 @@ export const renderWithRouter = (ui, path = "/tutorias/123") =>
         };
   
         const filtered = React.useMemo(() => {
-          let list = Array.isArray(tutorings) ? tutorings.slice() : [];
-  
-          const noTutorFlag = mergedFilters?.no_tutor ?? includeUndefinedTutor;
-          if (noTutorFlag) {
-            list = list.filter((t) => !t.tutor_id);
-          }
-  
-          if (currentQuery) {
-            const q = normalize(currentQuery);
-            if ((currentSearchBy || "course") === "course") {
-              list = list.filter((t) => normalize(t.course?.name).includes(q));
-            } else {
-              list = list.filter(
-                (t) =>
-                  Array.isArray(t.subjects) &&
-                  t.subjects.some((s) => normalize(s.name).includes(q))
-              );
+            const listSource = Array.isArray(mergedFilters?.tutorings ?? tutorings)
+              ? (mergedFilters?.tutorings ?? tutorings).slice()
+              : [];
+          
+            const noTutorFlag = mergedFilters?.no_tutor ?? includeUndefinedTutor;
+            let list = noTutorFlag ? listSource.filter((t) => !t.tutor_id) : listSource;
+          
+            if (currentQuery) {
+              const q = normalize(currentQuery);
+              if ((currentSearchBy || "course") === "course") {
+                list = list.filter((t) => normalize(t.course?.name).includes(q));
+              } else {
+                list = list.filter(
+                  (t) =>
+                    Array.isArray(t.subjects) &&
+                    t.subjects.some((s) => normalize(s.name).includes(q))
+                );
+              }
             }
-          }
-  
-          return list;
-        }, [tutorings, currentQuery, currentSearchBy, mergedFilters?.no_tutor, includeUndefinedTutor]);
+          
+            return list;
+          }, [mergedFilters?.tutorings, currentQuery, currentSearchBy, mergedFilters?.no_tutor]);
   
         return {
           tutorings: filtered,
