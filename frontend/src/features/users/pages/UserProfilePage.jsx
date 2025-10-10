@@ -29,7 +29,7 @@ export default function UserProfile() {
     return <p className="text-center mt-10">Usuario no encontrado.</p>;
   }
 
-  const photoUrl = user.photo || DEFAULT_PHOTO;
+  const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-[#001F54] text-white rounded-3xl shadow-xl w-full max-w-md p-6">
