@@ -11,7 +11,7 @@ module Api
 
         @pagy, @courses = pagy(courses, items: params[:per_page] || 20)
 
-        favorite_course_ids = 
+        favorite_course_ids =
           if current_user
             page_ids = @courses.map(&:id)
             current_user.favorite_courses.where(course_id: page_ids).pluck(:course_id)

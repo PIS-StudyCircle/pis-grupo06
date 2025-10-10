@@ -20,7 +20,7 @@ Rails.application.routes.draw do
       resources :users, module: :users, only: [:index, :show]
 
       resources :courses do
-        resources :subjects 
+        resources :subjects
         resource :favorite, only: [:create, :destroy], controller: 'course_favorites'
       end
       resources :tutorings
