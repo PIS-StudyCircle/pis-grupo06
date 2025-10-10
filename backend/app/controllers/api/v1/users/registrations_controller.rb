@@ -24,11 +24,11 @@ module Api
 
           respond_with(resource)
         else
-            error_response(
-            message: "No se pudo crear el usuario correctamente.",
+          error_response(
+            message: "User couldn't be created successfully.",
             errors: resource.errors.as_json(full_messages: true),
             status: :unprocessable_entity
-            )
+          )
         end
       end
 
