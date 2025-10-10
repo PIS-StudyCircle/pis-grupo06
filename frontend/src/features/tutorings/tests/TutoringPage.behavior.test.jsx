@@ -20,7 +20,7 @@ describe("TutoringPage - Comportamiento general", () => {
     mockUseTutorings({ tutorings: [], error: null });
     renderWithRouter(<TutoringPage />);
     await waitFor(() => {
-      expect(screen.getByText(/No hay tutorías disponibles/i)).toBeInTheDocument();
+      expect(screen.getByText(/No hay tutorías disponibles para esta materia/i)).toBeInTheDocument();
     });
   });
 

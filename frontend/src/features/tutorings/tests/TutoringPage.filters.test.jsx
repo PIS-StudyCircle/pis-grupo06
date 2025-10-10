@@ -88,8 +88,10 @@ describe("TutoringPage - Filtros y búsqueda", () => {
     fireEvent.change(searchInput, { target: { value: "Química" } });
 
     await waitFor(() => {
-      expect(screen.queryByText(/Química/i)).not.toBeInTheDocument();
-    });
+        expect(
+          screen.getByText(/No hay tutorías disponibles para Química/i)
+        ).toBeInTheDocument();
+      });
   });
 
   it("muestra solo una tutoría de Química y una de Física sin tutor al activar el toggle", async () => {
@@ -154,7 +156,7 @@ describe("TutoringPage - Filtros y búsqueda", () => {
     fireEvent.change(searchInput, { target: { value: "Historia" } });
   
     await waitFor(() => {
-      expect(screen.getByText(/No hay tutorías disponibles/i)).toBeInTheDocument();
+      expect(screen.getByText(/No hay tutorías disponibles para Historia/i)).toBeInTheDocument();
     });
   
     // Cambiamos a filtro por tema inexistente
@@ -162,7 +164,7 @@ describe("TutoringPage - Filtros y búsqueda", () => {
     fireEvent.change(searchInput, { target: { value: "Biología Molecular" } });
   
     await waitFor(() => {
-      expect(screen.getByText(/No hay tutorías disponibles/i)).toBeInTheDocument();
+      expect(screen.getByText(/No hay tutorías disponibles para Biología Molecular/i)).toBeInTheDocument();
     });
   });
 });
