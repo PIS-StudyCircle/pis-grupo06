@@ -8,7 +8,7 @@ import { ErrorAlert } from "@components/ErrorAlert";
 import { SubmitButton } from "@components/SubmitButton";
 import { useFormState } from "@utils/UseFormState";
 import { useFormSubmit } from "@utils/UseFormSubmit";
-import PageTitulo from "@/shared/components/PageTitulo";
+import PageTitle from "@/shared/components/PageTitle";
 
 const MAX_REQUEST_COMMENT = 500;
 const MAX_LOCATION_COMMENT = 255;
@@ -79,7 +79,7 @@ export default function CreateTutoringByStudent() {
 
   return (
     <AuthLayout>
-      <PageTitulo titulo={`Solicitar tutoría para ${course.name}`} className="subtitulo"></PageTitulo>
+      <PageTitle title={`Solicitar tutoría para ${course.name}`} className="subtitulo"></PageTitle>
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
         <div className="flex flex-col text-left">
           <label htmlFor="request_due_date" className="text-gray-600 text-xs font-medium mb-1">

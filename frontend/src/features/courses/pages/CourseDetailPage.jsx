@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCourse } from "../hooks/useCourse";
 import SubjectPage from "@/features/subjects/pages/SubjectPage";
-import PageTitulo from "@components/PageTitulo";
+import PageTitle from "@components/PageTitle";
 
 export default function CourseDetailPage() {
   const { courseId } = useParams();
@@ -29,7 +29,7 @@ export default function CourseDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Columna izquierda - info */}
                 <div className="md:col-span-2 text-left">
-                  <PageTitulo titulo={course.name} className='titulo'></PageTitulo>
+                  <PageTitle title={course.name} className='titulo'></PageTitle>
 
                   <div className="space-y-1 pl-[2px]">
                     {course.code && (

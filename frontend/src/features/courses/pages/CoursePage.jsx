@@ -4,7 +4,7 @@ import CourseList from "../components/CourseList";
 import { useCourses } from "../hooks/useCourses";
 import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
-import PageTitulo from "@components/PageTitulo";
+import PageTitle from "@components/PageTitle";
 
 export default function CoursePage() {
   const {
@@ -33,7 +33,7 @@ export default function CoursePage() {
     <div className="flex flex-col ">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
         <div className="max-w-5xl mx-auto">
-          <PageTitulo titulo="Materias Disponibles" className="titulo"></PageTitulo>
+          <PageTitle title="Materias Disponibles" className="titulo"></PageTitle>
           <SearchInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}

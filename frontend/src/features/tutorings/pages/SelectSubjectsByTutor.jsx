@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Footer from "@components/Footer";
 import { useCourse } from "../../courses/hooks/useCourse";
 import SubjectPage from "../../subjects/pages/SubjectPage";
-import PageTitulo from "@/shared/components/PageTitulo";
+import PageTitle from "@/shared/components/PageTitle";
 
 export default function SelectSubjectsByTutor() {
   const { courseId, mode } = useParams();
@@ -37,7 +37,7 @@ export default function SelectSubjectsByTutor() {
               </div>
             )}
             <div className="p-6 max-w-3xl mx-auto space-y-6">
-              <PageTitulo titulo={course && course.name}/>
+              <PageTitle title={course && course.name}/>
               <form onSubmit={handleSubmit} className="space-y-6 justify-items-start ml-3">
                 <p className="text-gray-700 mb-6">
                   {isTutor

@@ -2,7 +2,7 @@ import Footer from "@components/Footer";
 import { useSubjectDetail } from "../hooks/useSubjectDetail";
 import { TutoringPage } from "@/features/tutorings";
 import { useParams } from "react-router-dom";
-import PageTitulo from "@/shared/components/PageTitulo";
+import PageTitle from "@/shared/components/PageTitle";
 
 
 export default function SubjectDetailPage() {
@@ -32,7 +32,7 @@ export default function SubjectDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Columna izquierda - info */}
                 <div className="md:col-span-2 text-left">
-                  <PageTitulo titulo={subject.name} className='titulo'></PageTitulo>                                    
+                  <PageTitle title={subject.name} className='titulo'></PageTitle>                                    
                 </div>
               </div>
 

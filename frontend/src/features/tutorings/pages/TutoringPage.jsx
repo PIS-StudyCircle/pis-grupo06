@@ -4,7 +4,7 @@ import TutoringList from "../components/TutoringList";
 import TutoringSearchBar from "../components/TutoringSearchBar";
 import Pagination from "@components/Pagination";
 import { useParams, useNavigate } from "react-router-dom";
-import PageTitulo from "@components/PageTitulo";
+import PageTitle from "@components/PageTitle";
 
 export default function TutoringPage({ filters = {}, mode = "", titleClass = "titulo" }) {
   const { courseId } = useParams();
@@ -70,7 +70,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
     <div className="flex flex-col">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
         <div className="max-w-5xl mx-auto">
-          <PageTitulo titulo="Tutorías Disponibles" className={titleClass}>
+          <PageTitle title="Tutorías Disponibles" className={titleClass}>
             {["serTutor", "serEstudiante"].includes(mode) && (
               <button
                 type="button"
@@ -86,7 +86,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
                 {mode === "serTutor" ? "Crear nueva tutoría" : "Solicitar nueva tutoría"}
               </button>
             )}
-          </PageTitulo>
+          </PageTitle>
           <TutoringSearchBar
             query={query}
             onQueryChange={(e) => setQuery(e.target.value)}
