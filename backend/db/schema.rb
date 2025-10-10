@@ -105,7 +105,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_08_204654) do
     t.bigint "tutor_id"
     t.integer "enrolled", default: 0, null: false
     t.bigint "course_id", null: false
-    t.string "event_id"
     t.integer "state", default: 0, null: false
     t.text "request_comment"
     t.datetime "request_due_at"
