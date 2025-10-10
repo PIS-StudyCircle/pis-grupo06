@@ -65,8 +65,7 @@ export function ProfilePhotoEditor({ imageSrc, onCancel, onApply }) {
               <RotateCwSquare className="w-5 h-5 text-gray-300" />
             </button>
           </div>
-
-          {/* Fila 2: Cancelar / Aplicar */}
+        
           <div className="flex justify-end gap-3 mt-2 w-full">
             <button
               type="button"

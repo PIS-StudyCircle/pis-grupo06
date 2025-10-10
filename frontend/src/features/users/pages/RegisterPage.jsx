@@ -86,12 +86,20 @@ export default function RegisterPage() {
                 accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files[0];
-                  if (file) {
-                    if (fileUrl) URL.revokeObjectURL(fileUrl); 
-                    setFileUrl(URL.createObjectURL(file));
-                    setShowEditor(true);
+                  if (!file) return;
+
+                  const validTypes = ["image/jpeg", "image/png"];
+                  if (!validTypes.includes(file.type)) {
+                    alert("Solo se permiten imágenes en formato JPG o PNG.");
                     e.target.value = "";
+                    return;
                   }
+
+                  if (fileUrl) URL.revokeObjectURL(fileUrl);
+
+                  setFileUrl(URL.createObjectURL(file));
+                  setShowEditor(true);
+                  e.target.value = "";
                 }}
                 className="absolute inset-0 opacity-0 cursor-pointer"
               />
