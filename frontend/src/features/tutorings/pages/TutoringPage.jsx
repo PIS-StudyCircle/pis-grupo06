@@ -3,12 +3,15 @@ import { useTutorings } from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";
 import TutoringSearchBar from "../components/TutoringSearchBar";
 import Pagination from "@components/Pagination";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import PageTitle from "@components/PageTitle";
 
 export default function TutoringPage({ filters = {}, mode = "", titleClass = "titulo" }) {
   const { courseId } = useParams();
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const courseName = location.state?.courseName || "";
 
   // selector de búsqueda (por materia/tema) proveniente de origin/dev
   const [searchBy, setSearchBy] = useState("course");
@@ -66,28 +69,35 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
     if (forceSubjectSearch) setSearchBy("subject");
   }, [forceSubjectSearch, setSearchBy]);
 
+  const handleNavigateToTopics = () => {
+    const rolePath = mode === "serTutor" ? "tutor" : "estudiante";
+    navigate(`/tutorias/elegir_temas/${rolePath}/${courseId}`);
+  };
+
   return (
     <div className="flex flex-col">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
         <div className="max-w-5xl mx-auto">
-          <PageTitle title="Tutorías Disponibles" className={titleClass}>
+          <PageTitle 
+            title={
+                ["serTutor", "serEstudiante"].includes(mode)
+                  ? `Tutorías Disponibles para ${courseName || ""}`
+                  : "Tutorías Disponibles"
+              }
+            className={titleClass}>
             {["serTutor", "serEstudiante"].includes(mode) && (
               <button
                 type="button"
                 className="btn"
-                onClick={() =>
-                  navigate(
-                    `/tutorias/elegir_temas/${
-                      mode === "serTutor" ? "tutor" : "estudiante"
-                    }/${courseId}`
-                  )
-                }
+                onClick={handleNavigateToTopics}
               >
-                {mode === "serTutor" ? "Crear nueva tutoría" : "Solicitar nueva tutoría"}
+                {mode === "serTutor"
+                  ? "Crear nueva tutoría"
+                  : "Solicitar nueva tutoría"}
               </button>
             )}
           </PageTitle>
-          <TutoringSearchBar
+        <TutoringSearchBar
             query={query}
             onQueryChange={(e) => setQuery(e.target.value)}
             searchBy={forceSubjectSearch ? "subject" : searchBy}
@@ -107,20 +117,26 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
             }
           />
 
-            {/* Filter toggle */}
-            {mode !== "serTutor" && mode !== "serEstudiante" && (
-              <label className="flex items-center gap-2 cursor-pointer ml-4">
-                <input
-                  type="checkbox"
-                  checked={showWithoutTutor}
-                  onChange={(e) => setShowWithoutTutor(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-gray-700">Tutor Indefinido</span>
-              </label>
-            )}
+          {/* Filter toggle */}
+          {mode !== "serTutor" && mode !== "serEstudiante" && (
+            <label className="flex items-center gap-2 cursor-pointer ml-4">
+              <input
+                type="checkbox"
+                checked={showWithoutTutor}
+                onChange={(e) => setShowWithoutTutor(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-gray-700">Tutor Indefinido</span>
+            </label>
+          )}
 
-          <TutoringList tutorings={tutorings} mode={mode} loading={loading} error={error} />
+          <TutoringList
+            courseName={courseName ? courseName : query}
+            tutorings={tutorings}
+            mode={mode}
+            loading={loading}
+            error={error}
+          />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>
