@@ -1,15 +1,53 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@context/UserContext";
-import { ChevronDown, LogOut, User } from "lucide-react";
-
+import { ChevronDown, LogOut, User, Star } from "lucide-react";
+import { getMyFavoriteCourses } from "../../../features/courses/services/courseService";
 
 const NavBar = ({ toggleSidebar = () => {} }) => {
   const { user, signOut } = useUser();
   const nav = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const toggleDropdown = () => setIsDropdownOpen((v) => !v);
+  // estado para favoritas
+  const [favLoading, setFavLoading] = useState(false);
+  const [favError, setFavError] = useState("");
+  const [favorites, setFavorites] = useState([]);
+  const [isFavOpen, setIsFavOpen] = useState(false);
+
+  const toggleDropdown = async () => {
+    setIsDropdownOpen((v) => {
+      const next = !v;
+      // si se va a abrir, cargamos (si aún no cargamos)
+      if (next && user) {
+        setIsFavOpen(false);
+        fetchFavorites();
+      }
+      return next;
+    });
+  };
+
+  async function fetchFavorites() {
+    try {
+      setFavError("");
+      setFavLoading(true);
+      const data = await getMyFavoriteCourses();
+      setFavorites(data);
+    } catch (e) {
+      setFavError(e?.payload?.error || e?.message || "Error al cargar favoritas.");
+    } finally {
+      setFavLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    function onFavChanged() {
+      if (isDropdownOpen) fetchFavorites();
+      else setFavorites([]);
+    }
+    window.addEventListener("favorites:changed", onFavChanged);
+    return () => window.removeEventListener("favorites:changed", onFavChanged);
+  }, [isDropdownOpen]);
 
   async function handleLogout() {
     try {
@@ -65,6 +103,68 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
                 {isDropdownOpen && (
                   <div className="dropdown" role="menu">
                     <div className="py-1">
+
+                      {/* Cabezera plegable */}
+                      <button
+                        type="button"
+                        className="w-full px-3 py-2 text-sm font-medium flex items-center justify-between hover:bg-gray-50"
+                        onClick={() => setIsFavOpen((o) => !o)}
+                        aria-expanded={isFavOpen}
+                        aria-controls="fav-list"
+                      >
+                        <span className="flex items-center gap-2">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                          Materias favoritas
+                        </span>
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform ${isFavOpen ? "rotate-180" : ""}`}
+                        />
+                      </button>
+                      
+                      {/* Contenido plegable */}
+                      {isFavOpen && (
+                        <div id="fav-list" className="max-h-64 overflow-y-auto border-t">
+                          {favLoading && (
+                            <div className="px-3 py-2 text-sm text-gray-500">Cargando…</div>
+                          )}
+                          {favError && (
+                            <div className="px-3 py-2 text-sm text-red-600">
+                              {favError}
+                              <button className="ml-2 underline" onClick={fetchFavorites}>
+                                Reintentar
+                              </button>
+                            </div>
+                          )}
+                          {!favLoading && !favError && favorites.length === 0 && (
+                            <div className="px-3 py-2 text-sm text-gray-500">
+                              No tenés favoritas aún.
+                            </div>
+                          )}
+                          {!favLoading && !favError && favorites.length > 0 && (
+                            <ul className="py-1">
+                              {favorites.map((c) => (
+                                <li key={c.id}>
+                                  <Link
+                                    to={`/materias/${c.id}`}
+                                    state={{ fromFavs: true }}
+                                    className="dropdown-item"
+                                    onClick={() => setIsDropdownOpen(false)}
+                                    title={c.name}
+                                  >
+                                    <span className="truncate">{c.name}</span>
+                                    {c.code && (
+                                      <span className="ml-2 text-xs text-gray-500 truncate">
+                                        {c.code}
+                                      </span>
+                                    )}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
+
                       <Link
                         to="/perfil"
                         className="dropdown-item"
