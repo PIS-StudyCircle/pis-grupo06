@@ -149,10 +149,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_08_204654) do
     t.bigint "faculty_id"
     t.string "provider"
     t.string "uid"
-    t.string "google_access_token"
-    t.string "google_refresh_token"
-    t.datetime "google_expires_at"
-    t.string "calendar_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true
