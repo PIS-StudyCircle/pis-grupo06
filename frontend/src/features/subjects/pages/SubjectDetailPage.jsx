@@ -4,13 +4,11 @@ import { TutoringPage } from "@/features/tutorings";
 import { useParams } from "react-router-dom";
 import PageTitle from "@/shared/components/PageTitle";
 
-
 export default function SubjectDetailPage() {
   const { courseId, subjectId } = useParams();
- 
+
   const { subject, loading, error } = useSubjectDetail(subjectId, courseId);
 
-  
   return (
     <div className="min-h-screen bg-gray-50">
         {loading && (
@@ -41,7 +39,7 @@ export default function SubjectDetailPage() {
 
             </div>
           </div>
-        )}
+      )}
     </div>
   );
 }
