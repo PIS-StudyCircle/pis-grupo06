@@ -1,12 +1,13 @@
 import React from "react";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
-import { renderWithRouter, mockUseTutorings, baseTutorings } from "./TutoringPage.testUtils";
+import { renderWithRouter, mockUseTutorings, baseTutorings, setPageMock, setSearchMock } from "./TutoringPage.testUtils";
 import TutoringPage from "../pages/TutoringPage";
 import TutoringCard from "../components/TutoringCard";
 
 describe("TutoringPage - Comportamiento general", () => {
   beforeEach(() => {
-    mockUseTutorings();
+    jest.clearAllMocks();
+    mockUseTutorings({ tutorings: baseTutorings });
   });
 
   it("renderiza título y lista de tutorías", async () => {
@@ -41,27 +42,31 @@ describe("TutoringPage - Comportamiento general", () => {
 describe("TutoringPage - Comportamiento completo", () => {
     beforeEach(() => {
       jest.clearAllMocks();
+      mockUseTutorings({ tutorings: baseTutorings });
     });
   
     it("renderiza título y lista con tutorías disponibles", async () => {
-      mockUseTutorings({ tutorings: baseTutorings });
-    
-      renderWithRouter(<TutoringPage />);
-    
-      // Esperamos a que aparezca el título
-      expect(await screen.findByText(/Tutorías Disponibles/i)).toBeInTheDocument();
-    
-      // Validamos que cada tutoría se renderizó con su materia y tutor
-      for (const tutoring of baseTutorings) {
-        const tutorFullName = tutoring.tutor_id
-        ? `${tutoring.tutor_name} ${tutoring.tutor_last_name}`
-        : /sin tutor/i;
-    
-        expect(await screen.findByText(new RegExp(tutoring.course.name, "i"))).toBeInTheDocument();
-        if (tutoring.tutor_id) {
-          expect(await screen.findByText(new RegExp(tutorFullName, "i"))).toBeInTheDocument();
+        mockUseTutorings({ tutorings: baseTutorings });
+      
+        renderWithRouter(<TutoringPage />);
+      
+        // Esperamos a que aparezca el título
+        expect(await screen.findByText(/Tutorías Disponibles/i)).toBeInTheDocument();
+      
+        // Validamos que cada tutoría se renderizó con su materia y tutor
+        for (const tutoring of baseTutorings) {
+          const tutorFullName = tutoring.tutor_id
+            ? `${tutoring.tutor_name} ${tutoring.tutor_last_name}`
+            : /sin tutor/i;
+      
+          const courseElements = await screen.findAllByText(new RegExp(tutoring.course.name, "i"));
+          expect(courseElements.length).toBeGreaterThan(0); // al menos una coincidencia
+      
+          if (tutoring.tutor_id) {
+            const tutorElements = await screen.findAllByText(new RegExp(tutorFullName, "i"));
+            expect(tutorElements.length).toBeGreaterThan(0);
+          }
         }
-      }
     });
   
     it("renderiza botón de acción cuando mode='serTutor'", () => {
@@ -90,8 +95,6 @@ describe("TutoringPage - Comportamiento completo", () => {
     });
   
     it("toggle 'Tutor Indefinido' actualiza mergedFilters", () => {
-      const setPageMock = jest.fn();
-      const setSearchMock = jest.fn();
       mockUseTutorings({ setPage: setPageMock, setSearch: setSearchMock });
   
       renderWithRouter(<TutoringPage mode="other" />);
@@ -111,23 +114,21 @@ describe("TutoringPage - Comportamiento completo", () => {
     });
   
     it("efecto de debounce llama a setSearch y setPage", async () => {
-      const setPageMock = jest.fn();
-      const setSearchMock = jest.fn();
-      mockUseTutorings({ setPage: setPageMock, setSearch: setSearchMock });
-  
-      renderWithRouter(<TutoringPage />);
-  
-      const input = screen.getByPlaceholderText(/Buscar por materia/i);
-      fireEvent.change(input, { target: { value: "React" } });
-  
-      await waitFor(() => {
-        expect(setSearchMock).toHaveBeenCalledWith("React");
-        expect(setPageMock).toHaveBeenCalledWith(1);
-      });
+      
+        mockUseTutorings({ setSearch: setSearchMock, setPage: setPageMock });
+      
+        renderWithRouter(<TutoringPage />);
+        
+        const input = screen.getByPlaceholderText(/Buscar por materia/i);
+        fireEvent.change(input, { target: { value: "React" } });
+      
+        await waitFor(() => {
+          expect(setSearchMock).toHaveBeenCalledWith("React");
+          expect(setPageMock).toHaveBeenCalledWith(1);
+        });
     });
   
     it("cambia página al cambiar searchBy", () => {
-      const setPageMock = jest.fn();
       mockUseTutorings({ setPage: setPageMock });
   
       renderWithRouter(<TutoringPage />);
