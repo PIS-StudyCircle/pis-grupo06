@@ -97,7 +97,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
               </button>
             )}
           </PageTitle>
-          <TutoringSearchBar
+        <TutoringSearchBar
             query={query}
             onQueryChange={(e) => setQuery(e.target.value)}
             searchBy={forceSubjectSearch ? "subject" : searchBy}
