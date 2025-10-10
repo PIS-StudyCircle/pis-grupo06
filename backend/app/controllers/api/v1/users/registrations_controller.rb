@@ -13,6 +13,14 @@ module Api
       before_action :configure_sign_up_params, only: [:create]
       after_action :stash_jwt_and_csrf_cookies, only: :create, if: -> { resource.persisted? }
       rescue_from ActionController::ParameterMissing, with: :render_bad_request
+      before_action :authenticate_user!, only: [:destroy]
+
+      def destroy
+        resource = current_user
+        sign_out(resource_name)
+        resource.destroy
+        render json: { message: "Tu cuenta ha sido eliminada con éxito." }, status: :ok
+      end
 
       private
 
