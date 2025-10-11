@@ -151,7 +151,7 @@ module Api
 
       def create
         tutoring = Tutoring.new(tutoring_params)
-        tutoring.created_by_id = params.dig(:tutoring, :created_by_id)
+        tutoring.created_by_id =current_user.id
         tutoring.tutor_id      = params.dig(:tutoring, :tutor_id)
         tutoring.course_id     = params.dig(:tutoring, :course_id)
 
@@ -159,21 +159,11 @@ module Api
           tutoring.capacity = 1 # Valor por defecto para solicitudes pendientes
         end
 
-        if tutoring.tutor_id.present? && tutoring.scheduled_at.present? && tutoring.duration_mins.present?
-          tutoring.state = 1 # cuando la tutoria es creada por el tutor la creamos como activa
-          start_time = tutoring.scheduled_at
-          end_time = start_time + tutoring.duration_mins.minutes
-
-          overlapping = Tutoring.where(tutor_id: tutoring.tutor_id)
-                                .where.not(id: tutoring.id)
-                                .exists?([
-                                  "scheduled_at < ? AND (scheduled_at + INTERVAL '1 minute' * duration_mins) > ?",
-                                  end_time, start_time
-                                ])
-
-          if overlapping
+        # Validar overlapping con las availabilities antes de crearlas
+        if params[:tutoring][:availabilities_attributes].present?
+          if has_availability_overlaps?(params[:tutoring][:availabilities_attributes], current_user.id)
             render json: {
-              errors: ["Ya tienes una tutoría programada en esa fecha y horario"]
+              errors: ["Ya tienes tutorías programadas en algunos de los horarios de disponibilidad"]
             }, status: :unprocessable_entity
             return
           end
@@ -224,7 +214,7 @@ module Api
         @tutoring.destroy
         head :no_content
       end
-
+      #TODO: adaptar metodo cuando se realice "Unirse Tutoria"
       def confirm_schedule
         # Parsear el horario elegido
         scheduled_time = Time.zone.parse(params[:scheduled_at])
@@ -253,6 +243,14 @@ module Api
         if tutoring_end_time > availability.end_time
           return render json: {
             error: "No hay tiempo suficiente en esa franja horaria. La tutoría dura #{@tutoring.duration_mins} minutos."
+          }, status: :unprocessable_entity
+        end
+
+        # Validar que no haya tutorías que se solapen con este horario
+        overlapping_tutorings = check_overlapping_tutorings(scheduled_time, tutoring_end_time, current_user.id)
+        if overlapping_tutorings.any?
+          return render json: {
+            error: "Ya tienes tutorías programadas en ese horario"
           }, status: :unprocessable_entity
         end
 
@@ -470,6 +468,35 @@ module Api
             { availabilities_attributes: [:id, :start_time, :end_time, :_destroy] }
           ]
         )
+      end
+
+      def check_overlapping_tutorings(start_time, end_time, user_id)
+        # Buscar tutorías donde el usuario está involucrado (como tutor, creador o estudiante)
+        # que se solapen con el horario especificado
+        Tutoring.joins(:user_tutorings)
+                .where.not(id: @tutoring&.id) # Excluir la tutoría actual si existe
+                .where(
+                  "(scheduled_at < ? AND (scheduled_at + INTERVAL '1 minute' * duration_mins) > ?) OR " +
+                  "(scheduled_at >= ? AND scheduled_at < ?)",
+                  end_time, start_time, start_time, end_time
+                )
+                .where(
+                  "user_tutorings.user_id = ? OR tutor_id = ? OR created_by_id = ?", 
+                  user_id, user_id, user_id
+                )
+                .distinct
+      end
+
+      def has_availability_overlaps?(availabilities_params, user_id)
+        availabilities_params.any? do |availability_params|
+          next if availability_params[:_destroy] == '1' || availability_params[:_destroy] == true
+          
+          start_time = Time.zone.parse(availability_params[:start_time])
+          end_time = Time.zone.parse(availability_params[:end_time])
+          
+          # Buscar si hay tutorías que se solapen con esta availability
+          check_overlapping_tutorings(start_time, end_time, user_id).any?
+        end
       end
     end
   end

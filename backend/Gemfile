@@ -68,11 +68,12 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+  
+  # Ruby static code analyzer and formatter
+  gem "rubocop", "~> 1.80", require: false
 end
 
 gem "letter_opener", "~> 1.10"
 group :test do
   gem 'simplecov', require: false
 end
-
-gem "rubocop", "~> 1.80", require: false
