@@ -11,7 +11,6 @@ export default function CourseDetailPage() {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { course, loading, error } = useCourse(courseId);
-  const [msg, setMsg] = useState("");
   const { user } = useUser();
   const [favorite, setFavorite] = useState(
     user ? (state?.fromFavs ?? (typeof course?.favorite === "boolean" ? course.favorite : false)) : null
@@ -45,17 +44,8 @@ export default function CourseDetailPage() {
         await favoriteCourse(course.id);
         setFavorite(true);
       }
-      // avisá al NavBar para refrescar su lista si está abierto
-      window.dispatchEvent(new CustomEvent("favorites:changed"));
     } catch (error) {
-      if (error?.status === 401) {
-        setMsg(error?.payload?.error || "Debes iniciar sesión para actualizar favoritos.");
-        setTimeout(() => setMsg(""), 3000);
-        return;
-      }
-
-      setMsg(error?.payload?.error || error?.message || "Error al actualizar favorito.");
-      setTimeout(() => setMsg(""), 3000);
+      console.error("Error al actualizar favorito:", error);
     }
   }
 
@@ -107,8 +97,6 @@ export default function CourseDetailPage() {
                     )}
                  
                   </h1>
-
-                  {msg && <p className="text-sm text-red-600 mb-2">{msg}</p>}
 
                   <div className="space-y-1 pl-[2px]">
                     {course.code && (
