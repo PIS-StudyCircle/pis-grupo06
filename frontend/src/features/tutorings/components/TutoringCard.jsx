@@ -1,15 +1,36 @@
 import { formatDateTime } from "@shared/utils/FormatDate";
+import { useUser } from "@context/UserContext";
+import { useNavigate } from "react-router-dom";
 import { JoinTutoringButton } from "@/features/calendar";
 
+export default function TutoringCard({ tutoring }) {
+  const { currentUser } = useUser();
 
-export default function TutoringCard({ tutoring, mode }) {
-  mode = "unirme"; // FORZAR MODO unirme PARA PRUEBAS
+  let mode;
+
+  const noTieneTutor = tutoring.tutor_id === null;
+  const cuposDisponibles = tutoring.capacity > tutoring.enrolled;
+  const soyTutor = tutoring.tutor_id === currentUser?.id;
+  const soyEstudiante = tutoring.users?.some((u) => u.id === currentUser?.id);
+
+  if (soyTutor || soyEstudiante) {
+    mode = "misTutorias";
+  } else if (!cuposDisponibles) {
+    mode = "completo";
+  } else if (noTieneTutor && cuposDisponibles) {
+    mode = "ambos";
+  } else if (noTieneTutor) {
+    mode = "serTutor";
+  } else if (cuposDisponibles) {
+    mode = "serEstudiante";
+  }
+
+  const navigate = useNavigate();
+
   return (
-
     <div className="w-full bg-white rounded-lg shadow p-4 my-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         
-        {/* Información de la tutoría - sin cambios */}
         <div className="flex-1 flex flex-col text-left">
 
           <p className="tutoring-card-title">
@@ -66,7 +87,11 @@ export default function TutoringCard({ tutoring, mode }) {
             <button
               type="button"
               className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-              onClick={() => {}}
+              onClick={() =>
+                navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
+                  state: { tutoring },
+                })
+              }
             >
               Ser tutor
             </button>
@@ -87,7 +112,11 @@ export default function TutoringCard({ tutoring, mode }) {
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => {}}
+                onClick={() =>
+                  navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
+                    state: { tutoring },
+                  })
+                }
               >
                 Ser tutor
               </button>
@@ -119,7 +148,6 @@ export default function TutoringCard({ tutoring, mode }) {
             >
               Completo
             </button>
-
           )}
         </div>
       </div>

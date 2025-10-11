@@ -16,7 +16,7 @@ import {
 import { SubjectPage } from "@/features/subjects";
 import SubjectDetailPage from "@/features/subjects/pages/SubjectDetailPage";
 import { RequireGuestRoute } from "./RequireGuestRoute";
-import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent } from "@/features/tutorings";
+import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent, ChooseScheduleByTutor } from "@/features/tutorings";
 import { Error404Page } from "@components/Error404";
 
 
@@ -55,6 +55,7 @@ export function AppRoutes() {
         <Route path="/tutores" element={<TutorPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
         <Route path="/tutorias/materia/:courseId" element={<TutoringPage filters={{}} mode="serEstudiante" />} />
+        <Route path="/tutorias/:tutoringId/elegir_horario_tutor" element={<ChooseScheduleByTutor />} />
 
       </Route>
 

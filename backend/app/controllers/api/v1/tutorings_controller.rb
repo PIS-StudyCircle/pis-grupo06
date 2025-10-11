@@ -102,7 +102,10 @@ module Api
               request_comment: t.request_comment,
               request_due_at: t.request_due_at,
               tutor_name: t.tutor&.name,
-              tutor_last_name: t.tutor&.last_name
+              tutor_last_name: t.tutor&.last_name,
+              availabilities: t.tutoring_availabilities.map do |a|
+              { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
+              end
             }
           end,
           pagination: pagy_metadata(@pagy)
