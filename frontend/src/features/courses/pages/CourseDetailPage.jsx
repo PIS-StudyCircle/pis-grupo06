@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useCourse } from "../hooks/useCourse";
 import { favoriteCourse, unfavoriteCourse } from "../services/courseService";
 import SubjectPage from "@/features/subjects/pages/SubjectPage";
+import { useUser } from "@context/UserContext";
 
 export default function CourseDetailPage() {
 
@@ -11,8 +12,9 @@ export default function CourseDetailPage() {
   const navigate = useNavigate();
   const { course, loading, error } = useCourse(courseId);
   const [msg, setMsg] = useState("");
+  const { user } = useUser();
   const [favorite, setFavorite] = useState(
-    state?.fromFavs ?? (typeof course?.favorite === "boolean" ? course.favorite : false)
+    user ? (state?.fromFavs ?? (typeof course?.favorite === "boolean" ? course.favorite : false)) : null
   );
 
   useEffect(() => {
@@ -81,10 +83,10 @@ export default function CourseDetailPage() {
                   <h1 className="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3 w-full">
 
                     {/* el nombre ocupa el espacio restante */}
-                    <span className="min-w-0 flex-1 truncate">{course.name}</span>
+                    <span className="min-w-0 flex-1 ">{course.name}</span>
 
                     {/* la estrella se pega a la derecha dentro de estas 2 columnas */}
-                    {favorite !== null && (
+                    {user && favorite !== null && (
                       <button
                         type="button"
                         onClick={toggleFavorite}
