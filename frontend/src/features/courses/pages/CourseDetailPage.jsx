@@ -4,6 +4,7 @@ import { useCourse } from "../hooks/useCourse";
 import { favoriteCourse, unfavoriteCourse } from "../services/courseService";
 import SubjectPage from "@/features/subjects/pages/SubjectPage";
 import { useUser } from "@context/UserContext";
+import PageTitle from "@/shared/components/PageTitle";
 
 export default function CourseDetailPage() {
 
@@ -70,10 +71,7 @@ export default function CourseDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Columna izquierda - info */}
                 <div className="md:col-span-2 text-left">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3 w-full">
-
-                    {/* el nombre ocupa el espacio restante */}
-                    <span className="min-w-0 flex-1 ">{course.name}</span>
+                  <PageTitle title={course.name} className="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3 w-full" >
 
                     {/* la estrella se pega a la derecha dentro de estas 2 columnas */}
                     {user && favorite !== null && (
@@ -95,8 +93,8 @@ export default function CourseDetailPage() {
                         </svg>
                       </button>
                     )}
-                 
-                  </h1>
+                  </PageTitle>
+                  
 
                   <div className="space-y-1 pl-[2px]">
                     {course.code && (
