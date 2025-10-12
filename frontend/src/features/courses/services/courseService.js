@@ -1,6 +1,6 @@
 import { API_BASE } from "@/shared/config";
 
-export const getCourses = async (page = 1, perPage = 20, search = "") => {
+export const getCourses = async (page = 1, perPage = 20, search = "", showFavorites = false) => {
   const params = new URLSearchParams({
     page,
     per_page: perPage,
@@ -9,8 +9,10 @@ export const getCourses = async (page = 1, perPage = 20, search = "") => {
   if (search) {
     params.append("search", search);
   }
-
-  const response = await fetch(`${API_BASE}/courses?${params}`);
+  if (showFavorites) {
+    params.append("favorite", "true");
+  }
+  const response = await fetch(`${API_BASE}/courses?${params}`,{credentials: 'include'});
   
   if (!response.ok) throw new Error("Error fetching courses");
   return await response.json();

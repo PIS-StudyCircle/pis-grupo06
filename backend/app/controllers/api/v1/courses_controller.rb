@@ -9,6 +9,11 @@ module Api
         # Filtro de búsqueda por nombre
         courses = courses.where("unaccent(name) ILIKE unaccent(?)", "%#{params[:search]}%") if params[:search].present?
 
+        # Filtro para mostrar solo los cursos marcados como favoritos por el usuario actual
+        if params[:favorite].present? && ActiveModel::Type::Boolean.new.cast(params[:favorite]) && current_user
+          courses = courses.joins(:favorite_courses).where(favorite_courses: { user_id: current_user.id })
+        end
+
         @pagy, @courses = pagy(courses, items: params[:per_page] || 20)
 
         favorite_course_ids =

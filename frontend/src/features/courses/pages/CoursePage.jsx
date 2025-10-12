@@ -5,6 +5,7 @@ import { useCourses } from "../hooks/useCourses";
 import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
 import PageTitle from "@components/PageTitle";
+import { useUser } from "@context/UserContext";
 
 export default function CoursePage() {
   const {
@@ -16,10 +17,13 @@ export default function CoursePage() {
     setPage,
     search,
     setSearch,
+    showFavorites,
+    setShowFavorites,
   } = useCourses();
   const totalPages = pagination.last || 1;
 
   const [query, setQuery] = useState(search);
+  const { user } = useUser();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -39,6 +43,18 @@ export default function CoursePage() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar materia..."
           />
+
+          {user && (
+            <label className="flex items-center gap-2 cursor-pointer ml-4">
+              <input
+                type="checkbox"
+                checked={showFavorites}
+                onChange={(e) => setShowFavorites(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-gray-700">Favoritos</span>
+            </label>
+          )}
 
           <CourseList courses={courses} loading={loading} error={error} />
 
