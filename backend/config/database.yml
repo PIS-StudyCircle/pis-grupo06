@@ -58,6 +58,11 @@ test:
   <<: *default
   database: studycircle_test
 
+  queue:
+    <<: *default
+    database: studycircle_test_queue
+
+
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
 # ever seen by anyone, they now have access to your database.
@@ -105,6 +110,3 @@ staging:
 
   cable:
     <<: *primary_staging
-
-
-
