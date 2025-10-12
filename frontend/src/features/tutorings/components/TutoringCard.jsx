@@ -1,5 +1,4 @@
 import { formatDateTime } from "@shared/utils/FormatDate";
-import { JoinTutoringButton } from "@/features/calendar";
 
 
 export default function TutoringCard({ tutoring, mode }) {
