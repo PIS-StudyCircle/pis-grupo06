@@ -90,10 +90,6 @@ class Tutoring < ApplicationRecord
 
   # --- Métodos auxiliares ---
 
-  def enrolled
-    user_tutorings.size
-  end
-
   private
 
   def scheduled_at_cannot_be_in_past
@@ -106,10 +102,7 @@ class Tutoring < ApplicationRecord
 
   def capacity_not_less_than_enrolled
     return if capacity.blank?
-
-    if enrolled > capacity
-      errors.add(:capacity, :less_than_enrolled)
-    end
+    errors.add(:capacity, :less_than_enrolled) if enrolled > capacity
   end
 
   def request_due_at_before_scheduled_at

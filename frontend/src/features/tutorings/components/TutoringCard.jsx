@@ -6,6 +6,45 @@ import { JoinTutoringButton } from "@/features/calendar";
 export default function TutoringCard({ tutoring }) {
   const { currentUser } = useUser();
 
+  const handleUnirmeClick = async (tutoring) => {
+    if (!tutoring) return;
+    
+    const remaining = (tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0);
+    const primerEstudiante = tutoring.enrolled === 0;
+    
+    // Primer estudiante confirma las horas y se une a la tutoría
+    if (primerEstudiante) {
+      navigate(`/tutorias/${tutoring.id}/elegir_horario_estudiante`, { state: { tutoring } });
+      return;
+    }
+    
+    //Si no es el primer estudiante, simplemente se une
+    try {
+      const res = await fetch(`/api/v1/tutorings/${tutoring.id}/join_tutoring`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        //scheduled_at: selectedTime,
+        role: "student",
+      }),
+    });
+    if (res.ok) {
+      alert("Te uniste a la tutoría con éxito");
+      // si querés, refrescá estado o navegá:
+      // navigate(`/tutorias/${tutoring.id}`);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || "No se pudo unir a la tutoría");
+    }
+
+
+    } catch (error) {
+      console.error(error);
+      alert("Error en la conexion con el servidor");
+    }
+  };
+
   let mode;
 
   const noTieneTutor = tutoring.tutor_id === null;
@@ -101,7 +140,7 @@ export default function TutoringCard({ tutoring }) {
             <button
               type="button"
               className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-              onClick={() => {}}
+              onClick={() => handleUnirmeClick(tutoring)}
             >
               Unirme
             </button>
@@ -123,7 +162,7 @@ export default function TutoringCard({ tutoring }) {
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => {}}
+                onClick={() => handleUnirmeClick(tutoring)}
               >
                 Unirme
               </button>

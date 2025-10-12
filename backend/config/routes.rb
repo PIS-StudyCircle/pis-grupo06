@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       end
       resources :tutorings do 
         post "confirm_schedule", on: :member
+        post "join_tutoring", on: :member
       end
       resource :calendar, only: [] do
         post   "sessions",          to: "calendar#create"
