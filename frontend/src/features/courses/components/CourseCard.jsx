@@ -1,6 +1,6 @@
 import { HiArrowRight } from "react-icons/hi";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { favoriteCourse, unfavoriteCourse } from "../services/courseService";
 import { useUser } from "@context/UserContext";
 
