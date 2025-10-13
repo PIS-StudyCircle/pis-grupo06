@@ -15,13 +15,6 @@ module Api
       rescue_from ActionController::ParameterMissing, with: :render_bad_request
       before_action :authenticate_user!, only: [:destroy]
 
-      def destroy
-        resource = current_user
-        sign_out(resource_name)
-        resource.destroy
-        render json: { message: "Tu cuenta ha sido eliminada con éxito." }, status: :ok
-      end
-
       def create
         build_resource(sign_up_params)
 
@@ -38,6 +31,13 @@ module Api
             status: :unprocessable_entity
           )
         end
+      end
+
+      def destroy
+        resource = current_user
+        sign_out(resource_name)
+        resource.destroy
+        render json: { message: "Tu cuenta ha sido eliminada con éxito." }, status: :ok
       end
 
       private
