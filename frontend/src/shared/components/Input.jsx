@@ -54,6 +54,8 @@ export function Input({
               name={id}
               type={isPassword && show ? "text" : type}
               value={value}
+              minLength={minLength}
+              maxLength={maxLength}
               onChange={onChange}
               required={required}
               placeholder={placeholder}
