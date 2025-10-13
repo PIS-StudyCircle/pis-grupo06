@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getUserById } from "../services/usersServices";
-import { getReviewsByTutor, canReviewTutor, createReview } from "../services/tutorReviewsServices";
+import { getUserById, getReviewsByTutor, canReviewTutor, createReview } from "../services/usersServices";
 import { DEFAULT_PHOTO } from "@/shared/config";
 
 export default function UserProfile() {
