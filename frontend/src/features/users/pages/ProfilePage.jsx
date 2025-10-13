@@ -16,7 +16,7 @@ export default function Profile() {
   useEffect(() => {
     if (!user) return;
     fetchFavorites();
-  }, [user?.id]);
+  }, [user]);
 
   async function fetchFavorites() {
     try {

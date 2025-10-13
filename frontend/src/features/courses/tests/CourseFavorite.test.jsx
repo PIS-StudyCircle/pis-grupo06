@@ -1,12 +1,14 @@
 jest.mock("@context/UserContext", () => ({ useUser: jest.fn() }));
+
 jest.mock("../services/courseService", () => ({
   favoriteCourse: jest.fn(),
   unfavoriteCourse: jest.fn(),
   getCourseByID: jest.fn(),
   getMyFavoriteCourses: jest.fn(),
 }));
+
 jest.mock("../hooks/useCourses", () => ({ useCourses: jest.fn() }));
-// evitar que SubjectPage real llame a fetch/useSubjects
+
 jest.mock("../../subjects/pages/SubjectPage", () => (props) => <div>Mock SubjectPage - courseId: {props.courseId}</div>);
 
 jest.mock("react-router-dom", () => ({
@@ -20,9 +22,9 @@ import CourseDetailPage from "../pages/CourseDetailPage";
 import CourseCard from "../components/CourseCard";
 import CoursePage from "../pages/CoursePage";
 import * as courseService from "../services/courseService";
-
-const { useUser } = require("@context/UserContext");
-const { useCourses } = require("../hooks/useCourses"); // <-- añadido
+import { useUser } from "@context/UserContext";
+import { useCourses } from "../hooks/useCourses";
+import Profile from "../../users/pages/ProfilePage";
 
 function renderCourseCard(course) {
   return render(
@@ -43,7 +45,6 @@ function renderCourseDetail(courseId) {
 }
 
 function renderProfilePage() {
-  const Profile = require("../../users/pages/ProfilePage").default;
   return render(
     <MemoryRouter>
       <Profile />
@@ -51,15 +52,7 @@ function renderProfilePage() {
   );
 }
 
-function renderCoursePage() {
-  return render(
-    <MemoryRouter>
-      <CoursePage />
-    </MemoryRouter>
-  );
-}
-
-describe("Favoritos - CourseCard y CourseDetailPage", () => {
+describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
   beforeEach(() => {
     useUser.mockReturnValue({ user: { id: 1 } });
   });
