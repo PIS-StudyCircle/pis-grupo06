@@ -100,7 +100,8 @@ module Api
               request_comment: t.request_comment,
               request_due_at: t.request_due_at,
               tutor_name: t.tutor&.name,
-              tutor_last_name: t.tutor&.last_name
+              tutor_last_name: t.tutor&.last_name,
+              tutor_email: t.tutor&.email,
             }
           end,
           pagination: pagy_metadata(@pagy)

@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useUser } from "@context/UserContext";
 import { ChevronDown, LogOut, User } from "lucide-react";
-
+import { DEFAULT_PHOTO } from "@/shared/config";
 
 const NavBar = ({ toggleSidebar = () => {} }) => {
   const { user, signOut } = useUser();
@@ -22,6 +22,8 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
   }
 
   const userInitial = (user?.name?.[0] || "?").toUpperCase();
+
+  const photoUrl = user?.profile_photo_url || DEFAULT_PHOTO;
 
   return (
     <nav className="navbar">
@@ -49,8 +51,12 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
                   className="btn-avatar"
                   aria-expanded={isDropdownOpen}
                 >
-                  <div className="avatar">
-                    <span className="avatar-letter">{userInitial}</span>
+                  <div className="avatar w-10 h-10 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center bg-gray-200">
+                    <img
+                      src={photoUrl}
+                      alt={user.name || "Avatar"}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <span className="hidden md:block font-medium truncate max-w-[160px]">
                     {user.name || user.email}
@@ -116,7 +122,11 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
               </div>
             </button>
 
-            <Link to="/materias" className="navbar-logo-mobile" aria-label="Ir a cursos">
+            <Link
+              to="/materias"
+              className="navbar-logo-mobile"
+              aria-label="Ir a cursos"
+            >
               <img
                 src="/icon_sin_fondo.png"
                 alt="Study Circle"
@@ -144,10 +154,16 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
               </button>
             </div>
             <div className="flex gap-3">
-              <Link to="/iniciar_sesion" className="px-2 text-white hover:underline">
+              <Link
+                to="/iniciar_sesion"
+                className="px-2 text-white hover:underline"
+              >
                 Iniciar sesión
               </Link>
-              <Link to="/registrarse" className="px-2 text-white hover:underline">
+              <Link
+                to="/registrarse"
+                className="px-2 text-white hover:underline"
+              >
                 Registrarse
               </Link>
             </div>

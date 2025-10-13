@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCourse } from "../hooks/useCourse";
 import SubjectPage from "@/features/subjects/pages/SubjectPage";
+import PageTitle from "@components/PageTitle";
+
 
 export default function CourseDetailPage() {
   const { courseId } = useParams();
@@ -8,7 +10,7 @@ export default function CourseDetailPage() {
   const { course, loading, error } = useCourse(courseId);
 
   return (
-    <div className="flex flex-col bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
         {loading && (
           <div className="p-6 max-w-3xl mx-auto">Cargando curso...</div>
         )}
@@ -28,9 +30,7 @@ export default function CourseDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Columna izquierda - info */}
                 <div className="md:col-span-2 text-left">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                    {course.name}
-                  </h1>
+                  <PageTitle title={course.name} className='titulo'></PageTitle>
 
                   <div className="space-y-1 pl-[2px]">
                     {course.code && (
@@ -57,14 +57,14 @@ export default function CourseDetailPage() {
                   <button
                     type="button"
                     className="btn w-full"
-                    onClick={() => navigate(`/tutorias/ser_tutor/${courseId}`)}
+                    onClick={() => navigate(`/tutorias/ser_tutor/${courseId}`, { state: { courseName: course.name } })}
                   >
                     Brindar tutoría
                   </button>
                   <button
                     type="button"
                     className="btn w-full"
-                    onClick={() => navigate(`/tutorias/materia/${courseId}`)}
+                    onClick={() => navigate(`/tutorias/materia/${courseId}`, { state: { courseName: course.name } })}
                   >
                     Recibir tutoría
                   </button>

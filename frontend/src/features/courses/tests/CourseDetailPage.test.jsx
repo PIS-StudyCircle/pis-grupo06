@@ -151,12 +151,12 @@ describe("CourseDetailPage", () => {
     // Botón "Brindar tutoría"
     const tutorButton = screen.getByText(/Brindar tutoría/i);
     tutorButton.click();
-    expect(mockedNavigate).toHaveBeenCalledWith("/tutorias/ser_tutor/1");
+    expect(mockedNavigate).toHaveBeenCalledWith("/tutorias/ser_tutor/1", { state: { courseName: "Curso Test" } });
   
     // Botón "Recibir tutoría"
     const tutoriaButton = screen.getByText(/Recibir tutoría/i);
     tutoriaButton.click();
-    expect(mockedNavigate).toHaveBeenCalledWith("/tutorias/materia/1");
+    expect(mockedNavigate).toHaveBeenCalledWith("/tutorias/materia/1", { state: { courseName: "Curso Test" } });
   });
   
 });

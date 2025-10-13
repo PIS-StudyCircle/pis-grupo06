@@ -16,7 +16,6 @@ export const useUsers = (initialPage = 1, perPage = 20, initialRole = "") => {
       setLoading(true);
       try {
         const response = await getUsers(page, perPage, search, role);
-        console.log("Fetched users:", response.users);
         setUsers(response.users);
         setPagination(response.pagination);
       } catch (err) {

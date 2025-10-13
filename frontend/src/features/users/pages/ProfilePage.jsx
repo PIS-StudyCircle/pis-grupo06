@@ -17,7 +17,7 @@ export default function Profile() {
     return <p className="text-center mt-10">No hay usuario cargado.</p>;
   }
 
-  const photoUrl = user.photo || DEFAULT_PHOTO;
+  const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
