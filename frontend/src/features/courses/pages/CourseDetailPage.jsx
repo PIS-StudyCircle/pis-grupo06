@@ -71,7 +71,11 @@ export default function CourseDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Columna izquierda - info */}
                 <div className="md:col-span-2 text-left">
-                  <PageTitle title={course.name} className="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3 w-full" >
+                  <div className="relative mb-4">
+                    <PageTitle 
+                      title={course.name}
+                      className="text-3xl font-bold text-gray-900 leading-tight pr-14" 
+                    />
 
                     {/* la estrella se pega a la derecha dentro de estas 2 columnas */}
                     {user && favorite !== null && (
@@ -80,7 +84,7 @@ export default function CourseDetailPage() {
                         onClick={toggleFavorite}
                         aria-label={favorite ? "Quitar de favoritos" : "Agregar a favoritos"}
                         title={favorite ? "Quitar de favoritos" : "Agregar a favoritos"}
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100"
+                        className="absolute top-0 right-0 inline-flex w-8 h-8 rounded-full hover:bg-gray-100"
                       >
                         <svg
                           className={`w-5 h-5 ${favorite ? "text-yellow-400" : "text-gray-300"}`}
@@ -93,7 +97,7 @@ export default function CourseDetailPage() {
                         </svg>
                       </button>
                     )}
-                  </PageTitle>
+                  </div>
                   
 
                   <div className="space-y-1 pl-[2px]">
