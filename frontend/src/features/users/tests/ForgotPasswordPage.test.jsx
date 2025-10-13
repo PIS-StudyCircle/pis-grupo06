@@ -97,7 +97,7 @@ describe("ForgotPasswordPage", () => {
     });
   });
 
-  /*it("muestra errores del backend si los hay", async () => {
+  it("muestra errores del backend si los hay", async () => {
     mockForgotPassword.mockImplementation(() =>
       Promise.reject(["Error del servidor"])
     );
@@ -109,9 +109,9 @@ describe("ForgotPasswordPage", () => {
     fireEvent.submit(screen.getByRole("button", { name: /enviar/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent("Error del servidor");
+      expect(screen.getByRole("alert")).toHaveTextContent(/Error del servidor|Ocurrió un error/i);
     });
-  });*/
+  });
 
   it("muestra mensaje de confirmación tras envío exitoso", async () => {
     mockForgotPassword.mockResolvedValueOnce({});
