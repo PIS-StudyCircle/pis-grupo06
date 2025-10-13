@@ -4,7 +4,7 @@ import { useCourse } from "../hooks/useCourse";
 import { favoriteCourse, unfavoriteCourse } from "../services/courseService";
 import SubjectPage from "@/features/subjects/pages/SubjectPage";
 import { useUser } from "@context/UserContext";
-import PageTitle from "@/shared/components/PageTitle";
+import PageTitle from "@components/PageTitle";
 
 export default function CourseDetailPage() {
 

@@ -36,10 +36,10 @@ RSpec.describe "CourseFavorites API", type: :request do
     it "crea favorito al hacer POST" do
       expect {
         post "/api/v1/courses/#{course1.id}/favorite", as: :json
-      }.to change { user.favorite_courses.count }.by(1)
+      }.to change(user.favorite_courses, :count).by(1)
       expect(user.favorite_courses.pluck(:course_id)).to include(course1.id)
       expect(response).to have_http_status(:created)
-      body = JSON.parse(response.body)
+      body = response.parsed_body
       expect(body["favorite"]).to be true
     end
 
@@ -48,7 +48,7 @@ RSpec.describe "CourseFavorites API", type: :request do
       user.favorite_courses.create!(course: course2)
       expect {
         delete "/api/v1/courses/#{course1.id}/favorite", as: :json
-      }.to change { user.favorite_courses.count }.by(-1)
+      }.to change(user.favorite_courses, :count).by(-1)
       expect(user.favorite_courses.pluck(:course_id)).not_to include(course1.id)
       expect(response).to have_http_status(:no_content).or have_http_status(:ok)
     end
@@ -59,7 +59,7 @@ RSpec.describe "CourseFavorites API", type: :request do
 
       expect {
         post "/api/v1/courses/#{course1.id}/favorite", as: :json
-      }.not_to change { user.favorite_courses.count }
+      }.not_to change(user.favorite_courses, :count)
 
       expect(response).to have_http_status(:created).or have_http_status(:ok)
     end

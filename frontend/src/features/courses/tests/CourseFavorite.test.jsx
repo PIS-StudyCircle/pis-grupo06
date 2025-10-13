@@ -6,6 +6,8 @@ jest.mock("../services/courseService", () => ({
   getMyFavoriteCourses: jest.fn(),
 }));
 jest.mock("../hooks/useCourses", () => ({ useCourses: jest.fn() }));
+// evitar que SubjectPage real llame a fetch/useSubjects
+jest.mock("../../subjects/pages/SubjectPage", () => (props) => <div>Mock SubjectPage - courseId: {props.courseId}</div>);
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
@@ -16,9 +18,11 @@ import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/re
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import CourseDetailPage from "../pages/CourseDetailPage";
 import CourseCard from "../components/CourseCard";
+import CoursePage from "../pages/CoursePage";
 import * as courseService from "../services/courseService";
 
 const { useUser } = require("@context/UserContext");
+const { useCourses } = require("../hooks/useCourses"); // <-- añadido
 
 function renderCourseCard(course) {
   return render(
@@ -47,6 +51,14 @@ function renderProfilePage() {
   );
 }
 
+function renderCoursePage() {
+  return render(
+    <MemoryRouter>
+      <CoursePage />
+    </MemoryRouter>
+  );
+}
+
 describe("Favoritos - CourseCard y CourseDetailPage", () => {
   beforeEach(() => {
     useUser.mockReturnValue({ user: { id: 1 } });
@@ -57,14 +69,70 @@ describe("Favoritos - CourseCard y CourseDetailPage", () => {
     jest.clearAllMocks();
   });
 
-  it("no muestra botones de favorito cuando no hay usuario", async () => {
+  it("CoursePage alterna filtro 'Favoritos' mostrando solo favoritos y vuelve a mostrar todos", async () => {
+    const fav = { id: 1, name: "Curso Fav", favorite: true };
+    const nonFav = { id: 2, name: "Curso NoFav", favorite: false };
+
+    let onlyFavorites = false;
+    const setShowFavorites = jest.fn((val) => {
+      onlyFavorites = val;
+    });
+
+    useCourses.mockImplementation(() => ({
+      courses: onlyFavorites ? [fav] : [fav, nonFav],
+      loading: false,
+      error: null,
+      pagination: { page: 1, last: 1 },
+      page: 1,
+      setPage: jest.fn(),
+      search: "",
+      setSearch: jest.fn(),
+      showFavorites: onlyFavorites,
+      setShowFavorites,
+    }));
+
+    const { rerender } = render(
+      <MemoryRouter>
+        <CoursePage />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText("Curso Fav")).toBeInTheDocument();
+    expect(screen.getByText("Curso NoFav")).toBeInTheDocument();
+
+    const checkbox = screen.getByRole("checkbox", { name: /Favoritos/i });
+    fireEvent.click(checkbox);
+    expect(setShowFavorites).toHaveBeenCalledWith(true);
+
+    rerender(
+      <MemoryRouter>
+        <CoursePage />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("Curso Fav")).toBeInTheDocument();
+    expect(screen.queryByText("Curso NoFav")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("checkbox", { name: /Favoritos/i }));
+    expect(setShowFavorites).toHaveBeenCalledWith(false);
+
+    rerender(
+      <MemoryRouter>
+        <CoursePage />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("Curso Fav")).toBeInTheDocument();
+    expect(screen.getByText("Curso NoFav")).toBeInTheDocument();
+  });
+
+  it("No se muestran botones de favorito cuando no hay usuario", async () => {
     useUser.mockReturnValue({ user: null });
 
     renderCourseCard({ id: 1, name: "Favoriteable", favorite: false });
     expect(screen.queryByRole("button", { name: /Agregar a favoritos/i })).not.toBeInTheDocument();
     cleanup();
 
-    // CourseDetailPage caso sin usuario
     courseService.getCourseByID.mockResolvedValueOnce({
       id: 1,
       name: "Favoriteable",
