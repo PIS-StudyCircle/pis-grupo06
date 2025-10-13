@@ -29,8 +29,8 @@ export default function CourseCard({ course }) {
 
   return (
     <div className="w-full bg-white rounded-lg shadow p-4 my-4 flex items-center justify-between gap-2">
-      <div className="items-start flex flex-col">
-        <div className="flex items-center gap-2">
+      <div className="items-start flex flex-col w-full">
+        <div className="flex items-center gap-2 w-full">
           <Link to={`/materias/${course.id}`} className="block">
             <h2 className="text-black font-semibold text-lg hover:underline">
               {course.name}
@@ -43,7 +43,7 @@ export default function CourseCard({ course }) {
                 onClick={toggleFavorite}
                 aria-label={favorite ? "Quitar de favoritos" : "Agregar a favoritos"}
                 title={favorite ? "Quitar de favoritos" : "Agregar a favoritos"}
-                className="inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100"
+                className="ml-auto inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100"
               >
                 <svg
                   className={`w-5 h-5 ${favorite ? "text-yellow-400" : "text-gray-300"}`}
