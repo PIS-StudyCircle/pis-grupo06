@@ -359,6 +359,12 @@ module Api
             # Crear registro en user_tutorings para el tutor
             UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
+            # Agregar también al estudiante creador si no está registrado aún
+            if @tutoring.created_by_id.present? && !UserTutoring.exists?(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
+              UserTutoring.create!(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
+            end
+
+
             # Crear evento en Google Calendar y agregar a todos los estudiantes
             begin
               calendar_service = GoogleCalendarService.new(current_user)
@@ -374,6 +380,11 @@ module Api
               }
 
               calendar_service.create_event(@tutoring, event_params)
+
+               # 🔹 Agregar también al estudiante creador al evento
+              if @tutoring.creator&.email.present?
+                calendar_service.join_event(@tutoring, @tutoring.creator.email)
+              end
 
               # Agregar a todos los estudiantes ya inscritos
               existing_students = @tutoring.user_tutorings
