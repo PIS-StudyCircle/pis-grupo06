@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useUser } from "@context/UserContext"; 
 import { useCourse } from "../../courses/hooks/useCourse";
 import { createTutoringByTutor } from "../services/tutoringService";
-
+import PageTitle from "@components/PageTitle";
 import { AuthLayout } from "../../users/components/AuthLayout.jsx";
 import { Input } from "@components/Input";
 import { ErrorAlert } from "@components/ErrorAlert";
@@ -102,9 +102,8 @@ export default function CreateTutoringByTutor() {
   };
 
   return (
-    <AuthLayout
-      title={`Tutoría para ${course.name}`}
-    >
+    <AuthLayout>
+      <PageTitle title={`Crear tutoría para ${course.name} como tutor`} className="subtitulo"></PageTitle>
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
 
         <div className="flex flex-col text-left">
