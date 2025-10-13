@@ -31,8 +31,8 @@ Rails.application.configure do
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Log to STDOUT with the current request id as a default log tag.
-  config.log_tags = [ :request_id ]
-  config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
+  config.log_tags = [:request_id]
+  config.logger = ActiveSupport::TaggedLogging.logger(STDOUT)
 
   # Change to "debug" to log everything (including potentially personally-identifiable information!)
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
@@ -55,19 +55,17 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+  config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST"), protocol: "https" }
 
-  # Cómo se entregan los mails 
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-  address:              "smtp.gmail.com",
-    port:                 587,
-    domain:               "gmail.com",
-    user_name:            "studycircle.project@gmail.com",
-    password:             ENV["SMTP_PASS"],        # acá va el app password
-    authentication:       "plain",
-    enable_starttls_auto: true
-  }
+  Rails.application.routes.default_url_options[:host] = ENV.fetch("APP_HOST")
+  Rails.application.routes.default_url_options[:protocol] = "https"
+
+  Rails.application.config.after_initialize do
+    ActiveStorage::Current.url_options = {
+      host: ENV.fetch("APP_HOST"),
+      protocol: "https",
+    }
+  end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
@@ -77,7 +75,7 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Only use :id for inspections in production.
-  config.active_record.attributes_for_inspect = [ :id ]
+  config.active_record.attributes_for_inspect = [:id]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
