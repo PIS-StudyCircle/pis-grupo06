@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { DEFAULT_PHOTO } from "@/shared/config";
 import userEvent from "@testing-library/user-event";
-import TutorPage from "../pages/TutorListPage";
+import TutorPage from "../pages/UserListPage";
 import * as usersServices from "../services/usersServices";
 
 jest.mock("../services/usersServices");

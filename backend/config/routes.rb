@@ -14,7 +14,7 @@ Rails.application.routes.draw do
       namespace :users do
         get :me, to: 'me#show'
         
-        resources :tutor_reviews, only: [:create, :index] do
+        resources :user_reviews, only: [:create, :index] do
           collection do
             get :can_review
           end

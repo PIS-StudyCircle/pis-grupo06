@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_12_203146) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_13_210411) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -66,14 +66,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_12_203146) do
     t.index ["creator_id"], name: "index_subjects_on_creator_id"
   end
 
-  create_table "tutor_reviews", force: :cascade do |t|
-    t.integer "tutor_id"
-    t.integer "student_id"
-    t.text "review"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "tutoring_availabilities", force: :cascade do |t|
     t.bigint "tutoring_id", null: false
     t.datetime "start_time", null: false
@@ -109,6 +101,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_12_203146) do
 
   create_table "universities", force: :cascade do |t|
     t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_reviews", force: :cascade do |t|
+    t.integer "reviewed_id"
+    t.integer "reviewer_id"
+    t.text "review"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

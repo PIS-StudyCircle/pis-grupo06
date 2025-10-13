@@ -22,16 +22,16 @@ export const getUserById = async (id) => {
   return await response.json();
 };
 
-export const getReviewsByTutor = async (tutorId) => {
-  const res = await fetch(`${API_URL}/tutor_reviews?tutor_id=${tutorId}`, {
+export const getReviewsByUser = async (userId) => {
+  const res = await fetch(`${API_URL}/user_reviews?reviewed_id=${userId}`, {
     credentials: "include",
   });
   if (!res.ok) throw new Error("Error al obtener reseñas");
   return await res.json();
 };
 
-export const canReviewTutor = async (tutorId) => {
-  const res = await fetch(`${API_URL}/tutor_reviews/can_review?tutor_id=${tutorId}`, {
+export const canReviewUser = async (userId) => {
+  const res = await fetch(`${API_URL}/user_reviews/can_review?reviewed_id=${userId}`, {
     credentials: "include",
   });
   if (!res.ok) throw new Error("Error al verificar si se puede dejar reseña");
@@ -39,12 +39,12 @@ export const canReviewTutor = async (tutorId) => {
   return data.can_review;
 };
 
-export const createReview = async (tutorId, review) => {
-  const res = await fetch(`${API_URL}/tutor_reviews`, {
+export const createReview = async (userId, review) => {
+  const res = await fetch(`${API_URL}/user_reviews`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ tutor_id: tutorId, review }),
+    body: JSON.stringify({ reviewed_id: userId, review }),
   });
   if (!res.ok) throw new Error("Error al crear reseña");
   return await res.json();

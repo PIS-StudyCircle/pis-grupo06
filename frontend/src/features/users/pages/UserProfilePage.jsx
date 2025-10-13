@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getUserById, getReviewsByTutor, canReviewTutor, createReview } from "../services/usersServices";
+import { getUserById, getReviewsByUser, canReviewUser, createReview } from "../services/usersServices";
 import { DEFAULT_PHOTO } from "@/shared/config";
 
 export default function UserProfile() {
-  const { id } = useParams(); // id del tutor
+  const { id } = useParams(); // id del usuario
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [canReview, setCanReview] = useState(false);
@@ -22,8 +22,8 @@ export default function UserProfile() {
         setUser(userData);
 
         const [reviewsData, canReviewData] = await Promise.all([
-          getReviewsByTutor(id),
-          canReviewTutor(id),
+          getReviewsByUser(id),
+          canReviewUser(id),
         ]);
 
         setReviews(reviewsData);
@@ -48,7 +48,7 @@ export default function UserProfile() {
       setShowForm(false);
 
       // refrescar las reviews
-      const updated = await getReviewsByTutor(id);
+      const updated = await getReviewsByUser(id);
       setReviews(updated);
       setCanReview(false); // ya dejó una review
     } catch (err) {
@@ -105,7 +105,7 @@ export default function UserProfile() {
 
           {reviews.length === 0 ? (
             <p className="text-center text-gray-500">
-              Aún no hay reseñas para este tutor.
+              Aún no hay reseñas para este usuario.
             </p>
           ) : (
             <ul className="space-y-3">
