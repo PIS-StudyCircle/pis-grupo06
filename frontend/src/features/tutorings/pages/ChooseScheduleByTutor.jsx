@@ -13,64 +13,71 @@ export default function ChooseScheduleByTutor() {
   const [availableSchedules, setAvailableSchedules] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-    setLoading(true);
-    try {
-      let data;
-      if (tutoring) {
-        data = tutoring;
-      } else {
-        const res = await fetch(`/api/v1/tutorings/${tutoringId}`);
-        if (!res.ok) throw new Error("Error al obtener tutoría");
-        data = await res.json();
-      }
+      setLoading(true);
+      setMessage(null);
+      setError(null);
+      try {
+        let data;
+        if (tutoring) {
+          data = tutoring;
+        } else {
+          const res = await fetch(`/api/v1/tutorings/${tutoringId}`);
+          if (!res.ok) throw new Error("Error al obtener tutoría");
+          data = await res.json();
+        }
 
-      setAvailableSchedules(
-        data.availabilities?.map(a => ({ id: a.id, time: a.start_time })) || []
-      );
+        setAvailableSchedules(
+          data.availabilities?.map((a) => ({ id: a.id, time: a.start_time })) || []
+        );
+      } catch (error) {
+        console.error(error);
+        setError("No se pudo cargar la tutoría.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [tutoringId, tutoring]);
+
+  const handleConfirm = async () => {
+    setMessage(null);
+    setError(null);
+
+    if (!selectedTime) {
+      setError("Seleccioná un horario antes de continuar.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/v1/tutorings/${tutoringId}/confirm_schedule`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduled_at: selectedTime,
+          role: "tutor",
+        }),
+      });
+
+      if (res.ok) {
+        setMessage("Tutoría asignada con éxito");
+        setTimeout(() => navigate("/"), 2000);
+      } else {
+        const data = await res.json();
+        setError(data.error || "Error al asociarte como tutor.");
+      }
     } catch (error) {
       console.error(error);
-      alert("No se pudo cargar la tutoría");
-    } finally {
-      setLoading(false);
+      setError("Error en la conexión con el servidor.");
     }
   };
 
-  fetchData();
-  }, [tutoringId, tutoring]);
-
-
-
-  const handleConfirm = async () => {
-  if (!selectedTime) return alert("Seleccioná un horario antes de continuar.");
-
-  try {
-    const res = await fetch(`/api/v1/tutorings/${tutoringId}/confirm_schedule`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        scheduled_at: selectedTime,
-        role: "tutor",
-      }),
-    });
-
-    if (res.ok) {
-      alert("Tutoría asignada con éxito");
-      navigate("/");
-    } else {
-      const data = await res.json();
-      alert(data.error || "Error al asociarte como tutor");
-    }
-  } catch (error) {
-    console.error(error);
-    alert("Error en la conexión con el servidor");
-  }
-};
-
-
-  if (loading) return <p>Cargando horarios...</p>;
+  if (loading) return <p className="text-center">Cargando horarios...</p>;
 
   return (
     <div className="max-w-xl mx-auto mt-8 p-6 bg-white rounded-lg shadow">
@@ -78,8 +85,21 @@ export default function ChooseScheduleByTutor() {
         Seleccioná un horario para brindar la tutoría
       </h2>
 
+      {error && (
+        <div className="text-red-600 text-center mb-4">
+          {error}
+        </div>
+      )}
+
+      {message && (
+        <div className="text-green-600 text-center mb-4">
+          {message}
+          <div>Serás redirigido en unos segundos.</div>
+        </div>
+      )}
+
       {availableSchedules.length === 0 ? (
-        <p>No hay horarios disponibles para esta tutoría.</p>
+        <p className="text-center">No hay horarios disponibles para esta tutoría.</p>
       ) : (
         <ul className="space-y-2 mb-6">
           {availableSchedules.map((schedule) => (
@@ -91,10 +111,10 @@ export default function ChooseScheduleByTutor() {
                 value={schedule.time}
                 className="mr-3"
                 onChange={() => setSelectedTime(schedule.time)}
-                />
-                <label htmlFor={`s-${schedule.id}`}>
+              />
+              <label htmlFor={`s-${schedule.id}`}>
                 {formatDateTime(schedule.time)}
-                </label>
+              </label>
             </li>
           ))}
         </ul>

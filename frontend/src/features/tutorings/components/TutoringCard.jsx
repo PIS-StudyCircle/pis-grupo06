@@ -4,17 +4,20 @@ import { useNavigate } from "react-router-dom";
 import { JoinTutoringButton } from "@/features/calendar";
 
 export default function TutoringCard({ tutoring }) {
-  const { currentUser } = useUser();
+  const { user } = useUser();
 
   let mode;
 
   const noTieneTutor = tutoring.tutor_id === null;
   const cuposDisponibles = tutoring.capacity > tutoring.enrolled;
-  const soyTutor = tutoring.tutor_id === currentUser?.id;
-  const soyEstudiante = tutoring.users?.some((u) => u.id === currentUser?.id);
+  const soyTutor = tutoring.tutor_id === user?.id;
+  const soyEstudiante = tutoring.users?.some((u) => u.id === user?.id);
+  const esCreador = tutoring.created_by_id === user?.id; 
 
   if (soyTutor || soyEstudiante) {
     mode = "misTutorias";
+  } else if (esCreador) {
+    mode = "creador";  
   } else if (!cuposDisponibles) {
     mode = "completo";
   } else if (noTieneTutor && cuposDisponibles) {
@@ -82,33 +85,9 @@ export default function TutoringCard({ tutoring }) {
 
 
         {/* Botones */}
-        <div className="flex flex-col gap-3 md:pr-3">
-          {mode === "serTutor" && (
-            <button
-              type="button"
-              className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-              onClick={() =>
-                navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
-                  state: { tutoring },
-                })
-              }
-            >
-              Ser tutor
-            </button>
-          )}
-
-          {mode === "serEstudiante" && (
-            <button
-              type="button"
-              className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-              onClick={() => {}}
-            >
-              Unirme
-            </button>
-          )}
-
-          {mode === "ambos" && (
-            <>
+        {mode !== "creador" && (
+          <div className="flex flex-col gap-3 md:pr-3">
+            {mode === "serTutor" && (
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
@@ -120,36 +99,62 @@ export default function TutoringCard({ tutoring }) {
               >
                 Ser tutor
               </button>
+            )}
+
+            {mode === "serEstudiante" && (
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => {}}
+                onClick={() => handleUnirmeClick(tutoring)}
               >
                 Unirme
               </button>
-            </>
-          )}
+            )}
 
-          {mode === "misTutorias" && (
-            <button
-              type="button"
-              className="btn w-full bg-red-500 hover:bg-red-600 text-white"
-              onClick={() => {}}
-            >
-              Desuscribirme
-            </button>
-          )}
+            {mode === "ambos" && (
+              <>
+                <button
+                  type="button"
+                  className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+                  onClick={() =>
+                    navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
+                      state: { tutoring },
+                    })
+                  }
+                >
+                  Ser tutor
+                </button>
+                <button
+                  type="button"
+                  className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+                  onClick={() => handleUnirmeClick(tutoring)}
+                >
+                  Unirme
+                </button>
+              </>
+            )}
 
-          {mode === "completo" && (
-            <button
-              type="button"
-              className="btn w-full bg-gray-400 text-gray-700 cursor-not-allowed"
-              disabled={true}
-            >
-              Completo
-            </button>
-          )}
-        </div>
+            {mode === "misTutorias" && (
+              <button
+                type="button"
+                className="btn w-full bg-red-500 hover:bg-red-600 text-white"
+                onClick={() => {}}
+              >
+                Desuscribirme
+              </button>
+            )}
+
+            {mode === "completo" && (
+              <button
+                type="button"
+                className="btn w-full bg-gray-400 text-gray-700 cursor-not-allowed"
+                disabled={true}
+              >
+                Completo
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
