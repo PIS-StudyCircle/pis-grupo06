@@ -41,7 +41,7 @@ describe("TutorPage", () => {
           name: "Juan",
           last_name: "Pérez",
           email: "juan@example.com",
-          photo: "http://example.com/photo.jpg",
+          profile_photo_url: "http://example.com/photo.jpg",
         },
         { id: 2, name: "Ana", last_name: "Gómez", email: "ana@example.com" },
       ],
