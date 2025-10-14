@@ -5,6 +5,7 @@ jest.mock("../services/courseService", () => ({
   unfavoriteCourse: jest.fn(),
   getCourseByID: jest.fn(),
   getMyFavoriteCourses: jest.fn(),
+  getCourses: jest.fn(),
 }));
 
 jest.mock("../hooks/useCourses", () => ({ useCourses: jest.fn() }));
@@ -62,17 +63,14 @@ describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
     jest.clearAllMocks();
   });
 
-  it("CoursePage alterna filtro 'Favoritos' mostrando solo favoritos y vuelve a mostrar todos", async () => {
+  it("CoursePage alterna filtro 'Favoritos' mostrando solo favoritos y vuelve a mostrar todos (mock rerender)", async () => {
     const fav = { id: 1, name: "Curso Fav", favorite: true };
     const nonFav = { id: 2, name: "Curso NoFav", favorite: false };
 
-    let onlyFavorites = false;
-    const setShowFavorites = jest.fn((val) => {
-      onlyFavorites = val;
-    });
+    const setShowFavorites = jest.fn();
 
     useCourses.mockImplementation(() => ({
-      courses: onlyFavorites ? [fav] : [fav, nonFav],
+      courses: [fav, nonFav],
       loading: false,
       error: null,
       pagination: { page: 1, last: 1 },
@@ -80,7 +78,7 @@ describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
       setPage: jest.fn(),
       search: "",
       setSearch: jest.fn(),
-      showFavorites: onlyFavorites,
+      showFavorites: false,
       setShowFavorites,
     }));
 
@@ -97,6 +95,19 @@ describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
     fireEvent.click(checkbox);
     expect(setShowFavorites).toHaveBeenCalledWith(true);
 
+    useCourses.mockImplementation(() => ({
+      courses: [fav],
+      loading: false,
+      error: null,
+      pagination: { page: 1, last: 1 },
+      page: 1,
+      setPage: jest.fn(),
+      search: "",
+      setSearch: jest.fn(),
+      showFavorites: true,
+      setShowFavorites,
+    }));
+
     rerender(
       <MemoryRouter>
         <CoursePage />
@@ -108,6 +119,19 @@ describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
 
     fireEvent.click(screen.getByRole("checkbox", { name: /Favoritos/i }));
     expect(setShowFavorites).toHaveBeenCalledWith(false);
+
+    useCourses.mockImplementation(() => ({
+      courses: [fav, nonFav],
+      loading: false,
+      error: null,
+      pagination: { page: 1, last: 1 },
+      page: 1,
+      setPage: jest.fn(),
+      search: "",
+      setSearch: jest.fn(),
+      showFavorites: false,
+      setShowFavorites,
+    }));
 
     rerender(
       <MemoryRouter>
@@ -220,19 +244,34 @@ describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
     );
   });
 
+  it("ProfilePage muestra error si getMyFavoriteCourses falla", async () => {
+    useUser.mockReturnValue({
+      user: { id: 1, name: "Usuario", last_name: "Test", email: "test@test.com" },
+    });
+
+    courseService.getCourses.mockRejectedValueOnce(new Error("Server error"));
+
+    renderProfilePage();
+
+    expect(await screen.findByText(/Server error/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Reintentar/i })).toBeInTheDocument();
+  });
+
   it("ProfilePage muestra las materias favoritas del usuario", async () => {
     useUser.mockReturnValue({
       user: { id: 1, name: "Usuario", last_name: "Test", email: "test@test.com" },
     });
 
-    courseService.getMyFavoriteCourses.mockResolvedValueOnce([
-      { id: 1, name: "Favorita A", code: "FA" },
-      { id: 2, name: "Favorita B", code: "FB" },
-    ]);
+    // ProfilePage espera un objeto con { courses: [...] }
+    courseService.getCourses.mockResolvedValueOnce({
+      courses: [
+        { id: 1, name: "Favorita A", code: "FA" },
+        { id: 2, name: "Favorita B", code: "FB" },
+      ],
+    });
 
     renderProfilePage();
 
-    // espera que el título del panel y las materias aparezcan
     expect(await screen.findByText(/Materias favoritas/i)).toBeInTheDocument();
     expect(await screen.findByText("Favorita A")).toBeInTheDocument();
     expect(screen.getByText("Favorita B")).toBeInTheDocument();
@@ -243,10 +282,56 @@ describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
       user: { id: 1, name: "Usuario", last_name: "Test", email: "test@test.com" },
     });
 
-    courseService.getMyFavoriteCourses.mockResolvedValueOnce([]);
+    courseService.getCourses.mockResolvedValueOnce({ courses: [] });
 
     renderProfilePage();
 
     expect(await screen.findByText(/Aún no tenés materias favoritas/i)).toBeInTheDocument();
+  });
+
+  it("Si favoriteCourse falla, el botón no cambia en CourseCard", async () => {
+    const course = { id: 42, name: "FailFav", favorite: false };
+    courseService.favoriteCourse.mockRejectedValueOnce(new Error("API down"));
+
+    renderCourseCard(course);
+
+    const btn = screen.getByRole("button", { name: /Agregar a favoritos/i });
+    fireEvent.click(btn);
+
+    await waitFor(() => {
+      expect(courseService.favoriteCourse).toHaveBeenCalledWith(42);
+    });
+
+    expect(screen.getByRole("button", { name: /Agregar a favoritos/i })).toBeInTheDocument();
+  });
+
+  it("CourseDetailPage muestra estado inicial del favorito", async () => {
+    courseService.getCourseByID.mockResolvedValueOnce({
+      id: 7,
+      name: "Detalle Fav",
+      subjects: [],
+      favorite: true,
+    });
+
+    renderCourseDetail(7);
+
+    expect(await screen.findByText("Detalle Fav")).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Quitar de favoritos/i })).toBeInTheDocument();
+    });
+
+    jest.clearAllMocks();
+    courseService.getCourseByID.mockResolvedValueOnce({
+      id: 8,
+      name: "Detalle NoFav",
+      subjects: [],
+      favorite: false,
+    });
+
+    renderCourseDetail(8);
+
+    expect(await screen.findByText("Detalle NoFav")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Agregar a favoritos/i })).toBeInTheDocument();
   });
 });

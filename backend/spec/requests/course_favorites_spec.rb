@@ -63,5 +63,43 @@ RSpec.describe "CourseFavorites API", type: :request do
 
       expect(response).to have_http_status(:created).or have_http_status(:ok)
     end
+
+    it "no permite a un usuario borrar el favorito de otro" do
+      user2 = User.create!(
+        email: "other@example.com",
+        password: "password",
+        password_confirmation: "password",
+        name: "Other",
+        last_name: "User",
+        faculty: facultad
+      )
+
+      user2.favorite_courses.create!(course: course1)
+      expect(user2.favorite_courses.pluck(:course_id)).to include(course1.id)
+
+      delete "/api/v1/courses/#{course1.id}/favorite", as: :json
+
+      expect(response).to have_http_status(:no_content).or have_http_status(:ok)
+
+      user2.reload
+      expect(user2.favorite_courses.pluck(:course_id)).to include(course1.id)
+    end
+
+    it "elimina sin error si no existe favorito (idempotente)" do
+      expect {
+        delete "/api/v1/courses/#{course2.id}/favorite", as: :json
+      }.not_to change(user.favorite_courses, :count)
+      expect(response).to have_http_status(:no_content).or have_http_status(:ok)
+    end
+
+    it "devuelve 404 al intentar favoritear un curso inexistente" do
+      post "/api/v1/courses/1/favorite", as: :json
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "devuelve 404 al intentar eliminar favorito de un curso inexistente" do
+      delete "/api/v1/courses/1/favorite", as: :json
+      expect(response).to have_http_status(:not_found)
+    end
   end
 end
