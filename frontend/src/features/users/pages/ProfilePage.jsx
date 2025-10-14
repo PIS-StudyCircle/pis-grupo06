@@ -1,7 +1,7 @@
 import { useUser } from "@context/UserContext"; 
 import { DEFAULT_PHOTO } from "@/shared/config";
 import { useState, useEffect } from "react";
-import { getMyFavoriteCourses } from "../../courses/services/courseService";
+import { getCourses } from "../../courses/services/courseService";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 
@@ -22,8 +22,9 @@ export default function Profile() {
     try {
       setFavError("");
       setFavLoading(true);
-      const data = await getMyFavoriteCourses();
-      setFavorites(data);
+      const data = await getCourses(1, 50, "", true);
+
+      setFavorites(data.courses);
     } catch (e) {
       setFavError(e?.payload?.error || e?.message || "Error al cargar favoritas.");
     } finally {
