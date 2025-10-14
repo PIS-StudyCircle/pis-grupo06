@@ -103,6 +103,7 @@ module Api
               request_due_at: t.request_due_at,
               tutor_name: t.tutor&.name,
               tutor_last_name: t.tutor&.last_name,
+              location: t.location,
               availabilities: t.tutoring_availabilities.map do |a|
               { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
               end
@@ -231,6 +232,7 @@ module Api
       def confirm_schedule
         # Parsear el horario elegido
         scheduled_time = Time.zone.parse(params[:scheduled_at])
+        end_time = params[:end_time].present? ? Time.zone.parse(params[:end_time]) : scheduled_time + @tutoring.duration_mins.minutes
         user_role = params[:role] # 'student' o 'tutor'
 
         # Validar que se especifique el rol
@@ -241,8 +243,9 @@ module Api
         end
 
         # Buscar una disponibilidad que contenga ese horario
+        chosen_end = end_time
         availability = @tutoring.tutoring_availabilities.available.find do |a|
-          scheduled_time >= a.start_time && scheduled_time < a.end_time
+          scheduled_time >= a.start_time && chosen_end <= a.end_time
         end
 
         unless availability
@@ -252,7 +255,7 @@ module Api
         end
 
         # Validar que haya tiempo suficiente para la duración de la tutoría
-        tutoring_end_time = scheduled_time + @tutoring.duration_mins.minutes
+        tutoring_end_time = end_time || (scheduled_time + @tutoring.duration_mins.minutes)
         if tutoring_end_time > availability.end_time
           return render json: {
             error: "No hay tiempo suficiente en esa franja horaria. La tutoría dura #{@tutoring.duration_mins} minutos."
@@ -316,7 +319,6 @@ module Api
                 # Crear evento desde el calendario del tutor
                 tutor = @tutoring.tutor
                 calendar_service = GoogleCalendarService.new(tutor)
-                end_time = scheduled_time + @tutoring.duration_mins.minutes
 
                 course_name = @tutoring.course&.name || "Tutoría"
 
@@ -337,8 +339,8 @@ module Api
 
               # Agregar a todos los demás estudiantes ya inscritos
               existing_students = @tutoring.user_tutorings
-                                           .where.not(user_id: current_user.id)
-                                           .includes(:user)
+                                            .where.not(user_id: current_user.id)
+                                            .includes(:user)
 
               existing_students.each do |user_tutoring|
                 student = user_tutoring.user
@@ -364,11 +366,9 @@ module Api
               UserTutoring.create!(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
             end
 
-
             # Crear evento en Google Calendar y agregar a todos los estudiantes
             begin
               calendar_service = GoogleCalendarService.new(current_user)
-              end_time = scheduled_time + @tutoring.duration_mins.minutes
 
               course_name = @tutoring.course&.name || "Tutoría"
 
@@ -381,15 +381,15 @@ module Api
 
               calendar_service.create_event(@tutoring, event_params)
 
-               # 🔹 Agregar también al estudiante creador al evento
+              # Agregar también al estudiante creador al evento
               if @tutoring.creator&.email.present?
                 calendar_service.join_event(@tutoring, @tutoring.creator.email)
               end
 
               # Agregar a todos los estudiantes ya inscritos
               existing_students = @tutoring.user_tutorings
-                                           .where.not(user_id: current_user.id)
-                                           .includes(:user)
+                                            .where.not(user_id: current_user.id)
+                                            .includes(:user)
 
               existing_students.each do |user_tutoring|
                 student = user_tutoring.user
@@ -412,7 +412,6 @@ module Api
         end
 
         render json: {
-          # message: message,
           tutoring: {
             id: @tutoring.id,
             scheduled_at: @tutoring.scheduled_at,
@@ -421,11 +420,16 @@ module Api
             event_id: @tutoring.event_id
           }
         }, status: :ok
+
       rescue ActiveRecord::RecordInvalid => e
         render json: { error: e.message }, status: :unprocessable_entity
       rescue ArgumentError
         render json: { error: "Formato de fecha inválido" }, status: :unprocessable_entity
+      rescue => e
+        Rails.logger.error "Error inesperado en confirm_schedule: #{e.message}"
+        render json: { error: "Error interno del servidor" }, status: :internal_server_error
       end
+
 
       def build_tutoring_description
         description = []

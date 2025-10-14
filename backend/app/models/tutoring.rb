@@ -91,7 +91,7 @@ class Tutoring < ApplicationRecord
   # --- Métodos auxiliares ---
 
   def enrolled
-    user_tutorings.size
+    user_tutorings.where.not(user_id: tutor_id).count
   end
 
   private
