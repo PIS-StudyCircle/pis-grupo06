@@ -12,7 +12,7 @@ module Api
       end
 
       def destroy
-        current_user.favorite_courses.where(course: @course).delete_all
+        current_user.favorite_courses.destroy_by(course: @course)
         head :no_content
       end
 
