@@ -3,6 +3,8 @@ module Api
     class TutoringsController < ApplicationController
       include Pagy::Backend
 
+      before_action :authenticate_user!
+
       def index
         tutorings = Tutoring.all
 
@@ -30,11 +32,19 @@ module Api
         # los que aun no tienen tutor asignado
         if params[:no_tutor].present? && ActiveModel::Type::Boolean.new.cast(params[:no_tutor])
           tutorings = tutorings.without_tutor
+
+          # no aparecen las tutorias creadas por el usuario
+          tutorings = tutorings.where.not(created_by_id: current_user.id)
         end
 
-        # los que ya tienen tutor asignado
+        # los que ya tienen tutor asignado y no estan pending
         if params[:with_tutor].present? && ActiveModel::Type::Boolean.new.cast(params[:with_tutor])
-          tutorings = tutorings.with_tutor
+          tutorings = tutorings.with_tutor.where.not(state: "pending")
+
+          # no aparecen las tutorias creadas por el usuario ni las que el usuario es tutor
+          tutorings = tutorings
+                      .where.not(created_by_id: current_user.id)
+                      .where.not(tutor_id:      current_user.id)
         end
 
         q = params[:search].to_s
@@ -90,7 +100,8 @@ module Api
               request_comment: t.request_comment,
               request_due_at: t.request_due_at,
               tutor_name: t.tutor&.name,
-              tutor_last_name: t.tutor&.last_name
+              tutor_last_name: t.tutor&.last_name,
+              tutor_email: t.tutor&.email,
             }
           end,
           pagination: pagy_metadata(@pagy)
@@ -99,14 +110,17 @@ module Api
 
       def create
         tutoring = Tutoring.new(tutoring_params)
-        tutoring.created_by_id = params[:tutoring][:created_by_id]
-        tutoring.tutor_id      = params[:tutoring][:tutor_id]
-        tutoring.course_id     = params[:tutoring][:course_id]
+
+        tutoring.created_by_id = params.dig(:tutoring, :created_by_id)
+        tutoring.tutor_id      = params.dig(:tutoring, :tutor_id)
+        tutoring.course_id     = params.dig(:tutoring, :course_id)
 
         if tutoring.tutor_id.nil? && tutoring.capacity.nil?
           tutoring.capacity = 1 # Valor por defecto para solicitudes pendientes
         end
         if tutoring.tutor_id.present? && tutoring.scheduled_at.present? && tutoring.duration_mins.present?
+          tutoring.state = 1 # cuando la tutoria es creada por el tutor la creamos como activa
+
           start_time = tutoring.scheduled_at
           end_time = start_time + tutoring.duration_mins.minutes
 
@@ -126,6 +140,7 @@ module Api
         end
 
         if tutoring.save
+          # create_user_tutoring(tutoring)
           render json: { tutoring: tutoring }, status: :created
         else
           render json: { errors: tutoring.errors.full_messages }, status: :unprocessable_entity
@@ -133,6 +148,12 @@ module Api
       end
 
       private
+
+      def create_user_tutoring(tutoring)
+        return unless params.dig(:tutoring, :tutor_id).nil?
+
+        UserTutoring.create!(user: current_user, tutoring:)
+      end
 
       def tutoring_params
         params.expect(

@@ -77,7 +77,7 @@ export default function CreateTutoringByTutor() {
         duration_mins,
         modality: form.mode,
         capacity: parseInt(form.limit, 10),
-        creator_id: user.id,
+        created_by_id: user.id,
         tutor_id: user.id,
         course_id: course.id,
         subject_ids: selectedSubjects,
