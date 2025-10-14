@@ -145,8 +145,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_08_204654) do
     t.string "name", null: false
     t.string "last_name", null: false
     t.text "description"
-    t.string "jti", null: false
     t.bigint "faculty_id"
+    t.string "jti", null: false
+    t.string "password_reset_token"
+    t.datetime "password_reset_sent_at"
     t.string "provider"
     t.string "uid"
     t.string "google_access_token"
@@ -156,6 +158,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_08_204654) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true
+    t.index ["password_reset_token"], name: "index_users_on_password_reset_token"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["uid"], name: "index_users_on_uid"
   end

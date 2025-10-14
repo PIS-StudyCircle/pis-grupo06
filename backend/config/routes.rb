@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       get "up", to: proc { [200, {}, ['OK']] }
       namespace :users do
         get :me, to: 'me#show'
+        post 'validate_password', to: 'password_validations#create'
       end
 
       # index y show de UsersController

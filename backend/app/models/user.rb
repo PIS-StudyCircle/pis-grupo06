@@ -79,4 +79,43 @@ class User < ApplicationRecord
   def devise_mailer
     UserMailer
   end
+
+  before_destroy :handle_tutorings_on_user_deletion
+
+  def handle_tutorings_on_user_deletion
+    Tutoring.left_joins(:user_tutorings)
+            .where("user_tutorings.user_id = :id OR tutor_id = :id OR created_by_id = :id", id: id)
+            .distinct
+            .find_each do |tutoring|
+      if tutoring.tutor_id == id
+        # CASOS 1 y 3: el usuario era el TUTOR
+        if tutoring.users.empty?
+          # Caso 1: tutoría creada con horario confirmado
+          tutoring.destroy
+          # Caso 5*: tutoría con único usuario (el tutor)
+          tutoring.destroy
+          # Notificar a todos los estudiantes que el tutor canceló la tutoría
+        else
+          # Caso 3: tutoría pendiente (estudiante inició el flujo)
+          tutoring.update!(tutor_id: nil)
+          # Notificar al estudiante que el tutor eliminó su cuenta
+        end
+      else
+        # CASOS 2 y 4: el usuario era ESTUDIANTE
+        if tutoring.users.count == 1
+          tutoring.destroy
+          # Notificar al tutor que la tutoría fue cancelada
+        end
+        # Si hay más estudiantes en pending, no se hace nada,
+        # porque el estudiante eliminado se remueve automáticamente por `dependent: :destroy` en user_tutorings
+      end
+    end
+
+    # eliminar tutorías sin tutor ni estudiantes
+    Tutoring.without_tutor
+            .left_joins(:user_tutorings)
+            .group('tutorings.id')
+            .having('COUNT(user_tutorings.id) = 0')
+            .destroy_all
+  end
 end

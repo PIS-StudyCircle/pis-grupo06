@@ -46,6 +46,23 @@ export async function signOut() {
   removeItem("user");
 }
 
+export async function validatePasswordForDeletion(password) {
+  const body = {
+    user: { password },
+  };
+  await http("/users/validate_password", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function deleteAccount() {
+  await http("/users", { 
+    method: "DELETE", 
+  });
+  removeItem("user");
+  removeItem("token");
+}
 export async function forgotPassword(form) {
   const body = {
     user: {
