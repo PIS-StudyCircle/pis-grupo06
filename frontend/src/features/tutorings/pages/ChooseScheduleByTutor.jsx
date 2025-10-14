@@ -58,28 +58,30 @@ export default function ChooseScheduleByTutor() {
     setMessage(null);
     setError(null);
 
-    if (!selectedScheduleId || !selectedTime?.start || !selectedTime?.end) {
-      setError("Seleccioná un horario antes de continuar.");
-      return;
-    }
-
     const custom = customTimes[selectedScheduleId];
-    if (!custom?.start || !custom?.end) {
+
+    // que haya seleccionado y escrito las horas
+    if (!selectedScheduleId || !custom?.start || !custom?.end) {
       setError("Debes especificar una hora de inicio y fin.");
       return;
     }
 
-    const startTime = new Date(selectedTime.start);
-    const endTime = new Date(selectedTime.end);
+    const schedule = availableSchedules.find((s) => s.id === selectedScheduleId);
+    const localDate = new Date(schedule.start);
+    const localDateStr = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, "0")}-${String(localDate.getDate()).padStart(2, "0")}`;
+
+    const fullStart = `${localDateStr}T${custom.start}:00`;
+    const fullEnd = `${localDateStr}T${custom.end}:00`;
+
+    const startTime = new Date(fullStart);
+    const endTime = new Date(fullEnd);
+    const scheduleStart = new Date(schedule.start);
+    const scheduleEnd = new Date(schedule.end);
 
     if (endTime <= startTime) {
       setError("La hora de fin debe ser posterior a la hora de inicio.");
       return;
     }
-
-    const schedule = availableSchedules.find(s => s.id === selectedScheduleId);
-    const scheduleStart = new Date(schedule.start);
-    const scheduleEnd = new Date(schedule.end);
 
     if (startTime < scheduleStart || endTime > scheduleEnd) {
       setError("El horario elegido no está dentro de las disponibilidades ofrecidas.");
@@ -87,32 +89,20 @@ export default function ChooseScheduleByTutor() {
     }
 
     try {
-      // Confirmar horario y rol primero
       const res = await fetch(`/api/v1/tutorings/${tutoringId}/confirm_schedule`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          scheduled_at: selectedTime.start,
-          end_time: selectedTime.end,
+          scheduled_at: fullStart,
+          end_time: fullEnd,
           role: "tutor",
+          capacity,
         }),
       });
 
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Error al asociarte como tutor.");
-      }
-
-      // Si el horario fue confirmado correctamente ==> actualizar los cupos
-      const patchRes = await fetch(`/api/v1/tutorings/${tutoringId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tutoring: { capacity } }),
-      });
-
-      if (!patchRes.ok) {
-        const data = await patchRes.json();
-        throw new Error(data.error || "Error al actualizar los cupos.");
       }
 
       setMessage("Tutoría confirmada con éxito.");
@@ -123,6 +113,11 @@ export default function ChooseScheduleByTutor() {
     }
   };
 
+  const toLocalTimeString = (dateString) => {
+    const d = new Date(dateString);
+    // Devuelve "HH:MM" en hora local del navegador
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+  };
 
   if (loading) return <p className="text-center text-gray-600 mt-6">Cargando horarios...</p>;
 
@@ -160,7 +155,10 @@ export default function ChooseScheduleByTutor() {
               type="number"
               min="1"
               value={capacity}
-              onChange={(e) => setCapacity(Number(e.target.value))}
+              onChange={(e) => {
+                const value = Math.max(1, parseInt(e.target.value) || 1);
+                setCapacity(value);
+              }}
               className="border border-gray-300 rounded-lg px-4 py-1.5 text-center w-20 text-lg font-medium shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
             />
           </div>
@@ -247,8 +245,8 @@ export default function ChooseScheduleByTutor() {
                           }:00`,
                         });
                       }}
-                      min={new Date(schedule.start).toISOString().slice(11, 16)}
-                      max={new Date(schedule.end).toISOString().slice(11, 16)}
+                      min={toLocalTimeString(schedule.start)}
+                      max={toLocalTimeString(schedule.end)}
                       className="border rounded px-2 py-1 bg-white"
                     />
 
@@ -276,8 +274,8 @@ export default function ChooseScheduleByTutor() {
                           end: `${localDateStr}T${value}:00`,
                         });
                       }}
-                      min={new Date(schedule.start).toISOString().slice(11, 16)}
-                      max={new Date(schedule.end).toISOString().slice(11, 16)}
+                      min={toLocalTimeString(schedule.start)}
+                      max={toLocalTimeString(schedule.end)}
                       className="border rounded px-2 py-1 bg-white"
                     />
                   </div>

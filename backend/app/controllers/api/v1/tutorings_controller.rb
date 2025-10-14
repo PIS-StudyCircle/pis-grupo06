@@ -299,9 +299,12 @@ module Api
           end
         end
 
+        # Calcular duración real (en minutos)
+        duration = ((end_time - scheduled_time) / 60).to_i
+
         ActiveRecord::Base.transaction do
           # Confirmar el horario de la tutoría
-          @tutoring.update!(scheduled_at: scheduled_time)
+          @tutoring.update!(scheduled_at: scheduled_time, duration_mins: duration, state: 'active')
 
           # Marcar la disponibilidad como reservada
           availability.update!(is_booked: true)
@@ -324,7 +327,7 @@ module Api
 
                 event_params = {
                   title: "Tutoría - #{course_name}",
-                  description: build_tutoring_description,
+                  description: build_tutoring_description(end_time),
                   start_time: scheduled_time.iso8601,
                   end_time: end_time.iso8601
                 }
@@ -370,18 +373,33 @@ module Api
             begin
               calendar_service = GoogleCalendarService.new(current_user)
 
-              course_name = @tutoring.course&.name || "Tutoría"
+              # Actualizar datos antes de crear el evento
+              if params[:capacity].present?
+                new_cap = params[:capacity].to_i
+                raise ActiveRecord::RecordInvalid.new(@tutoring), "Capacidad inválida" if new_cap <= 0
+                @tutoring.capacity = new_cap
+              end
 
+              @tutoring.assign_attributes(
+                scheduled_at: scheduled_time,
+                tutor_id: current_user.id,
+                capacity: new_cap.presence || @tutoring.capacity,
+              )
+              @tutoring.save!
+
+              # Construir evento con datos actualizados
+              course_name = @tutoring.course&.name || "Tutoría"
               event_params = {
                 title: "Tutoría - #{course_name}",
-                description: build_tutoring_description,
+                description: build_tutoring_description(end_time), # usa los datos actualizados
                 start_time: scheduled_time.iso8601,
                 end_time: end_time.iso8601
               }
 
+              # Crear evento en Calendar
               calendar_service.create_event(@tutoring, event_params)
 
-              # Agregar también al estudiante creador al evento
+              # Agregar al creador si tiene email
               if @tutoring.creator&.email.present?
                 calendar_service.join_event(@tutoring, @tutoring.creator.email)
               end
@@ -395,6 +413,7 @@ module Api
                 student = user_tutoring.user
                 calendar_service.join_event(@tutoring, student.email)
               end
+
             rescue => e
               Rails.logger.error "Error al crear evento en Google Calendar: #{e.message}"
               # No fallar la transacción por errores de calendario
@@ -431,13 +450,23 @@ module Api
       end
 
 
-      def build_tutoring_description
+      def build_tutoring_description(end_time = nil)
         description = []
         description << "Modalidad: #{@tutoring.modality}"
-        description << "Duración: #{@tutoring.duration_mins} minutos"
-        description << "Capacidad: #{@tutoring.capacity} estudiantes" if @tutoring.capacity.present?
+        
+        # Calcular duración real si hay horario definido
+        if @tutoring.scheduled_at && end_time
+          duration = ((end_time - @tutoring.scheduled_at) / 60).to_i
+          description << "Duración: #{duration} minutos"
+        elsif @tutoring.duration_mins.present?
+          description << "Duración: #{@tutoring.duration_mins} minutos"
+        end
+
+        if @tutoring.capacity.present?
+          description << "Capacidad: #{@tutoring.capacity} #{'estudiante'.pluralize(@tutoring.capacity)}"
+        end
         description << "Ubicación: #{@tutoring.location}" if @tutoring.location.present?
-        description << "\n#{@tutoring.request_comment}" if @tutoring.request_comment.present?
+        # description << "\n#{@tutoring.request_comment}" if @tutoring.request_comment.present?
 
         description.join("\n")
       end
