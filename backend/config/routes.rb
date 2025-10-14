@@ -21,7 +21,8 @@ Rails.application.routes.draw do
       resources :courses do
         resources :subjects
       end
-      resources :tutorings do 
+      resources :tutorings do
+        get "upcoming", on: :collection
         post "confirm_schedule", on: :member
       end
       resource :calendar, only: [] do

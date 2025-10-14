@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { getUpcomingEvents } from "../services/calendarApi";
 
 export function useSessions(userId) {
   const [sessions, setSessions] = useState([]);
@@ -7,14 +6,19 @@ export function useSessions(userId) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!userId) return; // evita llamada si no hay usuario
+    if (!userId) return;
 
     setLoading(true);
     setError(null);
 
-    getUpcomingEvents()
+    fetch(`/api/v1/tutorings/upcoming?user_id=${userId}`)
+      .then((res) => res.json())
       .then((data) => {
-        setSessions(data);
+        const normalized = data.map((session) => ({
+          ...session,
+          date: new Date(session.date), // 🔥 clave para arreglar el error
+        }));
+        setSessions(normalized);
       })
       .catch((err) => {
         console.error("Error fetching sessions:", err);

@@ -471,6 +471,34 @@ module Api
         description.join("\n")
       end
 
+       # backend/app/controllers/api/v1/tutorings_controller.rb
+      def upcoming
+        user = User.find(params[:user_id])
+
+        tutorings = Tutoring
+          .enrolled_by(user)
+          .upcoming
+          .where(state: :active)
+          .includes(:tutor, :course)
+          .order(:scheduled_at)
+
+        render json: tutorings.map { |t|
+          is_tutor = t.tutor_id == user.id
+          {
+            id: t.id,
+            subject: t.course&.name,
+            tutor: t.tutor&.name || "Sin asignar",
+            date: t.scheduled_at,
+            duration: t.duration_mins,
+            location: t.location.presence || "Virtual",
+            status: t.state,
+            role: is_tutor ? "tutor" : "student",
+            attendees: t.users.map { |u| { email: u.email, status: "confirmada" } },
+            url: nil
+          }
+        }
+      end
+
       private
 
       def set_tutoring

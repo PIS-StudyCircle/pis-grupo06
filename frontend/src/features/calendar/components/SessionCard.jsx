@@ -49,7 +49,9 @@ export default function SessionCard({ session }) {
           </h3>
           <div className="flex items-center gap-2 text-gray-500 mt-1">
             <User className="w-4 h-4" />
-            <span className="text-sm">{session.tutor}</span>
+            <span className="text-sm">
+              {session.role === "tutor" ? "Tú (tutor)" : session.tutor}
+            </span>
           </div>
         </div>
         <div
