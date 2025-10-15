@@ -69,7 +69,7 @@ describe("SignInPage", () => {
     render(<SignInPage />);
     expect(screen.getByTestId("email")).toBeInTheDocument();
     expect(screen.getByTestId("password")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /ingresar|sign ?in/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /ingresar/i })).toBeInTheDocument();
   });
 
   it("llama a setField al tipear en los inputs", () => {
@@ -88,7 +88,7 @@ describe("SignInPage", () => {
     mockUseFormSubmit.mockReturnValue({ error: [], onSubmit: onSubmitMock });
 
     render(<SignInPage />);
-    fireEvent.click(screen.getByRole("button", { name: /ingresar|sign ?in/i }));
+    fireEvent.click(screen.getByRole("button", { name: /ingresar/i }));
     expect(validateMock).toHaveBeenCalled();
     expect(onSubmitMock).toHaveBeenCalled();
   });
