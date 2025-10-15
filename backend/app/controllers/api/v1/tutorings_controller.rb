@@ -229,6 +229,76 @@ module Api
         head :no_content
       end
 
+      def exists_user_tutoring
+        tutoring_id = params[:id] 
+        exists = UserTutoring.exists?(user_id: current_user.id, tutoring_id: tutoring_id)
+        render json: { exists: exists }
+      end
+
+      def join_tutoring
+
+        tid = params[:id] 
+        @tutoring = Tutoring.find(tid)
+
+        if UserTutoring.exists?(user_id: current_user.id, tutoring_id: tid)
+          render json: { error: "Ya perteneces a esta tutoría." }, status: :conflict and return
+        end
+
+        # Inscribir al estudiante
+        UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
+
+        # Incrementar contador de inscritos
+        @tutoring.update!(enrolled: @tutoring.enrolled + 1)
+
+        # Si no existe evento, crearlo con el tutor y agregarse
+        begin
+          if @tutoring.event_id.blank?
+            # Crear evento desde el calendario del tutor
+            tutor = @tutoring.tutor
+            calendar_service = GoogleCalendarService.new(tutor)
+            end_time = scheduled_time + @tutoring.duration_mins.minutes
+
+            course_name = @tutoring.course&.name || "Tutoría"
+
+            event_params = {
+              title: "Tutoría - #{course_name}",
+              description: build_tutoring_description,
+              start_time: scheduled_time.iso8601,
+              end_time: end_time.iso8601
+            }
+
+            calendar_service.create_event(@tutoring, event_params)
+          end
+
+          # Agregar al estudiante actual al evento
+          tutor = @tutoring.tutor
+          calendar_service = GoogleCalendarService.new(tutor)
+          calendar_service.join_event(@tutoring, current_user.email)
+
+          # Agregar a todos los demás estudiantes ya inscritos
+          existing_students = @tutoring.user_tutorings
+                                        .where.not(user_id: current_user.id)
+                                        .includes(:user)
+
+          existing_students.each do |user_tutoring|
+            student = user_tutoring.user
+            next if student.id == tutor.id # No agregar al tutor como estudiante
+
+            calendar_service.join_event(@tutoring, student.email)
+          end
+        rescue => e
+          Rails.logger.error "Error al manejar evento de Google Calendar: #{e.message}"
+          # No fallar la transacción por errores de calendario
+        end
+
+        render json: {
+          ok: true,
+          enrolled: @tutoring.reload.enrolled,
+          tutoring_id: @tutoring.id
+        }, status: :created
+
+      end
+
       def confirm_schedule
         # Parsear el horario elegido
         scheduled_time = Time.zone.parse(params[:scheduled_at])

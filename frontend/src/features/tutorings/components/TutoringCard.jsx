@@ -2,17 +2,89 @@ import { formatDateTime } from "@shared/utils/FormatDate";
 import { useUser } from "@context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { JoinTutoringButton } from "@/features/calendar";
+import { useState, useEffect, useMemo } from "react";
 
 export default function TutoringCard({ tutoring }) {
   const { user } = useUser();
+
+  const handleUnirmeClick = async (tutoring) => {
+    if (!tutoring) return;
+    
+    const remaining = (tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0);
+    const primerEstudiante = tutoring.enrolled === 0;
+    
+    // Primer estudiante confirma las horas y se une a la tutoría
+    if (primerEstudiante) {
+      navigate(`/tutorias/${tutoring.id}/elegir_horario_estudiante`, { state: { tutoring } });
+      return;
+    }
+    
+    //Si no es el primer estudiante, simplemente se une
+    try {
+      const res = await fetch(`/api/v1/tutorings/${tutoring.id}/join_tutoring`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: "student",
+        }),
+      });
+      if (res.ok) {
+        alert("Te uniste a la tutoría con éxito");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "No se pudo unir a la tutoría");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error en la conexion con el servidor");
+    }
+  };
+
 
   let mode;
 
   const noTieneTutor = tutoring.tutor_id === null;
   const cuposDisponibles = tutoring.capacity > tutoring.enrolled;
   const soyTutor = tutoring.tutor_id === user?.id;
-  const soyEstudiante = tutoring.users?.some((u) => u.id === user?.id);
   const esCreador = tutoring.created_by_id === user?.id; 
+
+  const [soyEstudiante, setSoyEstudiante] = useState(false);
+
+  useEffect(() => {
+    let cancel = false;
+    async function run() {
+      if (!user?.id || !tutoring?.id) {
+        setSoyEstudiante(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/v1/tutorings/${tutoring.id}/exists_user_tutoring`, {
+          credentials: "include",
+        });
+
+        if (cancel) return;
+
+        if (!res.ok) {
+          console.warn("exists_user_tutoring no OK:", res.status);
+          setSoyEstudiante(false);             
+          return;
+        }
+
+        const { exists } = await res.json().catch(() => ({ exists: false }));
+        setSoyEstudiante(!!exists);            
+      } catch (e) {
+        if (!cancel) {
+          console.warn("fetch error:", e);
+          setSoyEstudiante(false);            
+        }
+      }
+    }
+    run();
+    return () => { cancel = true };
+  }, [user?.id, tutoring?.id]);
+
 
   if (soyTutor || soyEstudiante) {
     mode = "misTutorias";

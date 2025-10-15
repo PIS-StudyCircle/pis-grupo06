@@ -99,9 +99,7 @@ class Tutoring < ApplicationRecord
   def scheduled_at_cannot_be_in_past
     return if scheduled_at.blank?
 
-    if scheduled_at < Time.current
-      errors.add(:scheduled_at, :past)
-    end
+    errors.add(:capacity, :less_than_enrolled) if enrolled > capacity
   end
 
   def capacity_not_less_than_enrolled

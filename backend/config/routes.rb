@@ -24,6 +24,8 @@ Rails.application.routes.draw do
       resources :tutorings do
         get "upcoming", on: :collection
         post "confirm_schedule", on: :member
+        post "join_tutoring", on: :member
+        get "exists_user_tutoring", on: :member
       end
       resource :calendar, only: [] do
         post   "sessions",          to: "calendar#create"

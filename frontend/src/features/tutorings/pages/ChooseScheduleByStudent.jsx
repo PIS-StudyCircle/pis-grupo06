@@ -1,0 +1,264 @@
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { formatDateTime } from "@shared/utils/FormatDate";
+
+export default function ChooseScheduleByTutor() {
+  const { tutoringId } = useParams(); 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const tutoring = location.state?.tutoring;
+
+  const [availableSchedules, setAvailableSchedules] = useState([]);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState(null);
+  const [error, setError] = useState(null);
+  const [requestComment, setRequestComment] = useState(null);
+  const [capacity, setCapacity] = useState(1);
+  const [customTimes, setCustomTimes] = useState({});
+  const [selectedScheduleId, setSelectedScheduleId] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setMessage(null);
+      setError(null);
+      try {
+        let data;
+        if (tutoring) {
+          data = tutoring;
+        } else {
+          const res = await fetch(`/api/v1/tutorings/${tutoringId}`);
+          if (!res.ok) throw new Error("Error al obtener tutoría");
+          data = await res.json();
+        }
+
+        setAvailableSchedules(
+          data.availabilities?.map((a) => ({
+            id: a.id,
+            start: a.start_time,
+            end: a.end_time,
+          })) || []
+        );
+
+        setRequestComment(data.request_comment || null);
+        setCapacity(data.capacity || 1);
+      } catch (error) {
+        console.error(error);
+        setError("No se pudo cargar la tutoría.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [tutoringId, tutoring]);
+
+  const handleConfirm = async () => {
+    setMessage(null);
+    setError(null);
+
+    const custom = customTimes[selectedScheduleId];
+
+    // que haya seleccionado y escrito las horas
+    if (!selectedScheduleId || !custom?.start || !custom?.end) {
+      setError("Debes especificar una hora de inicio y fin.");
+      return;
+    }
+
+    const schedule = availableSchedules.find((s) => s.id === selectedScheduleId);
+    const localDate = new Date(schedule.start);
+    const localDateStr = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, "0")}-${String(localDate.getDate()).padStart(2, "0")}`;
+
+    const fullStart = `${localDateStr}T${custom.start}:00`;
+    const fullEnd = `${localDateStr}T${custom.end}:00`;
+
+    const startTime = new Date(fullStart);
+    const endTime = new Date(fullEnd);
+    const scheduleStart = new Date(schedule.start);
+    const scheduleEnd = new Date(schedule.end);
+
+    if (endTime <= startTime) {
+      setError("La hora de fin debe ser posterior a la hora de inicio.");
+      return;
+    }
+
+    if (startTime < scheduleStart || endTime > scheduleEnd) {
+      setError("El horario elegido no está dentro de las disponibilidades ofrecidas.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/v1/tutorings/${tutoringId}/confirm_schedule`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduled_at: fullStart,
+          end_time: fullEnd,
+          role: "student",
+          capacity,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Error al asociarte como estudiante.");
+      }
+
+      setMessage("Tutoría confirmada con éxito.");
+      setTimeout(() => navigate("/"), 2000);
+    } catch (error) {
+      console.error(error);
+      setError(error.message || "Error en la conexión con el servidor.");
+    }
+  };
+
+  const toLocalTimeString = (dateString) => {
+    const d = new Date(dateString);
+    // Devuelve "HH:MM" en hora local del navegador
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+  };
+
+  if (loading) return <p className="text-center text-gray-600 mt-6">Cargando horarios...</p>;
+
+  return (
+    <div className="max-w-xl mx-auto mt-10 p-8 bg-white rounded-2xl shadow-md">
+      <h2 className="text-2xl font-semibold mb-6 text-center text-gray-900">
+        Seleccioná un horario para tener la tutoría
+      </h2>
+
+      {/* Mensajes */}
+      {error && <div className="text-red-600 text-center mb-4">{error}</div>}
+      {message && (
+        <div className="text-green-600 text-center mb-4">
+          {message}
+          <div>Serás redirigido en unos segundos.</div>
+        </div>
+      )}
+
+      {/* Horarios */}
+      {availableSchedules.length === 0 ? (
+        <div className="text-center text-gray-600 mb-8">
+          No hay horarios disponibles para esta tutoría.
+        </div>
+      ) : (
+        <ul className="space-y-4 mb-8">
+          {availableSchedules.map((schedule) => {
+            const customStart = customTimes[schedule.id]?.start || "";
+            const customEnd = customTimes[schedule.id]?.end || "";
+            const sameDay =
+              new Date(schedule.start).toLocaleDateString() ===
+              new Date(schedule.end).toLocaleDateString();
+
+            return (
+              <li
+                key={schedule.id}
+                className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <label className="font-medium text-gray-800 block mb-2">
+                  {sameDay
+                    ? `${formatDateTime(schedule.start)} – ${new Date(
+                        schedule.end
+                      ).toLocaleTimeString("es-UY", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })}`
+                    : `${formatDateTime(schedule.start)} – ${formatDateTime(
+                        schedule.end
+                      )}`}
+                </label>
+
+                <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                  <input
+                    type="radio"
+                    id={`s-${schedule.id}`}
+                    name="schedule"
+                    value={schedule.start}
+                    onChange={() => {
+                      setSelectedScheduleId(schedule.id);
+                      setSelectedTime({
+                        start: customStart || schedule.start,
+                        end: customEnd || schedule.end,
+                      });
+                    }}
+                  />
+
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="time"
+                      value={customStart}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setCustomTimes((prev) => ({
+                          ...prev,
+                          [schedule.id]: { ...prev[schedule.id], start: value },
+                        }));
+                        const localDate = new Date(schedule.start);
+                        const localDateStr = `${localDate.getFullYear()}-${String(
+                          localDate.getMonth() + 1
+                        ).padStart(2, "0")}-${String(
+                          localDate.getDate()
+                        ).padStart(2, "0")}`;
+                        setSelectedTime({
+                          start: `${localDateStr}T${value}:00`,
+                          end: `${localDateStr}T${
+                            customEnd || new Date(schedule.end).toISOString().slice(11, 16)
+                          }:00`,
+                        });
+                      }}
+                      min={toLocalTimeString(schedule.start)}
+                      max={toLocalTimeString(schedule.end)}
+                      className="border rounded px-2 py-1 bg-white"
+                    />
+
+                    <span>–</span>
+
+                    <input
+                      type="time"
+                      value={customEnd}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setCustomTimes((prev) => ({
+                          ...prev,
+                          [schedule.id]: { ...prev[schedule.id], end: value },
+                        }));
+                        const localDate = new Date(schedule.start);
+                        const localDateStr = `${localDate.getFullYear()}-${String(
+                          localDate.getMonth() + 1
+                        ).padStart(2, "0")}-${String(
+                          localDate.getDate()
+                        ).padStart(2, "0")}`;
+                        setSelectedTime({
+                          start: `${localDateStr}T${
+                            customStart || new Date(schedule.start).toISOString().slice(11, 16)
+                          }:00`,
+                          end: `${localDateStr}T${value}:00`,
+                        });
+                      }}
+                      min={toLocalTimeString(schedule.start)}
+                      max={toLocalTimeString(schedule.end)}
+                      className="border rounded px-2 py-1 bg-white"
+                    />
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <button
+        className={`w-full py-3 rounded-lg font-semibold shadow-md transition-transform ${
+          availableSchedules.length === 0
+            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white"
+        }`}
+        onClick={handleConfirm}
+        disabled={availableSchedules.length === 0}
+      >
+        Confirmar
+      </button>
+    </div>
+  );
+}
