@@ -27,10 +27,10 @@ module Api
       end
 
       def mark_all_seen
-        current_user.notifications.unseen.find_in_batches(batch_size: 500) do |batch|
-          batch.each { |n| n.update!(seen_at: Time.current) }
+        now = Time.current
+        current_user.notifications.where(seen_at: nil).find_each(batch_size: 500) do |batch|
+          batch.update!(seen_at: now)
         end
-
         render json: { ok: true }
       end
 
