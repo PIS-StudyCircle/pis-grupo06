@@ -53,14 +53,12 @@ RSpec.describe "Flow: Course → CourseDetail → Subject → SubjectDetail → 
     end
   end
 
-
   before do
     @tutor  = create_user
     sign_in @tutor
     @course = create_course(name: "Física I", code: "FIS101")
   end
   it "Permite al tutor navegar curso, crear una tutoría y verla listada con filtros" do
-
     # CourseDetailPage
     get "/api/v1/courses/#{@course.id}"
     expect(response).to have_http_status(:ok)
