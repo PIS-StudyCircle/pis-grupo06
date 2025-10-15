@@ -113,9 +113,12 @@ export default function UserProfile() {
                   key={rev.id}
                   className="border rounded-lg p-3 bg-gray-50 text-sm"
                 >
-                  <p>{rev.review}</p>
+                 <p>{rev.review}</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    — {rev.reviewer_name || "Usuario anónimo"}
+                    — {rev.reviewer?.name} {rev.reviewer?.last_name}
+                    {rev.reviewer?.email && (
+                      <span className="text-gray-400"> ({rev.reviewer.email})</span>
+                    )}
                   </p>
                 </li>
               ))}

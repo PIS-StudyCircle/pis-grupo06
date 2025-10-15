@@ -15,7 +15,6 @@ export default function UserListPage() {
     setPage,
     search,
     setSearch,
-    role,
     setRole,
   } = useUsers(1, 20); // sin filtro inicial
 
