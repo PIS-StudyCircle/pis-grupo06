@@ -53,31 +53,26 @@ RSpec.describe "Flow: Course → CourseDetail → Subject → SubjectDetail → 
     end
   end
 
+
+  before do
+    @tutor  = create_user
+    sign_in @tutor
+    @course = create_course(name: "Física I", code: "FIS101")
+  end
   it "Permite al tutor navegar curso, crear una tutoría y verla listada con filtros" do
-    # Registro y login
-    tutor = create_user
-    sign_in tutor
-
-    # Listar cursos
-    get "/api/v1/courses"
-    expect(response).to have_http_status(:ok)
-    _courses = extract_courses(parsed)
-
-    # Crear un curso
-    course = create_course(name: "Física I", code: "FIS101")
 
     # CourseDetailPage
-    get "/api/v1/courses/#{course.id}"
+    get "/api/v1/courses/#{@course.id}"
     expect(response).to have_http_status(:ok)
 
     # Crear subject
-    post "/api/v1/courses/#{course.id}/subjects",
-         params: { subject: { name: "Movimiento Rectilíneo", course_id: course.id } }
+    post "/api/v1/courses/#{@course.id}/subjects",
+         params: { subject: { name: "Movimiento Rectilíneo", course_id: @course.id } }
     expect(response).to have_http_status(:created)
     subject_id = parsed["id"]
 
     # Listar subjects del curso
-    get "/api/v1/courses/#{course.id}/subjects"
+    get "/api/v1/courses/#{@course.id}/subjects"
     expect(response).to have_http_status(:ok)
     subjects_payload = parsed
     expect(subjects_payload).to be_a(Hash)
@@ -85,7 +80,7 @@ RSpec.describe "Flow: Course → CourseDetail → Subject → SubjectDetail → 
     expect(subjects_payload["subjects"].pluck("id")).to include(subject_id)
 
     # SubjectDetailPage
-    get "/api/v1/courses/#{course.id}/subjects/#{subject_id}"
+    get "/api/v1/courses/#{@course.id}/subjects/#{subject_id}"
     expect(response).to have_http_status(:ok)
     expect(parsed["data"]).to include("id" => subject_id) if parsed["data"].is_a?(Hash)
 
@@ -97,9 +92,9 @@ RSpec.describe "Flow: Course → CourseDetail → Subject → SubjectDetail → 
              duration_mins: 90,
              modality: "presencial",
              capacity: 4,
-             course_id: course.id,
-             created_by_id: tutor.id,
-             tutor_id: tutor.id
+             course_id: @course.id,
+             created_by_id: @tutor.id,
+             tutor_id: @tutor.id
            },
            subject_ids: [subject_id]
          }
@@ -107,13 +102,13 @@ RSpec.describe "Flow: Course → CourseDetail → Subject → SubjectDetail → 
     tutoring_id = parsed["id"] || Tutoring.last.id
 
     # Filtrar por course_id
-    get "/api/v1/tutorings", params: { course_id: course.id }
+    get "/api/v1/tutorings", params: { course_id: @course.id }
     expect(response).to have_http_status(:ok)
     tuts = extract_tutorings(parsed)
     expect(tuts.pluck("id")).to include(tutoring_id)
 
     # Filtrar por mis tutorías creadas
-    get "/api/v1/tutorings", params: { created_by_user: tutor.id }
+    get "/api/v1/tutorings", params: { created_by_user: @tutor.id }
     expect(response).to have_http_status(:ok)
     tuts = extract_tutorings(parsed)
     expect(tuts.pluck("id")).to include(tutoring_id)
