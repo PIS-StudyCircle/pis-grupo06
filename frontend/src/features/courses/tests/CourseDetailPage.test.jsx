@@ -3,6 +3,11 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import CourseDetailPage from "../pages/CourseDetailPage";
 import * as courseService from "../services/courseService";
 
+// Mock del contexto de usuario DEBE ir antes de importar componentes que usen useUser
+jest.mock("@context/UserContext", () => ({
+  useUser: jest.fn().mockReturnValue({ user: null }), // valor por defecto seguro
+}));
+
 jest.mock("@components/layout/NavBar", () => () => <div>NavBar</div>);
 jest.mock("@components/Footer", () => () => <div>Footer</div>);
 
