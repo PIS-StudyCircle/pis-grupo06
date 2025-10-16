@@ -109,9 +109,9 @@ module Api
       end
 
       def create
-
         if params[:tutoring][:subject_ids].blank?
-          render json: { errors: ["No se recibieron correctamente los temas seleccionados. Inténtelo nuevamente."] }, status: :unprocessable_entity
+          render json: { errors: ["No se recibieron correctamente los temas seleccionados. Inténtelo nuevamente."] },
+                 status: :unprocessable_entity
           return
         end
 
@@ -147,7 +147,7 @@ module Api
 
         if tutoring.save
           create_user_tutoring(tutoring)
-          
+
           if params[:tutoring][:subject_ids].present?
             tutoring.subject_ids = params[:tutoring][:subject_ids]
           end
