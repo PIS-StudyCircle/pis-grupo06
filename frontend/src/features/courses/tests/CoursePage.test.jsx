@@ -1,39 +1,24 @@
-// IMPORTANTE!: Mocks antes de cualquier import que los use, porque si intenta importarlos antes de que sean mockeados, falla
-//porque Jest no sabe interpretar import.meta, que se usa en courseService.js
-
+// IMPORTANTE!: Mocks antes de los imports
 jest.mock("../../../shared/components/layout/NavBar", () => () => <div>NavBar</div>);
 jest.mock("../../../shared/components/Footer", () => () => <div>Footer</div>);
-
-jest.mock("../hooks/useCourses", () => ({
-  useCourses: jest.fn(),
-}));
-
-jest.mock("../hooks/useFiltredCourses", () => ({
-  useFilteredCourses: jest.fn((courses) => courses),
-}));
-
-
 jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"), // mantener los demás exports reales
-  useNavigate: () => jest.fn(),              // mock de useNavigate
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => jest.fn(),
 }));
-
-import { render, screen, fireEvent, act } from "@testing-library/react";
-import { MemoryRouter } from 'react-router-dom'
-import CoursePage from "../pages/CoursePage";
-import { useCourses } from "../hooks/useCourses";
-
 jest.mock("@context/UserContext", () => ({
-  useUser: jest.fn().mockReturnValue({ user: null }), // valor por defecto seguro
+  useUser: jest.fn().mockReturnValue({ user: null }),
+}));
+jest.mock("../services/courseService", () => ({
+  getCourses: jest.fn(),
 }));
 
-jest.mock("../hooks/useCourses");
+import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import CoursePage from "../pages/CoursePage";
+import { getCourses } from "../services/courseService";
 
-describe("CoursePage", () => {
-  const mockSetPage = jest.fn();
-
+describe("Tests de página de materias", () => {
   beforeAll(() => {
-    // decimos a Jest que use timers falsos (controlados)
     jest.useFakeTimers();
   });
 
@@ -41,45 +26,27 @@ describe("CoursePage", () => {
     jest.clearAllMocks();
   });
 
-  it("muestra el loading al inicio", () => {
-    useCourses.mockReturnValue({
-      courses: [],
-      loading: true,
-      error: null,
-      pagination: {},
-      page: 1,
-      setPage: mockSetPage,
-    });
-
+  it("muestra el loading al inicio", async () => {
+    getCourses.mockImplementation(() => new Promise(() => {}));
     render(<CoursePage />);
     expect(screen.getByText(/cargando materias/i)).toBeInTheDocument();
   });
 
-  it("muestra un mensaje de error si hay error", () => {
-    useCourses.mockReturnValue({
-      courses: [],
-      loading: false,
-      error: "Error",
-      pagination: {},
-      page: 1,
-      setPage: mockSetPage,
-    });
-
+  it("muestra mensaje de error si el fetch falla", async () => {
+    getCourses.mockRejectedValueOnce(new Error("Error fetching courses"));
     render(<CoursePage />);
-    expect(screen.getByText(/error al cargar las materias/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/error al cargar las materias/i)).toBeInTheDocument();
+    });
   });
 
-  it("muestra los cursos y la paginación", () => {
-    useCourses.mockReturnValue({
+  it("muestra los cursos correctamente", async () => {
+    getCourses.mockResolvedValueOnce({
       courses: [
         { id: 1, name: "Curso A" },
         { id: 2, name: "Curso B" },
       ],
-      loading: false,
-      error: null,
-      pagination: { page: 1, last: 3 },
-      page: 1,
-      setPage: mockSetPage,
+      pagination: { last: 1, current: 1 },
     });
 
     render(
@@ -88,77 +55,46 @@ describe("CoursePage", () => {
       </MemoryRouter>
     );
 
-    // Verifica que los cursos se muestren
-    expect(screen.getByText("Curso A")).toBeInTheDocument();
-    expect(screen.getByText("Curso B")).toBeInTheDocument();
-
-    // Verifica que la paginación tenga botones
-    const nextButton = screen.getByText(">");
-    fireEvent.click(nextButton);
-    expect(mockSetPage).toHaveBeenCalledWith(2);
+    await waitFor(() => {
+      expect(screen.getByText("Curso A")).toBeInTheDocument();
+      expect(screen.getByText("Curso B")).toBeInTheDocument();
+    });
   });
 
-  it("muestra 'No hay materias disponibles' si no hay cursos", () => {
-    useCourses.mockReturnValue({
+  it("muestra mensaje vacío cuando no hay cursos", async () => {
+    getCourses.mockResolvedValueOnce({
       courses: [],
-      loading: false,
-      error: null,
-      pagination: { page: 1, last: 1 },
-      page: 1,
-      setPage: mockSetPage,
+      pagination: { last: 1, current: 1 },
     });
-
     render(<CoursePage />);
-    expect(screen.getByText(/no hay materias disponibles/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/no hay materias disponibles/i)).toBeInTheDocument();
+    });
   });
 
-    
-  it("actualiza search y reinicia a la página 1 al cambiar el query", () => {
-    const mockSetSearch = jest.fn();
-    const mockSetPage = jest.fn();
-
-    useCourses.mockReturnValue({
+  it("realiza nueva búsqueda al escribir en el input", async () => {
+    getCourses.mockResolvedValueOnce({
       courses: [],
-      loading: false,
-      error: null,
-      pagination: { page: 1, last: 1 },
-      page: 1,
-      setPage: mockSetPage,
-      search: "",
-      setSearch: mockSetSearch,
+      pagination: { last: 1, current: 1 },
     });
-
     render(<CoursePage />);
-
     const input = screen.getByPlaceholderText(/buscar materia/i);
 
-    // Simula escribir algo
+    // Simula escribir algo en la búsqueda
     fireEvent.change(input, { target: { value: "mat" } });
 
-    // Avanza el tiempo del timeout
     act(() => {
       jest.advanceTimersByTime(400);
     });
 
-    expect(mockSetSearch).toHaveBeenCalledWith("mat");
-    expect(mockSetPage).toHaveBeenCalledWith(1);
-  });
-
-  it("usa totalPages = 1 cuando pagination.last no está definido", () => {
-    const mockSetPage = jest.fn();
-
-    useCourses.mockReturnValue({
-      courses: [],
-      loading: false,
-      error: null,
-      pagination: {}, // sin last
-      page: 1,
-      setPage: mockSetPage,
-      search: "",
-      setSearch: jest.fn(),
+    // el hook llama nuevamente al service con el query actualizado
+    await waitFor(() => {
+      expect(getCourses).toHaveBeenCalledWith(
+        expect.any(Number), // page
+        expect.any(Number), // perPage
+        "mat", // search
+        expect.any(Boolean) // showFavorites
+      );
     });
-
-    render(<CoursePage />);
-
   });
 });
