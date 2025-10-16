@@ -26,6 +26,13 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
       expect(json[0]["review"]).to eq("Muy bueno!")
       expect(json[0]["reviewer"]["id"]).to eq(current_user.id)
     end
+
+    it "devuelve array vacío si no hay reseñas" do
+      get "#{base_url}.json", params: { reviewed_id: other_user.id }
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body)
+      expect(json).to eq([])
+    end
   end
 
   describe "GET #can_review" do
@@ -48,6 +55,14 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
     it "no permite reseñar si ya existe reseña previa" do
       allow(Tutoring).to receive_message_chain(:shared_between, :exists?).and_return(true)
       UserReview.create!(reviewer: current_user, reviewed_id: other_user.id, review: "Ya reseñé")
+
+      get "#{base_url}/can_review.json", params: { reviewed_id: other_user.id }
+      json = JSON.parse(response.body)
+      expect(json["can_review"]).to be false
+    end
+
+    it "no permite reseñar si no hay tutorías compartidas" do
+      allow(Tutoring).to receive_message_chain(:shared_between, :exists?).and_return(false)
 
       get "#{base_url}/can_review.json", params: { reviewed_id: other_user.id }
       json = JSON.parse(response.body)
@@ -76,6 +91,26 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
 
       json = JSON.parse(response.body)
       expect(json["errors"]).to include("Review no puede estar en blanco")
+    end
+  end
+
+  describe "PATCH #update" do
+    it "actualiza la reseña correctamente" do
+      allow(Tutoring).to receive_message_chain(:shared_between, :exists?).and_return(true)
+      review = UserReview.create!(reviewer: current_user, reviewed_id: other_user.id, review: "Antigua")
+      patch "#{base_url}/#{review.id}.json", params: { review: "Actualizada" }
+      expect(response).to have_http_status(:ok)
+      expect(review.reload.review).to eq("Actualizada")
+    end
+  end
+
+  describe "DELETE #destroy" do
+    it "elimina la reseña correctamente" do
+      allow(Tutoring).to receive_message_chain(:shared_between, :exists?).and_return(true)
+      review = UserReview.create!(reviewer: current_user, reviewed_id: other_user.id, review: "A eliminar")
+      delete "#{base_url}/#{review.id}.json"
+      expect(response).to have_http_status(:ok)
+      expect(UserReview.exists?(review.id)).to be false
     end
   end
 end
