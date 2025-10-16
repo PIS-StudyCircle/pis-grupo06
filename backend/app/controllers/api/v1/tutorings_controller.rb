@@ -140,7 +140,9 @@ module Api
         end
 
         if tutoring.save
-          # create_user_tutoring(tutoring)
+          if tutoring.tutor_id.nil?
+            create_user_tutoring(tutoring)
+          end
           render json: { tutoring: tutoring }, status: :created
         else
           render json: { errors: tutoring.errors.full_messages }, status: :unprocessable_entity

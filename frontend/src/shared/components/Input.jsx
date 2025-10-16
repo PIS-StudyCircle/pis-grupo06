@@ -12,9 +12,11 @@ export function Input({
   placeholder = "",
   className = "",
   error,
+  minLength,
+  maxLength,
 }) {
   const baseClass =
-    "block w-full px-3 py-2 pr-10 rounded-md shadow-sm focus:ring-1";
+    "block w-full px-3 py-2 rounded-md shadow-sm focus:ring-1";
   const normalClass =
     "border border-gray-300 placeholder-gray-400 font-light focus:ring-indigo-500 focus:border-indigo-500";
   const errorClass =
@@ -52,6 +54,8 @@ export function Input({
               name={id}
               type={isPassword && show ? "text" : type}
               value={value}
+              minLength={minLength}
+              maxLength={maxLength}
               onChange={onChange}
               required={required}
               placeholder={placeholder}

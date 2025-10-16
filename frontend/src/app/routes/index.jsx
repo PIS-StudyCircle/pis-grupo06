@@ -6,7 +6,7 @@ import {
   ProfilePage,
   SignInPage,
   RegisterPage,
-  TutorPage,
+  TutorListPage,
   VisitorFlow,
   ForgotPasswordPage,
   ResetPasswordPage,
@@ -54,10 +54,10 @@ export function AppRoutes() {
           element={<CreateTutoringByStudent />}
         />
         <Route path="/perfil" element={<ProfilePage />} />
-        <Route path="/tutores" element={<TutorPage />} />
+        <Route path="/tutores" element={<TutorListPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
         <Route
-          path="/tutorias/materia/:courseId"
+          path="/tutorias/ser_estudiante/:courseId"
           element={<TutoringPage filters={{}} mode="serEstudiante" />}
         />
       </Route>
@@ -68,7 +68,7 @@ export function AppRoutes() {
         path="/materias/:courseId/temas/:subjectId"
         element={<SubjectDetailPage />}
       />
-      <Route path="/tutores" element={<TutorPage />} />
+      <Route path="/tutores" element={<TutorListPage />} />
       <Route path="*" element={<Error404Page />} />
     </Routes>
   );
