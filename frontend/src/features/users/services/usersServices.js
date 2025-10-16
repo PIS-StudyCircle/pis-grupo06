@@ -50,3 +50,24 @@ export const createReview = async (userId, review) => {
   if (!res.ok) throw new Error("Error al crear reseña");
   return await res.json();
 };
+
+export const updateReview = async (reviewId, review) => {
+  const res = await fetch(`${API_URL}/user_reviews/${reviewId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ review }),
+  });
+
+  if (!res.ok) throw new Error("Error al actualizar reseña");
+  return await res.json();
+};
+
+export const deleteReview = async (reviewId) => {
+  const res = await fetch(`${API_URL}/user_reviews/${reviewId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!res.ok) throw new Error("Error al eliminar reseña");
+};

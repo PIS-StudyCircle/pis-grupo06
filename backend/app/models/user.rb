@@ -29,6 +29,13 @@ class User < ApplicationRecord
            inverse_of: :creator,
            dependent: :nullify
 
+  has_many :given_reviews,
+           class_name: "UserReview", 
+           foreign_key: "reviewer_id", dependent: :destroy
+  has_many :received_reviews,
+           class_name: "UserReview",
+           foreign_key: "reviewed_id", dependent: :destroy
+
   belongs_to :faculty
 
   has_one_attached :profile_photo

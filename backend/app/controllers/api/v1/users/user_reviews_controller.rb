@@ -42,6 +42,46 @@ module Api
             render json: { errors: review.errors.full_messages }, status: :unprocessable_entity
           end
         end
+        
+        # PATCH/PUT /api/v1/user_reviews/:id
+        def update
+          review = current_user.given_reviews.find_by(id: params[:id])
+          return render json: { error: "Reseña no encontrada o sin permisos" }, status: :not_found unless review
+
+          if review.update(review: params[:review])
+            render json: review, status: :ok
+          else
+            render json: { errors: review.errors.full_messages }, status: :unprocessable_entity
+          end
+        end
+
+        # DELETE /api/v1/user_reviews/:id
+        def destroy
+          @review = UserReview.find_by(id: params[:id])
+
+          unless @review
+            return render json: { error: "Reseña no encontrada" }, status: :not_found
+          end
+
+          unless @review.reviewer_id == current_user.id
+            return render json: { error: "No tienes permiso para eliminar esta reseña" }, status: :forbidden
+          end
+
+          if @review.destroy
+            render json: { message: "Reseña eliminada correctamente" }, status: :ok
+          else
+            render json: { errors: @review.errors.full_messages }, status: :unprocessable_entity
+          end
+        end
+
+        private 
+
+        def set_review
+          @review = UserReview.find_by(id: params[:id])
+          unless @review
+            render json: { error: "Reseña no encontrada" }, status: :not_found
+          end
+        end
       end
     end
   end
