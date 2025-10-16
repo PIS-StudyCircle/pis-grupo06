@@ -1,56 +1,51 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getUserById, getReviewsByUser, canReviewUser, createReview } from "../services/usersServices";
+import { getUserById, canReviewUser, createReview, getReviewsByUser } from "../services/usersServices";
+import { useUserReviews } from "../hooks/useUserReviews";
+import ReviewsList from "../components/ReviewsList";
 import { DEFAULT_PHOTO } from "@/shared/config";
 
 export default function UserProfile() {
-  const { id } = useParams(); // id del usuario
+  const { id } = useParams();
   const [user, setUser] = useState(null);
-  const [reviews, setReviews] = useState([]);
   const [canReview, setCanReview] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [review, setReview] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true); 
+
+  const { reviews, loading: reviewsLoading, setReviews } = useUserReviews(id);
 
   useEffect(() => {
-    async function loadData() {
-      setLoading(true);
+    async function loadUser() {
+      setLoadingUser(true); 
       try {
         const userData = await getUserById(id);
+        const canReviewData = await canReviewUser(id);
         setUser(userData);
-
-        const [reviewsData, canReviewData] = await Promise.all([
-          getReviewsByUser(id),
-          canReviewUser(id),
-        ]);
-
-        setReviews(reviewsData);
         setCanReview(canReviewData);
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false);
+        setLoadingUser(false); 
       }
     }
-
-    loadData();
+    loadUser();
   }, [id]);
 
+  // Crear nueva reseña
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-
     try {
       setSubmitting(true);
       await createReview(id, review);
       setReview("");
       setShowForm(false);
+      setCanReview(false);
 
-      // refrescar las reviews
       const updated = await getReviewsByUser(id);
       setReviews(updated);
-      setCanReview(false); // ya dejó una review
     } catch (err) {
       alert("Error al enviar la reseña: " + err.message);
     } finally {
@@ -58,14 +53,21 @@ export default function UserProfile() {
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Cargando...</p>;
-  if (error) return <p className="text-center mt-10">Error: {error}</p>;
-  if (!user) return <p className="text-center mt-10">Usuario no encontrado.</p>;
+  if (loadingUser || reviewsLoading)
+    return <p className="text-center mt-10">Cargando...</p>;
+
+  if (error)
+    return <p className="text-center mt-10">Error: {error}</p>;
+
+  if (!user)
+    return <p className="text-center mt-10">Usuario no encontrado.</p>;
 
   const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-[#001F54] text-white rounded-3xl shadow-xl w-full max-w-md p-6">
+
         {/* --- Datos del usuario --- */}
         <div className="flex flex-col items-center mb-6">
           <img
@@ -102,28 +104,15 @@ export default function UserProfile() {
             Reseñas
           </h3>
 
-          {reviews.length === 0 ? (
-            <p className="text-center text-gray-500">
-              Aún no hay reseñas para este usuario.
-            </p>
-          ) : (
-            <ul className="space-y-3">
-              {reviews.map((rev) => (
-                <li
-                  key={rev.id}
-                  className="border rounded-lg p-3 bg-gray-50 text-sm"
-                >
-                 <p>{rev.review}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    — {rev.reviewer?.name} {rev.reviewer?.last_name}
-                    {rev.reviewer?.email && (
-                      <span className="text-gray-400"> ({rev.reviewer.email})</span>
-                    )}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
+          <ReviewsList
+            reviews={reviews}
+            onUpdate={async () => {
+              const updatedReviews = await getReviewsByUser(id);
+              const canReviewNow = await canReviewUser(id); // 🔄 vuelve a chequear si puede reseñar
+              setReviews(updatedReviews);
+              setCanReview(canReviewNow); // 🔄 actualiza el botón
+            }}
+          />
 
           {/* Botón para dejar reseña */}
           {canReview && !showForm && (
@@ -137,34 +126,34 @@ export default function UserProfile() {
             </div>
           )}
 
-          {/* Formulario para escribir reseña */}
-          {showForm && (
-            <form onSubmit={handleSubmitReview} className="mt-4 space-y-2">
-              <textarea
-                value={review}
-                onChange={(e) => setReview(e.target.value)}
-                className="w-full border rounded-lg p-2"
-                placeholder="Escribí tu reseña..."
-                required
-              />
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="bg-green-600 text-white px-3 py-1 rounded-lg disabled:opacity-60"
-                >
-                  {submitting ? "Enviando..." : "Confirmar"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="bg-gray-300 px-3 py-1 rounded-lg"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </form>
-          )}
+          {/* Formulario de reseña */}
+         {showForm && (
+          <form onSubmit={handleSubmitReview} className="mt-4 space-y-3">
+            <textarea
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+              className="w-full border rounded-lg p-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Escribí tu reseña..."
+              required
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="bg-green-600 text-white px-4 py-1.5 rounded-lg disabled:opacity-60"
+              >
+                {submitting ? "Enviando..." : "Confirmar"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="bg-gray-300 px-4 py-1.5 rounded-lg hover:bg-gray-400 transition"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        )}
         </div>
       </div>
     </div>

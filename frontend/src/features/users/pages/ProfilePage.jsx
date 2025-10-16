@@ -1,7 +1,11 @@
 import { useUser } from "@context/UserContext"; 
 import { DEFAULT_PHOTO } from "@/shared/config";
+import { useUserReviews } from "../hooks/useUserReviews";
+import ReviewsList from "../components/ReviewsList";
+
 export default function Profile() {
   const { user, loading, error } = useUser(); 
+  const { reviews, loading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id);
 
   if (loading) {
     return <p className="text-center mt-10">Cargando...</p>;
@@ -32,7 +36,7 @@ export default function Profile() {
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 mb-8">
           <div>
             <label className="block text-sm">Email</label>
             <input
@@ -55,6 +59,26 @@ export default function Profile() {
             </div>
           )}
         </div>
+
+        {/* --- Sección de Reseñas --- */}
+        <div className="bg-white text-black rounded-2xl p-4">
+          <h3 className="text-lg font-semibold mb-2 text-center text-[#001F54]">
+            Mis reseñas
+          </h3>
+
+          {reviewsLoading && (
+            <p className="text-center text-gray-500">Cargando reseñas...</p>
+          )}
+
+          {reviewsError && (
+            <p className="text-center text-red-500">Error al cargar reseñas.</p>
+          )}
+
+          {!reviewsLoading && !reviewsError && (
+            <ReviewsList reviews={reviews} />
+          )}
+        </div>
+
       </div>
     </div>
   );
