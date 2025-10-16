@@ -30,7 +30,7 @@ class User < ApplicationRecord
            dependent: :nullify
 
   has_many :given_reviews,
-           class_name: "UserReview", 
+           class_name: "UserReview",
            foreign_key: "reviewer_id", dependent: :destroy
   has_many :received_reviews,
            class_name: "UserReview",

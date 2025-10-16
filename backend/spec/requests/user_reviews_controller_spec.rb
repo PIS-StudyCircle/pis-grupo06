@@ -6,8 +6,14 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
   let!(:university) { University.create!(name: "Universidad de la República") }
   let!(:faculty)    { Faculty.create!(name: "Facultad de Ingeniería", university: university) }
 
-  let(:current_user) { User.create!(name: "Reviewer", last_name: "Test", email: "reviewer@example.com", password: "12345678", password_confirmation: "12345678", faculty: faculty) }
-  let(:other_user) { User.create!(name: "Reviewed", last_name: "User", email: "reviewed@example.com", password: "12345678", password_confirmation: "12345678", faculty: faculty) }
+  let(:current_user) {
+    User.create!(name: "Reviewer", last_name: "Test", email: "reviewer@example.com", password: "12345678",
+                 password_confirmation: "12345678", faculty: faculty)
+  }
+  let(:other_user) {
+    User.create!(name: "Reviewed", last_name: "User", email: "reviewed@example.com", password: "12345678",
+                 password_confirmation: "12345678", faculty: faculty)
+  }
 
   before do
     sign_in current_user
@@ -21,7 +27,7 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
       get "#{base_url}.json", params: { reviewed_id: other_user.id }
       expect(response).to have_http_status(:ok)
 
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json.length).to eq(1)
       expect(json[0]["review"]).to eq("Muy bueno!")
       expect(json[0]["reviewer"]["id"]).to eq(current_user.id)
@@ -30,7 +36,7 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
     it "devuelve array vacío si no hay reseñas" do
       get "#{base_url}.json", params: { reviewed_id: other_user.id }
       expect(response).to have_http_status(:ok)
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json).to eq([])
     end
   end
@@ -40,7 +46,7 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
       get "#{base_url}/can_review.json", params: { reviewed_id: current_user.id }
       expect(response).to have_http_status(:ok)
 
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["can_review"]).to be false
     end
 
@@ -48,7 +54,7 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
       allow(Tutoring).to receive_message_chain(:shared_between, :exists?).and_return(true)
 
       get "#{base_url}/can_review.json", params: { reviewed_id: other_user.id }
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["can_review"]).to be true
     end
 
@@ -57,7 +63,7 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
       UserReview.create!(reviewer: current_user, reviewed_id: other_user.id, review: "Ya reseñé")
 
       get "#{base_url}/can_review.json", params: { reviewed_id: other_user.id }
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["can_review"]).to be false
     end
 
@@ -65,7 +71,7 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
       allow(Tutoring).to receive_message_chain(:shared_between, :exists?).and_return(false)
 
       get "#{base_url}/can_review.json", params: { reviewed_id: other_user.id }
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["can_review"]).to be false
     end
   end
@@ -77,7 +83,7 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
       post "#{base_url}.json", params: { reviewed_id: other_user.id, review: "Excelente!" }
       expect(response).to have_http_status(:created)
 
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["review"]).to eq("Excelente!")
       expect(json["reviewer_id"]).to eq(current_user.id)
       expect(UserReview.count).to eq(1)
@@ -89,7 +95,7 @@ RSpec.describe "Api::V1::Users::UserReviewsController", type: :request do
       post "#{base_url}.json", params: { reviewed_id: other_user.id, review: "" }
       expect(response).to have_http_status(:unprocessable_content)
 
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["errors"]).to include("Review no puede estar en blanco")
     end
   end

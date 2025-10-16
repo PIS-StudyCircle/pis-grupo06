@@ -12,7 +12,7 @@ class UserReview < ApplicationRecord
 
   def shared_tutoring
     return if persisted?
-    
+
     unless Tutoring.shared_between(reviewer_id, reviewed_id).exists?
       errors.add(:base, "Solo se pueden dejar reseñas entre usuarios que compartieron tutoría")
     end
