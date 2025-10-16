@@ -56,6 +56,12 @@ export default function CreateTutoringByStudent() {
     }
 
     const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
+    // Validación: no continuar si no hay temas seleccionados
+    if (selectedSubjects.length === 0) {
+      alert('No se pudieron obtener los temas seleccionados. Al aceptar será redirigido a la selección de temas para intentarlo nuevamente.');
+      window.history.back(); // redirige a la página anterior
+      return; //para que no continúe con el envío del formulario
+    }
 
     const dueLocal = new Date(`${form.request_due_date}T${form.request_due_time}:00`);
     const request_due_at = dueLocal.toISOString();

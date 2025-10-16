@@ -38,7 +38,6 @@ export default function CreateTutoringByTutor() {
   const { courseId } = useParams();
   const { course, loadingCourse, errorCourse } = useCourse(courseId);
 
-  const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
 
   const { form, setField } = useFormState({
     date: "",
@@ -63,6 +62,13 @@ export default function CreateTutoringByTutor() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate(form)) {
+      const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
+      // Validación: no continuar si no hay temas seleccionados
+      if (selectedSubjects.length === 0) {
+        alert('No se pudieron obtener los temas seleccionados. Al aceptar será redirigido a la selección de temas para intentarlo nuevamente.');
+        window.history.back(); // redirige a la página anterior
+        return; //para que no continúe con el envío del formulario
+      }
       // Crea el objeto Date en la zona local
       const localDate = new Date(`${form.date}T${form.start_time}:00`);
       // Convierte a ISO string (UTC)
