@@ -15,10 +15,8 @@ export default function SelectSubjectsByTutor() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     localStorage.setItem("selectedSubjects", JSON.stringify(selectedSubjects));
    
-  
     navigate(isTutor ? `/tutorias/crear/${courseId}`
                      : `/tutorias/solicitar/${courseId}`);
   };
