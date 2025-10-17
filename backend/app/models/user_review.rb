@@ -1,6 +1,6 @@
 class UserReview < ApplicationRecord
-  belongs_to :reviewer, class_name: "User"
-  belongs_to :reviewed, class_name: "User"
+  belongs_to :reviewer, class_name: "User", inverse_of: :given_reviews
+  belongs_to :reviewed, class_name: "User", inverse_of: :received_reviews
 
   validates :review, presence: true
   validates :reviewer_id, uniqueness: { scope: :reviewed_id }
