@@ -106,7 +106,7 @@ module Api
               location: t.location,
               availabilities: t.tutoring_availabilities.map do |a|
               { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
-              end
+              end,
               tutor_email: t.tutor&.email,
             }
           end,

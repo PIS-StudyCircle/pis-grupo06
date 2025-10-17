@@ -1,18 +1,12 @@
-import { useUser } from "@context/UserContext";
+import { useUser } from "@context/UserContext"; 
 import { DEFAULT_PHOTO } from "@/shared/config";
-import {SessionListPage } from "@/features/calendar";
 import { useState, useEffect } from "react";
 import { getCourses } from "../../courses/services/courseService";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 
 export default function Profile() {
-  const { user, loading, error } = useUser();
-
-  if (loading) return <p className="text-center mt-10">Cargando...</p>;
-  if (error)
-    return <p className="text-center mt-10">Error al cargar perfil.</p>;
-  if (!user)
+  const { user, loading, error } = useUser(); 
 
   const [favLoading, setFavLoading] = useState(false);
   const [favError, setFavError] = useState("");
@@ -46,18 +40,18 @@ export default function Profile() {
   }
   if (!user) {
     return <p className="text-center mt-10">No hay usuario cargado.</p>;
+  }
 
   const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
 
   return (
-<div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100">
       <div className="mx-auto max-w-5xl p-4 md:p-8">
         <div className="space-y-6 md:space-y-0 md:flex md:items-start md:gap-6">
           
           {/* Panel izquierdo: Perfil */}
           <div className="bg-[#001F54] text-white rounded-3xl shadow-xl w-full md:basis-1/2 p-6">
-            <h2 className="text-xl font-bold mb-4 text-center">Perfil</h2>
-
+            
             <div className="flex flex-col items-center mb-6">
               <img
                 src={photoUrl}
@@ -94,23 +88,18 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Panel derecho: Favoritas + Sesiones */}
-          <div className="w-full md:basis-1/2 space-y-6">
-            {/* Favoritas */}
-            <div className="bg-white rounded-3xl shadow-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <Star className="w-5 h-5 text-yellow-500" />
-                  Materias favoritas
-                </h2>
-                <button
-                  className="text-sm underline"
-                  onClick={fetchFavorites}
-                  disabled={favLoading}
-                >
-                  {favLoading ? "Actualizando…" : "Actualizar"}
-                </button>
-              </div>
+          {/* Panel derecho: Favoritas */}
+          <div className="bg-white rounded-3xl shadow-xl w-full md:basis-1/2 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <Star className="w-5 h-5 text-yellow-500" />
+                Materias favoritas
+              </h2>
+            </div>
+
+            <div>
+
+              {favLoading && <p className="text-gray-500">Cargando…</p>}
 
               {favError && (
                 <div className="text-red-600">
@@ -121,14 +110,12 @@ export default function Profile() {
                 </div>
               )}
 
-              {!favError && favLoading && <p className="text-gray-500">Cargando…</p>}
-
-              {!favError && !favLoading && favorites.length === 0 && (
+              {!favLoading && !favError && favorites.length === 0 && (
                 <p className="text-gray-500">Aún no tenés materias favoritas.</p>
               )}
 
-              {!favError && !favLoading && favorites.length > 0 && (
-                <ul className="divide-y divide-gray-100 overflow-y-auto max-h-80">
+              {!favLoading && !favError && favorites.length > 0 && (
+                <ul className="divide-y divide-gray-100 overflow-y-auto max-h-full">
                   {favorites.map((c) => (
                     <li key={c.id} className="py-3">
                       <Link
@@ -146,10 +133,6 @@ export default function Profile() {
                 </ul>
               )}
             </div>
-
-            <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg border border-gray-200 p-4">
-              <SessionListPage userId={user.id} />
-            </div>
           </div>
 
         </div>
@@ -157,7 +140,6 @@ export default function Profile() {
     </div>
   );
 }
-
 
 
 
