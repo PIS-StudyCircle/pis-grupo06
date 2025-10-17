@@ -80,26 +80,6 @@ class GoogleCalendarService
     tutoring.update!(event_id: nil)
   end
 
-  private
-
-  def refresh_google_token(user)
-    client = Signet::OAuth2::Client.new(
-      client_id: ENV["GOOGLE_CLIENT_ID"],
-      client_secret: ENV["GOOGLE_CLIENT_SECRET"],
-      token_credential_uri: "https://oauth2.googleapis.com/token",
-      refresh_token: user.google_refresh_token
-    )
-
-    client.fetch_access_token!
-
-    user.update!(
-      google_access_token: client.access_token,
-      google_expires_at: Time.zone.now + client.expires_in
-    )
-
-    client.access_token
-  end
-
   # Crear el calendario StudyCircle si no existe
   def ensure_calendar(user)
     return user.calendar_id if user.calendar_id.present?
@@ -113,6 +93,29 @@ class GoogleCalendarService
     result = @service.insert_calendar(calendar)
     user.update!(calendar_id: result.id)
     result.id
+  end
+
+  private
+
+  def refresh_google_token(user)
+    return nil if user.google_refresh_token.blank?
+    
+    client = Signet::OAuth2::Client.new(
+      client_id: ENV["GOOGLE_CLIENT_ID"],
+      client_secret: ENV["GOOGLE_CLIENT_SECRET"],
+      token_credential_uri: "https://oauth2.googleapis.com/token",
+      refresh_token: user.google_refresh_token,
+      grant_type: "refresh_token"
+      )
+
+    client.fetch_access_token!
+
+    user.update!(
+      google_access_token: client.access_token,
+      google_expires_at: Time.zone.now + client.expires_in
+    )
+
+    client.access_token
   end
 
   # Obtener el calendar_id del tutor dueño de la tutoría
