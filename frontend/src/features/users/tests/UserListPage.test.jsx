@@ -13,6 +13,17 @@ jest.mock("@/shared/config", () => ({
   DEFAULT_PHOTO: "http://example.com/default-avatar.png",
 }));
 
+async function renderUserListPage() {
+  await act(async () => {
+    render(
+      <MemoryRouter>
+        <UserListPage />
+      </MemoryRouter>
+    );
+  });
+}
+
+
 describe("UserListPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -63,13 +74,7 @@ describe("UserListPage", () => {
       pagination: { last: 1 },
     });
 
-    await act(async () => {
-      render(
-        <MemoryRouter>
-          <UserListPage />
-        </MemoryRouter>
-      );
-    });
+    await renderUserListPage();
 
     expect(await screen.findByText("Juan Pérez")).toBeInTheDocument();
     expect(await screen.findByText("Ana Gómez")).toBeInTheDocument();
@@ -100,13 +105,7 @@ describe("UserListPage", () => {
     });
 
     // Renderizar la página
-    await act(async () => {
-      render(
-        <MemoryRouter>
-          <UserListPage />
-        </MemoryRouter>
-      );
-    });
+    await renderUserListPage();
 
     // Comprobar que los usuarios iniciales aparecen
     expect(await screen.findByText("Juan Pérez")).toBeInTheDocument();
@@ -134,13 +133,7 @@ describe("UserListPage", () => {
       pagination: { last: 1 },
     });
 
-    await act(async () => {
-      render(
-        <MemoryRouter>
-          <UserListPage />
-        </MemoryRouter>
-      );
-    });
+    await renderUserListPage();
 
     await waitFor(() => {
       expect(screen.getByText("Juan Pérez")).toBeInTheDocument();
@@ -154,13 +147,7 @@ describe("UserListPage", () => {
       pagination: { last: 1 },
     });
 
-    await act(async () => {
-      render(
-        <MemoryRouter>
-          <UserListPage />
-        </MemoryRouter>
-      );
-    });
+    await renderUserListPage();
 
     expect(await screen.findByText(/No hay usuarios disponibles./i)).toBeInTheDocument();
   });
@@ -178,13 +165,7 @@ describe("UserListPage", () => {
       pagination: { last: 1 },
     });
 
-    await act(async () => {
-      render(
-        <MemoryRouter>
-          <UserListPage />
-        </MemoryRouter>
-      );
-    });
+    await renderUserListPage();
 
     // Marcar checkbox "Solo tutores"
     const checkbox = screen.getByLabelText(/Solo tutores/i);
@@ -227,13 +208,7 @@ describe("UserListPage", () => {
   it("actualiza la búsqueda al escribir con el checkbox de solo tutores desmarcado", async () => {
     usersServices.getUsers.mockResolvedValueOnce({ users: [], pagination: { last: 1 } });
 
-    await act(async () => {
-      render(
-        <MemoryRouter>
-          <UserListPage />
-        </MemoryRouter>
-      );
-    });
+    await renderUserListPage();
 
     const input = screen.getByPlaceholderText(/buscar usuario/i);
 
@@ -252,13 +227,7 @@ describe("UserListPage", () => {
       pagination: { last: 5 },
     });
 
-    await act(async () => {
-      render(
-        <MemoryRouter>
-          <UserListPage />
-        </MemoryRouter>
-      );
-    });
+    await renderUserListPage();
 
     const nextPage = await screen.findByRole("button", { name: /2/i });
     await act(async () => {
@@ -276,13 +245,7 @@ describe("UserListPage", () => {
       pagination: { last: 1 },
     });
 
-    await act(async () => {
-      render(
-        <MemoryRouter>
-          <UserListPage />
-        </MemoryRouter>
-      );
-    });
+    await renderUserListPage();
 
     const checkbox = screen.getByLabelText(/Solo tutores/i);
     await act(async () => {
