@@ -198,7 +198,7 @@ module Api
               end
             end
 
-            # create_user_tutoring(tutoring)
+            create_user_tutoring(current_user.id, tutoring.id)
             render json: {
               tutoring: tutoring.as_json.merge(
                 availabilities: tutoring.tutoring_availabilities.as_json
@@ -575,10 +575,9 @@ module Api
         @tutoring = Tutoring.find(params[:id])
       end
 
-      def create_user_tutoring(tutoring)
-        return unless params.dig(:tutoring, :tutor_id).nil?
-
-        UserTutoring.create!(user: current_user, tutoring:)
+      def create_user_tutoring(user, tutoring)
+        return if user.blank? || tutoring.blank?
+        UserTutoring.find_or_create_by!(user_id: user, tutoring_id: tutoring)
       end
 
       def tutoring_params

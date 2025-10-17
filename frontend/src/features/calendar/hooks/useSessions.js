@@ -16,7 +16,7 @@ export function useSessions(userId) {
       .then((data) => {
         const normalized = data.map((session) => ({
           ...session,
-          date: new Date(session.date), // 🔥 clave para arreglar el error
+          date: new Date(session.date),
         }));
         setSessions(normalized);
       })

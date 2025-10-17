@@ -90,12 +90,12 @@ export default function TutoringCard({ tutoring }) {
     mode = "misTutorias";
   } else if (esCreador) {
     mode = "creador";  
+  } else if (noTieneTutor) {
+    mode = "serTutor";
   } else if (!cuposDisponibles) {
     mode = "completo";
   } else if (noTieneTutor && cuposDisponibles) {
     mode = "ambos";
-  } else if (noTieneTutor) {
-    mode = "serTutor";
   } else if (cuposDisponibles) {
     mode = "serEstudiante";
   }
