@@ -142,19 +142,7 @@ class GoogleCalendarService
     Rails.logger.error "leave_event error: #{e.message}"
   end
 
-  # Elimina el evento y limpia el event_id en la tutoría
-  def delete_event!(tutoring)
-    return if tutoring.event_id.blank?
 
-    calendar_id = tutoring_owner_calendar(tutoring)
-    service = Google::Apis::CalendarV3::CalendarService.new
-    service.authorization = tutoring.tutor.google_access_token
-
-    service.delete_event(calendar_id, tutoring.event_id)
-    tutoring.update!(event_id: nil)
-  rescue Google::Apis::ClientError => e
-    Rails.logger.error "delete_event! error: #{e.message}"
-  end
 
   def event_confirmed?(tutoring)
     tutoring.event_id.present?

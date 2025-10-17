@@ -571,10 +571,7 @@ module Api
 
       # DELETE /api/v1/tutorings/:id/unsubscribe
       def unsubscribe
-        user_tutoring = UserTutoring.find_by(user_id: current_user.id, tutoring_id: @tutoring.id)
-        unless user_tutoring
-          return render json: { error: "No estás inscripto en esta tutoría" }, status: :not_found
-        end
+        
 
         ActiveRecord::Base.transaction do
           @tutoring.lock!
@@ -592,7 +589,7 @@ module Api
             # Ej: @tutoring.student_users.each { |u| Notifier.tutoring_canceled_by_tutor(u, @tutoring).deliver_later }
 
             begin
-              calendar.delete_event!(@tutoring) # no-op si no hay event_id
+              calendar.delete_event(@tutoring) # no-op si no hay event_id
             rescue => e
               Rails.logger.error "Calendar delete_event! error (continuamos con el borrado): #{e.message}"
             end
