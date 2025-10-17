@@ -28,11 +28,10 @@ const Sidebar = ({
 
   const authedItems = [
     { title: "Inicio", path: "/", Icon: Home },
-    { title: "Clases", path: "#", Icon: BookOpen },
+    { title: "Mis Clases", path: "/notificaciones", Icon: BookOpen },
     { title: "Tutorías", path: "/tutorias", Icon: Users },
     { title: "Materias", path: "/materias", Icon: GraduationCap },
     { title: "Tutores", path: "/tutores", Icon: SquareUser },
-    { title: "Buzón", path: "/notificaciones", Icon: Inbox },
   ];
   const guestItems = [
     { title: "Inicio", path: "/flujo-visitante", Icon: Home },
