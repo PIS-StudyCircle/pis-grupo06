@@ -941,14 +941,15 @@ course = Course.find_by(id: 3) # Administración de Infraestructuras
 subject = Subject.find_by!(name: "Gestión de Servidores", course: course)
 
 tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 1.day.from_now,
+  scheduled_at: 1.day.ago,
   duration_mins: 60,
   modality: "presencial",
   capacity: 3,
   enrolled: 2,
   course: course,
   created_by_id: creator.id,
-  tutor_id: creator.id
+  tutor_id: creator.id,
+  state: 2 # finished
 )
 
 SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
@@ -966,9 +967,4 @@ UserTutoring.find_or_create_by!(
 UserTutoring.find_or_create_by!(
   user: User.find_by!(email: "paulacastro@gmail.com"),
   tutoring: tutoring_offered
-)
-
-tutoring_offered.update_columns(
-  state: "finished",
-  scheduled_at: 10.days.ago
 )
