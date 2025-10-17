@@ -9,10 +9,27 @@ module Api
         # Filtro de búsqueda por nombre
         courses = courses.where("unaccent(name) ILIKE unaccent(?)", "%#{params[:search]}%") if params[:search].present?
 
+        # Filtro para mostrar solo los cursos marcados como favoritos por el usuario actual
+        if params[:favorite].present? && ActiveModel::Type::Boolean.new.cast(params[:favorite]) && current_user
+          courses = courses.joins(:favorite_courses).where(favorite_courses: { user_id: current_user.id })
+        end
+
         @pagy, @courses = pagy(courses, items: params[:per_page] || 20)
 
+        favorite_course_ids =
+          if current_user
+            page_ids = @courses.map(&:id)
+            current_user.favorite_courses.where(course_id: page_ids).pluck(:course_id)
+          else
+            []
+          end
+
         render json: {
-          courses: @courses,
+          courses: @courses.map { |course|
+            course.as_json(only: [:id, :name, :code, :institute]).merge(
+              favorite: favorite_course_ids.include?(course.id)
+            )
+          },
           pagination: pagy_metadata(@pagy)
         }
       end
@@ -20,11 +37,16 @@ module Api
       # Método para obtener un curso por ID y sus temas asociados
       def show
         course = Course.includes(:subjects).find(params[:id])
-        render json: course.as_json(
+
+        payload = course.as_json(
           include: {
             subjects: { only: [:id, :name] } # en schema subjects tiene :id, :name
           }
         )
+
+        payload[:favorite] = current_user ? current_user.favorite_courses.exists?(course_id: course.id) : false
+
+        render json: payload
       rescue ActiveRecord::RecordNotFound
         render json: { error: "No se encontró el curso solicitado" }, status: :not_found
       end
