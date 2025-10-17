@@ -21,3 +21,52 @@ export const getUserById = async (id) => {
   if (!response.ok) throw new Error(`Error al obtener usuario con id ${id}`);
   return await response.json();
 };
+
+export const getReviewsByUser = async (userId) => {
+  const res = await fetch(`${API_URL}/user_reviews?reviewed_id=${userId}`, {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Error al obtener reseñas");
+  return await res.json();
+};
+
+export const canReviewUser = async (userId) => {
+  const res = await fetch(`${API_URL}/user_reviews/can_review?reviewed_id=${userId}`, {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Error al verificar si se puede dejar reseña");
+  const data = await res.json();
+  return data.can_review;
+};
+
+export const createReview = async (userId, review) => {
+  const res = await fetch(`${API_URL}/user_reviews`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ reviewed_id: userId, review }),
+  });
+  if (!res.ok) throw new Error("Error al crear reseña");
+  return await res.json();
+};
+
+export const updateReview = async (reviewId, review) => {
+  const res = await fetch(`${API_URL}/user_reviews/${reviewId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ review }),
+  });
+
+  if (!res.ok) throw new Error("Error al actualizar reseña");
+  return await res.json();
+};
+
+export const deleteReview = async (reviewId) => {
+  const res = await fetch(`${API_URL}/user_reviews/${reviewId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!res.ok) throw new Error("Error al eliminar reseña");
+};

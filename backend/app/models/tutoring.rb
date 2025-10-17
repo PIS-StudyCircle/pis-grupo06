@@ -65,6 +65,26 @@ class Tutoring < ApplicationRecord
     where("tutorings.modality ILIKE ?", "%#{q}%")
   }
 
+  # Devuelve tutorías donde un usuario A y un usuario B compartieron tutoría
+  scope :shared_between, ->(user_a_id, user_b_id) {
+    joins(:user_tutorings)
+      .where(state: Tutoring.states[:finished])
+      .where(
+        "(tutorings.tutor_id = :a AND user_tutorings.user_id = :b)
+          OR (tutorings.tutor_id = :b AND user_tutorings.user_id = :a)
+          OR (
+            tutorings.id IN (
+              SELECT ut1.tutoring_id
+              FROM user_tutorings ut1
+              JOIN user_tutorings ut2 ON ut1.tutoring_id = ut2.tutoring_id
+              WHERE ut1.user_id = :a AND ut2.user_id = :b
+            )
+          )",
+        a: user_a_id, b: user_b_id
+      )
+      .distinct
+  }
+
   # --- Validaciones ---
   validate :scheduled_at_cannot_be_in_past
 
