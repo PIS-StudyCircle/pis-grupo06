@@ -105,7 +105,7 @@ module Api
               tutor_last_name: t.tutor&.last_name,
               location: t.location,
               availabilities: t.tutoring_availabilities.map do |a|
-              { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
+                { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
               end,
               tutor_email: t.tutor&.email,
             }
@@ -227,14 +227,13 @@ module Api
       end
 
       def exists_user_tutoring
-        tutoring_id = params[:id] 
+        tutoring_id = params[:id]
         exists = UserTutoring.exists?(user_id: current_user.id, tutoring_id: tutoring_id)
         render json: { exists: exists }
       end
 
       def join_tutoring
-
-        tid = params[:id] 
+        tid = params[:id]
         @tutoring = Tutoring.find(tid)
 
         if UserTutoring.exists?(user_id: current_user.id, tutoring_id: tid)
@@ -274,8 +273,8 @@ module Api
 
           # Agregar a todos los demás estudiantes ya inscritos
           existing_students = @tutoring.user_tutorings
-                                        .where.not(user_id: current_user.id)
-                                        .includes(:user)
+                                       .where.not(user_id: current_user.id)
+                                       .includes(:user)
 
           existing_students.each do |user_tutoring|
             student = user_tutoring.user
@@ -293,13 +292,13 @@ module Api
           enrolled: @tutoring.reload.enrolled,
           tutoring_id: @tutoring.id
         }, status: :created
-
       end
 
       def confirm_schedule
         # Parsear el horario elegido
         scheduled_time = Time.zone.parse(params[:scheduled_at])
-        end_time = params[:end_time].present? ? Time.zone.parse(params[:end_time]) : scheduled_time + @tutoring.duration_mins.minutes
+        end_time = params[:end_time].present? ? Time.zone.parse(params[:end_time])
+                                              : scheduled_time + @tutoring.duration_mins.minutes
         user_role = params[:role] # 'student' o 'tutor'
 
         # Validar que se especifique el rol
@@ -417,8 +416,8 @@ module Api
 
               # Agregar a todos los demás estudiantes ya inscritos
               existing_students = @tutoring.user_tutorings
-                                            .where.not(user_id: current_user.id)
-                                            .includes(:user)
+                                           .where.not(user_id: current_user.id)
+                                           .includes(:user)
 
               existing_students.each do |user_tutoring|
                 student = user_tutoring.user
@@ -440,7 +439,8 @@ module Api
             UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
             # Agregar también al estudiante creador si no está registrado aún
-            if @tutoring.created_by_id.present? && !UserTutoring.exists?(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
+            if @tutoring.created_by_id.present? &&
+               !UserTutoring.exists?(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
               UserTutoring.create!(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
             end
 
@@ -452,6 +452,7 @@ module Api
               if params[:capacity].present?
                 new_cap = params[:capacity].to_i
                 raise ActiveRecord::RecordInvalid.new(@tutoring), "Capacidad inválida" if new_cap <= 0
+
                 @tutoring.capacity = new_cap
               end
 
@@ -481,14 +482,13 @@ module Api
 
               # Agregar a todos los estudiantes ya inscritos
               existing_students = @tutoring.user_tutorings
-                                            .where.not(user_id: current_user.id)
-                                            .includes(:user)
+                                           .where.not(user_id: current_user.id)
+                                           .includes(:user)
 
               existing_students.each do |user_tutoring|
                 student = user_tutoring.user
                 calendar_service.join_event(@tutoring, student.email)
               end
-
             rescue => e
               Rails.logger.error "Error al crear evento en Google Calendar: #{e.message}"
               # No fallar la transacción por errores de calendario
@@ -514,7 +514,6 @@ module Api
             event_id: @tutoring.event_id
           }
         }, status: :ok
-
       rescue ActiveRecord::RecordInvalid => e
         render json: { error: e.message }, status: :unprocessable_entity
       rescue ArgumentError
@@ -523,7 +522,6 @@ module Api
         Rails.logger.error "Error inesperado en confirm_schedule: #{e.message}"
         render json: { error: "Error interno del servidor" }, status: :internal_server_error
       end
-
 
       def build_tutoring_description(end_time = nil)
         description = []
@@ -551,11 +549,11 @@ module Api
         user = User.find(params[:user_id])
 
         tutorings = Tutoring
-          .enrolled_by(user)
-          .upcoming
-          .where(state: :active)
-          .includes(:tutor, :course)
-          .order(:scheduled_at)
+                    .enrolled_by(user)
+                    .upcoming
+                    .where(state: :active)
+                    .includes(:tutor, :course)
+                    .order(:scheduled_at)
 
         render json: tutorings.map { |t|
           is_tutor = t.tutor_id == user.id
@@ -582,6 +580,7 @@ module Api
 
       def create_user_tutoring(user, tutoring)
         return if user.blank? || tutoring.blank?
+        
         UserTutoring.find_or_create_by!(user_id: user, tutoring_id: tutoring)
       end
 

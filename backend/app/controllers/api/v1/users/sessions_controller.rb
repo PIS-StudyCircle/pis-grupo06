@@ -34,7 +34,7 @@ module Api
 
       def setup_google_calendar(user)
         service = GoogleCalendarService.new(user)
-        GoogleCalendarService.ensure_calendar()
+        service.ensure_calendar
       rescue Google::Auth::AuthorizationError => e
         Rails.logger.error "Error configurando Google Calendar: #{e.message}"
         # No fallar el login si hay problemas con Google Calendar

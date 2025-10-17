@@ -99,14 +99,14 @@ class GoogleCalendarService
 
   def refresh_google_token(user)
     return nil if user.google_refresh_token.blank?
-    
+
     client = Signet::OAuth2::Client.new(
       client_id: ENV["GOOGLE_CLIENT_ID"],
       client_secret: ENV["GOOGLE_CLIENT_SECRET"],
       token_credential_uri: "https://oauth2.googleapis.com/token",
       refresh_token: user.google_refresh_token,
       grant_type: "refresh_token"
-      )
+    )
 
     client.fetch_access_token!
 

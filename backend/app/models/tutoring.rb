@@ -78,7 +78,6 @@ class Tutoring < ApplicationRecord
             inclusion: { in: %w[virtual presencial],
                          message: :inclusion }
 
-
   validate :capacity_not_less_than_enrolled
 
   validates :request_comment, length: { maximum: 500 }, allow_blank: true
