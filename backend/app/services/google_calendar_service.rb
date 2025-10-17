@@ -120,4 +120,54 @@ class GoogleCalendarService
     Rails.logger.debug tutoring.inspect
     tutoring.tutor.calendar_id || ensure_calendar(tutoring.tutor)
   end
+
+    # Quitar asistente del evento (cuando alguien se desuscribe)
+  def leave_event(tutoring, attendee_email)
+    return if tutoring.event_id.blank?
+
+    calendar_id = tutoring_owner_calendar(tutoring)
+    service = Google::Apis::CalendarV3::CalendarService.new
+    service.authorization = tutoring.tutor.google_access_token
+
+    event = service.get_event(calendar_id, tutoring.event_id)
+    attendees = Array(event.attendees)
+    new_list = attendees.reject { |a| a.email == attendee_email }
+
+    # Solo actualiza si hay cambios
+    return if new_list.size == attendees.size
+
+    event.attendees = new_list
+    service.update_event(calendar_id, tutoring.event_id, event)
+  rescue Google::Apis::ClientError => e
+    Rails.logger.error "leave_event error: #{e.message}"
+  end
+
+  # Elimina el evento y limpia el event_id en la tutoría
+  def delete_event!(tutoring)
+    return if tutoring.event_id.blank?
+
+    calendar_id = tutoring_owner_calendar(tutoring)
+    service = Google::Apis::CalendarV3::CalendarService.new
+    service.authorization = tutoring.tutor.google_access_token
+
+    service.delete_event(calendar_id, tutoring.event_id)
+    tutoring.update!(event_id: nil)
+  rescue Google::Apis::ClientError => e
+    Rails.logger.error "delete_event! error: #{e.message}"
+  end
+
+  def event_confirmed?(tutoring)
+    tutoring.event_id.present?
+  end
+
+  def self.for_owner(tutoring)
+    owner = if tutoring.tutor_id.present?
+              User.find(tutoring.tutor_id)
+            else
+              User.find(tutoring.created_by_id)
+            end
+    
+    new(owner)
+  end
+
 end

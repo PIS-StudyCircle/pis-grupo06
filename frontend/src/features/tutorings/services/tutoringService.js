@@ -109,3 +109,26 @@ export const createTutoringByStudent = async (payload) => {
   
   return data;
 };
+
+export const unsubscribeFromTutoring = async (tutoringId) => {
+  if (!tutoringId) throw { message: "Falta el ID de la tutoría" };
+
+  const resp = await fetch(`${API_BASE}/tutorings/${tutoringId}/unsubscribe`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  // Puede venir 204 No Content
+  if (resp.status === 204) return null;
+
+  const data = await resp.json().catch(() => null);
+
+  if (!resp.ok) {
+    throw data || { message: "Error al desuscribirse de la tutoría" };
+  }
+
+  return data;
+};

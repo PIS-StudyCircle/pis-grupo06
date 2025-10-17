@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { JoinTutoringButton } from "@/features/calendar";
 import { useState, useEffect, useMemo } from "react";
 
-export default function TutoringCard({ tutoring }) {
+export default function TutoringCard({ tutoring, onDesuscribirse }) {
   const { user } = useUser();
 
   const handleUnirmeClick = async (tutoring) => {
@@ -41,8 +41,23 @@ export default function TutoringCard({ tutoring }) {
     }
   };
 
-
   let mode;
+
+  const handleDesuscribirmeClick = async (tutoring) => {
+    if (!tutoring) return;
+
+    const confirmar = confirm(`¿Seguro que querés desuscribirte de la tutoría? "${tutoring.id}"?`);
+    if (!confirmar) return;
+
+    try {
+      await onDesuscribirse(tutoring.id);
+      alert("Te desuscribiste correctamente.");
+    } catch (error) {
+      alert("Ocurrió un error al intentar desuscribirte.");
+    }
+  };
+
+  
 
   const noTieneTutor = tutoring.tutor_id === null;
   const cuposDisponibles = tutoring.capacity > tutoring.enrolled;
@@ -210,7 +225,7 @@ export default function TutoringCard({ tutoring }) {
               <button
                 type="button"
                 className="btn w-full bg-red-500 hover:bg-red-600 text-white"
-                onClick={() => {}}
+                onClick={() => handleDesuscribirmeClick(tutoring)}
               >
                 Desuscribirme
               </button>

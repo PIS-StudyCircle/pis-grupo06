@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useTutorings } from "../hooks/useTutorings";
+import { useTutorings} from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";
 import TutoringSearchBar from "../components/TutoringSearchBar";
 import Pagination from "@components/Pagination";
@@ -38,6 +38,7 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
     setPage,
     search,
     setSearch,
+    onDesuscribirse, // PIS-23
   } = useTutorings(1, 20, mergedFilters, mode);
 
   const totalPages = pagination?.last || 1;
@@ -124,7 +125,8 @@ export default function TutoringPage({ filters = {}, mode = "" }) {
               </label>
             )}
 
-          <TutoringList tutorings={tutorings} mode={mode} loading={loading} error={error} />
+          {/* PIS-23 */}
+          <TutoringList tutorings={tutorings} mode={mode} loading={loading} error={error} onDesuscribirse={onDesuscribirse}  />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
         </div>
