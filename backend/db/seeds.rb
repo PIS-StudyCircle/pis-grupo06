@@ -417,7 +417,7 @@ tutoring_request = Tutoring.find_or_create_by!(
   enrolled: 0,
   course: course,
   created_by_id: creator.id,
-  tutor_id: user_calendar.id
+  tutor_id: nil # user_calendar.id
 )
 
 subjects.each do |subject|
@@ -443,11 +443,11 @@ tutoring_request = Tutoring.find_or_create_by!(
   enrolled: 0,
   course: course,
   created_by_id: creator.id,
-  tutor_id: user_calendar.id
+  tutor_id: nil # user_calendar.id
 )
 
 SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
-create_event_for_tutoring(service, calendar_id, tutoring_request)
+# create_event_for_tutoring(service, calendar_id, tutoring_request)
 
 # El creador de la solicitud se inscribe automáticamente
 UserTutoring.find_or_create_by!(
@@ -468,7 +468,7 @@ tutoring_request = Tutoring.find_or_create_by!(
   enrolled: 0,
   course: course,
   created_by_id: creator.id,
-  tutor_id: user_calendar.id
+  tutor_id: nil # user_calendar.id
 )
 
 subjects.each do |subject|
