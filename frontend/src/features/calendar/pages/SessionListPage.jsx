@@ -10,9 +10,7 @@ export default function SessionList({ userId }) {
   // Detectar ruta actual
   const isInbox = location.pathname.includes("/notificaciones")
 
-  const emptyMessage = isInbox
-    ? { title: "No tienes invitaciones", subtitle: "Cuando te inviten a una tutoría, aparecerá aquí." }
-    : { title: "No tienes sesiones programadas", subtitle: "¡Agenda una tutoría para comenzar a aprender!" };
+  const emptyMessage = { title: "No tienes sesiones programadas", subtitle: "¡Agenda una tutoría para comenzar a aprender!" };
 
   if (loading) {
     return (

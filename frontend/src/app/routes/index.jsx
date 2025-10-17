@@ -22,7 +22,6 @@ import { Error404Page } from "@components/Error404";
 
 import {
   SessionListPage,
-  TutorSchedulePage,
   AppointClassPage,
 } from "@/features/calendar";
 
@@ -67,7 +66,6 @@ export function AppRoutes() {
       <Route path="/materias/:courseId/temas" element={<SubjectPage />} />
 
       <Route path="/prototipoCalendar" element={<SessionListPage />} />
-      <Route path="/calendar" element={<TutorSchedulePage />} />
       <Route path="/appoint" element={<AppointClassPage />} />
 
       <Route path="/materias/:courseId/temas/:subjectId" element={<SubjectDetailPage/>} />

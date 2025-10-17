@@ -1,6 +1,6 @@
 import { useUser } from "@context/UserContext";
 import { DEFAULT_PHOTO } from "@/shared/config";
-import { TutorSchedulePage, SessionListPage } from "@/features/calendar";
+import {SessionListPage } from "@/features/calendar";
 
 export default function Profile() {
   const { user, loading, error } = useUser();
