@@ -1,7 +1,6 @@
 import { formatDateTime } from "@shared/utils/FormatDate";
 import { useUser } from "@context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { JoinTutoringButton } from "@/features/calendar";
 import { useState, useEffect, useMemo } from "react";
 
 export default function TutoringCard({ tutoring }) {
