@@ -401,6 +401,8 @@ end
 # ------------------ TUTORIAS ------------------ #
 
 # ---- SIN TUTOR ---- #
+# Cuando un estudiante crea una solicitud de tutoría (tutor_id: nil),
+# automáticamente se inscribe en ella (UserTutoring).
 
 # Tutoría 1 creada por estudiante solicitándola, con 3 temas
 creator = User.find_by!(email: "luisgomez@gmail.com")
@@ -422,6 +424,7 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
 end
 
+# El creador de la solicitud se inscribe automáticamente
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_request
@@ -445,6 +448,7 @@ tutoring_request = Tutoring.find_or_create_by!(
 
 SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
 
+# El creador de la solicitud se inscribe automáticamente
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_request
@@ -470,6 +474,7 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
 end
 
+# El creador de la solicitud se inscribe automáticamente
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_request
@@ -495,12 +500,15 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
 end
 
+# El creador de la solicitud se inscribe automáticamente
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_request
 )
 
 # ---- CON TUTOR = USUARIO QUE LA CREA ---- #
+# Cuando un tutor crea una oferta de tutoría (tutor_id: present),
+# también se crea UserTutoring para vincular al tutor con la tutoría.
 
 # Tutoría 4 creada por estudiante dictándola
 creator = User.find_by!(email: "anaperez@gmail.com")
@@ -519,6 +527,12 @@ tutoring_offered = Tutoring.find_or_create_by!(
 )
 
 SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+
+# El tutor se asocia a su propia tutoría
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
 
 # Tutoría 5 creada por estudiante dictándola
 creator = User.find_by!(email: "martadaluz@gmail.com")
@@ -540,6 +554,12 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
+# El tutor se asocia a su propia tutoría
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
+
 # Tutoría 6 creada por estudiante dictándola
 creator = User.find_by!(email: "veronicagimenez@gmail.com")
 course = Course.find_by(id: 116) # Electrotécnica I
@@ -559,6 +579,11 @@ tutoring_offered = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
 
 # Tutoría 7 creada por estudiante dictándola
 creator = User.find_by!(email: "veronicagimenez@gmail.com")
@@ -580,6 +605,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
+
 # Tutoría 8 creada por estudiante dictándola
 creator = User.find_by!(email: "rociovazquez@gmail.com")
 course = Course.find_by(id: 443) # PIS
@@ -599,6 +629,11 @@ tutoring_offered = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
 
 # Tutoría 9 creada por estudiante dictándola
 creator = User.find_by!(email: "pablovillar@gmail.com")
@@ -620,6 +655,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
+
 # Tutoría 10 creada por estudiante dictándola
 creator = User.find_by!(email: "agustinabenitez@gmail.com")
 course = Course.find_by(id: 145) # Física I
@@ -639,6 +679,11 @@ tutoring_offered = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
 
 # Tutoría 11 creada por estudiante dictándola
 creator = User.find_by!(email: "agustinabenitez@gmail.com")
@@ -660,6 +705,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
+
 # Tutoría 12 creada por estudiante dictándola
 creator = User.find_by!(email: "tomasgarrido@gmail.com")
 course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
@@ -679,6 +729,11 @@ tutoring_offered = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
 
 # Tutoría 13 creada por estudiante dictándola
 creator = User.find_by!(email: "tomasgarrido@gmail.com")
@@ -700,6 +755,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
+
 # Tutoría 14 creada por estudiante dictándola
 creator = User.find_by!(email: "lauramaldonado@gmail.com")
 course = Course.find_by(id: 13) # Algoritmos Evolutivos
@@ -719,6 +779,11 @@ tutoring_offered = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
 
 # Tutoría 15 creada por estudiante dictándola
 creator = User.find_by!(email: "lauramaldonado@gmail.com")
@@ -740,6 +805,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
+
 # Tutoría 16 creada por estudiante dictándola
 creator = User.find_by!(email: "tomasgarrido@gmail.com")
 course = Course.find_by(id: 13) # Algoritmos Evolutivos
@@ -759,6 +829,11 @@ tutoring_offered = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
 
 # Tutoría 17 creada por estudiante dictándola
 creator = User.find_by!(email: "luisgomez@gmail.com")
@@ -780,6 +855,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
+
 # Tutoría 18 creada por estudiante dictándola
 creator = User.find_by!(email: "sofiagarcia@gmail.com")
 course = Course.find_by(id: 8) # Agrimensura Legal 1
@@ -799,6 +879,11 @@ tutoring_offered = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
 
 # Tutoría 19 creada por estudiante dictándola
 creator = User.find_by!(email: "paulacastro@gmail.com")
@@ -820,6 +905,11 @@ subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
 
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
+
 # Tutoría 20 creada por estudiante dictándola
 creator = User.find_by!(email: "martadaluz@gmail.com")
 course = Course.find_by(id: 8) # Agrimensura Legal 1
@@ -839,3 +929,46 @@ tutoring_offered = Tutoring.find_or_create_by!(
 subjects.each do |subject|
   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
 end
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
+
+#Tutoría 21 creada por estudiante dictándola con 2 estudiantes inscritos (ya finalizada)
+creator = User.find_by!(email: "clarasuarez@gmail.com")
+course = Course.find_by(id: 3) # Administración de Infraestructuras
+subject= Subject.find_by!(name: "Gestión de Servidores", course: course)
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 1.day.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 3,
+  enrolled: 2,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered
+)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "andresmendez@gmail.com"),
+  tutoring: tutoring_offered
+)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "paulacastro@gmail.com"),
+  tutoring: tutoring_offered
+)
+
+tutoring_offered.update_columns(
+  state: "finished",
+  scheduled_at: 10.days.ago
+)
