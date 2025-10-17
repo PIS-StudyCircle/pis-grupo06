@@ -84,10 +84,10 @@ export default function CourseDetailPage() {
                         onClick={toggleFavorite}
                         aria-label={favorite ? "Quitar de favoritos" : "Agregar a favoritos"}
                         title={favorite ? "Quitar de favoritos" : "Agregar a favoritos"}
-                        className="absolute top-0 right-0 inline-flex w-8 h-8 rounded-full hover:bg-gray-100"
+                        className="absolute top-0 right-0 inline-flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100"
                       >
                         <svg
-                          className={`w-5 h-5 ${favorite ? "text-yellow-400" : "text-gray-300"}`}
+                          className={`block w-5 h-5 ${favorite ? "text-yellow-400" : "text-gray-300"}`}
                           aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 22 20"
