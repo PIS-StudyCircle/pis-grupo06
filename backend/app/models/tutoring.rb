@@ -69,8 +69,8 @@ class Tutoring < ApplicationRecord
   scope :shared_between, ->(user_a_id, user_b_id) {
     joins(:user_tutorings)
       .where(state: Tutoring.states[:finished])
-        .where(
-          "(tutorings.tutor_id = :a AND user_tutorings.user_id = :b)
+      .where(
+        "(tutorings.tutor_id = :a AND user_tutorings.user_id = :b)
           OR (tutorings.tutor_id = :b AND user_tutorings.user_id = :a)
           OR (
             tutorings.id IN (
@@ -80,9 +80,9 @@ class Tutoring < ApplicationRecord
               WHERE ut1.user_id = :a AND ut2.user_id = :b
             )
           )",
-          a: user_a_id, b: user_b_id
-        )
-          .distinct
+        a: user_a_id, b: user_b_id
+      )
+      .distinct
   }
 
   # --- Validaciones ---

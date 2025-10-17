@@ -935,10 +935,10 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
-#Tutoría 21 creada por estudiante dictándola con 2 estudiantes inscritos (ya finalizada)
+# Tutoría 21 creada por estudiante dictándola con 2 estudiantes inscritos (ya finalizada)
 creator = User.find_by!(email: "clarasuarez@gmail.com")
 course = Course.find_by(id: 3) # Administración de Infraestructuras
-subject= Subject.find_by!(name: "Gestión de Servidores", course: course)
+subject = Subject.find_by!(name: "Gestión de Servidores", course: course)
 
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 1.day.from_now,
@@ -948,15 +948,11 @@ tutoring_offered = Tutoring.find_or_create_by!(
   enrolled: 2,
   course: course,
   created_by_id: creator.id,
-  tutor_id: creator.id
+  tutor_id: creator.id,
+  state: 1
 )
 
 SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
 
 UserTutoring.find_or_create_by!(
   user: User.find_by!(email: "andresmendez@gmail.com"),
@@ -968,7 +964,6 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
-tutoring_offered.update_columns(
-  state: "finished",
-  scheduled_at: 10.days.ago
-)
+tutoring_offered.state = 2
+tutoring_offered.scheduled_at = 10.days.ago
+tutoring_offered.save!(validate: false) # para que me deje poner una fecha del pasado aunque la db no lo permite

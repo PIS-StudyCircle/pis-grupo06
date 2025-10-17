@@ -42,7 +42,7 @@ module Api
             render json: { errors: review.errors.full_messages }, status: :unprocessable_entity
           end
         end
-        
+
         # PATCH/PUT /api/v1/user_reviews/:id
         def update
           review = current_user.given_reviews.find_by(id: params[:id])
@@ -74,7 +74,7 @@ module Api
           end
         end
 
-        private 
+        private
 
         def set_review
           @review = UserReview.find_by(id: params[:id])
