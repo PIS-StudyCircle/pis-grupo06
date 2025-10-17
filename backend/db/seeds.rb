@@ -935,10 +935,10 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
-#Tutoría 21 creada por estudiante dictándola con 2 estudiantes inscritos (ya finalizada)
+# Tutoría 21 creada por estudiante dictándola con 2 estudiantes inscritos (ya finalizada)
 creator = User.find_by!(email: "clarasuarez@gmail.com")
 course = Course.find_by(id: 3) # Administración de Infraestructuras
-subject= Subject.find_by!(name: "Gestión de Servidores", course: course)
+subject = Subject.find_by!(name: "Gestión de Servidores", course: course)
 
 tutoring_offered = Tutoring.find_or_create_by!(
   scheduled_at: 1.day.from_now,
