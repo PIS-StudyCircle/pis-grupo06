@@ -59,6 +59,7 @@ GEM
       activerecord (= 8.0.2.1)
       activesupport (= 8.0.2.1)
       marcel (~> 1.0)
+    activestorage-cloudinary-service (0.2.3)
     activesupport (8.0.2.1)
       base64
       benchmark (>= 0.3)
@@ -88,6 +89,11 @@ GEM
     byebug (12.0.0)
     childprocess (5.1.0)
       logger (~> 1.5)
+    cloudinary (2.4.0)
+      faraday (>= 2.0.1, < 3.0.0)
+      faraday-follow_redirects (~> 0.3.0)
+      faraday-multipart (~> 1.0, >= 1.0.4)
+      ostruct
     coderay (1.1.3)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.4)
@@ -134,6 +140,8 @@ GEM
       logger
     faraday-follow_redirects (0.3.0)
       faraday (>= 1, < 3)
+    faraday-multipart (1.1.1)
+      multipart-post (~> 2.0)
     faraday-net_http (3.4.1)
       net-http (>= 0.5.0)
     fugit (1.11.2)
@@ -212,6 +220,7 @@ GEM
     multi_json (1.17.0)
     multi_xml (0.7.2)
       bigdecimal (~> 3.1)
+    multipart-post (2.4.1)
     net-http (0.6.0)
       uri
     net-imap (0.5.10)
@@ -496,8 +505,10 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  activestorage-cloudinary-service
   bootsnap
   brakeman
+  cloudinary
   debug
   devise
   devise-i18n

@@ -3,6 +3,7 @@ import UserList from "../components/UserList";
 import { useUsers } from "../hooks/useUsers";
 import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
+import PageTitle from "@components/PageTitle";
 
 export default function TutorPage() {
   const {
@@ -31,8 +32,7 @@ export default function TutorPage() {
     <div className="flex flex-col ">
       <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold p-2 mb-4 text-black">Tutores</h1>
-
+          <PageTitle title="Tutores" className="titulo"></PageTitle>
           <SearchInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}

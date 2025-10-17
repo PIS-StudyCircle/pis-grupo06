@@ -9,6 +9,7 @@ import { SubmitButton } from "@components/SubmitButton"
 import { useFormState } from "@utils/UseFormState"
 import { useFormSubmit } from "@utils/UseFormSubmit"
 import { useState } from "react"
+import PageTitle from "@/shared/components/PageTitle";
 
 const MAX_REQUEST_COMMENT = 500
 const MAX_LOCATION_COMMENT = 255
@@ -109,7 +110,13 @@ export default function CreateTutoringByStudent() {
       return
     }
 
-    const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || []
+    const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
+    // Validación: no continuar si no hay temas seleccionados
+    if (selectedSubjects.length === 0) {
+      alert('No se pudieron obtener los temas seleccionados. Al aceptar será redirigido a la selección de temas para intentarlo nuevamente.');
+      window.history.back(); // redirige a la página anterior
+      return; //para que no continúe con el envío del formulario
+    }
 
 
     const payload = {
@@ -133,8 +140,41 @@ export default function CreateTutoringByStudent() {
   const errs = form._errors || {}
 
   return (
-    <AuthLayout title={`Solicitar tutoría para ${course.name}`}>
-      <form onSubmit={handleSubmit} noValidate className="space-y-6">        
+    <AuthLayout>
+      <PageTitle title={`Solicitar tutoría para ${course.name}`} className="subtitulo"></PageTitle>
+      <form onSubmit={handleSubmit} noValidate className="space-y-6">
+        <div className="flex flex-col text-left">
+          <label htmlFor="request_due_date" className="text-gray-600 text-xs font-medium mb-1">
+            Fecha límite para recibir la tutoría
+          </label>
+          <input
+            id="request_due_date"
+            type="date"
+            value={form.request_due_date}
+            onChange={(e) => setField("request_due_date", e.target.value)}
+            className="p-1 border rounded-md text-sm"
+          />
+          {errs.request_due_date && (
+            <span className="text-red-500 text-xs mt-1">{errs.request_due_date}</span>
+          )}
+        </div>
+
+        <div className="flex flex-col text-left">
+          <label htmlFor="request_due_time" className="text-gray-600 text-xs font-medium mb-1">
+            Hora límite
+          </label>
+          <input
+            id="request_due_time"
+            type="time"
+            value={form.request_due_time}
+            onChange={(e) => setField("request_due_time", e.target.value)}
+            className="p-1 border rounded-md text-sm"
+          />
+          {errs.request_due_time && (
+            <span className="text-red-500 text-xs mt-1">{errs.request_due_time}</span>
+          )}
+        </div>
+
         <div className="flex flex-col text-left">
           <label htmlFor="request_comment" className="text-gray-600 text-xs font-medium mb-1">
             Comentario para el tutor (opcional)

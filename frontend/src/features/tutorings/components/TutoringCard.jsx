@@ -126,7 +126,7 @@ export default function TutoringCard({ tutoring }) {
           {tutoring.tutor_id !== null ? (
             <>
               <p className="tutoring-card-title mt-1">
-                <b>Tutor: </b> {tutoring.tutor_name + " " + tutoring.tutor_last_name}
+                <b>Tutor: </b> {tutoring.tutor_name + " " + tutoring.tutor_last_name} <span className="text-gray-500">{" (" + tutoring.tutor_email + ")"}</span>
               </p>
             </>
           ) : null}

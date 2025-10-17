@@ -107,6 +107,7 @@ module Api
               availabilities: t.tutoring_availabilities.map do |a|
               { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
               end
+              tutor_email: t.tutor&.email,
             }
           end,
           pagination: pagy_metadata(@pagy)
@@ -154,6 +155,12 @@ module Api
       end
 
       def create
+        if params[:tutoring][:subject_ids].blank?
+          render json: { errors: ["No se recibieron correctamente los temas seleccionados. Inténtelo nuevamente."] },
+                 status: :unprocessable_entity
+          return
+        end
+
         tutoring = Tutoring.new(tutoring_params)
         tutoring.created_by_id = current_user.id
         tutoring.tutor_id      = params.dig(:tutoring, :tutor_id)

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { DEFAULT_PHOTO } from "@/shared/config";
 
 export default function UserCard({ user }) {
-  const photoUrl = user.photo ? user.photo : DEFAULT_PHOTO;
+  const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
   return (
     <div className="w-full bg-white rounded-lg shadow p-4 my-4 flex items-center justify-between gap-4">
       <div className="flex items-center gap-4">
