@@ -1,6 +1,7 @@
 // src/shared/components/layout/Sidebar.jsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "@context/UserContext";
+import { useNotifications } from "@/context/NotificationsContext";
 import {
   Home,
   BookOpen,
@@ -22,6 +23,8 @@ const Sidebar = ({
   const { user, signOut } = useUser();
   const location = useLocation();
   const nav = useNavigate();
+
+  const { notifications } = useNotifications(); 
 
   const authedItems = [
     { title: "Inicio", path: "/", Icon: Home },
@@ -132,6 +135,18 @@ const Sidebar = ({
                       active ? "sidebar-link--active" : ""
                     }`}
                   >
+                    <div className="relative">
+                      <ItemIcon
+                        className="w-5 h-5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      {/* 🔔 Badge solo en Buzón */}
+                      {item.title === "Buzón" && notifications > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {notifications}
+                        </span>
+                      )}
+                    </div>
                     <span
                       className={`font-medium whitespace-nowrap transition-all duration-200 ${
                         isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"

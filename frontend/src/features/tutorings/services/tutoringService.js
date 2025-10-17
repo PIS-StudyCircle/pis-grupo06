@@ -109,3 +109,35 @@ export const createTutoringByStudent = async (payload) => {
   
   return data;
 };
+
+export async function getTutoring(tutoringId) {
+  const res = await fetch(`${API_BASE}/tutorings/${tutoringId}`, {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Error al obtener tutoría");
+  return res.json();
+}
+
+export async function confirmSchedule(tutoringId, payload) {
+  const res = await fetch(`${API_BASE}/tutorings/${tutoringId}/confirm_schedule`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    // Log útil y mensaje claro
+    const raw = await res.text().catch(() => "");
+    let parsed = null;
+    try { parsed = raw ? JSON.parse(raw) : null; } catch {}
+    const msg = (parsed && (parsed.error || parsed.message)) || raw || "Error al confirmar la tutoría.";
+    console.error("confirmSchedule error:", res.status, res.statusText, raw);
+    const err = new Error(msg);
+    err.status = res.status;
+    err.body = parsed || raw;
+    throw err;
+  }
+
+  try { return await res.json(); } catch { return {}; }
+}
