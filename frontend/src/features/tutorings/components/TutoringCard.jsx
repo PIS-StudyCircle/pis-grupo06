@@ -118,7 +118,7 @@ export default function TutoringCard({ tutoring, mode: externalMode }) {
               <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)}
             </p>
           )}
-          {tutoring.duration_mins && (
+          {tutoring.state === "active" && tutoring.duration_mins && (
             <p className="tutoring-card-title mt-1">
               <b>Duración: </b> {tutoring.duration_mins} minutos
             </p>
