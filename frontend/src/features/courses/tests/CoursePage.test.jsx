@@ -18,21 +18,19 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => jest.fn(),              // mock de useNavigate
 }));
 
-
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter } from 'react-router-dom'
 import CoursePage from "../pages/CoursePage";
 import { useCourses } from "../hooks/useCourses";
 
+jest.mock("@context/UserContext", () => ({
+  useUser: jest.fn().mockReturnValue({ user: null }), // valor por defecto seguro
+}));
+
 jest.mock("../hooks/useCourses");
 
 describe("CoursePage", () => {
   const mockSetPage = jest.fn();
-
-  beforeAll(() => {
-    // decimos a Jest que use timers falsos (controlados)
-    jest.useFakeTimers();
-  });
 
   beforeAll(() => {
     // decimos a Jest que use timers falsos (controlados)

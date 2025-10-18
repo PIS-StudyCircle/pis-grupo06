@@ -24,6 +24,7 @@ Rails.application.routes.draw do
 
       resources :courses do
         resources :subjects
+        resource :favorite, only: [:create, :destroy], controller: 'course_favorites'
       end
       resources :tutorings
       resources :notifications do
