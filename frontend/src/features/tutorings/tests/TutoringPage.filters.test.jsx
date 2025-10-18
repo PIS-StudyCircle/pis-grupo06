@@ -10,7 +10,7 @@ describe("TutoringPage - Filtros y búsqueda", () => {
     mockUseTutorings({ tutorings: baseTutorings });
 
     // Mock fetch for exists_user_tutoring endpoint
-    global.fetch = jest.fn((url) => {
+    globalThis.fetch = jest.fn((url) => {
       if (url.includes('/exists_user_tutoring')) {
         return Promise.resolve({
           ok: true,
