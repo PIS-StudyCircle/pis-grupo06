@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState } from "react";
 
 export const NotificationsContext = createContext();
@@ -12,5 +13,4 @@ export function NotificationsProvider({ children }) {
   );
 }
 
-// Exportación con nombre diferente para evitar el error de Fast Refresh
 export const useNotifications = () => useContext(NotificationsContext);
