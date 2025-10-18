@@ -130,7 +130,9 @@ export async function confirmSchedule(tutoringId, payload) {
     // Log útil y mensaje claro
     const raw = await res.text().catch(() => "");
     let parsed = null;
-    try { parsed = raw ? JSON.parse(raw) : null; } catch {}
+    try { parsed = raw ? JSON.parse(raw) : null; } catch {
+      // Ignore JSON parse errors, parsed will remain null
+    }
     const msg = (parsed && (parsed.error || parsed.message)) || raw || "Error al confirmar la tutoría.";
     console.error("confirmSchedule error:", res.status, res.statusText, raw);
     const err = new Error(msg);

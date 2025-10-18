@@ -1,15 +1,14 @@
 import { formatDateTime } from "@shared/utils/FormatDate";
 import { useUser } from "@context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 export default function TutoringCard({ tutoring, mode: externalMode }) {
   const { user } = useUser();
 
   const handleUnirmeClick = async (tutoring) => {
     if (!tutoring) return;
-    
-    const remaining = (tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0);
+
     const primerEstudiante = tutoring.enrolled === 0;
     
     // Primer estudiante confirma las horas y se une a la tutoría
@@ -90,12 +89,12 @@ export default function TutoringCard({ tutoring, mode: externalMode }) {
       mode = "misTutorias";
     } else if (esCreador) {
       mode = "creador";
+    } else if (noTieneTutor && cuposDisponibles) {
+      mode = "ambos";
     } else if (noTieneTutor) {
       mode = "serTutor";
     } else if (!cuposDisponibles) {
       mode = "completo";
-    } else if (noTieneTutor && cuposDisponibles) {
-      mode = "ambos";
     } else if (cuposDisponibles) {
       mode = "serEstudiante";
     }

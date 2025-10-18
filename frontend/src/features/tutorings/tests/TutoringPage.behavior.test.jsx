@@ -1,3 +1,4 @@
+/* eslint-env jest */
 import React from "react";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import { renderWithRouter, mockUseTutorings, baseTutorings, setPageMock, setSearchMock } from "./TutoringPage.testUtils";
