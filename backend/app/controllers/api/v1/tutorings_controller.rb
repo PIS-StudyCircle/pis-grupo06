@@ -132,11 +132,11 @@ module Api
             code: @tutoring.course.code
           },
           subjects: @tutoring.subjects.map { |s| { id: s.id, name: s.name } },
-          created_by: @tutoring.created_by ? {
-            id: @tutoring.created_by.id,
-            name: @tutoring.created_by.name,
-            last_name: @tutoring.created_by.last_name,
-            email: @tutoring.created_by.email
+          created_by: @tutoring.creator ? {
+            id: @tutoring.creator.id,
+            name: @tutoring.creator.name,
+            last_name: @tutoring.creator.last_name,
+            email: @tutoring.creator.email
           } : nil,
           tutor: @tutoring.tutor ? {
             id: @tutoring.tutor.id,
@@ -526,7 +526,7 @@ module Api
       def build_tutoring_description(end_time = nil)
         description = []
         description << "Modalidad: #{@tutoring.modality}"
-        
+
         # Calcular duración real si hay horario definido
         if @tutoring.scheduled_at && end_time
           duration = ((end_time - @tutoring.scheduled_at) / 60).to_i
@@ -544,7 +544,7 @@ module Api
         description.join("\n")
       end
 
-       # backend/app/controllers/api/v1/tutorings_controller.rb
+      # backend/app/controllers/api/v1/tutorings_controller.rb
       def upcoming
         user = User.find(params[:user_id])
 
@@ -580,7 +580,7 @@ module Api
 
       def create_user_tutoring(user, tutoring)
         return if user.blank? || tutoring.blank?
-        
+
         UserTutoring.find_or_create_by!(user_id: user, tutoring_id: tutoring)
       end
 
@@ -631,7 +631,7 @@ module Api
                   end_time, start_time, start_time, end_time
                 )
                 .where(
-                  "user_tutorings.user_id = ? OR tutor_id = ? OR created_by_id = ?", 
+                  "user_tutorings.user_id = ? OR tutor_id = ? OR created_by_id = ?",
                   user_id, user_id, user_id
                 )
                 .distinct
