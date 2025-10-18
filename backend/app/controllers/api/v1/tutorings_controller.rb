@@ -244,7 +244,7 @@ module Api
         UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
         # Incrementar contador de inscritos
-        @tutoring.update!(enrolled: @tutoring.enrolled + 1)
+        #@tutoring.update!(enrolled: @tutoring.enrolled + 1)
 
         # Si no existe evento, crearlo con el tutor y agregarse
         begin
@@ -388,7 +388,7 @@ module Api
             UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
             # Incrementar contador de inscritos
-            @tutoring.update!(enrolled: @tutoring.enrolled + 1)
+            #@tutoring.update!(enrolled: @tutoring.enrolled + 1)
 
             # Si no existe evento, crearlo con el tutor y agregarse
             begin
