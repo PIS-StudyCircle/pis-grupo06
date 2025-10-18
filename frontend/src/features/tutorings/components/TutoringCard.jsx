@@ -3,7 +3,7 @@ import { useUser } from "@context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 
-export default function TutoringCard({ tutoring }) {
+export default function TutoringCard({ tutoring, mode: externalMode }) {
   const { user } = useUser();
 
   const handleUnirmeClick = async (tutoring) => {
@@ -39,9 +39,6 @@ export default function TutoringCard({ tutoring }) {
       alert("Error en la conexion con el servidor");
     }
   };
-
-
-  let mode;
 
   const noTieneTutor = tutoring.tutor_id === null;
   const cuposDisponibles = tutoring.capacity > tutoring.enrolled;
@@ -85,18 +82,23 @@ export default function TutoringCard({ tutoring }) {
   }, [user?.id, tutoring?.id]);
 
 
-  if (soyTutor || soyEstudiante) {
-    mode = "misTutorias";
-  } else if (esCreador) {
-    mode = "creador";  
-  } else if (noTieneTutor) {
-    mode = "serTutor";
-  } else if (!cuposDisponibles) {
-    mode = "completo";
-  } else if (noTieneTutor && cuposDisponibles) {
-    mode = "ambos";
-  } else if (cuposDisponibles) {
-    mode = "serEstudiante";
+  // Use externalMode if provided, otherwise calculate mode based on state
+  let mode = externalMode;
+
+  if (!externalMode) {
+    if (soyTutor || soyEstudiante) {
+      mode = "misTutorias";
+    } else if (esCreador) {
+      mode = "creador";
+    } else if (noTieneTutor) {
+      mode = "serTutor";
+    } else if (!cuposDisponibles) {
+      mode = "completo";
+    } else if (noTieneTutor && cuposDisponibles) {
+      mode = "ambos";
+    } else if (cuposDisponibles) {
+      mode = "serEstudiante";
+    }
   }
 
   const navigate = useNavigate();
