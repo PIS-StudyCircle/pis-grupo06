@@ -430,6 +430,21 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_request
 )
 
+# Crear disponibilidades para esta tutoría
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_request,
+  start_time: 6.days.from_now.change(hour: 14, min: 0),
+  end_time: 6.days.from_now.change(hour: 15, min: 30),
+  is_booked: false
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_request,
+  start_time: 6.days.from_now.change(hour: 16, min: 0),
+  end_time: 6.days.from_now.change(hour: 17, min: 30),
+  is_booked: false
+)
+
 # Tutoría 2 creada por estudiante solicitándola, con 1 tema
 creator = User.find_by!(email: "juanperez@gmail.com")
 course = Course.find_by(id: 145) # Física I
@@ -453,6 +468,14 @@ SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_request
+)
+
+# Crear disponibilidad para esta tutoría
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_request,
+  start_time: 3.days.from_now.change(hour: 10, min: 0),
+  end_time: 3.days.from_now.change(hour: 11, min: 30),
+  is_booked: false
 )
 
 # Tutoría 3 creada por estudiante solicitándola, con 5 temas
@@ -481,6 +504,21 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_request
 )
 
+# Crear disponibilidades para esta tutoría
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_request,
+  start_time: 4.days.from_now.change(hour: 15, min: 0),
+  end_time: 4.days.from_now.change(hour: 16, min: 30),
+  is_booked: false
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_request,
+  start_time: 4.days.from_now.change(hour: 18, min: 0),
+  end_time: 4.days.from_now.change(hour: 19, min: 30),
+  is_booked: false
+)
+
 # Tutoría 3 repetida con 5 temas
 creator = User.find_by!(email: "anaperez@gmail.com")
 course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
@@ -505,6 +543,14 @@ end
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_request
+)
+
+# Crear disponibilidad para esta tutoría
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_request,
+  start_time: 7.days.from_now.change(hour: 9, min: 0),
+  end_time: 7.days.from_now.change(hour: 12, min: 0),
+  is_booked: false
 )
 
 # ---- CON TUTOR = USUARIO QUE LA CREA ---- #
@@ -535,6 +581,21 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
+# Crear disponibilidades para esta tutoría
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 5.days.from_now.change(hour: 14, min: 0),
+  end_time: 5.days.from_now.change(hour: 15, min: 0),
+  is_booked: false
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 5.days.from_now.change(hour: 17, min: 0),
+  end_time: 5.days.from_now.change(hour: 18, min: 0),
+  is_booked: false
+)
+
 # Tutoría 5 creada por estudiante dictándola
 creator = User.find_by!(email: "martadaluz@gmail.com")
 course = Course.find_by(id: 116) # Electrotécnica I
@@ -559,6 +620,14 @@ end
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_offered
+)
+
+# Crear disponibilidad para esta tutoría
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 7.days.from_now.change(hour: 16, min: 0),
+  end_time: 7.days.from_now.change(hour: 17, min: 0),
+  is_booked: false
 )
 
 # Tutoría 6 creada por estudiante dictándola
@@ -586,6 +655,13 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 7.days.from_now.change(hour: 19, min: 0),
+  end_time: 7.days.from_now.change(hour: 20, min: 0),
+  is_booked: false
+)
+
 # Tutoría 7 creada por estudiante dictándola
 creator = User.find_by!(email: "veronicagimenez@gmail.com")
 course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
@@ -609,6 +685,20 @@ end
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_offered
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 10.days.from_now.change(hour: 11, min: 0),
+  end_time: 10.days.from_now.change(hour: 12, min: 0),
+  is_booked: false
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 10.days.from_now.change(hour: 15, min: 0),
+  end_time: 10.days.from_now.change(hour: 16, min: 0),
+  is_booked: false
 )
 
 # Tutoría 8 creada por estudiante dictándola
@@ -636,6 +726,13 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 2.days.from_now.change(hour: 14, min: 30),
+  end_time: 2.days.from_now.change(hour: 15, min: 30),
+  is_booked: false
+)
+
 # Tutoría 9 creada por estudiante dictándola
 creator = User.find_by!(email: "pablovillar@gmail.com")
 course = Course.find_by(id: 443) # PIS
@@ -659,6 +756,20 @@ end
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_offered
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 5.days.from_now.change(hour: 10, min: 0),
+  end_time: 5.days.from_now.change(hour: 11, min: 0),
+  is_booked: false
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 5.days.from_now.change(hour: 13, min: 0),
+  end_time: 5.days.from_now.change(hour: 14, min: 0),
+  is_booked: false
 )
 
 # Tutoría 10 creada por estudiante dictándola
@@ -686,6 +797,13 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 3.days.from_now.change(hour: 16, min: 0),
+  end_time: 3.days.from_now.change(hour: 17, min: 0),
+  is_booked: false
+)
+
 # Tutoría 11 creada por estudiante dictándola
 creator = User.find_by!(email: "agustinabenitez@gmail.com")
 course = Course.find_by(id: 145) # Física I
@@ -709,6 +827,20 @@ end
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_offered
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 7.days.from_now.change(hour: 18, min: 0),
+  end_time: 7.days.from_now.change(hour: 19, min: 0),
+  is_booked: false
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 7.days.from_now.change(hour: 20, min: 0),
+  end_time: 7.days.from_now.change(hour: 21, min: 0),
+  is_booked: false
 )
 
 # Tutoría 12 creada por estudiante dictándola
@@ -736,6 +868,13 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 2.days.from_now.change(hour: 17, min: 0),
+  end_time: 2.days.from_now.change(hour: 18, min: 0),
+  is_booked: false
+)
+
 # Tutoría 13 creada por estudiante dictándola
 creator = User.find_by!(email: "tomasgarrido@gmail.com")
 course = Course.find_by(id: 13) # Algoritmos Evolutivos
@@ -759,6 +898,20 @@ end
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_offered
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 5.days.from_now.change(hour: 12, min: 0),
+  end_time: 5.days.from_now.change(hour: 12, min: 30),
+  is_booked: false
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 5.days.from_now.change(hour: 14, min: 0),
+  end_time: 5.days.from_now.change(hour: 14, min: 30),
+  is_booked: false
 )
 
 # Tutoría 14 creada por estudiante dictándola
@@ -786,6 +939,13 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 7.days.from_now.change(hour: 13, min: 0),
+  end_time: 7.days.from_now.change(hour: 14, min: 0),
+  is_booked: false
+)
+
 # Tutoría 15 creada por estudiante dictándola
 creator = User.find_by!(email: "lauramaldonado@gmail.com")
 course = Course.find_by(id: 13) # Algoritmos Evolutivos
@@ -809,6 +969,20 @@ end
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_offered
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 5.days.from_now.change(hour: 9, min: 0),
+  end_time: 5.days.from_now.change(hour: 9, min: 45),
+  is_booked: false
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 5.days.from_now.change(hour: 11, min: 0),
+  end_time: 5.days.from_now.change(hour: 11, min: 45),
+  is_booked: false
 )
 
 # Tutoría 16 creada por estudiante dictándola
@@ -836,6 +1010,13 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 10.days.from_now.change(hour: 16, min: 30),
+  end_time: 10.days.from_now.change(hour: 17, min: 30),
+  is_booked: false
+)
+
 # Tutoría 17 creada por estudiante dictándola
 creator = User.find_by!(email: "luisgomez@gmail.com")
 course = Course.find_by(id: 13) # Algoritmos Evolutivos
@@ -859,6 +1040,20 @@ end
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_offered
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 8.days.from_now.change(hour: 10, min: 30),
+  end_time: 8.days.from_now.change(hour: 11, min: 0),
+  is_booked: false
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 8.days.from_now.change(hour: 15, min: 30),
+  end_time: 8.days.from_now.change(hour: 16, min: 0),
+  is_booked: false
 )
 
 # Tutoría 18 creada por estudiante dictándola
@@ -886,6 +1081,13 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 5.days.from_now.change(hour: 19, min: 0),
+  end_time: 5.days.from_now.change(hour: 20, min: 0),
+  is_booked: false
+)
+
 # Tutoría 19 creada por estudiante dictándola
 creator = User.find_by!(email: "paulacastro@gmail.com")
 course = Course.find_by(id: 8) # Agrimensura Legal 1
@@ -911,6 +1113,20 @@ UserTutoring.find_or_create_by!(
   tutoring: tutoring_offered
 )
 
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 3.days.from_now.change(hour: 11, min: 0),
+  end_time: 3.days.from_now.change(hour: 12, min: 0),
+  is_booked: false
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 3.days.from_now.change(hour: 14, min: 0),
+  end_time: 3.days.from_now.change(hour: 15, min: 0),
+  is_booked: false
+)
+
 # Tutoría 20 creada por estudiante dictándola
 creator = User.find_by!(email: "martadaluz@gmail.com")
 course = Course.find_by(id: 8) # Agrimensura Legal 1
@@ -934,4 +1150,11 @@ end
 UserTutoring.find_or_create_by!(
   user: creator,
   tutoring: tutoring_offered
+)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: 3.days.from_now.change(hour: 16, min: 30),
+  end_time: 3.days.from_now.change(hour: 17, min: 30),
+  is_booked: false
 )
