@@ -133,7 +133,10 @@ export default function TutoringCard({ tutoring, mode: externalMode }) {
           ) : null}
           {tutoring.capacity && (
             <p className="text-gray-600 text-sm mt-1">
-              <b>Cupos disponibles: </b> {tutoring.capacity - tutoring.enrolled}
+              <b>Cupos disponibles: </b>
+              {tutoring.state === "active"
+                ? ( (tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0) )
+                : "A definir"}
             </p>
           )}
           <p className="tutoring-card-title mt-1"><b>Temas:</b></p>
