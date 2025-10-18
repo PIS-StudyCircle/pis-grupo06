@@ -12,7 +12,6 @@ export const getUsers = async (page = 1, perPage = 20, search = "", role = "") =
   if (!response.ok) throw new Error("Error al obtener usuarios"); 
 
   const data = await response.json(); 
-  console.log("Response data:", data);
   return data;
 };
 

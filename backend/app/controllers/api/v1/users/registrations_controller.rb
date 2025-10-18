@@ -14,12 +14,32 @@ module Api
       after_action :stash_jwt_and_csrf_cookies, only: :create, if: -> { resource.persisted? }
       rescue_from ActionController::ParameterMissing, with: :render_bad_request
 
+      def create
+        build_resource(sign_up_params)
+
+        if resource.save
+          if params[:user][:profile_photo].present?
+            resource.profile_photo.attach(params[:user][:profile_photo])
+          end
+
+          respond_with(resource)
+        else
+          error_response(
+            message: "User couldn't be created successfully.",
+            errors: resource.errors.as_json(full_messages: true),
+            status: :unprocessable_entity
+          )
+        end
+      end
+
       private
 
       def sign_up_params
         params_hash = params.expect(
-          user: [:email, :password, :password_confirmation, :name, :last_name, :description]
+          user: [:email, :password, :password_confirmation, :name, :last_name, :description, :profile_photo]
         )
+
+        Rails.logger.info "PARAMS: #{params.inspect}"
 
         fing = Faculty.find_by(name: "Facultad de Ingeniería")
 
@@ -46,7 +66,7 @@ module Api
       protected
 
       def configure_sign_up_params
-        devise_parameter_sanitizer.permit(:sign_up, keys: %i[name last_name description])
+        devise_parameter_sanitizer.permit(:sign_up, keys: %i[name last_name description profile_photo])
       end
 
       def render_bad_request(exception)

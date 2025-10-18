@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getTutorings, unsubscribeFromTutoring } from "../services/tutoringService";
+import { getTutorings, getTutoring, unsubscribeFromTutoring } from "../services/tutoringService";
 
 export const useTutorings = (initialPage = 1, perPage = 20, filters = {}, mode = "") => {
   const [tutorings, setTutorings] = useState([]);
@@ -49,3 +49,33 @@ export const useTutorings = (initialPage = 1, perPage = 20, filters = {}, mode =
 
   return { tutorings, loading, error, pagination, page, setPage, search, setSearch, onDesuscribirse };
 };
+
+export function useTutoring(tutoring, tutoringId) {
+  const [data, setData] = useState(tutoring ?? null);
+  const [loading, setLoading] = useState(!tutoring);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (tutoring) { setData(tutoring); setLoading(false); setError(null); return; }
+    if (!tutoringId) return;
+
+    const ac = new AbortController();
+    (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const t = await getTutoring(tutoringId);
+        setData(t);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        setError(msg || "No se pudo cargar la tutoría.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+
+    return () => ac.abort();
+  }, [tutoring, tutoringId]);
+
+  return { data, loading, error };
+}

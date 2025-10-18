@@ -22,7 +22,6 @@ import { Error404Page } from "@components/Error404";
 
 import {
   SessionListPage,
-  TutorSchedulePage,
   AppointClassPage,
 } from "@/features/calendar";
 
@@ -47,17 +46,32 @@ export function AppRoutes() {
         <Route path="/notificaciones" element={<NotificationsPage />} />
 
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
-        <Route path="/tutorias/ser_tutor/:courseId" element={<TutoringPage filters={{}} mode="serTutor" />} />
-        <Route path="/tutorias/elegir_temas/:mode/:courseId" element={<SelectSubjectsByTutor />} />
-        <Route path="/tutorias/crear/:courseId" element={<CreateTutoringByTutor />} />
-        <Route path="/tutorias/solicitar/:courseId" element={<CreateTutoringByStudent />} />
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/tutores" element={<TutorPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
-        <Route path="/tutorias/materia/:courseId" element={<TutoringPage filters={{}} mode="serEstudiante" />} />
         <Route path="/tutorias/:tutoringId/elegir_horario_tutor" element={<ChooseScheduleByTutor />} />
         <Route path="/tutorias/:tutoringId/elegir_horario_estudiante" element={<ChooseScheduleByStudent />} />
 
+        <Route
+          path="/tutorias/ser_tutor/:courseId"
+          element={<TutoringPage filters={{}} mode="serTutor" />}
+        />
+        <Route
+          path="/tutorias/elegir_temas/:mode/:courseId"
+          element={<SelectSubjectsByTutor />}
+        />
+        <Route
+          path="/tutorias/crear/:courseId"
+          element={<CreateTutoringByTutor />}
+        />
+        <Route
+          path="/tutorias/solicitar/:courseId"
+          element={<CreateTutoringByStudent />}
+        />
+        <Route
+          path="/tutorias/materia/:courseId"
+          element={<TutoringPage filters={{}} mode="serEstudiante" />}
+        />
       </Route>
 
       <Route path="/" element={<Navigate to="/materias" replace />} />
@@ -67,11 +81,12 @@ export function AppRoutes() {
       <Route path="/materias/:courseId/temas" element={<SubjectPage />} />
 
       <Route path="/prototipoCalendar" element={<SessionListPage />} />
-      <Route path="/calendar" element={<TutorSchedulePage />} />
       <Route path="/appoint" element={<AppointClassPage />} />
 
-      <Route path="/materias/:courseId/temas/:subjectId" element={<SubjectDetailPage/>} />
-
+      <Route
+        path="/materias/:courseId/temas/:subjectId"
+        element={<SubjectDetailPage />}
+      />
       <Route path="/tutores" element={<TutorPage />} />
       <Route path="*" element={<Error404Page />} />
     </Routes>

@@ -6,6 +6,13 @@ import * as subjectService from "../services/subjectService";
 // Mockeamos todo el módulo
 jest.mock("../services/subjectService");
 
+// Mock UserContext
+jest.mock("@context/UserContext", () => ({
+  useUser: () => ({
+    user: { id: 1, name: "Test User" },
+  }),
+}));
+
 describe("SubjectPage", () => {
   const mockSubjects = [
     { id: 1, name: "Tema I" },

@@ -8,12 +8,13 @@ export const useCourses = (initialPage = 1, perPage = 20) => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(initialPage);
   const [search, setSearch] = useState("");
+  const [showFavorites, setShowFavorites] = useState(false);
 
   useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const response = await getCourses(page, perPage, search); 
+        const response = await getCourses(page, perPage, search, showFavorites); 
         setCourses(response.courses);   
         setPagination(response.pagination);
       } catch (err) {
@@ -25,7 +26,7 @@ export const useCourses = (initialPage = 1, perPage = 20) => {
     };
 
     fetchCourses();
-  }, [page, perPage, search]);
+  }, [page, perPage, search, showFavorites]);
 
-  return { courses, loading, error, pagination, page, setPage, search, setSearch };
+  return { courses, loading, error, pagination, page, setPage, search, setSearch, showFavorites, setShowFavorites };
 };

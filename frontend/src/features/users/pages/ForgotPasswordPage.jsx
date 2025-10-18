@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useUser } from "@context/UserContext";
 import { AuthLayout } from "../components/AuthLayout";
 import { Input } from "@components/Input";
@@ -20,17 +19,14 @@ export default function ForgotPasswordPage() {
 
   const { errors, validate } = useValidation(validators);
 
-  const { error, onSubmit } = useFormSubmit(forgotPassword, null);
-
-  const [submitted, setSubmitted] = useState(false);
+  const { error, onSubmit, submitted } = useFormSubmit(forgotPassword, null);
 
   const handleSubmit = (e) => {
-      e.preventDefault();
-      if (validate(form)) {
-        setSubmitted(true);
-        onSubmit(form);
-      }
-    };
+    e.preventDefault();
+    if (validate(form)) {
+      onSubmit(form);
+    }
+  };
 
   return (
     <AuthLayout
@@ -50,7 +46,7 @@ export default function ForgotPasswordPage() {
             onChange={(e) => setField("email", e.target.value)}
             error={errors.email}
           />
-          
+
           {/* Errores del backend */}
           {error.length > 0 && (
             <ErrorAlert>
@@ -65,7 +61,7 @@ export default function ForgotPasswordPage() {
       ) : (
         <div className="text-green-600 text-center">
           <div>El correo puede tardar unos minutos en llegar.</div>
-          <div>Luego de recibirlo, puedes cerrar esta ventana.</div>
+          <div>Puedes cerrar esta ventana.</div>
         </div>
       )}
     </AuthLayout>

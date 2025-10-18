@@ -78,9 +78,6 @@ class Tutoring < ApplicationRecord
             inclusion: { in: %w[virtual presencial],
                          message: :inclusion }
 
-  validates :capacity,
-            presence: true,
-            numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 100 }
   validate :capacity_not_less_than_enrolled
 
   validates :request_comment, length: { maximum: 500 }, allow_blank: true
@@ -98,6 +95,10 @@ class Tutoring < ApplicationRecord
 
   def scheduled_at_cannot_be_in_past
     return if scheduled_at.blank?
+
+    if scheduled_at < Time.current
+      errors.add(:scheduled_at, :past)
+    end
 
     errors.add(:capacity, :less_than_enrolled) if enrolled > capacity
   end

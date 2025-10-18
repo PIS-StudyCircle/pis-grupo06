@@ -105,8 +105,9 @@ module Api
               tutor_last_name: t.tutor&.last_name,
               location: t.location,
               availabilities: t.tutoring_availabilities.map do |a|
-              { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
-              end
+                { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
+              end,
+              tutor_email: t.tutor&.email,
             }
           end,
           pagination: pagy_metadata(@pagy)
@@ -154,8 +155,14 @@ module Api
       end
 
       def create
+        # if params[:tutoring][:subject_ids].blank?
+        #   render json: { errors: ["No se recibieron correctamente los temas seleccionados. Inténtelo nuevamente."] },
+        #          status: :unprocessable_entity
+        #   return
+        # end
+
         tutoring = Tutoring.new(tutoring_params)
-        tutoring.created_by_id = params.dig(:tutoring, :created_by_id)
+        tutoring.created_by_id = current_user.id
         tutoring.tutor_id      = params.dig(:tutoring, :tutor_id)
         tutoring.course_id     = params.dig(:tutoring, :course_id)
 
@@ -163,19 +170,9 @@ module Api
           tutoring.capacity = 1 # Valor por defecto para solicitudes pendientes
         end
 
-        if tutoring.tutor_id.present? && tutoring.scheduled_at.present? && tutoring.duration_mins.present?
-          tutoring.state = 1 # cuando la tutoria es creada por el tutor la creamos como activa
-          start_time = tutoring.scheduled_at
-          end_time = start_time + tutoring.duration_mins.minutes
-
-          overlapping = Tutoring.where(tutor_id: tutoring.tutor_id)
-                                .where.not(id: tutoring.id)
-                                .exists?([
-                                  "scheduled_at < ? AND (scheduled_at + INTERVAL '1 minute' * duration_mins) > ?",
-                                  end_time, start_time
-                                ])
-
-          if overlapping
+        # Validar overlapping con las availabilities antes de crearlas
+        if params[:tutoring][:availabilities_attributes].present?
+          if availability_overlaps?(params[:tutoring][:availabilities_attributes], current_user.id)
             render json: {
               errors: ["Ya tienes una tutoría programada en esa fecha y horario"]
             }, status: :unprocessable_entity
@@ -198,7 +195,7 @@ module Api
               end
             end
 
-            # create_user_tutoring(tutoring)
+            create_user_tutoring(current_user.id, tutoring.id)
             render json: {
               tutoring: tutoring.as_json.merge(
                 availabilities: tutoring.tutoring_availabilities.as_json
@@ -230,14 +227,13 @@ module Api
       end
 
       def exists_user_tutoring
-        tutoring_id = params[:id] 
+        tutoring_id = params[:id]
         exists = UserTutoring.exists?(user_id: current_user.id, tutoring_id: tutoring_id)
         render json: { exists: exists }
       end
 
       def join_tutoring
-
-        tid = params[:id] 
+        tid = params[:id]
         @tutoring = Tutoring.find(tid)
 
         if UserTutoring.exists?(user_id: current_user.id, tutoring_id: tid)
@@ -277,8 +273,8 @@ module Api
 
           # Agregar a todos los demás estudiantes ya inscritos
           existing_students = @tutoring.user_tutorings
-                                        .where.not(user_id: current_user.id)
-                                        .includes(:user)
+                                       .where.not(user_id: current_user.id)
+                                       .includes(:user)
 
           existing_students.each do |user_tutoring|
             student = user_tutoring.user
@@ -296,13 +292,13 @@ module Api
           enrolled: @tutoring.reload.enrolled,
           tutoring_id: @tutoring.id
         }, status: :created
-
       end
 
       def confirm_schedule
         # Parsear el horario elegido
         scheduled_time = Time.zone.parse(params[:scheduled_at])
-        end_time = params[:end_time].present? ? Time.zone.parse(params[:end_time]) : scheduled_time + @tutoring.duration_mins.minutes
+        end_time = params[:end_time].present? ? Time.zone.parse(params[:end_time])
+                                              : scheduled_time + @tutoring.duration_mins.minutes
         user_role = params[:role] # 'student' o 'tutor'
 
         # Validar que se especifique el rol
@@ -329,6 +325,14 @@ module Api
         if tutoring_end_time > availability.end_time
           return render json: {
             error: "No hay tiempo suficiente en esa franja horaria. La tutoría dura #{@tutoring.duration_mins} minutos."
+          }, status: :unprocessable_entity
+        end
+
+        # Validar que no haya tutorías que se solapen con este horario
+        overlapping_tutorings = check_overlapping_tutorings(scheduled_time, tutoring_end_time, current_user.id)
+        if overlapping_tutorings.any?
+          return render json: {
+            error: "Ya tienes tutorías programadas en ese horario"
           }, status: :unprocessable_entity
         end
 
@@ -412,8 +416,8 @@ module Api
 
               # Agregar a todos los demás estudiantes ya inscritos
               existing_students = @tutoring.user_tutorings
-                                            .where.not(user_id: current_user.id)
-                                            .includes(:user)
+                                           .where.not(user_id: current_user.id)
+                                           .includes(:user)
 
               existing_students.each do |user_tutoring|
                 student = user_tutoring.user
@@ -435,7 +439,8 @@ module Api
             UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
             # Agregar también al estudiante creador si no está registrado aún
-            if @tutoring.created_by_id.present? && !UserTutoring.exists?(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
+            if @tutoring.created_by_id.present? &&
+               !UserTutoring.exists?(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
               UserTutoring.create!(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
             end
 
@@ -447,6 +452,7 @@ module Api
               if params[:capacity].present?
                 new_cap = params[:capacity].to_i
                 raise ActiveRecord::RecordInvalid.new(@tutoring), "Capacidad inválida" if new_cap <= 0
+
                 @tutoring.capacity = new_cap
               end
 
@@ -476,14 +482,13 @@ module Api
 
               # Agregar a todos los estudiantes ya inscritos
               existing_students = @tutoring.user_tutorings
-                                            .where.not(user_id: current_user.id)
-                                            .includes(:user)
+                                           .where.not(user_id: current_user.id)
+                                           .includes(:user)
 
               existing_students.each do |user_tutoring|
                 student = user_tutoring.user
                 calendar_service.join_event(@tutoring, student.email)
               end
-
             rescue => e
               Rails.logger.error "Error al crear evento en Google Calendar: #{e.message}"
               # No fallar la transacción por errores de calendario
@@ -509,7 +514,6 @@ module Api
             event_id: @tutoring.event_id
           }
         }, status: :ok
-
       rescue ActiveRecord::RecordInvalid => e
         render json: { error: e.message }, status: :unprocessable_entity
       rescue ArgumentError
@@ -519,11 +523,10 @@ module Api
         render json: { error: "Error interno del servidor" }, status: :internal_server_error
       end
 
-
       def build_tutoring_description(end_time = nil)
         description = []
         description << "Modalidad: #{@tutoring.modality}"
-        
+
         # Calcular duración real si hay horario definido
         if @tutoring.scheduled_at && end_time
           duration = ((end_time - @tutoring.scheduled_at) / 60).to_i
@@ -541,16 +544,16 @@ module Api
         description.join("\n")
       end
 
-       # backend/app/controllers/api/v1/tutorings_controller.rb
+      # backend/app/controllers/api/v1/tutorings_controller.rb
       def upcoming
         user = User.find(params[:user_id])
 
         tutorings = Tutoring
-          .enrolled_by(user)
-          .upcoming
-          .where(state: :active)
-          .includes(:tutor, :course)
-          .order(:scheduled_at)
+                    .enrolled_by(user)
+                    .upcoming
+                    .where(state: :active)
+                    .includes(:tutor, :course)
+                    .order(:scheduled_at)
 
         render json: tutorings.map { |t|
           is_tutor = t.tutor_id == user.id
@@ -647,10 +650,10 @@ module Api
         @tutoring = Tutoring.find(params[:id])
       end
 
-      def create_user_tutoring(tutoring)
-        return unless params.dig(:tutoring, :tutor_id).nil?
+      def create_user_tutoring(user, tutoring)
+        return if user.blank? || tutoring.blank?
 
-        UserTutoring.create!(user: current_user, tutoring:)
+        UserTutoring.find_or_create_by!(user_id: user, tutoring_id: tutoring)
       end
 
       def tutoring_params
@@ -687,6 +690,35 @@ module Api
             { availabilities_attributes: [:id, :start_time, :end_time, :_destroy] }
           ]
         )
+      end
+
+      def check_overlapping_tutorings(start_time, end_time, user_id)
+        # Buscar tutorías donde el usuario está involucrado (como tutor, creador o estudiante)
+        # que se solapen con el horario especificado
+        Tutoring.joins(:user_tutorings)
+                .where.not(id: @tutoring&.id) # Excluir la tutoría actual si existe
+                .where(
+                  "(scheduled_at < ? AND (scheduled_at + INTERVAL '1 minute' * duration_mins) > ?) OR " +
+                  "(scheduled_at >= ? AND scheduled_at < ?)",
+                  end_time, start_time, start_time, end_time
+                )
+                .where(
+                  "user_tutorings.user_id = ? OR tutor_id = ? OR created_by_id = ?",
+                  user_id, user_id, user_id
+                )
+                .distinct
+      end
+
+      def availability_overlaps?(availabilities_params, user_id)
+        availabilities_params.any? do |availability_params|
+          next if availability_params[:_destroy] == '1' || availability_params[:_destroy] == true
+
+          start_time = Time.zone.parse(availability_params[:start_time])
+          end_time = Time.zone.parse(availability_params[:end_time])
+
+          # Buscar si hay tutorías que se solapen con esta availability
+          check_overlapping_tutorings(start_time, end_time, user_id).any?
+        end
       end
 
         

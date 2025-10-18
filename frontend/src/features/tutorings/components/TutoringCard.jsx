@@ -1,16 +1,14 @@
 import { formatDateTime } from "@shared/utils/FormatDate";
 import { useUser } from "@context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { JoinTutoringButton } from "@/features/calendar";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 
-export default function TutoringCard({ tutoring, onDesuscribirse }) {
+export default function TutoringCard({ tutoring, mode: externalMode, onDesuscribirse }) {
   const { user } = useUser();
 
   const handleUnirmeClick = async (tutoring) => {
     if (!tutoring) return;
-    
-    const remaining = (tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0);
+
     const primerEstudiante = tutoring.enrolled === 0;
     
     // Primer estudiante confirma las horas y se une a la tutoría
@@ -41,7 +39,7 @@ export default function TutoringCard({ tutoring, onDesuscribirse }) {
     }
   };
 
-  let mode;
+  //let mode;
 
   const handleDesuscribirmeClick = async (tutoring) => {
     if (!tutoring) return;
@@ -101,18 +99,23 @@ export default function TutoringCard({ tutoring, onDesuscribirse }) {
   }, [user?.id, tutoring?.id]);
 
 
-  if (soyTutor || soyEstudiante) {
-    mode = "misTutorias";
-  } else if (esCreador) {
-    mode = "creador";  
-  } else if (!cuposDisponibles) {
-    mode = "completo";
-  } else if (noTieneTutor && cuposDisponibles) {
-    mode = "ambos";
-  } else if (noTieneTutor) {
-    mode = "serTutor";
-  } else if (cuposDisponibles) {
-    mode = "serEstudiante";
+  // Use externalMode if provided, otherwise calculate mode based on state
+  let mode = externalMode;
+
+  if (!externalMode) {
+    if (soyTutor || soyEstudiante) {
+      mode = "misTutorias";
+    } else if (esCreador) {
+      mode = "creador";
+    } else if (noTieneTutor && cuposDisponibles) {
+      mode = "ambos";
+    } else if (noTieneTutor) {
+      mode = "serTutor";
+    } else if (!cuposDisponibles) {
+      mode = "completo";
+    } else if (cuposDisponibles) {
+      mode = "serEstudiante";
+    }
   }
 
   const navigate = useNavigate();
@@ -142,7 +145,7 @@ export default function TutoringCard({ tutoring, onDesuscribirse }) {
           {tutoring.tutor_id !== null ? (
             <>
               <p className="tutoring-card-title mt-1">
-                <b>Tutor: </b> {tutoring.tutor_name + " " + tutoring.tutor_last_name}
+                <b>Tutor: </b> {tutoring.tutor_name + " " + tutoring.tutor_last_name} <span className="text-gray-500">{" (" + tutoring.tutor_email + ")"}</span>
               </p>
             </>
           ) : null}

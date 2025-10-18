@@ -2,57 +2,39 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { formatDateTime } from "@shared/utils/FormatDate";
 
-export default function ChooseScheduleByTutor() {
+import { useTutoring } from "../hooks/useTutorings";
+import { confirmSchedule } from "../services/tutoringService";
+
+export default function ChooseScheduleByStudent() {
   const { tutoringId } = useParams(); 
   const navigate = useNavigate();
   const location = useLocation();
   const tutoring = location.state?.tutoring;
 
+  const { data, loading, error: loadError } = useTutoring(tutoring, tutoringId);
+
   const [availableSchedules, setAvailableSchedules] = useState([]);
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
-  const [requestComment, setRequestComment] = useState(null);
   const [capacity, setCapacity] = useState(1);
   const [customTimes, setCustomTimes] = useState({});
   const [selectedScheduleId, setSelectedScheduleId] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setMessage(null);
-      setError(null);
-      try {
-        let data;
-        if (tutoring) {
-          data = tutoring;
-        } else {
-          const res = await fetch(`/api/v1/tutorings/${tutoringId}`);
-          if (!res.ok) throw new Error("Error al obtener tutoría");
-          data = await res.json();
-        }
+    if (!data) return;
+    setAvailableSchedules(
+      (data.availabilities || []).map(a => ({
+        id: a.id,
+        start: a.start_time,
+        end: a.end_time,
+      }))
+    );
+    setCapacity(data.capacity || 1);
+  }, [data]);
 
-        setAvailableSchedules(
-          data.availabilities?.map((a) => ({
-            id: a.id,
-            start: a.start_time,
-            end: a.end_time,
-          })) || []
-        );
-
-        setRequestComment(data.request_comment || null);
-        setCapacity(data.capacity || 1);
-      } catch (error) {
-        console.error(error);
-        setError("No se pudo cargar la tutoría.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [tutoringId, tutoring]);
+  useEffect(() => {
+    if (loadError) setError(loadError);
+  }, [loadError]);
 
   const handleConfirm = async () => {
     setMessage(null);
@@ -60,56 +42,49 @@ export default function ChooseScheduleByTutor() {
 
     const custom = customTimes[selectedScheduleId];
 
-    // que haya seleccionado y escrito las horas
+    // Validaciones
     if (!selectedScheduleId || !custom?.start || !custom?.end) {
       setError("Debes especificar una hora de inicio y fin.");
       return;
     }
 
-    const schedule = availableSchedules.find((s) => s.id === selectedScheduleId);
+    const schedule = availableSchedules.find(s => s.id === selectedScheduleId);
     const localDate = new Date(schedule.start);
-    const localDateStr = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, "0")}-${String(localDate.getDate()).padStart(2, "0")}`;
+    const y = localDate.getFullYear();
+    const m = String(localDate.getMonth() + 1).padStart(2, "0");
+    const d = String(localDate.getDate()).padStart(2, "0");
+    const localDateStr = `${y}-${m}-${d}`;
 
     const fullStart = `${localDateStr}T${custom.start}:00`;
-    const fullEnd = `${localDateStr}T${custom.end}:00`;
+    const fullEnd   = `${localDateStr}T${custom.end}:00`;
 
     const startTime = new Date(fullStart);
-    const endTime = new Date(fullEnd);
+    const endTime   = new Date(fullEnd);
     const scheduleStart = new Date(schedule.start);
-    const scheduleEnd = new Date(schedule.end);
+    const scheduleEnd   = new Date(schedule.end);
 
     if (endTime <= startTime) {
       setError("La hora de fin debe ser posterior a la hora de inicio.");
       return;
     }
-
     if (startTime < scheduleStart || endTime > scheduleEnd) {
       setError("El horario elegido no está dentro de las disponibilidades ofrecidas.");
       return;
     }
 
     try {
-      const res = await fetch(`/api/v1/tutorings/${tutoringId}/confirm_schedule`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          scheduled_at: fullStart,
-          end_time: fullEnd,
-          role: "student",
-          capacity,
-        }),
+      await confirmSchedule(tutoringId, {
+        scheduled_at: fullStart,
+        end_time: fullEnd,
+        role: "student",
+        capacity,
       });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Error al asociarte como estudiante.");
-      }
-
       setMessage("Tutoría confirmada con éxito.");
       setTimeout(() => navigate("/"), 2000);
-    } catch (error) {
-      console.error(error);
-      setError(error.message || "Error en la conexión con el servidor.");
+    } catch (e) {
+      console.error(e);
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg || "Error en la conexión con el servidor.");
     }
   };
 
@@ -177,10 +152,6 @@ export default function ChooseScheduleByTutor() {
                     value={schedule.start}
                     onChange={() => {
                       setSelectedScheduleId(schedule.id);
-                      setSelectedTime({
-                        start: customStart || schedule.start,
-                        end: customEnd || schedule.end,
-                      });
                     }}
                   />
 
@@ -194,18 +165,6 @@ export default function ChooseScheduleByTutor() {
                           ...prev,
                           [schedule.id]: { ...prev[schedule.id], start: value },
                         }));
-                        const localDate = new Date(schedule.start);
-                        const localDateStr = `${localDate.getFullYear()}-${String(
-                          localDate.getMonth() + 1
-                        ).padStart(2, "0")}-${String(
-                          localDate.getDate()
-                        ).padStart(2, "0")}`;
-                        setSelectedTime({
-                          start: `${localDateStr}T${value}:00`,
-                          end: `${localDateStr}T${
-                            customEnd || new Date(schedule.end).toISOString().slice(11, 16)
-                          }:00`,
-                        });
                       }}
                       min={toLocalTimeString(schedule.start)}
                       max={toLocalTimeString(schedule.end)}
@@ -223,18 +182,6 @@ export default function ChooseScheduleByTutor() {
                           ...prev,
                           [schedule.id]: { ...prev[schedule.id], end: value },
                         }));
-                        const localDate = new Date(schedule.start);
-                        const localDateStr = `${localDate.getFullYear()}-${String(
-                          localDate.getMonth() + 1
-                        ).padStart(2, "0")}-${String(
-                          localDate.getDate()
-                        ).padStart(2, "0")}`;
-                        setSelectedTime({
-                          start: `${localDateStr}T${
-                            customStart || new Date(schedule.start).toISOString().slice(11, 16)
-                          }:00`,
-                          end: `${localDateStr}T${value}:00`,
-                        });
                       }}
                       min={toLocalTimeString(schedule.start)}
                       max={toLocalTimeString(schedule.end)}

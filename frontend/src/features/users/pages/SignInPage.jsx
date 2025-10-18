@@ -75,7 +75,7 @@ export default function SignInPage() {
           </ErrorAlert>
         )}
 
-        <SubmitButton text="Sign In" />
+        <SubmitButton text="Ingresar" />
 
         <a href={`${API_BASE}/users/auth/google_oauth2`}
           className="w-full flex justify-center px-4 py-2 font-semibold text-white bg-blue-500 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 mb-4">

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Footer from "@components/Footer";
 import { useCourse } from "../../courses/hooks/useCourse";
 import SubjectPage from "../../subjects/pages/SubjectPage";
+import PageTitle from "@/shared/components/PageTitle";
 
 export default function SelectSubjectsByTutor() {
   const { courseId, mode } = useParams();
@@ -14,10 +15,8 @@ export default function SelectSubjectsByTutor() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     localStorage.setItem("selectedSubjects", JSON.stringify(selectedSubjects));
    
-  
     navigate(isTutor ? `/tutorias/crear/${courseId}`
                      : `/tutorias/solicitar/${courseId}`);
   };
@@ -36,10 +35,8 @@ export default function SelectSubjectsByTutor() {
               </div>
             )}
             <div className="p-6 max-w-3xl mx-auto space-y-6">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {course && course.name}
-              </h1>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <PageTitle title={course && course.name}/>
+              <form onSubmit={handleSubmit} className="space-y-6 justify-items-start ml-3">
                 <p className="text-gray-700 mb-6">
                   {isTutor
                     ? "Seleccioná los temas que vas a cubrir en tu tutoría."
