@@ -172,7 +172,7 @@ module Api
 
         # Validar overlapping con las availabilities antes de crearlas
         if params[:tutoring][:availabilities_attributes].present?
-          if has_availability_overlaps?(params[:tutoring][:availabilities_attributes], current_user.id)
+          if availability_overlaps?(params[:tutoring][:availabilities_attributes], current_user.id)
             render json: {
               errors: ["Ya tienes una tutoría programada en esa fecha y horario"]
             }, status: :unprocessable_entity
@@ -526,7 +526,7 @@ module Api
       def build_tutoring_description(end_time = nil)
         description = []
         description << "Modalidad: #{@tutoring.modality}"
-        
+
         # Calcular duración real si hay horario definido
         if @tutoring.scheduled_at && end_time
           duration = ((end_time - @tutoring.scheduled_at) / 60).to_i
@@ -544,7 +544,7 @@ module Api
         description.join("\n")
       end
 
-       # backend/app/controllers/api/v1/tutorings_controller.rb
+      # backend/app/controllers/api/v1/tutorings_controller.rb
       def upcoming
         user = User.find(params[:user_id])
 
@@ -580,7 +580,7 @@ module Api
 
       def create_user_tutoring(user, tutoring)
         return if user.blank? || tutoring.blank?
-        
+
         UserTutoring.find_or_create_by!(user_id: user, tutoring_id: tutoring)
       end
 
@@ -631,13 +631,13 @@ module Api
                   end_time, start_time, start_time, end_time
                 )
                 .where(
-                  "user_tutorings.user_id = ? OR tutor_id = ? OR created_by_id = ?", 
+                  "user_tutorings.user_id = ? OR tutor_id = ? OR created_by_id = ?",
                   user_id, user_id, user_id
                 )
                 .distinct
       end
 
-      def has_availability_overlaps?(availabilities_params, user_id)
+      def availability_overlaps?(availabilities_params, user_id)
         availabilities_params.any? do |availability_params|
           next if availability_params[:_destroy] == '1' || availability_params[:_destroy] == true
 
