@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
+      mount ActionCable.server => "/cable"
+
       devise_for :users,
                  defaults: { format: :json },
                  controllers: {
@@ -21,6 +23,8 @@ Rails.application.routes.draw do
         end
       end
 
+      post "/notification_token", to: "notification_tokens#create"
+
       # index y show de UsersController
       resources :users, module: :users, only: [:index, :show]
 
@@ -29,6 +33,17 @@ Rails.application.routes.draw do
         resource :favorite, only: [:create, :destroy], controller: 'course_favorites'
       end
       resources :tutorings
+      resources :notifications do
+        collection do
+          post :mark_all_read
+          post :mark_all_seen
+          delete :destroy_all
+        end
+
+        member do
+          post :mark_as_read
+        end
+      end
     end
   end
 end

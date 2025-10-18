@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useUser } from "@context/UserContext";
 import { ChevronDown, LogOut, User } from "lucide-react";
 import { DEFAULT_PHOTO } from "@/shared/config";
+import { Bell } from "@/features/notifications/components/Bell";
 
 const NavBar = ({ toggleSidebar = () => {} }) => {
   const { user, signOut } = useUser();
@@ -45,50 +46,55 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
           {/* Right: auth */}
           <div className="auth-wrap">
             {user ? (
-              <div className="relative">
-                <button
-                  onClick={toggleDropdown}
-                  className="btn-avatar"
-                  aria-expanded={isDropdownOpen}
-                >
-                  <div className="avatar w-10 h-10 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center bg-gray-200">
-                    <img
-                      src={photoUrl}
-                      alt={user.name || "Avatar"}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span className="hidden md:block font-medium truncate max-w-[160px]">
-                    {user.name || user.email}
-                  </span>
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      isDropdownOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {isDropdownOpen && (
-                  <div className="dropdown" role="menu">
-                    <div className="py-1">
-                      <Link
-                        to="/perfil"
-                        className="dropdown-item"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        <User className="w-4 h-4 mr-3" />
-                        Ver perfil
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="dropdown-item text-left w-full"
-                      >
-                        <LogOut className="w-4 h-4 mr-3" />
-                        Cerrar sesión
-                      </button>
+              <div className="relative flex items-center gap-3">
+                <div className="relative">
+                  <Bell />
+                </div>
+                <div className="relative">
+                  <button
+                    onClick={toggleDropdown}
+                    className="btn-avatar"
+                    aria-expanded={isDropdownOpen}
+                  >
+                    <div className="avatar w-10 h-10 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center bg-gray-200">
+                      <img
+                        src={photoUrl}
+                        alt={user.name || "Avatar"}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  </div>
-                )}
+                    <span className="hidden md:block font-medium truncate max-w-[160px]">
+                      {user.name || user.email}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform duration-200 ${
+                        isDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isDropdownOpen && (
+                    <div className="dropdown" role="menu">
+                      <div className="py-1">
+                        <Link
+                          to="/perfil"
+                          className="dropdown-item"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <User className="w-4 h-4 mr-3" />
+                          Ver perfil
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="dropdown-item text-left w-full"
+                        >
+                          <LogOut className="w-4 h-4 mr-3" />
+                          Cerrar sesión
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="flex gap-4">
@@ -133,6 +139,9 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
                 style={{ width: 48, height: 48 }}
               />
             </Link>
+            <div className="ml-auto pr-2">
+              <Bell />
+            </div>
           </div>
         ) : (
           <div className="navbar-mobile-guest">

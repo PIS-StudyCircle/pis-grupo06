@@ -77,6 +77,13 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]
 
+  config.action_cable.url = "wss://studycircle-backend-production-08429859fc6e.herokuapp.com/cable"
+  
+  config.action_cable.allowed_request_origins = [
+    "https://studycircle-frontend-production.netlify.app"
+  ]
+
+
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
   #   "example.com",     # Allow requests from example.com

@@ -44,6 +44,8 @@ class User < ApplicationRecord
   belongs_to :faculty
 
   has_one_attached :profile_photo
+  has_many :notifications, as: :recipient, class_name: "Noticed::Notification", dependent: :destroy
+  has_many :notification_mentions, as: :record, class_name: "Noticed::Event", dependent: :destroy
 
   # validaciones
   validates :email, presence: true, uniqueness: true

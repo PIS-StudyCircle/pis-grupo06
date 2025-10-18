@@ -72,6 +72,34 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_002419) do
     t.index ["user_id"], name: "index_favorite_courses_on_user_id"
   end
 
+  create_table "noticed_events", force: :cascade do |t|
+    t.string "type"
+    t.string "record_type"
+    t.bigint "record_id"
+    t.jsonb "params"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "notifications_count"
+    t.index ["record_type", "record_id"], name: "index_noticed_events_on_record"
+  end
+
+  create_table "noticed_notifications", force: :cascade do |t|
+    t.string "type"
+    t.string "title"
+    t.text "body"
+    t.jsonb "metadata", default: {}, null: false
+    t.string "url"
+    t.bigint "event_id", null: false
+    t.string "recipient_type", null: false
+    t.bigint "recipient_id", null: false
+    t.datetime "read_at", precision: nil
+    t.datetime "seen_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_noticed_notifications_on_event_id"
+    t.index ["recipient_type", "recipient_id"], name: "index_noticed_notifications_on_recipient"
+  end
+
   create_table "subject_tutorings", force: :cascade do |t|
     t.bigint "subject_id", null: false
     t.bigint "tutoring_id", null: false
@@ -116,7 +144,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_002419) do
     t.bigint "tutor_id"
     t.integer "enrolled", default: 0, null: false
     t.bigint "course_id", null: false
-    t.string "event_id"
     t.integer "state", default: 0, null: false
     t.text "request_comment"
     t.datetime "request_due_at"
@@ -169,10 +196,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_002419) do
     t.bigint "faculty_id"
     t.string "provider"
     t.string "uid"
-    t.string "google_access_token"
-    t.string "google_refresh_token"
-    t.datetime "google_expires_at"
-    t.string "calendar_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true
