@@ -603,6 +603,8 @@ module Api
           end
 
           # 2) No es tutor: eliminar la relación y actualizar contador
+          #Encuentro el user_tutoring correspondiente
+          user_tutoring = UserTutoring.find_by!(user_id: current_user.id, tutoring_id: @tutoring.id)
           user_tutoring.destroy!
 
           new_enrolled = [prev_enrolled - 1, 0].max
@@ -613,7 +615,7 @@ module Api
           # 3.a) Tutoría en estado pendiente (sin horario/confirmación) -> se elimina sin notificaciones
           unless event_confirmed
             begin
-              calendar.delete_event!(@tutoring) # por si hubiera quedado event_id
+              calendar.delete_event(@tutoring) # por si hubiera quedado event_id
             rescue => e
               Rails.logger.error "Calendar delete_event! (pendiente) error: #{e.message}"
             end
@@ -625,9 +627,9 @@ module Api
           remaining_participants = new_enrolled + (had_tutor ? 1 : 0)
           if remaining_participants.zero?
             begin
-              calendar.delete_event!(@tutoring)
+              calendar.delete_event(@tutoring)
             rescue => e
-              Rails.logger.error "Calendar delete_event! (último en irse) error: #{e.message}"
+              Rails.logger.error "Calendar delete_event (último en irse) error: #{e.message}"
             end
             @tutoring.destroy!
             return head :no_content
@@ -635,6 +637,8 @@ module Api
 
           # 4) Caso normal (tutoría sigue viva): quitar al usuario del evento de Calendar
           begin
+            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+            console.log("Intentando leave_event para #{@tutoring.id} y #{current_user.email}")
             calendar.leave_event(@tutoring, current_user.email)
           rescue => e
             Rails.logger.error "Calendar leave_event error (no detiene la desuscripción): #{e.message}"

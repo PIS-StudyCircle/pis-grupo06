@@ -94,7 +94,27 @@ class GoogleCalendarService
     user.update!(calendar_id: result.id)
     result.id
   end
+    # Quitar asistente del evento (cuando alguien se desuscribe)
+  def leave_event(tutoring, attendee_email)
+    return if tutoring.event_id.blank?
 
+    calendar_id = tutoring_owner_calendar(tutoring)
+    service = Google::Apis::CalendarV3::CalendarService.new
+    service.authorization = tutoring.tutor.google_access_token
+
+    event = service.get_event(calendar_id, tutoring.event_id)
+    attendees = Array(event.attendees)
+    new_list = attendees.reject { |a| a.email == attendee_email }
+
+    # Solo actualiza si hay cambios
+    return if new_list.size == attendees.size
+
+    event.attendees = new_list
+    service.update_event(calendar_id, tutoring.event_id, event)
+  rescue Google::Apis::ClientError => e
+    Rails.logger.error "leave_event error: #{e.message}"
+  end
+  
   private
 
   def refresh_google_token(user)
@@ -124,26 +144,6 @@ class GoogleCalendarService
     tutoring.tutor.calendar_id || ensure_calendar(tutoring.tutor)
   end
 
-    # Quitar asistente del evento (cuando alguien se desuscribe)
-  def leave_event(tutoring, attendee_email)
-    return if tutoring.event_id.blank?
-
-    calendar_id = tutoring_owner_calendar(tutoring)
-    service = Google::Apis::CalendarV3::CalendarService.new
-    service.authorization = tutoring.tutor.google_access_token
-
-    event = service.get_event(calendar_id, tutoring.event_id)
-    attendees = Array(event.attendees)
-    new_list = attendees.reject { |a| a.email == attendee_email }
-
-    # Solo actualiza si hay cambios
-    return if new_list.size == attendees.size
-
-    event.attendees = new_list
-    service.update_event(calendar_id, tutoring.event_id, event)
-  rescue Google::Apis::ClientError => e
-    Rails.logger.error "leave_event error: #{e.message}"
-  end
 
 
 
