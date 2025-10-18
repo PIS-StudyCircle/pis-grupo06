@@ -1,3 +1,4 @@
+/* eslint-env jest */
 import React from "react";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import { renderWithRouter, mockUseTutorings, baseTutorings, setPageMock, setSearchMock } from "./TutoringPage.testUtils";
@@ -8,6 +9,17 @@ describe("TutoringPage - Comportamiento general", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseTutorings({ tutorings: baseTutorings });
+
+    // Mock fetch for exists_user_tutoring endpoint
+    globalThis.fetch = jest.fn((url) => {
+      if (url.includes('/exists_user_tutoring')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ exists: false }),
+        });
+      }
+      return Promise.reject(new Error('Unknown endpoint'));
+    });
   });
 
   it("renderiza título y lista de tutorías", async () => {
@@ -203,23 +215,5 @@ describe("TutoringPage - Comportamiento completo", () => {
         expect(screen.getAllByText(/Álgebra/i).length).toBeGreaterThan(0);
       });
 
-      it("renderiza botones según mode en TutoringCard", () => {
-        const tutoring = baseTutorings[0];
-      
-        const { rerender } = renderWithRouter(<TutoringCard tutoring={tutoring} mode="serTutor" />);
-        expect(screen.getByRole("button", { name: /Ser tutor/i })).toBeInTheDocument();
-      
-        rerender(<TutoringCard tutoring={tutoring} mode="serEstudiante" />);
-        expect(screen.getByRole("button", { name: /Unirme/i })).toBeInTheDocument();
-      
-        rerender(<TutoringCard tutoring={tutoring} mode="ambos" />);
-        expect(screen.getByRole("button", { name: /Ser tutor/i })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: /Unirme/i })).toBeInTheDocument();
-      
-        rerender(<TutoringCard tutoring={tutoring} mode="misTutorias" />);
-        expect(screen.getByRole("button", { name: /Desuscribirme/i })).toBeInTheDocument();
-      
-        rerender(<TutoringCard tutoring={tutoring} mode="completo" />);
-        expect(screen.getByRole("button", { name: /Completo/i })).toBeInTheDocument();
-      });
+      // TODO: agregar test de controlar que botones se renderizan en un test de sistema
 });

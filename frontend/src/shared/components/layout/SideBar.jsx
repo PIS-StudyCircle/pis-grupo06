@@ -1,6 +1,7 @@
 // src/shared/components/layout/Sidebar.jsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "@context/UserContext";
+import { useNotifications } from "@/context/NotificationsContext";
 import {
   Home,
   BookOpen,
@@ -10,6 +11,7 @@ import {
   User as UserIcon,
   LogOut,
   SquareUser,
+  Inbox,
 } from "lucide-react";
 
 const Sidebar = ({
@@ -22,9 +24,11 @@ const Sidebar = ({
   const location = useLocation();
   const nav = useNavigate();
 
+  const { notifications } = useNotifications(); 
+
   const authedItems = [
     { title: "Inicio", path: "/", Icon: Home },
-    { title: "Clases", path: "#", Icon: BookOpen },
+    { title: "Mis Clases", path: "/notificaciones", Icon: BookOpen },
     { title: "Tutorías", path: "/tutorias", Icon: Users },
     { title: "Materias", path: "/materias", Icon: GraduationCap },
     { title: "Tutores", path: "/tutores", Icon: SquareUser },
@@ -122,16 +126,27 @@ const Sidebar = ({
             {menuItems.map((item) => {
               const active = isActive(item.path);
               const ItemIcon = item.Icon;
+
               return (
-                // 3) key única y estable
-                <li key={item.title}>
+                <li key={item.title} className="relative">
                   <Link
                     to={item.path}
                     className={`sidebar-link ${
                       active ? "sidebar-link--active" : ""
                     }`}
                   >
-                    <ItemIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
+                    <div className="relative">
+                      <ItemIcon
+                        className="w-5 h-5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      {/* 🔔 Badge solo en Buzón */}
+                      {item.title === "Buzón" && notifications > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {notifications}
+                        </span>
+                      )}
+                    </div>
                     <span
                       className={`font-medium whitespace-nowrap transition-all duration-200 ${
                         isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"

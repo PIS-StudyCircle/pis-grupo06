@@ -1,86 +1,144 @@
-import { useParams } from "react-router-dom";
-import { useUser } from "@context/UserContext"; 
-import { useCourse } from "../../courses/hooks/useCourse";
-import { createTutoringByTutor } from "../services/tutoringService";
+import { useParams } from "react-router-dom"
+import { useUser } from "@context/UserContext"
+import { useCourse } from "../../courses/hooks/useCourse"
+import { createTutoringByTutor } from "../services/tutoringService"
 
-import { AuthLayout } from "../../users/components/AuthLayout.jsx";
-import { Input } from "@components/Input";
-import { ErrorAlert } from "@components/ErrorAlert";
-import { SubmitButton } from "@components/SubmitButton";
-import { useFormState } from "@utils/UseFormState";
-import {
-  validateRequired,
-  validateDate,
-  validateHoursTutoring,
-  validateInteger,
-} from "@utils/validation";
-import { useValidation } from "@hooks/useValidation";
-import { useFormSubmit } from "@utils/UseFormSubmit";
+import { AuthLayout } from "../../users/components/AuthLayout.jsx"
+import { Input } from "@components/Input"
+import { ErrorAlert } from "@components/ErrorAlert"
+import { SubmitButton } from "@components/SubmitButton"
+import { useFormState } from "@utils/UseFormState"
+import { useState } from "react"
+import { validateDate, validateHoursTutoring, validateInteger } from "@utils/validation"
+import { useValidation } from "@hooks/useValidation"
+import { useFormSubmit } from "@utils/UseFormSubmit"
 
 const validators = {
-  date: (value) => validateDate(value, "Fecha de inicio"),
-  start_time: (value) => validateRequired(value, "Hora de inicio"),
-  end_time: (value, form) => {
-    const required = validateRequired(value, "Hora de fin");
-    if (required) return required;
-    // Solo valida relación si ambas horas están presentes
-    if (form.date && form.start_time && form.end_time) {
-      return validateHoursTutoring(form.date, form.start_time, form.end_time);
-    }
-    return null;
-  },
   limit: (value) => validateInteger(value, "Límite de estudiantes"),
-};
+}
 
 export default function CreateTutoringByTutor() {
-  const { user, userLoading, userError } = useUser(); 
+  const { user, userLoading, userError } = useUser()
 
-  const { courseId } = useParams();
-  const { course, loadingCourse, errorCourse } = useCourse(courseId);
+  const { courseId } = useParams()
+  const { course, loadingCourse, errorCourse } = useCourse(courseId)
 
+  const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || []
 
   const { form, setField } = useFormState({
-    date: "",
-    start_time: "",
-    end_time: "",
     mode: "virtual",
     limit: "20",
     location: "",
-  });
+  })
 
-  const { errors, validate } = useValidation(validators);
-  const { error, onSubmit } = useFormSubmit(createTutoringByTutor, "/");
+  const [availabilities, setAvailabilities] = useState([{ date: "", startTime: "", endTime: "" }])
+  const [availabilityError, setAvailabilityError] = useState("")
 
-  if (userLoading) return <p className="text-center mt-10">Cargando usuario...</p>;
-  if (userError) return <p className="text-center mt-10">Error al cargar perfil.</p>;
-  if (!user) return <p className="text-center mt-10">No hay usuario cargado.</p>;
+  const { errors, validate } = useValidation(validators)
+  const { error, onSubmit } = useFormSubmit(createTutoringByTutor, "/")
 
-  if (loadingCourse) return <p className="text-center mt-10">Cargando curso...</p>;
-  if (errorCourse) return <p className="text-center mt-10">Error al cargar el curso.</p>;
-  if (!course) return <p className="text-center mt-10">No hay curso cargado.</p>;
-    
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validate(form)) {
-      const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
-      // Validación: no continuar si no hay temas seleccionados
-      if (selectedSubjects.length === 0) {
-        alert('No se pudieron obtener los temas seleccionados. Al aceptar será redirigido a la selección de temas para intentarlo nuevamente.');
-        window.history.back(); // redirige a la página anterior
-        return; //para que no continúe con el envío del formulario
+  const addAvailability = () => {
+    setAvailabilities([...availabilities, { date: "", startTime: "", endTime: "" }])
+  }
+
+  const removeAvailability = (index) => {
+    if (availabilities.length > 1) {
+      setAvailabilities(availabilities.filter((_, i) => i !== index))
+    }
+  }
+
+  const updateAvailability = (index, field, value) => {
+    const updated = [...availabilities]
+    updated[index][field] = value
+    setAvailabilities(updated)
+  }
+
+  if (userLoading) return <p className="text-center mt-10">Cargando usuario...</p>
+  if (userError) return <p className="text-center mt-10">Error al cargar perfil.</p>
+  if (!user) return <p className="text-center mt-10">No hay usuario cargado.</p>
+
+  if (loadingCourse) return <p className="text-center mt-10">Cargando curso...</p>
+  if (errorCourse) return <p className="text-center mt-10">Error al cargar el curso.</p>
+  if (!course) return <p className="text-center mt-10">No hay curso cargado.</p>
+
+  const validateAvailabilities = () => {
+    // Validar campos completos y lógica básica
+    const invalidAvailability = availabilities.some((av) => {
+      if (!av.date || !av.startTime || !av.endTime) return true
+
+      const dateError = validateDate(av.date, "Fecha de inicio")
+      if (dateError) return true
+
+      const hoursError = validateHoursTutoring(av.date, av.startTime, av.endTime)
+      if (hoursError) return true
+
+      return false
+    })
+
+    if (invalidAvailability) {
+      return "Por favor completa todas las disponibilidades correctamente. La hora de fin debe ser posterior a la hora de inicio."
+    }
+
+    // Validar fechas en el pasado
+    const now = new Date()
+    const hasPastDate = availabilities.some((av) => {
+      const avDate = new Date(`${av.date}T${av.startTime}:00`)
+      return avDate < now
+    })
+    if (hasPastDate) {
+      return "No puedes seleccionar fechas u horas en el pasado."
+    }
+
+    // Validar solapamientos
+    for (let i = 0; i < availabilities.length; i++) {
+      const av1Start = new Date(`${availabilities[i].date}T${availabilities[i].startTime}:00`)
+      const av1End = new Date(`${availabilities[i].date}T${availabilities[i].endTime}:00`)
+
+      for (let j = i + 1; j < availabilities.length; j++) {
+        const av2Start = new Date(`${availabilities[j].date}T${availabilities[j].startTime}:00`)
+        const av2End = new Date(`${availabilities[j].date}T${availabilities[j].endTime}:00`)
+
+        // Verificar si hay solapamiento
+        const overlap = av1Start < av2End && av2Start < av1End
+        if (overlap) {
+          return `Las disponibilidades ${i + 1} y ${j + 1} se solapan. Por favor ajusta los horarios.`
+        }
       }
-      // Crea el objeto Date en la zona local
-      const localDate = new Date(`${form.date}T${form.start_time}:00`);
-      // Convierte a ISO string (UTC)
-      const scheduled_at = localDate.toISOString();
+    }
 
-      const [startH, startM] = form.start_time.split(":").map(Number);
-      const [endH, endM] = form.end_time.split(":").map(Number);
-      const duration_mins = (endH * 60 + endM) - (startH * 60 + startM);
+    return null // Sin errores
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    // Validar campos básicos del formulario
+    if (!validate(form)) {
+      return
+    }
+
+    // Validar disponibilidades
+    const availabilityErrors = validateAvailabilities()
+    if (availabilityErrors) {
+      setAvailabilityError(availabilityErrors)
+      return
+    }
+    setAvailabilityError("") // Limpiar si está ok
+
+    try {
+      // Transformar availabilities al formato esperado por el backend
+      // Transformar availabilities al formato esperado por el backend
+      const availabilities_attributes = availabilities.map((availability) => {
+        const startDateTime = new Date(`${availability.date}T${availability.startTime}:00`)
+        const endDateTime = new Date(`${availability.date}T${availability.endTime}:00`)
+
+        return {
+          start_time: startDateTime.toISOString(),
+          end_time: endDateTime.toISOString(),
+        }
+      })
 
       const payload = {
-        scheduled_at,
-        duration_mins,
         modality: form.mode,
         capacity: parseInt(form.limit, 10),
         created_by_id: user.id,
@@ -88,88 +146,25 @@ export default function CreateTutoringByTutor() {
         course_id: course.id,
         subject_ids: selectedSubjects,
         location: form.mode === "presencial" ? form.location : "",
-      };
-      onSubmit(payload);
-      localStorage.removeItem("selectedSubjects");
+        availabilities_attributes,
+      }
+
+      await onSubmit(payload)
+      localStorage.removeItem("selectedSubjects")
+    } catch (err) {
+      console.error("Error creating tutoring sessions:", err)
     }
-  };
+  }
 
   return (
-    <AuthLayout
-      title={`Tutoría para ${course.name}`}
-    >
+    <AuthLayout title={`Tutoría para ${course.name}`}>
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
-
-        <div className="flex flex-col text-left">
-          <label
-            htmlFor="date"
-            className="text-gray-600 text-xs font-medium mb-1"
-          >
-            Fecha
-          </label>
-          <input
-            id="date"
-            type="date"
-            value={form.date}
-            onChange={(e) => setField("date", e.target.value)}
-            className="p-1 border rounded-md text-sm"
-          />
-          {errors.date && (
-            <span className="text-red-500 text-xs mt-1">
-              {errors.date}
-            </span>
-          )}
-        </div>
-
-        <div>
-          <div className="flex flex-row gap-4">
-            <div className="flex flex-col flex-1">
-              <label
-                htmlFor="start_time"
-                className="text-gray-600 text-xs font-medium mb-1"
-              >
-                Hora de inicio
-              </label>
-              <input
-                id="start_time"
-                type="time"
-                value={form.start_time}
-                onChange={(e) => setField("start_time", e.target.value)}
-                className="p-1 border rounded-md text-sm"
-              />
-            </div>
-            <div className="flex flex-col flex-1">
-              <label
-                htmlFor="end_time"
-                className="text-gray-600 text-xs font-medium mb-1"
-              >
-                Hora de fin
-              </label>
-              <input
-                id="end_time"
-                type="time"
-                value={form.end_time}
-                onChange={(e) => setField("end_time", e.target.value)}
-                className="p-1 border rounded-md text-sm"
-              />
-            </div>
-          </div>
-          {errors.start_time && (
-            <span className="text-red-500 text-xs">{errors.start_time}</span>
-          )}
-          {!errors.start_time && errors.end_time && (
-            <span className="text-red-500 text-xs">{errors.end_time}</span>
-          )}
-        </div>
- 
         <div className="flex items-center gap-4">
           <span className="font-medium">Modalidad:</span>
           <button
             type="button"
             className={`px-4 py-2 rounded font-medium transition-colors ${
-              form.mode === "virtual"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-800"
+              form.mode === "virtual" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
             }`}
             onClick={() => setField("mode", "virtual")}
           >
@@ -178,9 +173,7 @@ export default function CreateTutoringByTutor() {
           <button
             type="button"
             className={`px-4 py-2 rounded font-medium transition-colors ${
-              form.mode === "presencial"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-800"
+              form.mode === "presencial" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
             }`}
             onClick={() => setField("mode", "presencial")}
           >
@@ -205,9 +198,7 @@ export default function CreateTutoringByTutor() {
             <div className={`text-xs mt-1 ${form.location.length === 255 ? "text-red-600" : "text-gray-500"}`}>
               {form.location.length}/{255}
             </div>
-            {form.location.length > 255 && (
-              <span className="text-red-500 text-xs mt-1">Máximo 255 caracteres.</span>
-            )}
+            {form.location.length > 255 && <span className="text-red-500 text-xs mt-1">Máximo 255 caracteres.</span>}
           </div>
         )}
 
@@ -226,6 +217,81 @@ export default function CreateTutoringByTutor() {
           />
         </div>
 
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <label className="text-gray-600 text-sm font-semibold">
+              Disponibilidad <span className="text-red-500">*</span>
+            </label>
+            <button
+              type="button"
+              onClick={addAvailability}
+              className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 rounded font-medium transition-colors"
+            >
+              + Agregar
+            </button>
+          </div>
+
+          {availabilities.map((availability, index) => (
+            <div key={index} className="p-4 border rounded-lg space-y-3 bg-gray-50">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">Disponibilidad {index + 1}</span>
+                {availabilities.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeAvailability(index)}
+                    className="text-red-500 hover:text-red-700 text-sm font-medium"
+                  >
+                    Eliminar
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="flex flex-col text-left">
+                  <label htmlFor={`date-${index}`} className="text-gray-600 text-xs font-medium mb-1">
+                    Fecha
+                  </label>
+                  <input
+                    id={`date-${index}`}
+                    type="date"
+                    value={availability.date}
+                    onChange={(e) => updateAvailability(index, "date", e.target.value)}
+                    className="p-1 border rounded-md text-sm"
+                  />
+                </div>
+
+                <div className="flex flex-col text-left">
+                  <label htmlFor={`start-${index}`} className="text-gray-600 text-xs font-medium mb-1">
+                    Hora inicio
+                  </label>
+                  <input
+                    id={`start-${index}`}
+                    type="time"
+                    value={availability.startTime}
+                    onChange={(e) => updateAvailability(index, "startTime", e.target.value)}
+                    className="p-1 border rounded-md text-sm"
+                  />
+                </div>
+
+                <div className="flex flex-col text-left">
+                  <label htmlFor={`end-${index}`} className="text-gray-600 text-xs font-medium mb-1">
+                    Hora final
+                  </label>
+                  <input
+                    id={`end-${index}`}
+                    type="time"
+                    value={availability.endTime}
+                    onChange={(e) => updateAvailability(index, "endTime", e.target.value)}
+                    className="p-1 border rounded-md text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {availabilityError && <span className="text-red-500 text-xs">{availabilityError}</span>}
+        </div>
+
         {error.length > 0 && (
           <ErrorAlert>
             {error.map((err, idx) => (
@@ -237,5 +303,5 @@ export default function CreateTutoringByTutor() {
         <SubmitButton text="Confirmar" />
       </form>
     </AuthLayout>
-  );
+  )
 }

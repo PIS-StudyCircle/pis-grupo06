@@ -15,13 +15,20 @@ jest.mock("@/shared/config", () => ({
 describe("TutorPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Set up default mock to prevent undefined returns
+    usersServices.getUsers.mockResolvedValue({ users: [], pagination: { last: 1 } });
   });
 
-  it("muestra loading", () => {
+  it("muestra loading", async () => {
     usersServices.getUsers.mockResolvedValueOnce({ users: [], pagination: {} });
 
     render(<TutorPage />);
     expect(screen.getByText(/cargando/i)).toBeInTheDocument();
+
+    // Wait for the loading to complete
+    await waitFor(() => {
+      expect(screen.queryByText(/cargando/i)).not.toBeInTheDocument();
+    });
   });
 
   it("muestra mensaje de error", async () => {
@@ -30,7 +37,11 @@ describe("TutorPage", () => {
     );
 
     render(<TutorPage />);
-    expect(await screen.findByText(/Error al cargar los usuarios/i)).toBeInTheDocument();
+
+    // Wait for error to be displayed
+    await waitFor(() => {
+      expect(screen.getByText(/Error al cargar los usuarios/i)).toBeInTheDocument();
+    });
   });
 
   it("muestra la lista de tutores con sus imágenes o iniciales", async () => {

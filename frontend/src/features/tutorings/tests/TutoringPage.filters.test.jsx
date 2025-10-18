@@ -1,3 +1,4 @@
+/* eslint-env jest */
 import React from "react";
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { renderWithRouter, mockUseTutorings, baseTutorings } from "./TutoringPage.testUtils";
@@ -7,6 +8,17 @@ describe("TutoringPage - Filtros y búsqueda", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseTutorings({ tutorings: baseTutorings });
+
+    // Mock fetch for exists_user_tutoring endpoint
+    globalThis.fetch = jest.fn((url) => {
+      if (url.includes('/exists_user_tutoring')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ exists: false }),
+        });
+      }
+      return Promise.reject(new Error('Unknown endpoint'));
+    });
   });
 
   it("muestra todas las tutorías cuando el filtro está vacío", async () => {

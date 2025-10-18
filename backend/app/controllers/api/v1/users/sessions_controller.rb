@@ -16,6 +16,11 @@ module Api
       private
 
       def respond_with(resource, _opt = {})
+        # Solo procesar Google Calendar si el usuario tiene OAuth configurado
+        if resource.google_refresh_token.present?
+          setup_google_calendar(resource)
+        end
+
         success_response(
           message: 'Logged in successfully.',
           data: { user: UserSerializer.new(resource).serializable_hash[:data][:attributes] },
@@ -25,6 +30,14 @@ module Api
 
       def respond_to_on_destroy
         success_response(message: 'Logged out successfully.', status: :ok)
+      end
+
+      def setup_google_calendar(user)
+        service = GoogleCalendarService.new(user)
+        service.ensure_calendar
+      rescue Google::Auth::AuthorizationError => e
+        Rails.logger.error "Error configurando Google Calendar: #{e.message}"
+        # No fallar el login si hay problemas con Google Calendar
       end
     end
   end
