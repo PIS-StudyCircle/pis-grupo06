@@ -49,6 +49,14 @@ module Api
                       .where.not(tutor_id:      current_user.id)
         end
 
+        # los que aun tienen cupo
+        if params[:not_full].present? && ActiveModel::Type::Boolean.new.cast(params[:not_full])
+          tutorings = tutorings.not_full
+
+          # no aparecen las tutorias creadas por el usuario
+          tutorings = tutorings.where.not(created_by_id: current_user.id)
+        end
+
         q = params[:search].to_s
         search_by = params[:search_by].presence_in(%w[course subject]) || "course"
 
