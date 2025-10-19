@@ -124,15 +124,13 @@ class Tutoring < ApplicationRecord
     if scheduled_at < Time.current
       errors.add(:scheduled_at, :past)
     end
-
-    errors.add(:capacity, :less_than_enrolled) if enrolled > capacity
   end
 
   def capacity_not_less_than_enrolled
-    return if capacity.blank?
-
-    if enrolled > capacity
-      errors.add(:capacity, :less_than_enrolled)
+    unless capacity.nil?
+      if enrolled > capacity
+        errors.add(:capacity, :less_than_enrolled)
+      end
     end
   end
 

@@ -530,8 +530,6 @@ tutoring_request = Tutoring.find_or_create_by!(
   scheduled_at: 7.days.from_now,
   duration_mins: 180,
   modality: "virtual",
-  capacity: 1,
-  enrolled: 0,
   course: course,
   created_by_id: creator.id,
   tutor_id: nil
