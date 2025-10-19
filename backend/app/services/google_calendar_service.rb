@@ -173,7 +173,7 @@ class GoogleCalendarService
 
     new(owner)
   end
-  
+
   private
 
   def refresh_google_token(user)
@@ -206,6 +206,4 @@ class GoogleCalendarService
   def event_confirmed?(tutoring)
     tutoring.event_id.present?
   end
-
-  
 end
