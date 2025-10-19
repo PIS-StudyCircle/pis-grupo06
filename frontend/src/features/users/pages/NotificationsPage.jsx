@@ -1,10 +1,8 @@
 import { useUser } from "@context/UserContext";
 import { SessionListPage } from "@/features/calendar";
-import { useNotifications } from "@/context/NotificationsContext";
 
 export default function Notifications() {
   const { user, loading, error } = useUser();
-  const { setNotifications } = useNotifications();
 
   if (loading) return <p className="text-center mt-10">Cargando...</p>;
   
@@ -23,7 +21,6 @@ export default function Notifications() {
           <SessionListPage
             userId={user.id}
             type="invited"
-            onCountChange={(n) => setNotifications(n)}
           />
         </div>
       </div>

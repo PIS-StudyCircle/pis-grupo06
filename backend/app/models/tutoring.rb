@@ -43,6 +43,11 @@ class Tutoring < ApplicationRecord
     where.not(tutor_id: nil)
   }
 
+  # Tutorías con cupos disponibles
+  scope :with_tutor_not_full, -> {
+    where("enrolled < capacity and tutor_id IS NOT NULL")
+  }
+
   # Ya pasó (scheduled_at < ahora)
   scope :past, -> { where(scheduled_at: ...Time.current) }
 
@@ -65,6 +70,26 @@ class Tutoring < ApplicationRecord
     return all if q.blank?
 
     where("tutorings.modality ILIKE ?", "%#{q}%")
+  }
+
+  # Devuelve tutorías donde un usuario A y un usuario B compartieron tutoría
+  scope :shared_between, ->(user_a_id, user_b_id) {
+    joins(:user_tutorings)
+      .where(state: Tutoring.states[:finished])
+      .where(
+        "(tutorings.tutor_id = :a AND user_tutorings.user_id = :b)
+          OR (tutorings.tutor_id = :b AND user_tutorings.user_id = :a)
+          OR (
+            tutorings.id IN (
+              SELECT ut1.tutoring_id
+              FROM user_tutorings ut1
+              JOIN user_tutorings ut2 ON ut1.tutoring_id = ut2.tutoring_id
+              WHERE ut1.user_id = :a AND ut2.user_id = :b
+            )
+          )",
+        a: user_a_id, b: user_b_id
+      )
+      .distinct
   }
 
   # --- Validaciones ---
@@ -99,15 +124,13 @@ class Tutoring < ApplicationRecord
     if scheduled_at < Time.current
       errors.add(:scheduled_at, :past)
     end
-
-    errors.add(:capacity, :less_than_enrolled) if enrolled > capacity
   end
 
   def capacity_not_less_than_enrolled
-    return if capacity.blank?
-
-    if enrolled > capacity
-      errors.add(:capacity, :less_than_enrolled)
+    unless capacity.nil?
+      if enrolled > capacity
+        errors.add(:capacity, :less_than_enrolled)
+      end
     end
   end
 

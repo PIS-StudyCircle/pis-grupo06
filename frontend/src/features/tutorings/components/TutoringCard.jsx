@@ -58,7 +58,7 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
   
 
   const noTieneTutor = tutoring.tutor_id === null;
-  const cuposDisponibles = tutoring.capacity > tutoring.enrolled;
+  const cuposDisponibles =  tutoring.capacity != null && tutoring.capacity > tutoring.enrolled;
   const soyTutor = tutoring.tutor_id === user?.id;
   const esCreador = tutoring.created_by_id === user?.id; 
 
@@ -108,10 +108,10 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
     } else if (esCreador) {
       mode = "creador";
     } else if (noTieneTutor && cuposDisponibles) {
-      mode = "ambos";
+      mode = "ambos"; //TODO: Este modo se va a borrar mas adelante
     } else if (noTieneTutor) {
       mode = "serTutor";
-    } else if (!cuposDisponibles) {
+    } else if (!cuposDisponibles && !noTieneTutor) {
       mode = "completo";
     } else if (cuposDisponibles) {
       mode = "serEstudiante";
@@ -136,7 +136,7 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
               <b>Fecha: </b> {formatDateTime(tutoring.scheduled_at)}
             </p>
           )}
-          {tutoring.duration_mins && (
+          {tutoring.state === "active" && tutoring.duration_mins && (
             <p className="tutoring-card-title mt-1">
               <b>Duración: </b> {tutoring.duration_mins} minutos
             </p>
@@ -149,11 +149,12 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
               </p>
             </>
           ) : null}
-          {tutoring.capacity && (
-            <p className="text-gray-600 text-sm mt-1">
-              <b>Cupos disponibles: </b> {tutoring.capacity - tutoring.enrolled}
-            </p>
-          )}
+          <p className="text-gray-600 text-sm mt-1">
+            <b>Cupos disponibles: </b>
+            {tutoring.capacity == null
+              ? "A definir"
+              : (tutoring.capacity - (tutoring.enrolled ?? 0))}
+          </p>
           <p className="tutoring-card-title mt-1"><b>Temas:</b></p>
 
           <div className="flex flex-wrap gap-2 mt-1">

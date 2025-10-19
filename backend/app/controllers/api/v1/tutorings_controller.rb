@@ -49,6 +49,15 @@ module Api
                       .where.not(tutor_id:      current_user.id)
         end
 
+        # los que aun tienen cupo y tienen tutor asignado
+        if params[:with_tutor_not_full].present? && ActiveModel::Type::Boolean.new.cast(params[:with_tutor_not_full])
+          tutorings = tutorings.with_tutor_not_full
+          Rails.logger.debug { "Tutorings with_tutor_not_full scope applied: #{tutorings.to_sql}" }
+
+          # no aparecen las tutorias creadas por el usuario
+          tutorings = tutorings.where.not(created_by_id: current_user.id)
+        end
+
         q = params[:search].to_s
         search_by = params[:search_by].presence_in(%w[course subject]) || "course"
 
@@ -167,7 +176,7 @@ module Api
         tutoring.course_id     = params.dig(:tutoring, :course_id)
 
         if tutoring.tutor_id.nil? && tutoring.capacity.nil?
-          tutoring.capacity = 1 # Valor por defecto para solicitudes pendientes
+          tutoring.capacity = nil # Valor por defecto para solicitudes pendientes
         end
 
         # Validar overlapping con las availabilities antes de crearlas
@@ -244,7 +253,7 @@ module Api
         UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
         # Incrementar contador de inscritos
-        @tutoring.update!(enrolled: @tutoring.enrolled + 1)
+        # @tutoring.update!(enrolled: @tutoring.enrolled + 1)
 
         # Si no existe evento, crearlo con el tutor y agregarse
         begin
@@ -388,7 +397,7 @@ module Api
             UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
             # Incrementar contador de inscritos
-            @tutoring.update!(enrolled: @tutoring.enrolled + 1)
+            # @tutoring.update!(enrolled: @tutoring.enrolled + 1)
 
             # Si no existe evento, crearlo con el tutor y agregarse
             begin

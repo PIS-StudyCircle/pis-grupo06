@@ -30,9 +30,23 @@ class User < ApplicationRecord
            inverse_of: :creator,
            dependent: :nullify
 
+  has_many :given_reviews,
+           class_name: "UserReview",
+           foreign_key: "reviewer_id",
+           inverse_of: :reviewer,
+           dependent: :destroy
+
+  has_many :received_reviews,
+           class_name: "UserReview",
+           foreign_key: "reviewed_id",
+           inverse_of: :reviewed,
+           dependent: :destroy
+
   belongs_to :faculty
 
   has_one_attached :profile_photo
+  has_many :notifications, as: :recipient, class_name: "Noticed::Notification", dependent: :destroy
+  has_many :notification_mentions, as: :record, class_name: "Noticed::Event", dependent: :destroy
 
   # validaciones
   validates :email, presence: true, uniqueness: true
