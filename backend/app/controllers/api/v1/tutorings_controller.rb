@@ -581,6 +581,33 @@ module Api
         }
       end
 
+      def past
+        user = User.find(params[:user_id])
+
+        tutorings = Tutoring
+                      .enrolled_by(user)
+                      .past                          
+                      .includes(:tutor, :course)
+                      .order(scheduled_at: :desc)
+
+        render json: tutorings.map { |t|
+          is_tutor = t.tutor_id == user.id
+          {
+            id: t.id,
+            subject: t.course&.name,
+            tutor: t.tutor&.name || "Sin asignar",
+            date: t.scheduled_at,
+            duration: t.duration_mins,
+            location: t.location.presence || "Virtual",
+            status: t.state,
+            role: is_tutor ? "tutor" : "student",
+            attendees: t.users.map { |u| { email: u.email, status: "finalizada" } },
+            url: nil
+          }
+        }
+      end
+
+
       private
 
       def set_tutoring
