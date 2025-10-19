@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_11_002544) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_17_002419) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -70,6 +70,34 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_11_002544) do
     t.index ["course_id"], name: "index_favorite_courses_on_course_id"
     t.index ["user_id", "course_id"], name: "index_favorite_courses_on_user_id_and_course_id", unique: true
     t.index ["user_id"], name: "index_favorite_courses_on_user_id"
+  end
+
+  create_table "noticed_events", force: :cascade do |t|
+    t.string "type"
+    t.string "record_type"
+    t.bigint "record_id"
+    t.jsonb "params"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "notifications_count"
+    t.index ["record_type", "record_id"], name: "index_noticed_events_on_record"
+  end
+
+  create_table "noticed_notifications", force: :cascade do |t|
+    t.string "type"
+    t.string "title"
+    t.text "body"
+    t.jsonb "metadata", default: {}, null: false
+    t.string "url"
+    t.bigint "event_id", null: false
+    t.string "recipient_type", null: false
+    t.bigint "recipient_id", null: false
+    t.datetime "read_at", precision: nil
+    t.datetime "seen_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_noticed_notifications_on_event_id"
+    t.index ["recipient_type", "recipient_id"], name: "index_noticed_notifications_on_recipient"
   end
 
   create_table "subject_tutorings", force: :cascade do |t|
@@ -133,6 +161,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_11_002544) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "user_reviews", force: :cascade do |t|
+    t.integer "reviewed_id"
+    t.integer "reviewer_id"
+    t.text "review"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reviewer_id", "reviewed_id"], name: "index_user_reviews_on_reviewer_id_and_reviewed_id", unique: true
+  end
+
   create_table "user_tutorings", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "tutoring_id", null: false
@@ -160,10 +197,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_11_002544) do
     t.bigint "faculty_id"
     t.string "provider"
     t.string "uid"
-    t.string "google_access_token"
-    t.string "google_refresh_token"
-    t.datetime "google_expires_at"
-    t.string "calendar_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true

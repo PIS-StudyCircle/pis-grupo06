@@ -1,7 +1,9 @@
 import { AppRoutes } from "./routes";
 import Layout from "@components/layout/Layout";
-import { UserProvider } from "@/features/users";
-import { NotificationsProvider } from "@/context/NotificationsContext";
+
+import UserProvider from "@/features/users/userProvider";
+import { NotificationsProvider } from "@/features/notifications/notificationProvider";
+
 import "../App.css";
 
 import { ToastContainer } from "react-toastify";
@@ -10,13 +12,13 @@ import "react-toastify/dist/ReactToastify.css";
 export default function App() {
   return (
     <div className="app-container">
-      <NotificationsProvider>
-        <UserProvider>
+      <UserProvider>
+        <NotificationsProvider>
           <Layout>
             <AppRoutes />
           </Layout>
-        </UserProvider>
-      </NotificationsProvider>
+        </NotificationsProvider>
+      </UserProvider>
       <ToastContainer
         position="top-right"
         autoClose={3000}

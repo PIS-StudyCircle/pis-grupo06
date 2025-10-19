@@ -80,4 +80,8 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
 
   Rails.application.routes.default_url_options[:host] = "http://localhost:3000"
+
+  config.action_cable.disable_request_forgery_protection = true
+
+  config.action_cable.allowed_request_origins = [ /http:\/\/localhost:\d+/, /http:\/\/127\.0\.0\.1:\d+/ ]
 end

@@ -31,7 +31,7 @@ const Sidebar = ({
     { title: "Mis Clases", path: "/notificaciones", Icon: BookOpen },
     { title: "Tutorías", path: "/tutorias", Icon: Users },
     { title: "Materias", path: "/materias", Icon: GraduationCap },
-    { title: "Tutores", path: "/tutores", Icon: SquareUser },
+    { title: "Usuarios", path: "/usuarios", Icon: SquareUser },
   ];
   const guestItems = [
     { title: "Inicio", path: "/flujo-visitante", Icon: Home },

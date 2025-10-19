@@ -6,7 +6,7 @@ import {
   ProfilePage,
   SignInPage,
   RegisterPage,
-  TutorPage,
+  UserPage,
   VisitorFlow,
   ForgotPasswordPage,
   ResetPasswordPage,
@@ -41,13 +41,11 @@ export function AppRoutes() {
           element={<TutoringPage filters={{}} mode="" />}
         />
         <Route path="/perfil" element={<ProfilePage />} />
-        <Route path="/tutores" element={<TutorPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
         <Route path="/notificaciones" element={<NotificationsPage />} />
 
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
         <Route path="/perfil" element={<ProfilePage />} />
-        <Route path="/tutores" element={<TutorPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
         <Route path="/tutorias/:tutoringId/elegir_horario_tutor" element={<ChooseScheduleByTutor />} />
         <Route path="/tutorias/:tutoringId/elegir_horario_estudiante" element={<ChooseScheduleByStudent />} />
@@ -68,6 +66,9 @@ export function AppRoutes() {
           path="/tutorias/solicitar/:courseId"
           element={<CreateTutoringByStudent />}
         />
+        <Route path="/perfil" element={<ProfilePage />} />
+        <Route path="/usuarios" element={<UserPage />} />
+        <Route path="/usuarios/:id" element={<UserProfilePage />} />
         <Route
           path="/tutorias/materia/:courseId"
           element={<TutoringPage filters={{}} mode="serEstudiante" />}
@@ -87,7 +88,7 @@ export function AppRoutes() {
         path="/materias/:courseId/temas/:subjectId"
         element={<SubjectDetailPage />}
       />
-      <Route path="/tutores" element={<TutorPage />} />
+      <Route path="/usuarios" element={<UserPage />} />
       <Route path="*" element={<Error404Page />} />
     </Routes>
   );
