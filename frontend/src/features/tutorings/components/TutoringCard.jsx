@@ -131,14 +131,12 @@ export default function TutoringCard({ tutoring, mode: externalMode }) {
               </p>
             </>
           ) : null}
-          {tutoring.capacity && (
-            <p className="text-gray-600 text-sm mt-1">
-              <b>Cupos disponibles: </b>
-              {tutoring.capacity == null
-                ? "A definir"
-                : (tutoring.capacity - (tutoring.enrolled ?? 0))}
-            </p>
-          )}
+          <p className="text-gray-600 text-sm mt-1">
+            <b>Cupos disponibles: </b>
+            {tutoring.capacity == null
+              ? "A definir"
+              : (tutoring.capacity - (tutoring.enrolled ?? 0))}
+          </p>
           <p className="tutoring-card-title mt-1"><b>Temas:</b></p>
 
           <div className="flex flex-wrap gap-2 mt-1">
