@@ -49,9 +49,10 @@ module Api
                       .where.not(tutor_id:      current_user.id)
         end
 
-        # los que aun tienen cupo
-        if params[:not_full].present? && ActiveModel::Type::Boolean.new.cast(params[:not_full])
-          tutorings = tutorings.not_full
+        # los que aun tienen cupo y tienen tutor asignado
+        if params[:with_tutor_not_full].present? && ActiveModel::Type::Boolean.new.cast(params[:with_tutor_not_full])
+          tutorings = tutorings.with_tutor_not_full
+          Rails.logger.debug "Tutorings with_tutor_not_full scope applied: #{tutorings.to_sql}"
 
           # no aparecen las tutorias creadas por el usuario
           tutorings = tutorings.where.not(created_by_id: current_user.id)
@@ -175,7 +176,7 @@ module Api
         tutoring.course_id     = params.dig(:tutoring, :course_id)
 
         if tutoring.tutor_id.nil? && tutoring.capacity.nil?
-          tutoring.capacity = 1 # Valor por defecto para solicitudes pendientes
+          tutoring.capacity = nil # Valor por defecto para solicitudes pendientes
         end
 
         # Validar overlapping con las availabilities antes de crearlas

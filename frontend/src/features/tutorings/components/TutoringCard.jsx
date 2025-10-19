@@ -134,9 +134,9 @@ export default function TutoringCard({ tutoring, mode: externalMode }) {
           {tutoring.capacity && (
             <p className="text-gray-600 text-sm mt-1">
               <b>Cupos disponibles: </b>
-              {tutoring.state === "active"
-                ? ( (tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0) )
-                : "A definir"}
+              {tutoring.capacity == null
+                ? "A definir"
+                : (tutoring.capacity - (tutoring.enrolled ?? 0))}
             </p>
           )}
           <p className="tutoring-card-title mt-1"><b>Temas:</b></p>

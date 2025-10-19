@@ -44,8 +44,8 @@ class Tutoring < ApplicationRecord
   }
 
   # Tutorías con cupos disponibles
-  scope :not_full, -> { 
-    where("enrolled < capacity") 
+  scope :with_tutor_not_full, -> { 
+    where("enrolled < capacity and tutor_id IS NOT NULL") 
   }
 
   # Ya pasó (scheduled_at < ahora)

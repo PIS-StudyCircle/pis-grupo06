@@ -5,9 +5,8 @@ const filtersFromMode = (mode) => {
     case "serTutor":
       return { no_tutor: true };
     case "serEstudiante":
-      return { not_full: true };
-    // Se cambia with_tutor por not_full ya que un estudiante puede unirse a una tutoria pending sin tutor asignado, sin embargo
-    // no tiene sentido mostrar tutorías que ya estén completas 
+      return { with_tutor_not_full: true };
+    // Se cambia with_tutor por with_tutor_not_full ya que un estudiante ya que no tiene sentido mostrar tutorías que ya estén completas 
     case "misTutorias":
       return { enrolled: true };
     default:
