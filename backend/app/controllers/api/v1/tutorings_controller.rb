@@ -573,80 +573,63 @@ module Api
       end
 
       # DELETE /api/v1/tutorings/:id/unsubscribe
-      def unsubscribe
-        
+      # DELETE /api/v1/tutorings/:id/unsubscribe
+    def unsubscribe
+      ActiveRecord::Base.transaction do
+        @tutoring.lock!
 
-        ActiveRecord::Base.transaction do
-          @tutoring.lock!
+        calendar = GoogleCalendarService.for_owner(@tutoring)
 
-          calendar = GoogleCalendarService.for_owner(@tutoring)
+        was_tutor       = (@tutoring.tutor_id.present? && @tutoring.tutor_id == current_user.id)
+        had_tutor       = @tutoring.tutor_id.present?
+        prev_enrolled   = @tutoring.enrolled.to_i
+        event_confirmed = @tutoring.event_id.present?
 
-          was_tutor      = (@tutoring.tutor_id.present? && @tutoring.tutor_id == current_user.id)
-          had_tutor      = @tutoring.tutor_id.present?
-          prev_enrolled  = @tutoring.enrolled.to_i
-          event_confirmed = @tutoring.event_id.present?
-
-          # 1) Tutor se desuscribe -> SIEMPRE se elimina la tutoría
-          if was_tutor
-            # Comentario: acá deberíamos notificar a todos los estudiantes inscriptos que el tutor canceló.
-            # Ej: @tutoring.student_users.each { |u| Notifier.tutoring_canceled_by_tutor(u, @tutoring).deliver_later }
-
-            begin
-              calendar.delete_event(@tutoring) # no-op si no hay event_id
-            rescue => e
-              Rails.logger.error "Calendar delete_event! error (continuamos con el borrado): #{e.message}"
-            end
-
-            # Si borrás la tutoría, en general cascada elimina UserTutorings (según tus dependencias)
-            @tutoring.destroy!
-            return head :no_content
-          end
-
-          # 2) No es tutor: eliminar la relación y actualizar contador
-          #Encuentro el user_tutoring correspondiente
-          user_tutoring = UserTutoring.find_by!(user_id: current_user.id, tutoring_id: @tutoring.id)
-          user_tutoring.destroy!
-
-          new_enrolled = [prev_enrolled - 1, 0].max
-          @tutoring.update!(enrolled: new_enrolled)
-
-          # 3) Casos borde (NO tutor)
-
-          # 3.a) Tutoría en estado pendiente (sin horario/confirmación) -> se elimina sin notificaciones
-          unless event_confirmed
-            begin
-              calendar.delete_event(@tutoring) # por si hubiera quedado event_id
-            rescue => e
-              Rails.logger.error "Calendar delete_event! (pendiente) error: #{e.message}"
-            end
-            @tutoring.destroy!
-            return head :no_content
-          end
-
-          # 3.b) Si queda vacío el conjunto tutor+estudiantes -> eliminar
-          remaining_participants = new_enrolled + (had_tutor ? 1 : 0)
-          if remaining_participants.zero?
-            begin
-              calendar.delete_event(@tutoring)
-            rescue => e
-              Rails.logger.error "Calendar delete_event (último en irse) error: #{e.message}"
-            end
-            @tutoring.destroy!
-            return head :no_content
-          end
-
-          # 4) Caso normal (tutoría sigue viva): quitar al usuario del evento de Calendar
+        # 1) Si el que se va es el tutor -> SIEMPRE borrar tutoría (+ evento si existe)
+        if was_tutor
+          # (Comentario futuro) notificar a estudiantes que el tutor canceló
           begin
-            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-            console.log("Intentando leave_event para #{@tutoring.id} y #{current_user.email}")
-            calendar.leave_event(@tutoring, current_user.email)
+            calendar.delete_event(@tutoring) if event_confirmed
           rescue => e
-            Rails.logger.error "Calendar leave_event error (no detiene la desuscripción): #{e.message}"
+            Rails.logger.error "Calendar delete_event (se va tutor) error: #{e.message}"
           end
+
+          @tutoring.destroy!
+          return head :no_content
         end
 
-        head :no_content
+        # 2) Es estudiante: quitar relación + actualizar contador
+        user_tutoring = UserTutoring.find_by!(user_id: current_user.id, tutoring_id: @tutoring.id)
+        user_tutoring.destroy!
+
+        new_enrolled = [prev_enrolled - 1, 0].max
+        @tutoring.update!(enrolled: new_enrolled)
+
+        # 3) Caso borde: si NO hay tutor y NO quedan estudiantes -> borrar todo
+        if !had_tutor && new_enrolled.zero?
+          begin
+            calendar.delete_event(@tutoring) if event_confirmed
+          rescue => e
+            Rails.logger.error "Calendar delete_event (no tutor y sin estudiantes) error: #{e.message}"
+          end
+
+          @tutoring.destroy!
+          return head :no_content
+        end
+
+        # 4) Caso normal: la tutoría queda viva -> remover del evento (si existe)
+        if event_confirmed
+          begin
+            calendar.leave_event(@tutoring, current_user.email)
+          rescue => e
+            Rails.logger.error "Calendar leave_event error (continuamos): #{e.message}"
+          end
+        end
       end
+
+      head :no_content
+    end
+
 
       private
 

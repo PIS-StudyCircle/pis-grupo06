@@ -94,25 +94,46 @@ class GoogleCalendarService
     user.update!(calendar_id: result.id)
     result.id
   end
-    # Quitar asistente del evento (cuando alguien se desuscribe)
-  def leave_event(tutoring, attendee_email)
+  
+  # Quitar asistente del evento (cuando alguien se desuscribe)
+    def leave_event(tutoring, attendee_email)
     return if tutoring.event_id.blank?
 
-    calendar_id = tutoring_owner_calendar(tutoring)
-    service = Google::Apis::CalendarV3::CalendarService.new
-    service.authorization = tutoring.tutor.google_access_token
-
-    event = service.get_event(calendar_id, tutoring.event_id)
-    attendees = Array(event.attendees)
-    new_list = attendees.reject { |a| a.email == attendee_email }
-
-    # Solo actualiza si hay cambios
-    return if new_list.size == attendees.size
-
-    event.attendees = new_list
-    service.update_event(calendar_id, tutoring.event_id, event)
-  rescue Google::Apis::ClientError => e
-    Rails.logger.error "leave_event error: #{e.message}"
+    begin
+      # Obtener el owner del evento
+      owner = tutoring.tutor || User.find(tutoring.created_by_id)
+      calendar_id = owner.calendar_id || ensure_calendar(owner)
+      
+      # CRÍTICO: Crear servicio con autorización del OWNER, no del usuario actual
+      owner_service = Google::Apis::CalendarV3::CalendarService.new
+      owner_service.authorization = owner.google_access_token || refresh_google_token(owner)
+      
+      Rails.logger.info "Intentando remover #{attendee_email} del evento #{tutoring.event_id}"
+      Rails.logger.info "Calendar ID: #{calendar_id}"
+      Rails.logger.info "Owner: #{owner.email}"
+      
+      # Usar owner_service en lugar de @service
+      event = owner_service.get_event(calendar_id, tutoring.event_id)
+      attendees = Array(event.attendees)
+      
+      Rails.logger.info "Attendees antes: #{attendees.map(&:email)}"
+      
+      new_list = attendees.reject { |a| a.email == attendee_email }
+      
+      Rails.logger.info "Attendees después: #{new_list.map(&:email)}"
+      
+      if new_list.size != attendees.size
+        event.attendees = new_list.empty? ? nil : new_list
+        owner_service.update_event(calendar_id, tutoring.event_id, event)  # owner_service, no @service
+        Rails.logger.info "Usuario #{attendee_email} removido exitosamente del evento"
+      else
+        Rails.logger.warn "Usuario #{attendee_email} no encontrado en la lista de attendees"
+      end
+      
+    rescue => e
+      Rails.logger.error "Error en leave_event: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+    end
   end
   
   private
