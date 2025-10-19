@@ -319,7 +319,7 @@ RSpec.describe "Api::V1::TutoringsController", type: :request do
         password_confirmation: "password123",
         faculty: faculty
       )
-  
+
       course2 = Course.create!(name: "Matemática I", faculty: faculty)
       tutor2  = User.create!(
         name: "Tutor 2",
@@ -329,7 +329,7 @@ RSpec.describe "Api::V1::TutoringsController", type: :request do
         password_confirmation: "password123",
         faculty: faculty
       )
-  
+
       tutoring_future = Tutoring.create!(
         course: course2,
         tutor: tutor2,
@@ -339,7 +339,7 @@ RSpec.describe "Api::V1::TutoringsController", type: :request do
         scheduled_at: 1.day.from_now,
         state: "active"
       )
-  
+
       # Crear tutoría como futura y luego cambiarle la fecha a pasada sin validación
       tutoring_past = Tutoring.create!(
         course: course2,
@@ -351,15 +351,15 @@ RSpec.describe "Api::V1::TutoringsController", type: :request do
         state: "active"
       )
       tutoring_past.update_column(:scheduled_at, 2.days.ago)
-  
+
       UserTutoring.create!(user: alumno, tutoring: tutoring_future)
       UserTutoring.create!(user: alumno, tutoring: tutoring_past)
-  
+
       get upcoming_api_v1_tutorings_path, params: { user_id: alumno.id }
-  
+
       expect(response).to have_http_status(:ok)
       json = response.parsed_body
-  
+
       expect(json.size).to eq(1)
       expect(json.first["id"]).to eq(tutoring_future.id)
       expect(json.first["subject"]).to eq(course2.name)

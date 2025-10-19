@@ -255,7 +255,7 @@ module Api
         # Incrementar contador de inscritos
         # Sin esto testeando me di cuenta que por alguna razón crea la tutoría igual a pesar de la capacidad habría que
         # cambiarlo por otro chequeo
-        @tutoring.update!(enrolled: @tutoring.enrolled + 1) 
+        @tutoring.update!(enrolled: @tutoring.enrolled + 1)
 
         # Si no existe evento, crearlo con el tutor y agregarse
         begin
