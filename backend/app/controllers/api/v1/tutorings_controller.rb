@@ -581,8 +581,7 @@ module Api
         }
       end
 
-      # DELETE /api/v1/tutorings/:id/unsubscribe
-      # DELETE /api/v1/tutorings/:id/unsubscribe
+    # DELETE /api/v1/tutorings/:id/unsubscribe
     def unsubscribe
       ActiveRecord::Base.transaction do
         @tutoring.lock!
