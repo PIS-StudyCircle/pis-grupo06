@@ -350,7 +350,7 @@ RSpec.describe "Api::V1::TutoringsController", type: :request do
         scheduled_at: 1.day.from_now,
         state: "active"
       )
-      tutoring_past.update_column(:scheduled_at, 2.days.ago)
+      tutoring_past.update_column(:scheduled_at, 2.days.ago) # rubocop:disable Rails/SkipsModelValidations
 
       UserTutoring.create!(user: alumno, tutoring: tutoring_future)
       UserTutoring.create!(user: alumno, tutoring: tutoring_past)
