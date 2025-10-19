@@ -613,6 +613,18 @@ module Api
         new_enrolled = [prev_enrolled - 1, 0].max
         @tutoring.update!(enrolled: new_enrolled)
 
+        # 2.5) Si el que se va es el creador y no quedan estudiantes -> eliminar tutoría
+        if current_user.id == @tutoring.created_by_id && new_enrolled.zero?
+          begin
+            calendar.delete_event(@tutoring) if event_confirmed
+          rescue => e
+            Rails.logger.error "Calendar delete_event (se va creador y sin estudiantes) error: #{e.message}"
+          end
+
+          @tutoring.destroy!
+          return head :no_content
+        end
+
         # 3) Caso borde: si NO hay tutor y NO quedan estudiantes -> borrar todo
         if !had_tutor && new_enrolled.zero?
           begin
@@ -633,6 +645,13 @@ module Api
             Rails.logger.error "Calendar leave_event error (continuamos): #{e.message}"
           end
         end
+
+        # Si queda tutor pero ya no quedan estudiantes (enrolled == 0), limpiar el horario
+        if had_tutor && new_enrolled.zero?
+          @tutoring.update!(scheduled_at: nil)
+          @tutoring.tutoring_availabilities.update_all(is_booked: false)
+        end
+        
       end
 
       head :no_content
