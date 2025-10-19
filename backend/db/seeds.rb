@@ -404,120 +404,122 @@ end
 # Cuando un estudiante crea una solicitud de tutoría (tutor_id: nil),
 # automáticamente se inscribe en ella (UserTutoring).
 
-# Tutoría 1 creada por estudiante solicitándola, con 3 temas
-creator = User.find_by!(email: "luisgomez@gmail.com")
-course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+# TODO: VER DE ARREGLAR LO DE USER CALENDAR PARA DESCOMENTAR ESTAS TUTORIAS
 
-tutoring_request = Tutoring.find_or_create_by!(
-  scheduled_at: 6.days.from_now,
-  duration_mins: 90,
-  modality: "virtual",
-  capacity: 3,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: nil # user_calendar.id
-)
+# # Tutoría 1 creada por estudiante solicitándola, con 3 temas
+# creator = User.find_by!(email: "luisgomez@gmail.com")
+# course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
+# subjects = Subject.where(course: course).shuffle.take(rand(1..3))
 
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
-end
+# tutoring_request = Tutoring.find_or_create_by!(
+#   scheduled_at: 6.days.from_now,
+#   duration_mins: 90,
+#   modality: "virtual",
+#   capacity: 3,
+#   enrolled: 0,
+#   course: course,
+#   created_by_id: creator.id,
+#   tutor_id: nil # user_calendar.id
+# )
 
-# El creador de la solicitud se inscribe automáticamente
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_request
-)
+# subjects.each do |subject|
+#   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
+# end
 
-# Crear disponibilidades para esta tutoría
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_request,
-  start_time: 6.days.from_now.change(hour: 14, min: 0),
-  end_time: 6.days.from_now.change(hour: 15, min: 30),
-  is_booked: false
-)
+# # El creador de la solicitud se inscribe automáticamente
+# UserTutoring.find_or_create_by!(
+#   user: creator,
+#   tutoring: tutoring_request
+# )
 
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_request,
-  start_time: 6.days.from_now.change(hour: 16, min: 0),
-  end_time: 6.days.from_now.change(hour: 17, min: 30),
-  is_booked: false
-)
+# # Crear disponibilidades para esta tutoría
+# TutoringAvailability.find_or_create_by!(
+#   tutoring: tutoring_request,
+#   start_time: 6.days.from_now.change(hour: 14, min: 0),
+#   end_time: 6.days.from_now.change(hour: 15, min: 30),
+#   is_booked: false
+# )
 
-# Tutoría 2 creada por estudiante solicitándola, con 1 tema
-creator = User.find_by!(email: "juanperez@gmail.com")
-course = Course.find_by(id: 145) # Física I
-subject = course.subjects.sample(1).first
+# TutoringAvailability.find_or_create_by!(
+#   tutoring: tutoring_request,
+#   start_time: 6.days.from_now.change(hour: 16, min: 0),
+#   end_time: 6.days.from_now.change(hour: 17, min: 30),
+#   is_booked: false
+# )
 
-tutoring_request = Tutoring.find_or_create_by!(
-  scheduled_at: 3.days.from_now,
-  duration_mins: 90,
-  modality: "virtual",
-  capacity: 1,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: nil # user_calendar.id
-)
+# # # Tutoría 2 creada por estudiante solicitándola, con 1 tema
+# # creator = User.find_by!(email: "juanperez@gmail.com")
+# # course = Course.find_by(id: 145) # Física I
+# # subject = course.subjects.sample(1).first
 
-SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
-# create_event_for_tutoring(service, calendar_id, tutoring_request)
+# # tutoring_request = Tutoring.find_or_create_by!(
+# #   scheduled_at: 3.days.from_now,
+# #   duration_mins: 90,
+# #   modality: "virtual",
+# #   capacity: 1,
+# #   enrolled: 0,
+# #   course: course,
+# #   created_by_id: creator.id,
+# #   tutor_id: nil # user_calendar.id
+# # )
 
-# El creador de la solicitud se inscribe automáticamente
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_request
-)
+# # SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
+# # # create_event_for_tutoring(service, calendar_id, tutoring_request)
 
-# Crear disponibilidad para esta tutoría
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_request,
-  start_time: 3.days.from_now.change(hour: 10, min: 0),
-  end_time: 3.days.from_now.change(hour: 11, min: 30),
-  is_booked: false
-)
+# # # El creador de la solicitud se inscribe automáticamente
+# # UserTutoring.find_or_create_by!(
+# #   user: creator,
+# #   tutoring: tutoring_request
+# # )
 
-# Tutoría 3 creada por estudiante solicitándola, con 5 temas
-creator = User.find_by!(email: "anaperez@gmail.com")
-course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-subjects = Subject.where(course: course).shuffle.take(rand(1..5))
+# # # Crear disponibilidad para esta tutoría
+# # TutoringAvailability.find_or_create_by!(
+# #   tutoring: tutoring_request,
+# #   start_time: 3.days.from_now.change(hour: 10, min: 0),
+# #   end_time: 3.days.from_now.change(hour: 11, min: 30),
+# #   is_booked: false
+# # )
 
-tutoring_request = Tutoring.find_or_create_by!(
-  scheduled_at: 4.days.from_now,
-  duration_mins: 90,
-  modality: "virtual",
-  capacity: 1,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: nil # user_calendar.id
-)
+# # Tutoría 3 creada por estudiante solicitándola, con 5 temas
+# creator = User.find_by!(email: "anaperez@gmail.com")
+# course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
+# subjects = Subject.where(course: course).shuffle.take(rand(1..5))
 
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
-end
+# tutoring_request = Tutoring.find_or_create_by!(
+#   scheduled_at: 4.days.from_now,
+#   duration_mins: 90,
+#   modality: "virtual",
+#   capacity: 1,
+#   enrolled: 0,
+#   course: course,
+#   created_by_id: creator.id,
+#   tutor_id: nil # user_calendar.id
+# )
 
-# El creador de la solicitud se inscribe automáticamente
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_request
-)
+# subjects.each do |subject|
+#   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
+# end
 
-# Crear disponibilidades para esta tutoría
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_request,
-  start_time: 4.days.from_now.change(hour: 15, min: 0),
-  end_time: 4.days.from_now.change(hour: 16, min: 30),
-  is_booked: false
-)
+# # El creador de la solicitud se inscribe automáticamente
+# UserTutoring.find_or_create_by!(
+#   user: creator,
+#   tutoring: tutoring_request
+# )
 
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_request,
-  start_time: 4.days.from_now.change(hour: 18, min: 0),
-  end_time: 4.days.from_now.change(hour: 19, min: 30),
-  is_booked: false
-)
+# # Crear disponibilidades para esta tutoría
+# TutoringAvailability.find_or_create_by!(
+#   tutoring: tutoring_request,
+#   start_time: 4.days.from_now.change(hour: 15, min: 0),
+#   end_time: 4.days.from_now.change(hour: 16, min: 30),
+#   is_booked: false
+# )
+
+# TutoringAvailability.find_or_create_by!(
+#   tutoring: tutoring_request,
+#   start_time: 4.days.from_now.change(hour: 18, min: 0),
+#   end_time: 4.days.from_now.change(hour: 19, min: 30),
+#   is_booked: false
+# )
 
 # Tutoría 3 repetida con 5 temas
 creator = User.find_by!(email: "anaperez@gmail.com")
