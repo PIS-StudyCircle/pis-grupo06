@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 
 
-export async function createFeedback(tutorId, comment) {
+export async function createFeedback(tutoring_id, comment) {
   try {
     const response = await fetch("/api/v1/users/user_feedbacks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include", // mantiene la sesión autenticada (importante con devise)
+      credentials: "include", 
       body: JSON.stringify({
-        tutor_id: tutorId,
+        tutoring_id,
         comment,
       }),
     });

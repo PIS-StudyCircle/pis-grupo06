@@ -10,7 +10,7 @@ export default function FeedbackModal({
   onClose,
   onSubmit,
 }) {
-  const [rating, setRating] = useState(0);
+  const [setRating] = useState(0);
   const [comment, setComment] = useState("");
 
   const handleSubmit = async () => {

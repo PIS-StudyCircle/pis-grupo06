@@ -1,6 +1,7 @@
 class Feedback < ApplicationRecord
   belongs_to :tutor, class_name: "User"
   belongs_to :student, class_name: "User"
+  belongs_to :tutoring, optional: true
 
   validates :tutor_id, :student_id, :comment, presence: true
   validates :comment, length: { maximum: 1000 }
