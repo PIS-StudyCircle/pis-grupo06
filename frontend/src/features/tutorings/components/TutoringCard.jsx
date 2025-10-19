@@ -40,7 +40,7 @@ export default function TutoringCard({ tutoring, mode: externalMode }) {
   };
 
   const noTieneTutor = tutoring.tutor_id === null;
-  const cuposDisponibles = tutoring.capacity > tutoring.enrolled;
+  const cuposDisponibles =  tutoring.capacity != null && tutoring.capacity > tutoring.enrolled;
   const soyTutor = tutoring.tutor_id === user?.id;
   const esCreador = tutoring.created_by_id === user?.id; 
 
@@ -90,10 +90,10 @@ export default function TutoringCard({ tutoring, mode: externalMode }) {
     } else if (esCreador) {
       mode = "creador";
     } else if (noTieneTutor && cuposDisponibles) {
-      mode = "ambos";
+      mode = "ambos"; //TODO: Este modo se va a borrar mas adelante
     } else if (noTieneTutor) {
       mode = "serTutor";
-    } else if (!cuposDisponibles) {
+    } else if (!cuposDisponibles && !noTieneTutor) {
       mode = "completo";
     } else if (cuposDisponibles) {
       mode = "serEstudiante";
