@@ -80,7 +80,7 @@ export default function ChooseScheduleByStudent() {
         capacity,
       });
       setMessage("Tutoría confirmada con éxito.");
-      setTimeout(() => navigate("/"), 2000);
+      setTimeout(() => navigate("/notificaciones"), 2000);
     } catch (e) {
       console.error(e);
       const msg = e instanceof Error ? e.message : String(e);
