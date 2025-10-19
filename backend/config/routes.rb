@@ -32,7 +32,22 @@ Rails.application.routes.draw do
         resources :subjects
         resource :favorite, only: [:create, :destroy], controller: 'course_favorites'
       end
-      resources :tutorings
+
+      resources :tutorings do
+        get "upcoming", on: :collection
+        post "confirm_schedule", on: :member
+        post "join_tutoring", on: :member
+        get "exists_user_tutoring", on: :member
+      end
+
+      resource :calendar, only: [] do
+        post   "sessions",          to: "calendar#create"
+        post   "sessions/:id/join", to: "calendar#join"
+        get    "sessions/upcoming", to: "calendar#upcoming"
+        get    "sessions/:id",      to: "calendar#show"
+        delete "sessions/:id",      to: "calendar#destroy"
+      end
+
       resources :notifications do
         collection do
           post :mark_all_read

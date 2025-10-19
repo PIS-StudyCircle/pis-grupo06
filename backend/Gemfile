@@ -57,10 +57,12 @@ gem 'omniauth'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-rails_csrf_protection'
 
-group :development, :test do
-  gem 'rspec-rails', '~> 8.0.0'
+gem 'google-apis-calendar_v3'
+gem 'googleauth'
 
+group :development, :test do
   gem "pry-byebug"
+  gem 'rspec-rails', '~> 8.0.0'
 
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
@@ -70,6 +72,9 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Ruby static code analyzer and formatter
+  gem "rubocop", "~> 1.80", require: false
 end
 
 gem "letter_opener", "~> 1.10"

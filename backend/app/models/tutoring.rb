@@ -5,6 +5,8 @@ class Tutoring < ApplicationRecord
   has_many :subject_tutorings, dependent: :destroy
   has_many :subjects, through: :subject_tutorings
 
+  has_many :tutoring_availabilities, dependent: :destroy
+
   belongs_to :course
   belongs_to :creator, class_name: 'User',
                        foreign_key: 'created_by_id',
@@ -39,6 +41,11 @@ class Tutoring < ApplicationRecord
   # Tutorías con tutor asignado
   scope :with_tutor, -> {
     where.not(tutor_id: nil)
+  }
+
+  # Tutorías con cupos disponibles
+  scope :with_tutor_not_full, -> {
+    where("enrolled < capacity and tutor_id IS NOT NULL")
   }
 
   # Ya pasó (scheduled_at < ahora)
@@ -96,19 +103,17 @@ class Tutoring < ApplicationRecord
             inclusion: { in: %w[virtual presencial],
                          message: :inclusion }
 
-  validates :capacity,
-            presence: true,
-            numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 100 }
   validate :capacity_not_less_than_enrolled
 
   validates :request_comment, length: { maximum: 500 }, allow_blank: true
   validates :location, length: { maximum: 255 }, allow_blank: true
   validate :request_due_at_after_now
   validate :request_due_at_before_scheduled_at
+
   # --- Métodos auxiliares ---
 
   def enrolled
-    user_tutorings.size
+    user_tutorings.where.not(user_id: tutor_id).count
   end
 
   private
@@ -122,10 +127,10 @@ class Tutoring < ApplicationRecord
   end
 
   def capacity_not_less_than_enrolled
-    return if capacity.blank?
-
-    if enrolled > capacity
-      errors.add(:capacity, :less_than_enrolled)
+    unless capacity.nil?
+      if enrolled > capacity
+        errors.add(:capacity, :less_than_enrolled)
+      end
     end
   end
 
