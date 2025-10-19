@@ -18,7 +18,7 @@ module Api
               tutoring: {
                 only: [:id],
                 include: {
-                  course: { only: [:id, :name] } # 👈 incluye el curso con su nombre
+                  course: { only: [:id, :name] }
                 }
               }
             },
