@@ -58,6 +58,11 @@ test:
   <<: *default
   database: studycircle_test
 
+  queue:
+    <<: *default
+    database: studycircle_test_queue
+
+
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
 # ever seen by anyone, they now have access to your database.
@@ -84,16 +89,10 @@ production:
     url: <%= ENV["PRODUCTION_DATABASE_URL"] || ENV["DATABASE_URL"] %>
   cache:
     <<: *primary_production
-    database: studycircle_production_cache
-    migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: studycircle_production_queue
-    migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: studycircle_production_cable
-    migrations_paths: db/cable_migrate
 
 staging:
   primary: &primary_staging
@@ -105,6 +104,3 @@ staging:
 
   cable:
     <<: *primary_staging
-
-
-

@@ -1,3 +1,4 @@
+require 'ostruct'
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
 
@@ -29,7 +30,23 @@ class User < ApplicationRecord
            inverse_of: :creator,
            dependent: :nullify
 
+  has_many :given_reviews,
+           class_name: "UserReview",
+           foreign_key: "reviewer_id",
+           inverse_of: :reviewer,
+           dependent: :destroy
+
+  has_many :received_reviews,
+           class_name: "UserReview",
+           foreign_key: "reviewed_id",
+           inverse_of: :reviewed,
+           dependent: :destroy
+
   belongs_to :faculty
+
+  has_one_attached :profile_photo
+  has_many :notifications, as: :recipient, class_name: "Noticed::Notification", dependent: :destroy
+  has_many :notification_mentions, as: :record, class_name: "Noticed::Event", dependent: :destroy
 
   # validaciones
   validates :email, presence: true, uniqueness: true
@@ -60,17 +77,20 @@ class User < ApplicationRecord
       password = Devise.friendly_token[0, 32]
       user.password = password
       user.password_confirmation = password
-
-      user.save!
     else
-      user.update(
-        name: user.name.presence || auth.info.first_name || auth.info.name,
-        last_name: user.last_name.presence || auth.info.last_name,
-        provider: auth.provider,
-        uid: auth.uid
-      )
+      user.provider ||= auth.provider
+      user.uid      ||= auth.uid
+      user.name     ||= auth.info.first_name || auth.info.name
+      user.last_name ||= auth.info.last_name
     end
 
+    # Guardar credenciales de Google
+    creds = auth.credentials || OpenStruct.new
+    user.google_access_token  = creds.token
+    user.google_refresh_token = creds.refresh_token || user.google_refresh_token
+    user.google_expires_at    = Time.zone.at(creds.expires_at) if creds.expires_at
+
+    user.save!
     user
   end
 

@@ -10,6 +10,7 @@ import {
   User as UserIcon,
   LogOut,
   SquareUser,
+  Inbox,
 } from "lucide-react";
 
 const Sidebar = ({
@@ -24,10 +25,10 @@ const Sidebar = ({
 
   const authedItems = [
     { title: "Inicio", path: "/", Icon: Home },
-    { title: "Clases", path: "#", Icon: BookOpen },
+    { title: "Mis Clases", path: "/notificaciones", Icon: BookOpen },
     { title: "Tutorías", path: "/tutorias", Icon: Users },
     { title: "Materias", path: "/materias", Icon: GraduationCap },
-    { title: "Tutores", path: "/tutores", Icon: SquareUser },
+    { title: "Usuarios", path: "/usuarios", Icon: SquareUser },
   ];
   const guestItems = [
     { title: "Inicio", path: "/flujo-visitante", Icon: Home },
@@ -122,16 +123,19 @@ const Sidebar = ({
             {menuItems.map((item) => {
               const active = isActive(item.path);
               const ItemIcon = item.Icon;
+
               return (
-                // 3) key única y estable
-                <li key={item.title}>
+                <li key={item.title} className="relative">
                   <Link
                     to={item.path}
                     className={`sidebar-link ${
                       active ? "sidebar-link--active" : ""
                     }`}
                   >
-                    <ItemIcon className="w-5 h-5 shrink-0" aria-hidden="true" />
+                    <ItemIcon
+                      className="w-5 h-5 shrink-0"
+                      aria-hidden="true"
+                    />
                     <span
                       className={`font-medium whitespace-nowrap transition-all duration-200 ${
                         isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
