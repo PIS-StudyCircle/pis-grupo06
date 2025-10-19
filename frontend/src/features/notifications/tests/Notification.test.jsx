@@ -5,12 +5,12 @@ import NavBar from "../../../shared/components/layout/NavBar";
 import { NotificationsCtx } from "../../../shared/context/NotificationContext";
 import { useUser } from "../../../shared/context/UserContext";
 
-jest.mock("@rails/actioncable", () => ({
-  createConsumer: jest.fn(() => ({
-    subscriptions: { create: jest.fn(() => ({ unsubscribe: jest.fn() })) },
-    disconnect: jest.fn(),
-  })),
-}));
+// jest.mock("@rails/actioncable", () => ({
+//   createConsumer: jest.fn(() => ({
+//     subscriptions: { create: jest.fn(() => ({ unsubscribe: jest.fn() })) },
+//     disconnect: jest.fn(),
+//   })),
+// }));
 
 jest.mock("../components/Bell", () => {
   const React = jest.requireActual("react");
