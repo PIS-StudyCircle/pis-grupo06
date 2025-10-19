@@ -51,6 +51,7 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
       await onDesuscribirse(tutoring.id);
       alert("Te desuscribiste correctamente.");
     } catch (_error) {
+      console.error(error);
       alert("Ocurrió un error al intentar desuscribirte.");
     }
   };

@@ -656,7 +656,6 @@ module Api
         head :no_content
       end
 
-
       private
 
       def set_tutoring
