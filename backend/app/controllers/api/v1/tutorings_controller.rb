@@ -52,7 +52,7 @@ module Api
         # los que aun tienen cupo y tienen tutor asignado
         if params[:with_tutor_not_full].present? && ActiveModel::Type::Boolean.new.cast(params[:with_tutor_not_full])
           tutorings = tutorings.with_tutor_not_full
-          Rails.logger.debug "Tutorings with_tutor_not_full scope applied: #{tutorings.to_sql}"
+          Rails.logger.debug { "Tutorings with_tutor_not_full scope applied: #{tutorings.to_sql}" }
 
           # no aparecen las tutorias creadas por el usuario
           tutorings = tutorings.where.not(created_by_id: current_user.id)
