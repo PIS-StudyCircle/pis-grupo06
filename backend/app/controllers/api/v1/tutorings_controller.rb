@@ -141,11 +141,11 @@ module Api
             code: @tutoring.course.code
           },
           subjects: @tutoring.subjects.map { |s| { id: s.id, name: s.name } },
-          created_by: @tutoring.created_by ? {
-            id: @tutoring.created_by.id,
-            name: @tutoring.created_by.name,
-            last_name: @tutoring.created_by.last_name,
-            email: @tutoring.created_by.email
+          created_by: @tutoring.creator ? {
+            id: @tutoring.creator.id,
+            name: @tutoring.creator.name,
+            last_name: @tutoring.creator.last_name,
+            email: @tutoring.creator.email
           } : nil,
           tutor: @tutoring.tutor ? {
             id: @tutoring.tutor.id,
@@ -253,7 +253,9 @@ module Api
         UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
         # Incrementar contador de inscritos
-        # @tutoring.update!(enrolled: @tutoring.enrolled + 1)
+        # Sin esto testeando me di cuenta que por alguna razón crea la tutoría igual a pesar de la capacidad habría que
+        # cambiarlo por otro chequeo
+        @tutoring.update!(enrolled: @tutoring.enrolled + 1) 
 
         # Si no existe evento, crearlo con el tutor y agregarse
         begin
