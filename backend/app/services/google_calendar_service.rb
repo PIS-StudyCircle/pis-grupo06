@@ -94,20 +94,20 @@ class GoogleCalendarService
     user.update!(calendar_id: result.id)
     result.id
   end
-  
+
   # Quitar asistente del evento (cuando alguien se desuscribe)
-    def leave_event(tutoring, attendee_email)
-      return if tutoring.event_id.blank?
-      return if attendee_email.blank?
+  def leave_event(tutoring, attendee_email)
+    return if tutoring.event_id.blank?
+    return if attendee_email.blank?
 
     owner = tutoring.tutor || User.find(tutoring.created_by_id)
 
-    unless owner&.calendar_id.present?
+    if owner&.calendar_id.blank?
       Rails.logger.error "Owner #{owner&.email} no tiene calendar_id"
       return
     end
 
-    unless owner&.google_access_token.present?
+    if owner&.google_access_token.blank?
       Rails.logger.error "Owner #{owner&.email} no tiene google_access_token"
       return
     end
@@ -148,7 +148,6 @@ class GoogleCalendarService
     owner_service.update_event(calendar_id, event_id, event)
 
     Rails.logger.info "✅ Usuario #{attendee_email} removido exitosamente del evento"
-
   rescue Google::Apis::AuthorizationError => e
     Rails.logger.error "❌ Error de autorización en leave_event: #{e.message}"
     Rails.logger.error "Token del owner puede estar expirado"
@@ -165,7 +164,17 @@ class GoogleCalendarService
     Rails.logger.error e.backtrace.first(5).join("\n")
   end
 
-private
+  def self.for_owner(tutoring)
+    owner = if tutoring.tutor_id.present?
+              User.find(tutoring.tutor_id)
+            else
+              User.find(tutoring.created_by_id)
+            end
+
+    new(owner)
+  end
+  
+  private
 
   def refresh_google_token(user)
     return nil if user.google_refresh_token.blank?
@@ -194,21 +203,9 @@ private
     tutoring.tutor.calendar_id || ensure_calendar(tutoring.tutor)
   end
 
-
-
-
   def event_confirmed?(tutoring)
     tutoring.event_id.present?
   end
 
-  def self.for_owner(tutoring)
-    owner = if tutoring.tutor_id.present?
-              User.find(tutoring.tutor_id)
-            else
-              User.find(tutoring.created_by_id)
-            end
-    
-    new(owner)
-  end
-
+  
 end
