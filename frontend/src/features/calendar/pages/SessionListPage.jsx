@@ -4,7 +4,7 @@ import { useSessions } from "../hooks/useSessions";
 import { useLocation } from "react-router-dom";
 
 export default function SessionList({ userId }) {
-  const { sessions, loading } = useSessions(userId);
+  const { sessions, loading, refresh } = useSessions(userId);
   const location = useLocation();
 
   // Detectar ruta actual
@@ -56,7 +56,7 @@ export default function SessionList({ userId }) {
 
       <div className="space-y-4 w-full">
         {sessions.map((session) => (
-          <SessionCard key={session.id} session={session} />
+          <SessionCard key={session.id} session={session} refresh={refresh} />
         ))}
       </div>
     </div>
