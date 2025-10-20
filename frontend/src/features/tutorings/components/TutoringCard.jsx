@@ -2,6 +2,8 @@ import { formatDateTime } from "@shared/utils/FormatDate";
 import { useUser } from "@context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import {showSuccess, showError} from '@shared/utils/toastService';
+
 
 export default function TutoringCard({ tutoring, mode: externalMode, onDesuscribirse }) {
   const { user } = useUser();
@@ -28,14 +30,14 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
         }),
       });
       if (res.ok) {
-        alert("Te uniste a la tutoría con éxito");
+        showSuccess("Te uniste a la tutoría con éxito");
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || "No se pudo unir a la tutoría");
+        showError(data.error || "No se pudo unir a la tutoría");
       }
     } catch (error) {
       console.error(error);
-      alert("Error en la conexion con el servidor");
+      showError("Error en la conexion con el servidor");
     }
   };
 
@@ -49,10 +51,10 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
 
     try {
       await onDesuscribirse(tutoring.id);
-      alert("Te desuscribiste correctamente.");
+      showSuccess("Te desuscribiste correctamente.");
     } catch (error) {
       console.error(error);
-      alert("Ocurrió un error al intentar desuscribirte.");
+      showError("Ocurrió un error al intentar desuscribirte.");
     }
   };
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_17_002419) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_19_213110) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -70,6 +70,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_002419) do
     t.index ["course_id"], name: "index_favorite_courses_on_course_id"
     t.index ["user_id", "course_id"], name: "index_favorite_courses_on_user_id_and_course_id", unique: true
     t.index ["user_id"], name: "index_favorite_courses_on_user_id"
+  end
+
+  create_table "feedbacks", force: :cascade do |t|
+    t.integer "tutor_id", null: false
+    t.integer "student_id", null: false
+    t.text "comment", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "tutoring_id", null: false
+    t.index ["tutor_id", "student_id"], name: "index_feedbacks_on_tutor_id_and_student_id", unique: true
+    t.index ["tutoring_id"], name: "index_feedbacks_on_tutoring_id"
   end
 
   create_table "noticed_events", force: :cascade do |t|
@@ -214,6 +225,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_002419) do
   add_foreign_key "faculties", "universities"
   add_foreign_key "favorite_courses", "courses"
   add_foreign_key "favorite_courses", "users"
+  add_foreign_key "feedbacks", "tutorings"
+  add_foreign_key "feedbacks", "users", column: "student_id"
+  add_foreign_key "feedbacks", "users", column: "tutor_id"
   add_foreign_key "subject_tutorings", "subjects"
   add_foreign_key "subject_tutorings", "tutorings"
   add_foreign_key "subjects", "courses"
