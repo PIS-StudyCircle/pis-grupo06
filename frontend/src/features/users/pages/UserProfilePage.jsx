@@ -4,7 +4,7 @@ import { getUserById, canReviewUser, createReview, getReviewsByUser } from "../s
 import { useUserReviews } from "../hooks/useUserReviews";
 import ReviewsList from "../components/ReviewsList";
 import { DEFAULT_PHOTO } from "@/shared/config";
-import {showSuccess, showError} from '@shared/utils/toastService';
+import {showError} from '@shared/utils/toastService';
 
 export default function UserProfile() {
   const { id } = useParams();
