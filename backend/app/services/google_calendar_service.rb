@@ -95,6 +95,85 @@ class GoogleCalendarService
     result.id
   end
 
+  # Quitar asistente del evento (cuando alguien se desuscribe)
+  def leave_event(tutoring, attendee_email)
+    return if tutoring.event_id.blank?
+    return if attendee_email.blank?
+
+    owner = tutoring.tutor || User.find(tutoring.created_by_id)
+
+    if owner&.calendar_id.blank?
+      Rails.logger.error "Owner #{owner&.email} no tiene calendar_id"
+      return
+    end
+
+    if owner&.google_access_token.blank?
+      Rails.logger.error "Owner #{owner&.email} no tiene google_access_token"
+      return
+    end
+
+    owner_service = Google::Apis::CalendarV3::CalendarService.new
+    owner_service.authorization = owner.google_access_token
+
+    calendar_id = owner.calendar_id
+    event_id    = tutoring.event_id
+
+    Rails.logger.info "=== LEAVE_EVENT DEBUG ==="
+    Rails.logger.info "Evento ID: #{event_id}"
+    Rails.logger.info "Calendar ID: #{calendar_id}"
+    Rails.logger.info "Owner: #{owner.email}"
+    Rails.logger.info "Attendee a remover: #{attendee_email}"
+
+    # 1) Traer el evento
+    event = owner_service.get_event(calendar_id, event_id)
+
+    attendees = Array(event.attendees)
+    Rails.logger.info "Attendees antes: #{attendees.map(&:email)}"
+
+    # 2) Remover el attendee si existe
+    new_list = attendees.reject { |a| a.email.to_s.downcase == attendee_email.downcase }
+
+    if new_list.size == attendees.size
+      Rails.logger.warn "⚠️ Usuario #{attendee_email} no estaba en la lista de attendees"
+      return
+    end
+
+    Rails.logger.info "Attendees después: #{new_list.map(&:email)}"
+
+    # 3) Actualizar el evento (array vacío mejor que nil)
+    event.attendees = new_list
+
+    # Si querés que se envíe mail de actualización al que sale:
+    # owner_service.update_event(calendar_id, event_id, event, send_updates: "all")
+    owner_service.update_event(calendar_id, event_id, event)
+
+    Rails.logger.info "✅ Usuario #{attendee_email} removido exitosamente del evento"
+  rescue Google::Apis::AuthorizationError => e
+    Rails.logger.error "❌ Error de autorización en leave_event: #{e.message}"
+    Rails.logger.error "Token del owner puede estar expirado"
+  rescue Google::Apis::ClientError => e
+    if e.status_code == 404
+      Rails.logger.warn "⚠️ Evento no encontrado (404) en leave_event: #{e.message}"
+    else
+      Rails.logger.error "❌ ClientError en leave_event (#{e.status_code}): #{e.message}"
+    end
+  rescue Google::Apis::ServerError => e
+    Rails.logger.error "❌ ServerError en leave_event: #{e.message}"
+  rescue => e
+    Rails.logger.error "❌ Error inesperado en leave_event: #{e.class}: #{e.message}"
+    Rails.logger.error e.backtrace.first(5).join("\n")
+  end
+
+  def self.for_owner(tutoring)
+    owner = if tutoring.tutor_id.present?
+              User.find(tutoring.tutor_id)
+            else
+              User.find(tutoring.created_by_id)
+            end
+
+    new(owner)
+  end
+
   private
 
   def refresh_google_token(user)
@@ -122,5 +201,9 @@ class GoogleCalendarService
   def tutoring_owner_calendar(tutoring)
     Rails.logger.debug tutoring.inspect
     tutoring.tutor.calendar_id || ensure_calendar(tutoring.tutor)
+  end
+
+  def event_confirmed?(tutoring)
+    tutoring.event_id.present?
   end
 end
