@@ -38,6 +38,7 @@ Rails.application.routes.draw do
         post "confirm_schedule", on: :member
         post "join_tutoring", on: :member
         get "exists_user_tutoring", on: :member
+        delete "unsubscribe", on: :member
       end
 
       resource :calendar, only: [] do

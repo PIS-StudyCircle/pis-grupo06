@@ -1,7 +1,8 @@
 import { Calendar, Clock, User, MapPin, Users } from "lucide-react";
 import { useState } from "react";
+import { handleCancel } from "@/features/calendar/hooks/useCancelSession";
 
-export default function SessionCard({ session }) {
+export default function SessionCard({ session, refresh }) {
   const [showAttendees, setShowAttendees] = useState(false);
 
   const formatDate = (date) =>
@@ -31,6 +32,10 @@ export default function SessionCard({ session }) {
     }
   };
 
+  const handleDesuscribirmeClick = (session) => {
+    if (!session) return;
+    handleCancel(session.id, refresh);
+  };
 
   return (
     <div className="bg-white border border-gray-300 rounded-xl p-6 shadow-lg hover:shadow-xl hover:scale-[1.01] transition transform">
@@ -82,44 +87,54 @@ export default function SessionCard({ session }) {
       </div>
 
       {session.attendees && session.attendees.length > 0 && (
-        <div className="mt-4">
-          <button
-            onClick={() => setShowAttendees(!showAttendees)}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
-          >
-            <Users className="w-4 h-4" />
-            {showAttendees ? "Ocultar participantes" : "Ver participantes"}
-          </button>
+        <>
+          <div className="mt-4">
+            <button
+              onClick={() => setShowAttendees(!showAttendees)}
+              className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
+            >
+              <Users className="w-4 h-4" />
+              {showAttendees ? "Ocultar participantes" : "Ver participantes"}
+            </button>
 
-          {showAttendees && (
-            <ul className="mt-2 space-y-1 text-sm">
-              {session.attendees.map((attendee, idx) => (
-                <li
-                  key={idx}
-                  className="flex justify-between items-center bg-gray-50 px-3 py-1 rounded"
-                >
-                  <span className="text-gray-700">{attendee.email}</span>
-                  <span
-                    className={
-                      attendee.status === "confirmada"
-                        ? "text-green-600 font-medium"
-                        : attendee.status === "tentativa"
-                        ? "text-yellow-600 font-medium"
-                        : attendee.status === "rechazada"
-                        ? "text-red-600 font-medium"
-                        : attendee.status === "pendiente"
-                        ? "text-gray-500 font-medium"
-                        : "text-gray-400"
-                    }
+            {showAttendees && (
+              <ul className="mt-2 space-y-1 text-sm">
+                {session.attendees.map((attendee, idx) => (
+                  <li
+                    key={idx}
+                    className="flex justify-between items-center bg-gray-50 px-3 py-1 rounded"
                   >
-                    {attendee.status}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                    <span className="text-gray-700">{attendee.email}</span>
+                    <span
+                      className={
+                        attendee.status === "confirmada"
+                          ? "text-green-600 font-medium"
+                          : attendee.status === "tentativa"
+                          ? "text-yellow-600 font-medium"
+                          : attendee.status === "rechazada"
+                          ? "text-red-600 font-medium"
+                          : attendee.status === "pendiente"
+                          ? "text-gray-500 font-medium"
+                          : "text-gray-400"
+                      }
+                    >
+                      {attendee.status}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <button
+                type="button"
+                className="btn w-full bg-red-500 hover:bg-red-600 text-white mt-3"
+                onClick={() => handleDesuscribirmeClick(session)}
+              >
+                Desuscribirme
+              </button>
+        </>
       )}
+
       </div>
   );
 }

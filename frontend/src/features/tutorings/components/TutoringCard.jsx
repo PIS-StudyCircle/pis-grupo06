@@ -3,7 +3,7 @@ import { useUser } from "@context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-export default function TutoringCard({ tutoring, mode: externalMode }) {
+export default function TutoringCard({ tutoring, mode: externalMode, onDesuscribirse }) {
   const { user } = useUser();
 
   const handleUnirmeClick = async (tutoring) => {
@@ -38,6 +38,25 @@ export default function TutoringCard({ tutoring, mode: externalMode }) {
       alert("Error en la conexion con el servidor");
     }
   };
+
+  //let mode;
+
+  const handleDesuscribirmeClick = async (tutoring) => {
+    if (!tutoring) return;
+
+    const confirmar = confirm(`¿Seguro que querés desuscribirte de la tutoría? "${tutoring.id}"?`);
+    if (!confirmar) return;
+
+    try {
+      await onDesuscribirse(tutoring.id);
+      alert("Te desuscribiste correctamente.");
+    } catch (error) {
+      console.error(error);
+      alert("Ocurrió un error al intentar desuscribirte.");
+    }
+  };
+
+  
 
   const noTieneTutor = tutoring.tutor_id === null;
   const cuposDisponibles =  tutoring.capacity != null && tutoring.capacity > tutoring.enrolled;
@@ -211,7 +230,7 @@ export default function TutoringCard({ tutoring, mode: externalMode }) {
               <button
                 type="button"
                 className="btn w-full bg-red-500 hover:bg-red-600 text-white"
-                onClick={() => {}}
+                onClick={() => handleDesuscribirmeClick(tutoring)}
               >
                 Desuscribirme
               </button>

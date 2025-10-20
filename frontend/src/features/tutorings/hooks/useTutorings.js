@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getTutorings, getTutoring } from "../services/tutoringService";
+import { getTutorings, getTutoring, unsubscribeFromTutoring } from "../services/tutoringService";
 
 export const useTutorings = (initialPage = 1, perPage = 20, filters = {}, mode = "") => {
   const [tutorings, setTutorings] = useState([]);
@@ -34,7 +34,20 @@ export const useTutorings = (initialPage = 1, perPage = 20, filters = {}, mode =
     fetchTutorings();
   }, [page, perPage, filters, search, mode]);
 
-  return { tutorings, loading, error, pagination, page, setPage, search, setSearch };
+ 
+ // Acción de desuscripción (sin refresh)
+  const onDesuscribirse = async (tutoringId) => {
+  try {
+      console.log("mando solicitud de desuscripción para tutoringId:", tutoringId);
+    await unsubscribeFromTutoring(tutoringId);
+    setTutorings((prev) => prev.filter((t) => t.id !== tutoringId));
+  } catch (error) {
+    console.error("Error al desuscribirse:", error);
+    throw error;
+  }
+  };
+
+  return { tutorings, loading, error, pagination, page, setPage, search, setSearch, onDesuscribirse };
 };
 
 export function useTutoring(tutoring, tutoringId) {
