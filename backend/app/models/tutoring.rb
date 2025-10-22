@@ -91,7 +91,7 @@ class Tutoring < ApplicationRecord
       )
       .distinct
   }
-  
+
   scope :active, -> {
     where(state: Tutoring.states[:active])
   }

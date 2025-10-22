@@ -14,7 +14,7 @@ class Subject < ApplicationRecord
     self.due_date ||= 3.months.from_now.to_date
   end
 
-  scope :expired, -> (today = Time.zone.today) {
-    where.not(due_date: nil).where("due_date <= ?", today)
+  scope :expired, ->(today = Time.zone.today) {
+    where(due_date: ..today)
   }
 end

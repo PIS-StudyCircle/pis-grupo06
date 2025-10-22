@@ -17,7 +17,7 @@ class Subjects::RemoveRenewExpiredJob < ApplicationJob
     if subject.tutorings.active.exists?
       subject.update!(due_date: today + RENEW_MONTHS.months)
     else
-      subject.destroy!  # borra también la tabla de join por dependent: :destroy
+      subject.destroy! # borra también la tabla de join por dependent: :destroy
     end
   rescue => e
     Rails.logger.error "[RemoveRenewExpiredJob] Subject #{subject.id}: #{e.class} - #{e.message}"
