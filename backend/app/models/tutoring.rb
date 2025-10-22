@@ -91,6 +91,10 @@ class Tutoring < ApplicationRecord
       )
       .distinct
   }
+  
+  scope :active, -> {
+    where(state: Tutoring.states[:active])
+  }
 
   # --- Validaciones ---
   validate :scheduled_at_cannot_be_in_past
