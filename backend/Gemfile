@@ -60,6 +60,9 @@ gem 'omniauth-rails_csrf_protection'
 gem 'google-apis-calendar_v3'
 gem 'googleauth'
 
+gem 'sidekiq'
+gem 'sidekiq-cron'
+
 group :development, :test do
   gem "pry-byebug"
   gem 'rspec-rails', '~> 8.0.0'

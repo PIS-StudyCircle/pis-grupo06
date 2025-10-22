@@ -58,5 +58,8 @@ module Backend
     config.middleware.insert_after ActionDispatch::Session::CookieStore, JwtCookieToAuthorization
 
     # Nada más acá. No insertes estrategias OmniAuth ni otro CookieStore en otro archivo.
+    
+    # Configure ActiveJob to use Sidekiq
+    config.active_job.queue_adapter = :sidekiq
   end
 end

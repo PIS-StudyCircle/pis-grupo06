@@ -1,0 +1,5 @@
+mark_finished_tutorings:
+  cron: '0 * * * *'  # Every hour at minute 0
+  class: 'MarkFinishedTutoringsJob'
+  queue: default
+  active_job: true
