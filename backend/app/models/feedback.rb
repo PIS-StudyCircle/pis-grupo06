@@ -1,20 +1,19 @@
 class Feedback < ApplicationRecord
   belongs_to :tutor,   class_name: "User"
   belongs_to :student, class_name: "User"
-  belongs_to :tutoring 
+  belongs_to :tutoring, class_name: "Tutoring"
 
   validates :tutor_id, :student_id, :tutoring_id, :rating, presence: true
 
   validates :rating,
-            numericality: {
-              greater_than_or_equal_to: 0.5,
-              less_than_or_equal_to: 5.0
-            }
+            numericality: { greater_than_or_equal_to: 0.5, less_than_or_equal_to: 5.0 }
   validate  :rating_in_half_star_steps
 
   validates :student_id,
-            uniqueness: { scope: [:tutor_id, :tutoring_id],
-                          message: "ya dejó calificación para esta tutoría de este tutor" }
+            uniqueness: {
+              scope: [:tutor_id, :tutoring_id],
+              message: "ya dejó calificación para esta tutoría de este tutor"
+            }
 
   validate :student_cannot_be_tutor
 
