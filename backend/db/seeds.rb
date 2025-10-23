@@ -101,6 +101,17 @@ Subject.find_or_create_by!(name: "Casos de Uso", course: course) do |s|
   s.due_date = 5.months.from_now
 end
 
+# creo un subject con due_date anterior a hoy para testear el job de eliminación/renovación
+Subject.find_or_create_by!(name: "Pruebas de Software", course: course) do |s|
+  s.creator = creator
+  s.due_date = 2.months.ago
+end
+
+Subject.find_or_create_by!(name: "Modelado UML", course: course) do |s|
+  s.creator = creator
+  s.due_date = 1.month.ago
+end
+
 # ========================
 course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
 creator = User.find_by(email: "martadaluz@gmail.com") || User.first
