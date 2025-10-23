@@ -7,17 +7,24 @@ module Api
 
         # GET /api/v1/users/user_feedbacks
         def index
-          tutor = current_user
+          # Si se pasa tutor_id, buscar ese usuario; si no, usar current_user
+          tutor = if params[:tutor_id].present?
+                    User.find_by(id: params[:tutor_id])
+                  else
+                    current_user
+                  end
+
+          return render json: { error: "Tutor no encontrado" }, status: :not_found unless tutor
 
           feedbacks = tutor.received_feedbacks
-                           .includes(:student, tutoring: :course)
-                           .order(created_at: :desc)
+                          .includes(:student, tutoring: :course)
+                          .order(created_at: :desc)
 
           avg = (feedbacks.average(:rating) || 0).to_f.round(2)
 
           render json: {
-            average_rating:   avg,
-            total_feedbacks:  feedbacks.size,
+            average_rating:  avg,
+            total_feedbacks: feedbacks.size,
             feedbacks: feedbacks.as_json(
               include: {
                 student: { only: [:id, :name, :last_name, :email] },
@@ -32,6 +39,7 @@ module Api
             )
           }, status: :ok
         end
+
 
         # POST /api/v1/users/user_feedbacks
         # Espera params: { tutoring_id:, rating: }
