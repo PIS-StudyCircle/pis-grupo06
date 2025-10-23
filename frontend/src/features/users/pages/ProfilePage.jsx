@@ -24,7 +24,7 @@ export default function Profile() {
   const [averageRating, setAverageRating] = useState(0);
   const [totalFeedbacks, setTotalFeedbacks] = useState(0);
 
-  const [setFeedbacks] = useState([]);
+  const [, setFeedbacks] = useState([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState("");
 
