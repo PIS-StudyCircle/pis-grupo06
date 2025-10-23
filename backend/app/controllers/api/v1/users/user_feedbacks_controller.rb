@@ -7,7 +7,6 @@ module Api
 
         # GET /api/v1/users/user_feedbacks
         def index
-          # Si se pasa tutor_id, buscar ese usuario; si no, usar current_user
           tutor = if params[:tutor_id].present?
                     User.find_by(id: params[:tutor_id])
                   else
@@ -40,9 +39,35 @@ module Api
           }, status: :ok
         end
 
+        def check
+          user_id = params[:user_id]
+          tutoring_id = params[:tutoring_id]
+
+          if tutoring_id.blank? || user_id.blank?
+            return render json: { error: "Falta tutoring_id o user_id" }, status: :unprocessable_entity
+          end
+
+          tutoring = Tutoring.find_by(id: tutoring_id)
+          return render json: { error: "Tutoría no encontrada" }, status: :not_found unless tutoring
+
+          feedback = Feedback.find_by(
+            student_id: user_id,
+            tutor_id: tutoring.tutor_id,
+            tutoring_id: tutoring_id
+          )
+
+          if feedback
+            render json: {
+              has_feedback: true,
+              rating: feedback.rating.to_f.round(1)
+            }, status: :ok
+          else
+            render json: { has_feedback: false }, status: :ok
+          end
+        end
+
 
         # POST /api/v1/users/user_feedbacks
-        # Espera params: { tutoring_id:, rating: }
         def create
           tutoring = Tutoring.find_by(id: feedback_params[:tutoring_id])
           rating   = feedback_params[:rating]

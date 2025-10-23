@@ -21,7 +21,11 @@ Rails.application.routes.draw do
             get :can_review
           end
         end
-        resources :user_feedbacks, only: [:create, :index, :destroy]
+        resources :user_feedbacks, only: [:index, :create, :destroy] do
+          collection do
+            get :check   
+          end
+        end
       end
 
       post "/notification_token", to: "notification_tokens#create"

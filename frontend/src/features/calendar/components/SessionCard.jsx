@@ -1,10 +1,32 @@
 import { Calendar, Clock, User, MapPin, Users, Star } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FeedbackModal from "./FeedbackModal";
+import { hasFeedback } from "../hooks/useFeedback"; 
+import { useUser } from "@context/UserContext";
 
 export default function SessionCard({ session, type = "all" }) {
   const [showAttendees, setShowAttendees] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [userRating, setUserRating] = useState(null); 
+  const [loadingFeedback, setLoadingFeedback] = useState(false);
+
+  const { user } = useUser();
+  useEffect(() => {
+    if (type === "finalized") {
+      async function checkFeedback() {
+        try {
+          setLoadingFeedback(true);
+          const res = await hasFeedback(user.id, session.id);
+          if (res.has_feedback) setUserRating(res.rating);
+        } catch (err) {
+          console.error("Error al verificar feedback:", err);
+        } finally {
+          setLoadingFeedback(false);
+        }
+      }
+      checkFeedback();
+    }
+  }, [session.id, session.tutor_id, type]);
 
   const formatDate = (date) =>
     date.toLocaleDateString("es-ES", {
@@ -33,8 +55,35 @@ export default function SessionCard({ session, type = "all" }) {
     }
   };
 
-  const handleSubmitReview = (data) => {
+  const handleSubmitReview = () => {
     setShowFeedbackModal(false);
+    // después de enviar feedback, actualizamos el rating localmente
+    setUserRating(5); // ⚠️ si querés podrías recibir el valor real en onSubmit
+  };
+
+  // componente auxiliar para mostrar estrellas fijas
+  const StarRow = ({ value }) => {
+    const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1)));
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((i) => {
+          const fill = fillFor(i);
+          return (
+            <span key={i} className="relative inline-block w-5 h-5 align-middle">
+              <span className="absolute inset-0 text-gray-300">
+                <Star className="w-5 h-5" style={{ fill: "transparent" }} color="currentColor" />
+              </span>
+              <span
+                className="absolute inset-0 text-yellow-500 overflow-hidden pointer-events-none"
+                style={{ width: `${fill * 100}%` }}
+              >
+                <Star className="w-5 h-5" style={{ fill: "currentColor" }} color="currentColor" />
+              </span>
+            </span>
+          );
+        })}
+      </div>
+    );
   };
 
   return (
@@ -127,13 +176,22 @@ export default function SessionCard({ session, type = "all" }) {
 
         {type === "finalized" && (
           <div className="mt-6 flex justify-end">
-            <button
-              onClick={() => setShowFeedbackModal(true)}
-              className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800"
-            >
-              <Star className="w-4 h-4" />
-              Dejar feedback
-            </button>
+            {loadingFeedback ? (
+              <span className="text-sm text-gray-500">Cargando...</span>
+            ) : userRating ? (
+              <div className="flex items-center gap-2 text-gray-700">
+                <StarRow value={userRating} />
+                <span className="text-sm">({userRating.toFixed(1)}/5)</span>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowFeedbackModal(true)}
+                className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800"
+              >
+                <Star className="w-4 h-4" />
+                Dejar feedback
+              </button>
+            )}
           </div>
         )}
       </div>
