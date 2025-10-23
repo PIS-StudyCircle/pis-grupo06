@@ -178,13 +178,15 @@ export default function SessionCard({ session, type = "all", refresh }) {
                 </ul>
               )}
             </div>
-            <button
+            {type !== "finalized" && (
+              <button
                 type="button"
                 className="btn w-full bg-red-500 hover:bg-red-600 text-white mt-3"
                 onClick={() => handleDesuscribirmeClick(session)}
               >
                 Desuscribirme
               </button>
+            )}
         </>
       )}
 
