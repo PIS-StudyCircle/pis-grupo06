@@ -4,7 +4,7 @@ import { useSessions } from "../hooks/useSessions";
 import { useLocation } from "react-router-dom";
 
 export default function SessionList({ userId, type = "upcoming" }) {
-  const { sessions = [], loading } = useSessions(userId, type);
+  const { sessions = [], loading, refresh } = useSessions(userId, type);
   const location = useLocation();
 
   // UI: título según tipo
@@ -65,7 +65,7 @@ export default function SessionList({ userId, type = "upcoming" }) {
 
       <div className="space-y-4 w-full">
         {sessions.map((session) => (
-          <SessionCard key={session.id} session={session} type={type} />
+          <SessionCard key={session.id} session={session} type={type} refresh={refresh} />
         ))}
       </div>
     </div>

@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import FeedbackModal from "./FeedbackModal";
 import { hasFeedback } from "../hooks/useFeedback"; 
 import { useUser } from "@context/UserContext";
+import { handleCancel } from "@/features/calendar/hooks/useCancelSession";
 
-export default function SessionCard({ session, type = "all" }) {
+export default function SessionCard({ session, type = "all", refresh }) {
   const [showAttendees, setShowAttendees] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [userRating, setUserRating] = useState(null); 
@@ -55,6 +56,10 @@ export default function SessionCard({ session, type = "all" }) {
     }
   };
 
+  const handleDesuscribirmeClick = (session) => {
+    if (!session) return;
+    handleCancel(session.id, refresh);
+  };
   const handleSubmitReview = () => {
     setShowFeedbackModal(false);
     // después de enviar feedback, actualizamos el rating localmente
@@ -135,44 +140,53 @@ export default function SessionCard({ session, type = "all" }) {
         </div>
 
         {session.attendees && session.attendees.length > 0 && (
-          <div className="mt-4">
-            <button
-              onClick={() => setShowAttendees(!showAttendees)}
-              className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
-            >
-              <Users className="w-4 h-4" />
-              {showAttendees ? "Ocultar participantes" : "Ver participantes"}
-            </button>
+        <>
+            <div className="mt-4">
+              <button
+                onClick={() => setShowAttendees(!showAttendees)}
+                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
+              >
+                <Users className="w-4 h-4" />
+                {showAttendees ? "Ocultar participantes" : "Ver participantes"}
+              </button>
 
-            {showAttendees && (
-              <ul className="mt-2 space-y-1 text-sm">
-                {session.attendees.map((attendee, idx) => (
-                  <li
-                    key={idx}
-                    className="flex justify-between items-center bg-gray-50 px-3 py-1 rounded"
-                  >
-                    <span className="text-gray-700">{attendee.email}</span>
-                    <span
-                      className={
-                        attendee.status === "confirmada"
-                          ? "text-green-600 font-medium"
-                          : attendee.status === "tentativa"
-                          ? "text-yellow-600 font-medium"
-                          : attendee.status === "rechazada"
-                          ? "text-red-600 font-medium"
-                          : attendee.status === "pendiente"
-                          ? "text-gray-500 font-medium"
-                          : "text-gray-400"
-                      }
+              {showAttendees && (
+                <ul className="mt-2 space-y-1 text-sm">
+                  {session.attendees.map((attendee, idx) => (
+                    <li
+                      key={idx}
+                      className="flex justify-between items-center bg-gray-50 px-3 py-1 rounded"
                     >
-                      {attendee.status}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
+                      <span className="text-gray-700">{attendee.email}</span>
+                      <span
+                        className={
+                          attendee.status === "confirmada"
+                            ? "text-green-600 font-medium"
+                            : attendee.status === "tentativa"
+                            ? "text-yellow-600 font-medium"
+                            : attendee.status === "rechazada"
+                            ? "text-red-600 font-medium"
+                            : attendee.status === "pendiente"
+                            ? "text-gray-500 font-medium"
+                            : "text-gray-400"
+                        }
+                      >
+                        {attendee.status}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <button
+                type="button"
+                className="btn w-full bg-red-500 hover:bg-red-600 text-white mt-3"
+                onClick={() => handleDesuscribirmeClick(session)}
+              >
+                Desuscribirme
+              </button>
+        </>
+      )}
 
         {type === "finalized" && (
           <div className="mt-6 flex justify-end">
@@ -194,6 +208,7 @@ export default function SessionCard({ session, type = "all" }) {
             )}
           </div>
         )}
+
       </div>
 
       {showFeedbackModal && (
