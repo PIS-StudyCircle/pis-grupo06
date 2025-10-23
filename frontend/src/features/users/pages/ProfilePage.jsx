@@ -90,7 +90,7 @@ export default function Profile() {
         </div>
 
         {/* Tarjetas inferiores */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Favoritas */}
           <div className="bg-white rounded-3xl shadow-md p-6">
             <h2 className="text-xl font-semibold flex items-center gap-2 mb-3 text-[#001F54]">
@@ -135,22 +135,6 @@ export default function Profile() {
             )}
             {!reviewsLoading && !reviewsError && (
               <ReviewsList reviews={reviews} />
-            )}
-          </div>
-
-          {/* Feedbacks */}
-          <div className="bg-white text-black rounded-3xl shadow-md p-6">
-            <h3 className="text-xl font-semibold mb-3 text-center text-[#001F54]">
-              Feedback de tutorías
-            </h3>
-            {feedbackLoading && (
-              <p className="text-center text-gray-500">Cargando feedback...</p>
-            )}
-            {feedbackError && (
-              <p className="text-center text-red-500">{feedbackError}</p>
-            )}
-            {!feedbackLoading && !feedbackError && (
-              <FeedbackList feedbacks={feedbacks} />
             )}
           </div>
         </div>

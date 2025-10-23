@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_19_213110) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_22_235429) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -75,10 +75,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_19_213110) do
   create_table "feedbacks", force: :cascade do |t|
     t.integer "tutor_id", null: false
     t.integer "student_id", null: false
-    t.text "comment", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "tutoring_id", null: false
+    t.decimal "rating", precision: 2, scale: 1, default: "5.0", null: false
     t.index ["tutor_id", "student_id"], name: "index_feedbacks_on_tutor_id_and_student_id", unique: true
     t.index ["tutoring_id"], name: "index_feedbacks_on_tutoring_id"
   end
