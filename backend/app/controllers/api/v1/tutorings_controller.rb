@@ -587,10 +587,10 @@ module Api
         user = User.find(params[:user_id])
 
         tutorings = Tutoring
-                      .enrolled_by(user)
-                      .past                          
-                      .includes(:tutor, :course)
-                      .order(scheduled_at: :desc)
+                    .enrolled_by(user)
+                    .past
+                    .includes(:tutor, :course)
+                    .order(scheduled_at: :desc)
 
         render json: tutorings.map { |t|
           is_tutor = t.tutor_id == user.id
@@ -608,7 +608,6 @@ module Api
           }
         }
       end
-
 
       # DELETE /api/v1/tutorings/:id/unsubscribe
       def unsubscribe

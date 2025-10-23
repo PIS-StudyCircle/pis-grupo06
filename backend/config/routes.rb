@@ -23,14 +23,12 @@ Rails.application.routes.draw do
         end
         resources :user_feedbacks, only: [:index, :create, :destroy] do
           collection do
-            get :check   
+            get :check
           end
         end
       end
 
       post "/notification_token", to: "notification_tokens#create"
-
-
 
       # index y show de UsersController
       resources :users, module: :users, only: [:index, :show]

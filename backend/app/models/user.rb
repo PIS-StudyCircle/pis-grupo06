@@ -41,17 +41,16 @@ class User < ApplicationRecord
            foreign_key: "reviewed_id",
            inverse_of: :reviewed,
            dependent: :destroy
-  
+
   has_many :given_feedbacks,
-          class_name: "Feedback",
-          foreign_key: "student_id",
-          dependent: :destroy
+           class_name: "Feedback",
+           foreign_key: "student_id",
+           dependent: :destroy
 
   has_many :received_feedbacks,
            class_name: "Feedback",
            foreign_key: "tutor_id",
            dependent: :destroy
-
 
   belongs_to :faculty
 

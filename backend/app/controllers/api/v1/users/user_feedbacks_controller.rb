@@ -16,13 +16,13 @@ module Api
           return render json: { error: "Tutor no encontrado" }, status: :not_found unless tutor
 
           feedbacks = tutor.received_feedbacks
-                          .includes(:student, tutoring: :course)
-                          .order(created_at: :desc)
+                           .includes(:student, tutoring: :course)
+                           .order(created_at: :desc)
 
           avg = (feedbacks.average(:rating) || 0).to_f.round(2)
 
           render json: {
-            average_rating:  avg,
+            average_rating: avg,
             total_feedbacks: feedbacks.size,
             feedbacks: feedbacks.as_json(
               include: {
@@ -66,13 +66,13 @@ module Api
           end
         end
 
-
         # POST /api/v1/users/user_feedbacks
         def create
           tutoring = Tutoring.find_by(id: feedback_params[:tutoring_id])
           rating   = feedback_params[:rating]
 
-          return render json: { error: "Falta tutoring_id o rating" }, status: :unprocessable_entity if tutoring.blank? || rating.blank?
+          return render json: { error: "Falta tutoring_id o rating" },
+                        status: :unprocessable_entity if tutoring.blank? || rating.blank?
 
           tutor_id = tutoring.tutor_id
 
@@ -85,10 +85,10 @@ module Api
           end
 
           feedback = Feedback.new(
-            tutor_id:    tutor_id,
-            student_id:  current_user.id,
+            tutor_id: tutor_id,
+            student_id: current_user.id,
             tutoring_id: tutoring.id,
-            rating:      rating
+            rating: rating
           )
 
           if feedback.save
@@ -102,7 +102,7 @@ module Api
               feedback: feedback.as_json(
                 include: {
                   student: { only: [:id, :name, :last_name, :email] },
-                  tutor:   { only: [:id, :name, :last_name, :email] }
+                  tutor: { only: [:id, :name, :last_name, :email] }
                 },
                 only: [:id, :rating, :created_at]
               )
@@ -116,7 +116,9 @@ module Api
         def destroy
           feedback = Feedback.find_by(id: params[:id])
           return render json: { error: "Feedback no encontrado" }, status: :not_found unless feedback
-          return render json: { error: "No tienes permiso para eliminar este feedback" }, status: :forbidden unless feedback.student_id == current_user.id
+
+          return render json: { error: "No tienes permiso para eliminar este feedback" },
+                        status: :forbidden unless feedback.student_id == current_user.id
 
           if feedback.destroy
             render json: { ok: true, message: "Feedback eliminado correctamente" }, status: :ok

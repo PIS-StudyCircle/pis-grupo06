@@ -3,7 +3,7 @@ class Feedback < ApplicationRecord
   belongs_to :student, class_name: "User"
   belongs_to :tutoring, class_name: "Tutoring"
 
-  validates :tutor_id, :student_id, :tutoring_id, :rating, presence: true
+  validates :rating, presence: true
 
   validates :rating,
             numericality: { greater_than_or_equal_to: 0.5, less_than_or_equal_to: 5.0 }
@@ -21,6 +21,7 @@ class Feedback < ApplicationRecord
 
   def rating_in_half_star_steps
     return if rating.blank?
+
     v = rating.to_d
     errors.add(:rating, "debe ser en pasos de 0.5") unless ((v * 2) % 1).zero?
   end
