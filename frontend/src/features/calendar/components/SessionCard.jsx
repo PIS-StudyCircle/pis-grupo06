@@ -13,21 +13,22 @@ export default function SessionCard({ session, type = "all", refresh }) {
 
   const { user } = useUser();
   useEffect(() => {
-    if (type === "finalized") {
-      async function checkFeedback() {
-        try {
-          setLoadingFeedback(true);
-          const res = await hasFeedback(user.id, session.id);
-          if (res.has_feedback) setUserRating(res.rating);
-        } catch (err) {
-          console.error("Error al verificar feedback:", err);
-        } finally {
-          setLoadingFeedback(false);
-        }
+  if (type === "finalized" && user?.id) {
+    async function checkFeedback() {
+      try {
+        setLoadingFeedback(true);
+        const res = await hasFeedback(user.id, session.id);
+        if (res.has_feedback) setUserRating(res.rating);
+      } catch (err) {
+        console.error("Error al verificar feedback:", err);
+      } finally {
+        setLoadingFeedback(false);
       }
-      checkFeedback();
     }
-  }, [session.id, session.tutor_id, type]);
+    checkFeedback();
+  }
+}, [session.id, session.tutor_id, type, user?.id]);
+
 
   const formatDate = (date) =>
     date.toLocaleDateString("es-ES", {
