@@ -28,6 +28,8 @@ module Backend
 
     config.paths.add "app/channels", eager_load: true
 
+    config.active_job.queue_adapter = :solid_queue
+
     require "action_cable/engine"
 
     # Configuration for the application, engines, and railties goes here.
