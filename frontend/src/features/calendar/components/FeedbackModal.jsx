@@ -10,7 +10,7 @@ export default function FeedbackModal({
   onClose,
   onSubmit,
 }) {
-  const [rating, setRating] = useState(0);       // admite 0.5 pasos
+  const [rating, setRating] = useState(0);       
   const [tempRating, setTempRating] = useState(0);
   const stars = [1, 2, 3, 4, 5];
 
@@ -19,7 +19,7 @@ export default function FeedbackModal({
   const handleSubmit = async () => {
     if (rating <= 0) return;
     try {
-      const result = await createFeedback(sessionId, { rating });
+      const result = await createFeedback(sessionId, rating);
       showSuccess("¡Calificación enviada con éxito!");
       onSubmit?.(result?.feedback ?? { rating });
       setRating(0);
@@ -29,16 +29,14 @@ export default function FeedbackModal({
     }
   };
 
-  // calcula 0, 0.5 o 1 de fill para cada estrella
   const fillFor = (starValue) =>
     Math.max(0, Math.min(1, current - (starValue - 1)));
 
-  // click/hover: decide media estrella según posición del cursor
   const decideHalfOrFull = (e, starValue) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX ?? (e.touches?.[0]?.clientX ?? rect.left)) - rect.left;
     const isHalf = x < rect.width / 2 ? 0.5 : 1;
-    return (starValue - 1) + isHalf; // 0.5..5 en pasos de 0.5
+    return (starValue - 1) + isHalf; 
   };
 
   return (

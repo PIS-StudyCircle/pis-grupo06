@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 
-export async function createFeedback(tutoring_id, comment) {
+export async function createFeedback(tutoring_id, rating) {
   try {
     const response = await fetch("/api/v1/users/user_feedbacks", {
       method: "POST",
@@ -11,7 +11,7 @@ export async function createFeedback(tutoring_id, comment) {
       credentials: "include", 
       body: JSON.stringify({
         tutoring_id,
-        comment,
+        rating,
       }),
     });
 
