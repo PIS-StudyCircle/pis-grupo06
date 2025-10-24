@@ -25,3 +25,10 @@ staging:
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
+  remove_renew_expired_jobs:
+    command: "RenewExpiredJob.remove_expired_jobs"
+    schedule: "weekdays at 3am"
+  mark_finished_tutorings_job:
+    class: Tutorings::MarkFinishedTutoringsJob
+    queue: default
+    schedule: every hour at minute 12
