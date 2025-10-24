@@ -231,6 +231,9 @@ module Api
       end
 
       def destroy
+        # Enviar notificaciones de cancelación antes de eliminar
+        TutoringCancelledJob.perform_later(@tutoring.id, current_user.id, "Tutoría eliminada")
+        
         @tutoring.destroy
         head :no_content
       end
@@ -509,6 +512,9 @@ module Api
           end
         end
 
+        # Programar notificaciones automáticas
+        ScheduleTutoringNotificationsJob.perform_later(@tutoring.id)
+
         # Enviar notificaciones según el rol
         if user_role == 'student'
           # TutoringMailer.student_enrolled(@tutoring, current_user).deliver_later
@@ -597,13 +603,15 @@ module Api
 
           # 1) Si el que se va es el tutor -> SIEMPRE borrar tutoría (+ evento si existe)
           if was_tutor
-            # (Comentario futuro) notificar a estudiantes que el tutor canceló
+            # Notificar a estudiantes que el tutor canceló
+            TutoringCancelledJob.perform_later(@tutoring.id, current_user.id, "Tutor se desuscribió")
+            
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
               Rails.logger.error "Calendar delete_event (se va tutor) error: #{e.message}"
             end
-
+            
             @tutoring.destroy!
             return head :no_content
           end
@@ -617,24 +625,30 @@ module Api
 
           # 2.5) Si el que se va es el creador y no quedan estudiantes -> eliminar tutoría
           if current_user.id == @tutoring.created_by_id && new_enrolled.zero?
+            # Notificar a participantes que el creador canceló
+            TutoringCancelledJob.perform_later(@tutoring.id, current_user.id, "Creador se desuscribió")
+            
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
               Rails.logger.error "Calendar delete_event (se va creador y sin estudiantes) error: #{e.message}"
             end
-
+            
             @tutoring.destroy!
             return head :no_content
           end
 
           # 3) Caso borde: si NO hay tutor y NO quedan estudiantes -> borrar todo
           if !had_tutor && new_enrolled.zero?
+            # Notificar a participantes que la tutoría fue cancelada
+            TutoringCancelledJob.perform_later(@tutoring.id, current_user.id, "Sin participantes")
+            
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
               Rails.logger.error "Calendar delete_event (no tutor y sin estudiantes) error: #{e.message}"
             end
-
+            
             @tutoring.destroy!
             return head :no_content
           end

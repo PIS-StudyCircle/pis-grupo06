@@ -82,17 +82,20 @@ class GoogleCalendarService
 
   # Crear el calendario StudyCircle si no existe
   def ensure_calendar(user)
-    return user.calendar_id if user.calendar_id.present?
 
-    calendar = Google::Apis::CalendarV3::Calendar.new(
-      summary: "StudyCircle",
-      description: "Calendario dedicado a las tutorías de StudyCircle",
-      time_zone: "America/Montevideo"
-    )
+      # Verificar nuevamente dentro del lock
+      return user.calendar_id if user.calendar_id.present?
 
-    result = @service.insert_calendar(calendar)
-    user.update!(calendar_id: result.id)
-    result.id
+      calendar = Google::Apis::CalendarV3::Calendar.new(
+        summary: "StudyCircle",
+        description: "Calendario dedicado a las tutorías de StudyCircle",
+        time_zone: "America/Montevideo"
+      )
+
+      result = @service.insert_calendar(calendar)
+      user.update!(calendar_id: result.id)
+      result.id
+
   end
 
   # Quitar asistente del evento (cuando alguien se desuscribe)

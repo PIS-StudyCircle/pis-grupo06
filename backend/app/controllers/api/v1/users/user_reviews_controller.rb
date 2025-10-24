@@ -37,6 +37,15 @@ module Api
           )
 
           if review.save
+            # Enviar notificación al usuario que recibió la review
+            ReviewReceivedNotifier.with(
+              title: "Nueva reseña recibida",
+              url: "/users/#{review.reviewed_id}/reviews",
+              reviewer_name: "#{current_user.name} #{current_user.last_name}",
+              review_id: review.id,
+              reviewer_id: current_user.id
+            ).deliver_later(review.reviewed)
+            
             render json: review, status: :created
           else
             render json: { errors: review.errors.full_messages }, status: :unprocessable_entity
