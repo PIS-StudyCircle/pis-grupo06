@@ -16,11 +16,19 @@ class Tutorings::MarkFinishedTutoringsJob < ApplicationJob
 
   def update_tutorings_state(tutorings)
     tutorings.each do |t|
-      t.update!(state: Tutoring.states[:finished])
+      # Camino normal: intenta actualizar con validaciones
+      # Si no se hace este camino no se puede chequear en el test cuando ocurre un error en el proceso
+      t.update!(state: :finished)
+    rescue ActiveRecord::RecordInvalid => e
+      # Si no pasa las validaciones, forzar el cambio sin validar
+      Rails.logger.warn "[MarkFinishedTutoringsJob] Tutoring##{t.id} invalid: #{e.message} — forcing state"
+      t.state = :finished # Obs "t.update(state: :finished, validate: false)" no funciona correctamente con enums
+      t.save(validate: false)
+    rescue => e
+      # Cualquier otro error (por ejemplo el “Fallo controlado” del spec)
+      Rails.logger.error "[MarkFinishedTutoringsJob] Tutoring##{t.id} #{e.class}: #{e.message}"
     end
 
     Rails.logger.info "Marked #{tutorings.count} tutorings as finished"
-  rescue => e
-    Rails.logger.error "[MarkFinishedTutoringsJob] Error updating tutorings: #{e.class} - #{e.message}"
   end
 end
