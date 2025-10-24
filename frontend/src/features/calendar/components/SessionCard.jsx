@@ -63,8 +63,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
   };
   const handleSubmitReview = () => {
     setShowFeedbackModal(false);
-    // después de enviar feedback, actualizamos el rating localmente
-    setUserRating(5); // ⚠️ si querés podrías recibir el valor real en onSubmit
+    setUserRating(5); 
   };
 
   // componente auxiliar para mostrar estrellas fijas
