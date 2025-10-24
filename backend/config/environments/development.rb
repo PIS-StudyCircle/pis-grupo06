@@ -84,4 +84,6 @@ Rails.application.configure do
   config.action_cable.disable_request_forgery_protection = true
 
   config.action_cable.allowed_request_origins = [ /http:\/\/localhost:\d+/, /http:\/\/127\.0\.0\.1:\d+/ ]
+
+  config.active_job.queue_adapter = :inline
 end
