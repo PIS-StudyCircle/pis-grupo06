@@ -63,7 +63,7 @@ RSpec.describe Tutorings::MarkFinishedTutoringsJob, type: :job do
 
     context "cuando hay múltiples tutorías finalizadas" do
       let!(:multiple_finished_tutorings) do
-        3.times.map do |i|
+        Array.new(3) do |i|
           Tutoring.new(
             course: course,
             tutor: tutor,
