@@ -205,6 +205,22 @@ module Api
             end
 
             create_user_tutoring(current_user.id, tutoring.id)
+
+            # Notificar a usuarios con esta materia (course) como favorita
+            favoriters = User.joins(:favorite_courses)
+                            .where(favorite_courses: { course_id: tutoring.course_id })
+                            .where.not(id: tutoring.created_by_id) # no notificar al creador
+                            .distinct
+
+            if favoriters.exists?
+              favoriters.find_each do |user|
+                ApplicationNotifier.with(
+                  title: "Se creó una nueva tutoría de #{tutoring.course.name}!",
+                  url: "/tutorias/materia/#{tutoring.course_id}"
+                ).deliver_later(user)
+              end
+            end
+
             render json: {
               tutoring: tutoring.as_json.merge(
                 availabilities: tutoring.tutoring_availabilities.as_json
@@ -296,6 +312,14 @@ module Api
         rescue => e
           Rails.logger.error "Error al manejar evento de Google Calendar: #{e.message}"
           # No fallar la transacción por errores de calendario
+        end
+
+        # Notificar al tutor que un nuevo estudiante se unió
+        if @tutoring.tutor.present?
+          ApplicationNotifier.with(
+            title: "#{current_user.name} se unió a tu tutoría de #{@tutoring.course.name}.",
+            url: "/notificaciones"
+          ).deliver_later(@tutoring.tutor)
         end
 
         render json: {
@@ -667,6 +691,14 @@ module Api
             @tutoring.update!(scheduled_at: nil)
             @tutoring.tutoring_availabilities.each { |a| a.update(is_booked: false) }
           end
+        end
+
+        # Notificar al tutor que un estudiante se dio de baja
+        if @tutoring.tutor.present?
+          ApplicationNotifier.with(
+            title: "#{current_user.name} se dio de baja de tu tutoría de #{@tutoring.course.name}.",
+            url: "/notificaciones"
+          ).deliver_later(@tutoring.tutor)
         end
 
         head :no_content
