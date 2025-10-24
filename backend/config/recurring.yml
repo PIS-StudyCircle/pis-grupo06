@@ -16,6 +16,10 @@ production:
   remove_renew_expired_jobs:
     command: "RenewExpiredJob.remove_expired_jobs"
     schedule: "weekdays at 3am"
+  mark_finished_tutorings_job:
+    class: Tutorings::MarkFinishedTutoringsJob
+    queue: default
+    schedule: every hour at minute 12
 
 staging:
   clear_solid_queue_finished_jobs:
