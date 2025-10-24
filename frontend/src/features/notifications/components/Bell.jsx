@@ -149,7 +149,7 @@ export function Bell() {
                           <div className="mt-1 h-2 w-2 shrink-0" />
                         )}
                         <div className="min-w-0">
-                          <div className="truncate font-medium">
+                          <div className="font-medium break-words whitespace-normal">
                             {n.title || n.kind || "Notificación"}
                           </div>
                           <div className="text-xs opacity-70">
