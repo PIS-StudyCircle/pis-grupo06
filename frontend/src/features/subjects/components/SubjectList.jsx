@@ -3,6 +3,7 @@ import SubjectCard from "./SubjectCard";
 import { createSubject } from "../services/subjectService";
 import { useValidation } from "@hooks/useValidation";
 import { validateRequired } from "@utils/validation";
+import {showSuccess} from '@shared/utils/toastService';
 
 export default function SubjectList({
   subjects,
@@ -57,6 +58,7 @@ export default function SubjectList({
       if (type === "selectable") {
         setSelectedIds((prev) => [...prev, created.id]);
       }
+      showSuccess(`Tema ${created.name} creado con éxito.`);
     } catch (err) {
       const msg =
         err?.errors

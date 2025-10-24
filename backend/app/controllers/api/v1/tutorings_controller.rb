@@ -650,6 +650,13 @@ module Api
 
           # Si queda tutor pero ya no quedan estudiantes (enrolled == 0), limpiar el horario
           if had_tutor && new_enrolled.zero?
+            # Remover el tutor del evento de su propio calendario
+            begin
+              calendar.delete_event(@tutoring) if event_confirmed
+            rescue => e
+              Rails.logger.error "Calendar leave_event (tutor sin estudiantes) error: #{e.message}"
+            end
+
             @tutoring.update!(scheduled_at: nil)
             @tutoring.tutoring_availabilities.each { |a| a.update(is_booked: false) }
           end

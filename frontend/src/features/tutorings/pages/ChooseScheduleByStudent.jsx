@@ -4,6 +4,7 @@ import { formatDateTime } from "@shared/utils/FormatDate";
 
 import { useTutoring } from "../hooks/useTutorings";
 import { confirmSchedule } from "../services/tutoringService";
+import {showSuccess, showError} from '@shared/utils/toastService';
 
 export default function ChooseScheduleByStudent() {
   const { tutoringId } = useParams(); 
@@ -79,12 +80,12 @@ export default function ChooseScheduleByStudent() {
         role: "student",
         capacity,
       });
-      setMessage("Tutoría confirmada con éxito.");
-      setTimeout(() => navigate("/notificaciones"), 2000);
+      showSuccess("Tutoría confirmada con éxito.");
+      navigate("/notificaciones");
     } catch (e) {
       console.error(e);
       const msg = e instanceof Error ? e.message : String(e);
-      setError(msg || "Error en la conexión con el servidor.");
+      showError(msg || "Error en la conexión con el servidor.");
     }
   };
 
