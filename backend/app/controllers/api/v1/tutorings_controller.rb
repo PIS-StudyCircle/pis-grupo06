@@ -516,6 +516,20 @@ module Api
           # TutoringMailer.tutor_assigned(@tutoring, current_user).deliver_later
         end
 
+        # Notificar al otro usuario (el creador de la tutoría)
+        if @tutoring.creator.present? && @tutoring.creator != current_user
+          title_msg =
+            if user_role == "tutor"
+              "Tu solicitud de tutoría de #{@tutoring.course.name} fue confirmada por el tutor #{current_user.name}."
+            else
+              "El estudiante #{current_user.name} confirmó la tutoría de #{@tutoring.course.name}."
+            end
+          ApplicationNotifier.with(
+            title: title_msg,
+            url: "/notificaciones"
+          ).deliver_later(@tutoring.creator)
+        end
+
         render json: {
           tutoring: {
             id: @tutoring.id,
