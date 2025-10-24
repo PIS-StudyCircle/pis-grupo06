@@ -3,7 +3,7 @@ import { showSuccess, showError, showConfirm } from "@utils/toastService";
 
 export const handleCancel = (sessionId, refresh) => {
   showConfirm(
-    "¿Seguro que deseas cancelar esta tutoría?",
+    "¿Seguro que deseas desuscribirte de esta tutoría?",
     async () => {
       try {
         await unsubscribeFromClassEvent(sessionId);

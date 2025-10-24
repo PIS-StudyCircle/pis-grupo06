@@ -85,9 +85,13 @@ Rails.application.configure do
 
   Rails.application.routes.default_url_options[:host] = "http://localhost:3000"
 
+ # config/environments/development.rb
+  config.action_cable.mount_path = "/api/v1/cable"
+
   config.action_cable.disable_request_forgery_protection = true
-
-  config.action_cable.allowed_request_origins = [ /http:\/\/localhost:\d+/, /http:\/\/127\.0\.0\.1:\d+/ ]
-
-  config.active_job.queue_adapter = :async
+  
+  config.action_cable.allowed_request_origins = [
+    %r{\Ahttp://localhost:\d+\z},
+    %r{\Ahttp://127\.0\.0\.1:\d+\z}
+  ]
 end
