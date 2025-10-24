@@ -36,5 +36,4 @@
 /config/credentials/production.key
 
 /coverage
-
 *.key

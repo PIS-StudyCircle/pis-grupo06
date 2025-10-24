@@ -11,6 +11,7 @@ import ReviewsList from "../components/ReviewsList";
 import { DEFAULT_PHOTO } from "@/shared/config";
 import { getFeedbacks } from "../services/feedbackServices";
 import { Star } from "lucide-react";
+import {showError} from '@shared/utils/toastService';
 
 export default function UserProfile() {
   const { id } = useParams();
@@ -65,7 +66,7 @@ export default function UserProfile() {
       const updated = await getReviewsByUser(id);
       setReviews(updated);
     } catch (err) {
-      alert("Error al enviar la reseña: " + err.message);
+      showError("Error al enviar la reseña: " + err.message);
     } finally {
       setSubmitting(false);
     }
