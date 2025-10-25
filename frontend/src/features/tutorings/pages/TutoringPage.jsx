@@ -124,10 +124,13 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
               <input
                 type="checkbox"
                 checked={showWithoutTutor}
-                onChange={(e) => setShowWithoutTutor(e.target.checked)}
+                onChange={(e) => {
+                  setShowWithoutTutor(e.target.checked);
+                  setPage(1);
+                }}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-gray-700">Tutor Indefinido</span>
+              <span className="text-gray-700">Solo sin tutor</span>
             </label>
           )}
 
