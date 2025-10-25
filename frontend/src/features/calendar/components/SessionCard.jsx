@@ -12,23 +12,23 @@ export default function SessionCard({ session, type = "all", refresh }) {
   const [loadingFeedback, setLoadingFeedback] = useState(false);
 
   const { user } = useUser();
-  useEffect(() => {
-  if (type === "finalized" && user?.id) {
-    async function checkFeedback() {
-      try {
-        setLoadingFeedback(true);
-        const res = await hasFeedback(user.id, session.id);
-        if (res.has_feedback) setUserRating(res.rating);
-      } catch (err) {
-        console.error("Error al verificar feedback:", err);
-      } finally {
-        setLoadingFeedback(false);
-      }
-    }
-    checkFeedback();
-  }
-}, [session.id, session.tutor_id, type, user?.id]);
 
+  useEffect(() => {
+    if (type === "finalized" && user?.id) {
+      async function checkFeedback() {
+        try {
+          setLoadingFeedback(true);
+          const res = await hasFeedback(user.id, session.id);
+          if (res.has_feedback) setUserRating(Number(res.rating)); 
+        } catch (err) {
+          console.error("Error al verificar feedback:", err);
+        } finally {
+          setLoadingFeedback(false);
+        }
+      }
+      checkFeedback();
+    }
+  }, [session.id, session.tutor_id, type, user?.id]);
 
   const formatDate = (date) =>
     date.toLocaleDateString("es-ES", {
@@ -61,12 +61,17 @@ export default function SessionCard({ session, type = "all", refresh }) {
     if (!session) return;
     handleCancel(session.id, refresh);
   };
-  const handleSubmitReview = () => {
+
+  const handleSubmitReview = (rating) => {
+    let value = rating;
+    if (value && typeof value === "object") {
+      value = value.rating ?? value?.rating;
+    }
+    if (value == null) return;
     setShowFeedbackModal(false);
-    setUserRating(5); 
+    setUserRating(Number(value)); 
   };
 
-  // componente auxiliar para mostrar estrellas fijas
   const StarRow = ({ value }) => {
     const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1)));
     return (
@@ -140,7 +145,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
         </div>
 
         {session.attendees && session.attendees.length > 0 && (
-        <>
+          <>
             <div className="mt-4">
               <button
                 onClick={() => setShowAttendees(!showAttendees)}
@@ -187,17 +192,17 @@ export default function SessionCard({ session, type = "all", refresh }) {
                 Desuscribirme
               </button>
             )}
-        </>
-      )}
+          </>
+        )}
 
         {type === "finalized" && (
           <div className="mt-6 flex justify-end">
             {loadingFeedback ? (
               <span className="text-sm text-gray-500">Cargando...</span>
-            ) : userRating ? (
+            ) : userRating != null && Number.isFinite(Number(userRating)) ? (
               <div className="flex items-center gap-2 text-gray-700">
-                <StarRow value={userRating} />
-                <span className="text-sm">({userRating.toFixed(1)}/5)</span>
+                <StarRow value={Number(userRating)} />
+                <span className="text-sm">({Number(userRating).toFixed(1)}/5)</span>
               </div>
             ) : (
               <button
@@ -210,7 +215,6 @@ export default function SessionCard({ session, type = "all", refresh }) {
             )}
           </div>
         )}
-
       </div>
 
       {showFeedbackModal && (
@@ -220,7 +224,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
           tutor={session.tutor}
           tutoria={session.subject}
           onClose={() => setShowFeedbackModal(false)}
-          onSubmit={handleSubmitReview}
+          onSubmit={(rating) => handleSubmitReview(rating)}
         />
       )}
     </>

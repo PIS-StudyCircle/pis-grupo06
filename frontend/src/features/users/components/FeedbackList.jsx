@@ -36,13 +36,6 @@ export default function FeedbackList({ feedbacks = [] }) {
             </div>
           </div>
 
-          {/* Comentario */}
-          {f.comment && (
-            <p className="text-sm text-gray-700 italic leading-snug">
-              “{f.comment}”
-            </p>
-          )}
-
           {/* Información del estudiante */}
           {f.student && (
             <p className="text-xs text-gray-500 mt-1">
