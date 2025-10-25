@@ -12,6 +12,11 @@ export default function SubjectCard({
   const { user } = useUser();
 
   const handleClick = () => {
+    if (!user) {
+      navigate(`/flujo-visitante`);
+      return;
+    }
+
     if (type === "button") {
       navigate(`/materias/${courseId}/temas/${subject.id}`);
     } else if (type === "selectable" && onSelect) {
@@ -30,7 +35,6 @@ export default function SubjectCard({
         ${isButton || isSelectable ? "cursor-pointer" : "cursor-default opacity-70"}`}
       onClick={handleClick}
       style={{ cursor: isButton || isSelectable ? "pointer" : "default" }}
-      disabled={!user}
     >
       <div className="flex flex-col text-left w-full">
         <span className={`font-medium transition-colors ${isSelectable && selected ? "text-white" : "text-gray-800"}`}>
