@@ -1,6 +1,10 @@
 export default function UserCardSkeleton() {
   return (
-    <div className="w-full bg-white rounded-lg shadow p-4 my-4 flex items-center justify-between gap-4 animate-pulse">
+    <div
+      className="w-full bg-white rounded-lg shadow p-4 my-4 flex items-center justify-between gap-4 animate-pulse"
+      role="progressbar"
+      aria-label="Cargando usuario"
+    >
       <div className="flex items-center gap-4">
         <div className="w-16 h-16 rounded-full bg-gray-200"></div>
         <div className="flex flex-col space-y-2">

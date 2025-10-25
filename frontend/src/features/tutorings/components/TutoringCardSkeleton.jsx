@@ -1,6 +1,9 @@
 export default function TutoringCardSkeleton() {
   return (
-    <div className="w-full bg-white rounded-lg shadow p-4 my-4 animate-pulse">
+    <div
+      role="progressbar"
+      className="w-full bg-white rounded-lg shadow p-4 my-4 animate-pulse"
+    >
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex-1 flex flex-col text-left space-y-2">
           <div className="h-4 bg-gray-300 rounded w-3/4"></div>

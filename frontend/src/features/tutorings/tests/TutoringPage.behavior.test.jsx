@@ -44,10 +44,10 @@ describe("TutoringPage - Comportamiento general", () => {
     });
   });
 
-  it("muestra mensaje de carga cuando loading es true", () => {
+  it("muestra skeletons cuando loading es true", () => {
     mockUseTutorings({ loading: true, tutorings: [] });
     renderWithRouter(<TutoringPage />);
-    expect(screen.getByText(/Cargando tutorías.../i)).toBeInTheDocument();
+    expect(screen.getAllByRole("progressbar")[0]).toBeInTheDocument();
   });
 });
 

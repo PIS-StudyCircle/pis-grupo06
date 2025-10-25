@@ -1,6 +1,7 @@
 export default function SubjectCardSkeleton() {
   return (
     <div
+      role="progressbar"
       className="flex items-center justify-between p-2 pl-4 border rounded-md h-15 w-full bg-gray-50 animate-pulse"
     >
       <div className="flex flex-col w-full">
