@@ -6,7 +6,7 @@ import Pagination from "@components/Pagination";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import PageTitle from "@components/PageTitle";
 
-export default function TutoringPage({ filters = {}, mode = "", titleClass = "titulo",  showSearchBar = true }) {
+export default function TutoringPage({ filters = {}, mode = "", titleClass = "titulo" }) {
   const { courseId } = useParams();
   const navigate = useNavigate();
 
@@ -98,28 +98,25 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
               </button>
             )}
           </PageTitle>
-
-          {showSearchBar && (
-            <TutoringSearchBar
-              query={query}
-              onQueryChange={(e) => setQuery(e.target.value)}
-              searchBy={forceSubjectSearch ? "subject" : searchBy}
-              onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
-              options={
-                forceSubjectSearch
-                  ? [{ value: "subject", label: "Tema" }]
-                  : [
-                      { value: "course", label: "Materia" },
-                      { value: "subject", label: "Tema" },
-                    ]
-              }
-              placeholder={
-                (forceSubjectSearch ? "subject" : searchBy) === "course"
-                  ? "Buscar por materia..."
-                  : "Buscar por tema..."
-              }
-            />
-          )}
+        <TutoringSearchBar
+            query={query}
+            onQueryChange={(e) => setQuery(e.target.value)}
+            searchBy={forceSubjectSearch ? "subject" : searchBy}
+            onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
+            options={
+              forceSubjectSearch
+                ? [{ value: "subject", label: "Tema" }]
+                : [
+                    { value: "course", label: "Materia" },
+                    { value: "subject", label: "Tema" },
+                  ]
+            }
+            placeholder={
+              (forceSubjectSearch ? "subject" : searchBy) === "course"
+                ? "Buscar por materia..."
+                : "Buscar por tema..."
+            }
+          />
 
           {/* Filter toggle */}
           {mode !== "serTutor" && mode !== "serEstudiante" && (
@@ -127,13 +124,10 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
               <input
                 type="checkbox"
                 checked={showWithoutTutor}
-                onChange={(e) => {
-                  setShowWithoutTutor(e.target.checked);
-                  setPage(1);
-                }}
+                onChange={(e) => setShowWithoutTutor(e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-gray-700">Solo sin tutor</span>
+              <span className="text-gray-700">Tutor Indefinido</span>
             </label>
           )}
 

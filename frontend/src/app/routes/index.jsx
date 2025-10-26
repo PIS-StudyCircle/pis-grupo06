@@ -73,11 +73,6 @@ export function AppRoutes() {
           path="/tutorias/materia/:courseId"
           element={<TutoringPage filters={{}} mode="serEstudiante" />}
         />
-        
-        <Route
-          path="/materias/:courseId/temas/:subjectId"
-          element={<SubjectDetailPage />}
-        />
       </Route>
 
       <Route path="/" element={<Navigate to="/materias" replace />} />
@@ -89,6 +84,10 @@ export function AppRoutes() {
       <Route path="/prototipoCalendar" element={<SessionListPage />} />
       <Route path="/appoint" element={<AppointClassPage />} />
 
+      <Route
+        path="/materias/:courseId/temas/:subjectId"
+        element={<SubjectDetailPage />}
+      />
       <Route path="/usuarios" element={<UserPage />} />
       <Route path="*" element={<Error404Page />} />
     </Routes>

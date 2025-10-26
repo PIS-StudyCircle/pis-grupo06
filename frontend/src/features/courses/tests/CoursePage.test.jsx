@@ -41,7 +41,7 @@ describe("CoursePage", () => {
     jest.clearAllMocks();
   });
 
-  it("muestra skeletons al inicio", () => {
+  it("muestra el loading al inicio", () => {
     useCourses.mockReturnValue({
       courses: [],
       loading: true,
@@ -52,7 +52,7 @@ describe("CoursePage", () => {
     });
 
     render(<CoursePage />);
-    expect(screen.getAllByRole("progressbar")[0]).toBeInTheDocument();
+    expect(screen.getByText(/cargando materias/i)).toBeInTheDocument();
   });
 
   it("muestra un mensaje de error si hay error", () => {

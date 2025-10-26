@@ -36,8 +36,9 @@ describe("UserListPage", () => {
 
     render(<UserListPage />);
 
-    // Ahora el skeleton debe estar visible
-    expect(screen.getAllByRole("progressbar")[0]).toBeInTheDocument();
+    // Ahora el loading debe estar visible
+    expect(screen.getByText(/cargando/i)).toBeInTheDocument();
+
     // Resolvemos la promesa para que el componente termine
     await act(async () => {
       resolve({ users: [], pagination: {} });

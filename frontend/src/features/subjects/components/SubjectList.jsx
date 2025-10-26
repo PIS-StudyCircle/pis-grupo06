@@ -4,7 +4,6 @@ import { createSubject } from "../services/subjectService";
 import { useValidation } from "@hooks/useValidation";
 import { validateRequired } from "@utils/validation";
 import {showSuccess} from '@shared/utils/toastService';
-import SubjectCardSkeleton from "./SubjectCardSkeleton";
 
 export default function SubjectList({
   subjects,
@@ -39,13 +38,7 @@ export default function SubjectList({
     }
   }, [selectedSubjects, type]);
 
-  if (loading) return (
-    <div className="flex flex-col gap-2">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <SubjectCardSkeleton key={i} />
-      ))}
-    </div>
-  );
+  if (loading) return <div>Cargando temas...</div>;
   if (error) return <div>Error al cargar los temas.</div>;
 
   const handleSubmit = async (e) => {

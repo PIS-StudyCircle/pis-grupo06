@@ -51,10 +51,7 @@ export default function UserListPage() {
             <input
               type="checkbox"
               checked={showOnlyTutors}
-              onChange={(e) => {
-                setShowOnlyTutors(e.target.checked);
-                setPage(1);
-              }}
+              onChange={(e) => setShowOnlyTutors(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <span className="text-gray-700">Solo tutores</span>

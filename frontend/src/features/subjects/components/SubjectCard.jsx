@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useUser } from "@context/UserContext";
 
 export default function SubjectCard({
   subject,
@@ -8,6 +9,7 @@ export default function SubjectCard({
 }) {
   const navigate = useNavigate();
   const { courseId } = useParams();
+  const { user } = useUser();
 
   const handleClick = () => {
     if (type === "button") {
@@ -28,6 +30,7 @@ export default function SubjectCard({
         ${isButton || isSelectable ? "cursor-pointer" : "cursor-default opacity-70"}`}
       onClick={handleClick}
       style={{ cursor: isButton || isSelectable ? "pointer" : "default" }}
+      disabled={!user}
     >
       <div className="flex flex-col text-left w-full">
         <span className={`font-medium transition-colors ${isSelectable && selected ? "text-white" : "text-gray-800"}`}>

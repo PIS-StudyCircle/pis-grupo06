@@ -110,7 +110,7 @@ describe("TutoringPage - Filtros y búsqueda", () => {
     mockUseTutorings({ tutorings: baseTutorings, includeUndefinedTutor: true });
     renderWithRouter(<TutoringPage />);
   
-    const toggle = screen.getByLabelText(/Solo sin tutor/i);
+    const toggle = screen.getByLabelText(/Tutor Indefinido/i);
   
     // Activamos el toggle
     fireEvent.click(toggle);
@@ -131,14 +131,14 @@ describe("TutoringPage - Filtros y búsqueda", () => {
     const searchBySelect = screen.getByLabelText(/Buscar por/i);
     const searchInput = screen.getByPlaceholderText(/Buscar por materia/i);
     const undefinedTutorCheckbox = screen.getByRole("checkbox", {
-      name: /Solo sin tutor/i,
+      name: /Tutor Indefinido/i,
     });
   
     // Filtramos por materia "Química"
     fireEvent.change(searchBySelect, { target: { value: "course" } });
     fireEvent.change(searchInput, { target: { value: "Química" } });
   
-    // Activamos checkbox de Solo sin tutor → solo tutorías sin tutor
+    // Activamos checkbox de tutor indefinido → solo tutorías sin tutor
     fireEvent.click(undefinedTutorCheckbox);
     await waitFor(() => {
       expect(screen.getAllByText(/Química/i)).toHaveLength(1);

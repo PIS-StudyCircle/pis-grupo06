@@ -35,7 +35,7 @@ export default function SubjectDetailPage() {
               </div>
 
              {/*El mostrar los temas de la materia se delega a SubjectPage*/}
-             <TutoringPage filters={{ subject_id: subject.id }}  showCreate={false} titleClass = "subtitulo" showSearchBar={false} />
+             <TutoringPage filters={{ subject_id: subject.id }}  showCreate={false} titleClass = "subtitulo" />
 
             </div>
           </div>
