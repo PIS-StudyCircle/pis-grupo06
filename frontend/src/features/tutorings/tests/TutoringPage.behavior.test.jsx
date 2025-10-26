@@ -103,15 +103,15 @@ describe("TutoringPage - Comportamiento completo", () => {
       renderWithRouter(<TutoringPage mode="other" />);
   
       expect(screen.queryByRole("button")).not.toBeInTheDocument();
-      expect(screen.getByLabelText(/Tutor Indefinido/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Solo sin tutor/i)).toBeInTheDocument();
     });
   
-    it("toggle 'Tutor Indefinido' actualiza mergedFilters", () => {
+    it("toggle 'Solo sin tutor' actualiza mergedFilters", () => {
       mockUseTutorings({ setPage: setPageMock, setSearch: setSearchMock });
   
       renderWithRouter(<TutoringPage mode="other" />);
   
-      const toggle = screen.getByLabelText(/Tutor Indefinido/i);
+      const toggle = screen.getByLabelText(/Solo sin tutor/i);
       fireEvent.click(toggle);
   
       expect(toggle).toBeChecked();
