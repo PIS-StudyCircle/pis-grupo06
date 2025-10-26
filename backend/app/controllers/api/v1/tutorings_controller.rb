@@ -282,21 +282,21 @@ module Api
 
         # Validaciones generales para el usuario
         if (err = user_validations(user_role, end_time, scheduled_time, current_user, availability))
-          return render json: {error: err}, status: :unprocessable_entity
-        end  
-        
+          return render json: { error: err }, status: :unprocessable_entity
+        end
+
         # Validaciones específicas por rol
         if user_role == 'student'
 
           if (err = student_validations)
-            return render json: {error: err}, status: :unprocessable_entity
-          end  
+            return render json: { error: err }, status: :unprocessable_entity
+          end
 
         elsif user_role == 'tutor'
 
           if (err = tutor_validations)
-            return render json: {error: err}, status: :unprocessable_entity
-          end  
+            return render json: { error: err }, status: :unprocessable_entity
+          end
 
         end
 
@@ -527,10 +527,6 @@ module Api
       end
 
       def join_user_calendar(current_user, tutoring, scheduled_time)
-        #if user.google_expires_at.blank? || user.google_expires_at <= 2.minutes.from_now
-        #GoogleCalendarService.refresh_google_token(user)
-        #end  
-        
         #Si no existe el evento, lo crea en el calendario y une al estudiante
         begin
           if @tutoring.event_id.blank?
