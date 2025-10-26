@@ -44,10 +44,10 @@ describe("TutoringPage - Comportamiento general", () => {
     });
   });
 
-  it("muestra mensaje de carga cuando loading es true", () => {
+  it("muestra skeletons cuando loading es true", () => {
     mockUseTutorings({ loading: true, tutorings: [] });
     renderWithRouter(<TutoringPage />);
-    expect(screen.getByText(/Cargando tutorías.../i)).toBeInTheDocument();
+    expect(screen.getAllByRole("progressbar")[0]).toBeInTheDocument();
   });
 });
 
@@ -103,15 +103,15 @@ describe("TutoringPage - Comportamiento completo", () => {
       renderWithRouter(<TutoringPage mode="other" />);
   
       expect(screen.queryByRole("button")).not.toBeInTheDocument();
-      expect(screen.getByLabelText(/Tutor Indefinido/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Solo sin tutor/i)).toBeInTheDocument();
     });
   
-    it("toggle 'Tutor Indefinido' actualiza mergedFilters", () => {
+    it("toggle 'Solo sin tutor' actualiza mergedFilters", () => {
       mockUseTutorings({ setPage: setPageMock, setSearch: setSearchMock });
   
       renderWithRouter(<TutoringPage mode="other" />);
   
-      const toggle = screen.getByLabelText(/Tutor Indefinido/i);
+      const toggle = screen.getByLabelText(/Solo sin tutor/i);
       fireEvent.click(toggle);
   
       expect(toggle).toBeChecked();
