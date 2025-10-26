@@ -537,7 +537,11 @@ module Api
         end
 
         # Programar notificaciones automáticas
+        puts "🔔 [DEBUG] Controller: Programando ScheduleTutoringNotificationsJob para tutoring_id: #{@tutoring.id}"
+        Rails.logger.info "🔔 [DEBUG] Controller: Programando ScheduleTutoringNotificationsJob para tutoring_id: #{@tutoring.id}"
         ScheduleTutoringNotificationsJob.perform_later(@tutoring.id)
+        puts "🔔 [DEBUG] Controller: ✅ ScheduleTutoringNotificationsJob programado exitosamente"
+        Rails.logger.info "🔔 [DEBUG] Controller: ✅ ScheduleTutoringNotificationsJob programado exitosamente"
 
         # Enviar notificaciones según el rol
         if user_role == 'student'
@@ -641,8 +645,10 @@ module Api
 
           # 1) Si el que se va es el tutor -> SIEMPRE borrar tutoría (+ evento si existe)
           if was_tutor
+            # Guardar datos antes de borrar para el job
+            tutoring_data = capture_tutoring_data(@tutoring)
             # Notificar a estudiantes que el tutor canceló
-            TutoringCancelledJob.perform_later(@tutoring.id, current_user.id, "Tutor se desuscribió")
+            TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Tutor se desuscribió")
             
             begin
               calendar.delete_event(@tutoring) if event_confirmed
@@ -663,8 +669,10 @@ module Api
 
           # 2.5) Si el que se va es el creador y no quedan estudiantes -> eliminar tutoría
           if current_user.id == @tutoring.created_by_id && new_enrolled.zero?
+            # Guardar datos antes de borrar para el job
+            tutoring_data = capture_tutoring_data(@tutoring)
             # Notificar a participantes que el creador canceló
-            TutoringCancelledJob.perform_later(@tutoring.id, current_user.id, "Creador se desuscribió")
+            TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Creador se desuscribió")
             
             begin
               calendar.delete_event(@tutoring) if event_confirmed
@@ -678,8 +686,10 @@ module Api
 
           # 3) Caso borde: si NO hay tutor y NO quedan estudiantes -> borrar todo
           if !had_tutor && new_enrolled.zero?
+            # Guardar datos antes de borrar para el job
+            tutoring_data = capture_tutoring_data(@tutoring)
             # Notificar a participantes que la tutoría fue cancelada
-            TutoringCancelledJob.perform_later(@tutoring.id, current_user.id, "Sin participantes")
+            TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Sin participantes")
             
             begin
               calendar.delete_event(@tutoring) if event_confirmed
@@ -788,6 +798,16 @@ module Api
                   user_id, user_id, user_id
                 )
                 .distinct
+      end
+      def capture_tutoring_data(tutoring)
+        {
+          id: tutoring.id,
+          course_name: tutoring.course&.name,
+          tutor_id: tutoring.tutor_id,
+          scheduled_at: tutoring.scheduled_at,
+          enrolled: tutoring.enrolled,
+          created_by_id: tutoring.created_by_id
+        }
       end
 
       def availability_overlaps?(availabilities_params, user_id)

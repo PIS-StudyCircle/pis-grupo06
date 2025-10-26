@@ -20,10 +20,12 @@ export function NotificationsProvider({ children }) {
     let cancelled = false;
     (async () => {
       try {
+        console.log("🔔 [DEBUG] Frontend: Cargando notificaciones existentes...");
         const data = await getJson("/notifications");
+        console.log("🔔 [DEBUG] Frontend: Notificaciones cargadas:", data.notifications?.length || 0);
         if (!cancelled) setList(data.notifications || []);
       } catch (e) {
-        console.error(e);
+        console.error("🔔 [DEBUG] Frontend: Error cargando notificaciones:", e);
       }
     })();
     return () => { cancelled = true; };
@@ -36,20 +38,32 @@ export function NotificationsProvider({ children }) {
       try {
         if (subRef.current) return;
 
+        console.log("🔔 [DEBUG] Frontend: Obteniendo token de notificaciones...");
         const tokenResp = await fetch(`${API_BASE}/notification_token`, {
           method: "POST",
           credentials: "include",
         });
         if (!tokenResp.ok) throw new Error(`POST /notification_token failed: ${tokenResp.status}`);
         const { notifToken } = await tokenResp.json();
+        console.log("🔔 [DEBUG] Frontend: Token obtenido exitosamente");
 
+        console.log("🔔 [DEBUG] Frontend: Conectando a WebSocket...");
         consumer = createConsumer(`${WS_BASE}?notif_token=${encodeURIComponent(notifToken)}`);
 
         subRef.current = consumer.subscriptions.create(
           { channel: "NotificationsChannel" },
           {
+            connected: () => {
+              console.log("🔔 [DEBUG] Frontend: ✅ WebSocket conectado exitosamente");
+            },
+            disconnected: () => {
+              console.log("🔔 [DEBUG] Frontend: ❌ WebSocket desconectado");
+            },
             received: (payload) => {
-              console.log("Recibida la notificacion"),
+              console.log("🔔 [DEBUG] Frontend: Notificación recibida via WebSocket:", payload);
+              console.log("🔔 [DEBUG] Frontend: Tipo de notificación:", payload.title || payload.kind);
+              console.log("🔔 [DEBUG] Frontend: URL:", payload.url);
+              console.log("🔔 [DEBUG] Frontend: Fecha:", payload.created_at);
               setList(prev => (prev.some(n => n.id === payload.id) ? prev : [payload, ...prev]));
             },
           }

@@ -5,6 +5,7 @@ Rails.application.routes.draw do
 
       post "dev/cable_test", to: "dev#cable_test" if Rails.env.development?
       post "dev/notify_test", to: "dev#notify_test" if Rails.env.development?
+      post "dev/test_reminder", to: "dev#test_reminder" if Rails.env.development?
 
       devise_for :users,
                  defaults: { format: :json },
