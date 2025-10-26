@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useUser } from "@context/UserContext";
 
 export default function SubjectCard({
   subject,
