@@ -3,6 +3,9 @@ Rails.application.routes.draw do
     namespace :v1 do
       mount ActionCable.server => "/cable"
 
+      post "dev/cable_test", to: "dev#cable_test" if Rails.env.development?
+      post "dev/notify_test", to: "dev#notify_test" if Rails.env.development?
+
       devise_for :users,
                  defaults: { format: :json },
                  controllers: {

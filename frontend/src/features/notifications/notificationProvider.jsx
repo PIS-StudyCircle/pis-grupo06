@@ -34,6 +34,8 @@ export function NotificationsProvider({ children }) {
 
     (async () => {
       try {
+        if (subRef.current) return;
+
         const tokenResp = await fetch(`${API_BASE}/notification_token`, {
           method: "POST",
           credentials: "include",
@@ -47,6 +49,7 @@ export function NotificationsProvider({ children }) {
           { channel: "NotificationsChannel" },
           {
             received: (payload) => {
+              console.log("Recibida la notificacion"),
               setList(prev => (prev.some(n => n.id === payload.id) ? prev : [payload, ...prev]));
             },
           }
