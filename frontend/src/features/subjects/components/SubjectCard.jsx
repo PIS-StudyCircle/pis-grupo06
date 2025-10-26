@@ -12,11 +12,6 @@ export default function SubjectCard({
   const { user } = useUser();
 
   const handleClick = () => {
-    if (!user) {
-      navigate(`/flujo-visitante`);
-      return;
-    }
-
     if (type === "button") {
       navigate(`/materias/${courseId}/temas/${subject.id}`);
     } else if (type === "selectable" && onSelect) {
