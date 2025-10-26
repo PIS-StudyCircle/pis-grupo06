@@ -17,7 +17,7 @@ export default function TutoringList({
       </div>
     );
   if (error) return <div>Error al cargar las tutorías. </div>;
-  if (tutorings.length === 0)
+  if (!tutorings || tutorings.length === 0)
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] px-6 py-8 text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
