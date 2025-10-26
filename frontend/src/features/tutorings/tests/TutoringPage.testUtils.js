@@ -103,7 +103,7 @@ export const renderWithRouter = (ui, path = "/tutorias/123", user = { id: 999, n
               ? (mergedFilters?.tutorings ?? tutorings).slice()
               : [];
           
-            const noTutorFlag = mergedFilters?.no_tutor ?? includeUndefinedTutor;
+            const noTutorFlag = mergedFilters?.no_tutor_incluyendo_mias ?? includeUndefinedTutor;
             let list = noTutorFlag ? listSource.filter((t) => !t.tutor_id) : listSource;
           
             if (currentQuery) {
@@ -120,7 +120,7 @@ export const renderWithRouter = (ui, path = "/tutorias/123", user = { id: 999, n
             }
           
             return list;
-          }, [mergedFilters?.tutorings, currentQuery, currentSearchBy, mergedFilters?.no_tutor]);
+          }, [mergedFilters?.tutorings, currentQuery, currentSearchBy, mergedFilters?.no_tutor_incluyendo_mias]);
   
         return {
           tutorings: filtered,

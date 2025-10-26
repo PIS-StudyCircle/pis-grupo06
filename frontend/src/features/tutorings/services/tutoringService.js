@@ -9,6 +9,8 @@ const filtersFromMode = (mode) => {
     // Se cambia with_tutor por with_tutor_not_full ya que un estudiante ya que no tiene sentido mostrar tutorías que ya estén completas 
     case "misTutorias":
       return { enrolled: true };
+    case "serTutorIncluyendoMias":
+      return { no_tutor_incluyendo_mias: true };
     default:
       return {};
   }
