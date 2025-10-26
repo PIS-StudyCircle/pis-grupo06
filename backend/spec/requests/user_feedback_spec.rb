@@ -4,7 +4,7 @@ RSpec.describe "Api::V1::Users::UserFeedbacks", type: :request do
   include Devise::Test::IntegrationHelpers
 
   def json
-    JSON.parse(response.body)
+    response.parsed_body
   end
 
   let!(:university) { University.create!(name: "Universidad Demo") }
@@ -34,19 +34,18 @@ RSpec.describe "Api::V1::Users::UserFeedbacks", type: :request do
 
   let!(:course) { Course.create!(name: "Curso Demo") }
 
-def build_tutoring_for(tutor_user)
-  Tutoring.create!(
-    scheduled_at: 1.day.from_now,
-    duration_mins: 60,
-    modality: "presencial", 
-    capacity: 2,
-    enrolled: 0,
-    course: course,
-    created_by_id: tutor_user.id,
-    tutor_id: tutor_user.id
-  )
-end
-
+  def build_tutoring_for(tutor_user)
+    Tutoring.create!(
+      scheduled_at: 1.day.from_now,
+      duration_mins: 60,
+      modality: "presencial",
+      capacity: 2,
+      enrolled: 0,
+      course: course,
+      created_by_id: tutor_user.id,
+      tutor_id: tutor_user.id
+    )
+  end
 
   describe "POST /api/v1/users/user_feedbacks (puntuar tutor)" do
     context "cuando el usuario está autenticado" do
@@ -56,8 +55,10 @@ end
         t1 = build_tutoring_for(tutor)
         t2 = build_tutoring_for(tutor)
 
-        s1 = User.create!(email: "s1@ex.com", password: "12345678", password_confirmation: "12345678", faculty: faculty, name: "S1", last_name: "Demo")
-        s2 = User.create!(email: "s2@ex.com", password: "12345678", password_confirmation: "12345678", faculty: faculty, name: "S2", last_name: "Demo")
+        s1 = User.create!(email: "s1@ex.com", password: "12345678", password_confirmation: "12345678",
+                          faculty: faculty, name: "S1", last_name: "Demo")
+        s2 = User.create!(email: "s2@ex.com", password: "12345678", password_confirmation: "12345678",
+                          faculty: faculty, name: "S2", last_name: "Demo")
         Feedback.create!(tutor_id: tutor.id, student_id: s1.id, tutoring_id: t1.id, rating: 4.0)
         Feedback.create!(tutor_id: tutor.id, student_id: s2.id, tutoring_id: t2.id, rating: 5.0)
 
@@ -186,9 +187,12 @@ end
       t2 = build_tutoring_for(tutor)
       t3 = build_tutoring_for(tutor)
 
-      s1 = User.create!(email: "s1@ex.com", password: "12345678", password_confirmation: "12345678", faculty: faculty, name: "S1", last_name: "Demo")
-      s2 = User.create!(email: "s2@ex.com", password: "12345678", password_confirmation: "12345678", faculty: faculty, name: "S2", last_name: "Demo")
-      s3 = User.create!(email: "s3@ex.com", password: "12345678", password_confirmation: "12345678", faculty: faculty, name: "S3", last_name: "Demo")
+      s1 = User.create!(email: "s1@ex.com", password: "12345678", password_confirmation: "12345678", faculty: faculty,
+                        name: "S1", last_name: "Demo")
+      s2 = User.create!(email: "s2@ex.com", password: "12345678", password_confirmation: "12345678", faculty: faculty,
+                        name: "S2", last_name: "Demo")
+      s3 = User.create!(email: "s3@ex.com", password: "12345678", password_confirmation: "12345678", faculty: faculty,
+                        name: "S3", last_name: "Demo")
 
       Feedback.create!(tutor_id: tutor.id, student_id: s1.id, tutoring_id: t1.id, rating: 4.0)
       Feedback.create!(tutor_id: tutor.id, student_id: s2.id, tutoring_id: t2.id, rating: 5.0)
