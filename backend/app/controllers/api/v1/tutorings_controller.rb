@@ -258,45 +258,7 @@ module Api
         @tutoring.update!(enrolled: @tutoring.enrolled + 1)
 
         # Si no existe evento, crearlo con el tutor y agregarse
-        begin
-          if @tutoring.event_id.blank?
-            # Crear evento desde el calendario del tutor
-            tutor = @tutoring.tutor
-            calendar_service = GoogleCalendarService.new(tutor)
-            end_time = scheduled_time + @tutoring.duration_mins.minutes
-
-            course_name = @tutoring.course&.name || "Tutoría"
-
-            event_params = {
-              title: "Tutoría - #{course_name}",
-              description: build_tutoring_description,
-              start_time: scheduled_time.iso8601,
-              end_time: end_time.iso8601
-            }
-
-            calendar_service.create_event(@tutoring, event_params)
-          end
-
-          # Agregar al estudiante actual al evento
-          tutor = @tutoring.tutor
-          calendar_service = GoogleCalendarService.new(tutor)
-          calendar_service.join_event(@tutoring, current_user.email)
-
-          # Agregar a todos los demás estudiantes ya inscritos
-          existing_students = @tutoring.user_tutorings
-                                       .where.not(user_id: current_user.id)
-                                       .includes(:user)
-
-          existing_students.each do |user_tutoring|
-            student = user_tutoring.user
-            next if student.id == tutor.id # No agregar al tutor como estudiante
-
-            calendar_service.join_event(@tutoring, student.email)
-          end
-        rescue => e
-          Rails.logger.error "Error al manejar evento de Google Calendar: #{e.message}"
-          # No fallar la transacción por errores de calendario
-        end
+        join_user_calendar(current_user, tutoring, @tutoring.scheduled_time)
 
         render json: {
           ok: true,
@@ -312,76 +274,30 @@ module Api
                                               : scheduled_time + @tutoring.duration_mins.minutes
         user_role = params[:role] # 'student' o 'tutor'
 
-        # Validar que se especifique el rol
-        unless ['student', 'tutor'].include?(user_role)
-          return render json: {
-            error: "Debe especificar el rol: 'student' o 'tutor'"
-          }, status: :unprocessable_entity
-        end
-
         # Buscar una disponibilidad que contenga ese horario
         chosen_end = end_time
         availability = @tutoring.tutoring_availabilities.available.find do |a|
           scheduled_time >= a.start_time && chosen_end <= a.end_time
         end
 
-        unless availability
-          return render json: {
-            error: "El horario elegido no está dentro de las disponibilidades ofrecidas"
-          }, status: :unprocessable_entity
-        end
-
-        # Validar que haya tiempo suficiente para la duración de la tutoría
-        tutoring_end_time = end_time || (scheduled_time + @tutoring.duration_mins.minutes)
-        if tutoring_end_time > availability.end_time
-          return render json: {
-            error: "No hay tiempo suficiente en esa franja horaria. La tutoría dura #{@tutoring.duration_mins} minutos."
-          }, status: :unprocessable_entity
-        end
-
-        # Validar que no haya tutorías que se solapen con este horario
-        overlapping_tutorings = check_overlapping_tutorings(scheduled_time, tutoring_end_time, current_user.id)
-        if overlapping_tutorings.any?
-          return render json: {
-            error: "Ya tienes tutorías programadas en ese horario"
-          }, status: :unprocessable_entity
-        end
-
+        # Validaciones generales para el usuario
+        if (err = user_validations(user_role, end_time, scheduled_time, current_user, availability))
+          return render json: {error: err}, status: :unprocessable_entity
+        end  
+        
+        # Validaciones específicas por rol
         if user_role == 'student'
-          # Validaciones específicas para estudiantes
-          if @tutoring.enrolled >= @tutoring.capacity
-            return render json: {
-              error: "La tutoría ya alcanzó su capacidad máxima"
-            }, status: :unprocessable_entity
-          end
 
-          # Verificar que la tutoría ya tenga un tutor asignado
-          if @tutoring.tutor_id.blank?
-            return render json: {
-              error: "Esta tutoría aún no tiene un tutor asignado"
-            }, status: :unprocessable_entity
-          end
+          if (err = student_validations)
+            return render json: {error: err}, status: :unprocessable_entity
+          end  
 
-          # Verificar que el estudiante no esté ya inscrito
-          if UserTutoring.exists?(user_id: current_user.id, tutoring_id: @tutoring.id)
-            return render json: {
-              error: "Ya estás inscrito en esta tutoría"
-            }, status: :unprocessable_entity
-          end
         elsif user_role == 'tutor'
-          # Validaciones específicas para tutores
-          if @tutoring.tutor_id.present?
-            return render json: {
-              error: "Esta tutoría ya tiene un tutor asignado"
-            }, status: :unprocessable_entity
-          end
 
-          # Verificar que el tutor no esté ya en la tutoría
-          if UserTutoring.exists?(user_id: current_user.id, tutoring_id: @tutoring.id)
-            return render json: {
-              error: "Ya estás registrado en esta tutoría"
-            }, status: :unprocessable_entity
-          end
+          if (err = tutor_validations)
+            return render json: {error: err}, status: :unprocessable_entity
+          end  
+
         end
 
         # Calcular duración real (en minutos)
@@ -398,48 +314,7 @@ module Api
             # Inscribir al estudiante
             UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
-            # Incrementar contador de inscritos
-            # @tutoring.update!(enrolled: @tutoring.enrolled + 1)
-
-            # Si no existe evento, crearlo con el tutor y agregarse
-            begin
-              if @tutoring.event_id.blank?
-                # Crear evento desde el calendario del tutor
-                tutor = @tutoring.tutor
-                calendar_service = GoogleCalendarService.new(tutor)
-
-                course_name = @tutoring.course&.name || "Tutoría"
-
-                event_params = {
-                  title: "Tutoría - #{course_name}",
-                  description: build_tutoring_description(end_time),
-                  start_time: scheduled_time.iso8601,
-                  end_time: end_time.iso8601
-                }
-
-                calendar_service.create_event(@tutoring, event_params)
-              end
-
-              # Agregar al estudiante actual al evento
-              tutor = @tutoring.tutor
-              calendar_service = GoogleCalendarService.new(tutor)
-              calendar_service.join_event(@tutoring, current_user.email)
-
-              # Agregar a todos los demás estudiantes ya inscritos
-              existing_students = @tutoring.user_tutorings
-                                           .where.not(user_id: current_user.id)
-                                           .includes(:user)
-
-              existing_students.each do |user_tutoring|
-                student = user_tutoring.user
-                next if student.id == tutor.id # No agregar al tutor como estudiante
-
-                calendar_service.join_event(@tutoring, student.email)
-              end
-            rescue => e
-              Rails.logger.error "Error al manejar evento de Google Calendar: #{e.message}"
-              # No fallar la transacción por errores de calendario
-            end
+            join_user_calendar(current_user, @tutoring, scheduled_time)
 
             "Te inscribiste exitosamente en la tutoría"
           else # tutor
@@ -455,55 +330,7 @@ module Api
               UserTutoring.create!(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
             end
 
-            # Crear evento en Google Calendar y agregar a todos los estudiantes
-            begin
-              calendar_service = GoogleCalendarService.new(current_user)
-
-              # Actualizar datos antes de crear el evento
-              if params[:capacity].present?
-                new_cap = params[:capacity].to_i
-                raise ActiveRecord::RecordInvalid.new(@tutoring), "Capacidad inválida" if new_cap <= 0
-
-                @tutoring.capacity = new_cap
-              end
-
-              @tutoring.assign_attributes(
-                scheduled_at: scheduled_time,
-                tutor_id: current_user.id,
-                capacity: new_cap.presence || @tutoring.capacity,
-              )
-              @tutoring.save!
-
-              # Construir evento con datos actualizados
-              course_name = @tutoring.course&.name || "Tutoría"
-              event_params = {
-                title: "Tutoría - #{course_name}",
-                description: build_tutoring_description(end_time), # usa los datos actualizados
-                start_time: scheduled_time.iso8601,
-                end_time: end_time.iso8601
-              }
-
-              # Crear evento en Calendar
-              calendar_service.create_event(@tutoring, event_params)
-
-              # Agregar al creador si tiene email
-              if @tutoring.creator&.email.present?
-                calendar_service.join_event(@tutoring, @tutoring.creator.email)
-              end
-
-              # Agregar a todos los estudiantes ya inscritos
-              existing_students = @tutoring.user_tutorings
-                                           .where.not(user_id: current_user.id)
-                                           .includes(:user)
-
-              existing_students.each do |user_tutoring|
-                student = user_tutoring.user
-                calendar_service.join_event(@tutoring, student.email)
-              end
-            rescue => e
-              Rails.logger.error "Error al crear evento en Google Calendar: #{e.message}"
-              # No fallar la transacción por errores de calendario
-            end
+            set_event_tutor(scheduled_time, current_user, end_time)
 
             "Fuiste asignado como tutor exitosamente"
           end
@@ -659,6 +486,145 @@ module Api
       end
 
       private
+
+      def user_validations(user_role, end_time, scheduled_time, current_user, availability)
+      
+        # Validar que se especifique el rol
+        unless ['student', 'tutor'].include?(user_role)
+          return "Debe especificar el rol: 'student' o 'tutor'"
+        end
+
+        unless availability
+          return "El horario elegido no está dentro de las disponibilidades ofrecidas"
+        end
+
+        # Validar que haya tiempo suficiente para la duración de la tutoría
+        tutoring_end_time = end_time || (scheduled_time + @tutoring.duration_mins.minutes)
+        if tutoring_end_time > availability.end_time
+          return "No hay tiempo suficiente en esa franja horaria. La tutoría dura #{@tutoring.duration_mins} minutos."
+        end
+
+        # Validar que no haya tutorías que se solapen con este horario
+        overlapping_tutorings = check_overlapping_tutorings(scheduled_time, tutoring_end_time, current_user.id)
+        if overlapping_tutorings.any?
+          return "Ya tienes tutorías programadas en ese horario"
+        end
+
+        if UserTutoring.exists?(user_id: current_user.id, tutoring_id: @tutoring.id)
+          return "Ya estás registrado en esta tutoría"
+        end      
+      end
+
+      def  student_validations
+        return "La tutoría ya alcanzó su capacidad máxima" if @tutoring.enrolled >= @tutoring.capacity
+        return "Esta tutoría aún no tiene un tutor asignado" if @tutoring.tutor_id.blank?
+        nil
+      end
+
+      def tutor_validations
+        return "Esta tutoría ya tiene un tutor asignado" if @tutoring.tutor_id.present?
+        nil
+      end
+
+      def join_user_calendar(current_user, tutoring, scheduled_time)
+        #if user.google_expires_at.blank? || user.google_expires_at <= 2.minutes.from_now
+        #GoogleCalendarService.refresh_google_token(user)
+        #end  
+        
+        #Si no existe el evento, lo crea en el calendario y une al estudiante
+        begin
+          if @tutoring.event_id.blank?
+            # Crear evento desde el calendario del tutor
+            tutor = @tutoring.tutor
+            calendar_service = GoogleCalendarService.new(tutor)
+            end_time = scheduled_time + @tutoring.duration_mins.minutes
+
+            course_name = @tutoring.course&.name || "Tutoría"
+
+            event_params = {
+              title: "Tutoría - #{course_name}",
+              description: build_tutoring_description,
+              start_time: scheduled_time.iso8601,
+              end_time: end_time.iso8601
+            }
+            calendar_service.create_event(@tutoring, event_params)
+          end
+
+          # Agregar al estudiante actual al evento
+          tutor = @tutoring.tutor
+          calendar_service = GoogleCalendarService.new(tutor)
+          calendar_service.join_event(@tutoring, current_user.email)
+
+          # Agregar a todos los demás estudiantes ya inscritos
+          existing_students = @tutoring.user_tutorings
+                                       .where.not(user_id: current_user.id)
+                                       .includes(:user)
+
+          existing_students.each do |user_tutoring|
+            student = user_tutoring.user
+            # next if student.id == tutor.id # No agregar al tutor como estudiante
+
+            calendar_service.join_event(@tutoring, student.email)
+          end
+        rescue => e
+          Rails.logger.error "Error al manejar evento de Google Calendar: #{e.message}"
+          # No fallar la transacción por errores de calendario
+        end
+      
+      end
+
+      def set_event_tutor(scheduled_time, current_user, end_time)
+        # Creado de evento de Google Calendar de parte del tutor
+        begin
+          calendar_service = GoogleCalendarService.new(current_user)
+
+          # Actualizar datos antes de crear el evento
+          if params[:capacity].present?
+            new_cap = params[:capacity].to_i
+            raise ActiveRecord::RecordInvalid.new(@tutoring), "Capacidad inválida" if new_cap <= 0
+
+            @tutoring.capacity = new_cap
+          end
+
+          @tutoring.assign_attributes(
+            scheduled_at: scheduled_time,
+            tutor_id: current_user.id,
+            capacity: new_cap.presence || @tutoring.capacity,
+          )
+          @tutoring.save!
+
+          # Construir evento con datos actualizados
+          course_name = @tutoring.course&.name || "Tutoría"
+          event_params = {
+            title: "Tutoría - #{course_name}",
+            description: build_tutoring_description(end_time), # usa los datos actualizados
+            start_time: scheduled_time.iso8601,
+            end_time: end_time.iso8601
+          }
+
+          # Crear evento en Calendar
+          calendar_service.create_event(@tutoring, event_params)
+
+          # Agregar al creador si tiene email
+          if @tutoring.creator&.email.present?
+            calendar_service.join_event(@tutoring, @tutoring.creator.email)
+          end
+
+          # Agregar a todos los estudiantes ya inscritos
+          existing_students = @tutoring.user_tutorings
+                                        .where.not(user_id: current_user.id)
+                                        .includes(:user)
+
+          existing_students.each do |user_tutoring|
+            student = user_tutoring.user
+            calendar_service.join_event(@tutoring, student.email)
+          end
+        rescue => e
+          Rails.logger.error "Error al crear evento en Google Calendar: #{e.message}"
+          # No fallar la transacción por errores de calendario
+        end
+
+      end
 
       def set_tutoring
         @tutoring = Tutoring.find(params[:id])
