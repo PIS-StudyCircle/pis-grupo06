@@ -28,7 +28,7 @@ describe("SubjectPage", () => {
     console.error.mockRestore();
   });
 
-  it("renderiza loading, lista de temas y paginación", async () => {
+  it("renderiza skeleton, lista de temas y paginación", async () => {
     subjectService.getSubjects.mockResolvedValue({
       subjects: mockSubjects,
       pagination: { last: 3 },
@@ -40,8 +40,8 @@ describe("SubjectPage", () => {
       </MemoryRouter>
     );
 
-    // Loading
-    expect(screen.getByText(/Cargando temas/i)).toBeInTheDocument();
+    // skeleton
+    expect(screen.getAllByRole("progressbar")[0]).toBeInTheDocument();
 
     // Lista
     expect(await screen.findByText("Tema I")).toBeInTheDocument();
@@ -117,7 +117,8 @@ describe("SubjectPage", () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/Cargando temas/i)).toBeInTheDocument();
+    expect(screen.getAllByRole("progressbar")[0]).toBeInTheDocument();
+
   });
 
   it("muestra error si falla la API", async () => {
