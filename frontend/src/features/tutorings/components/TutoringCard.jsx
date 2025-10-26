@@ -1,7 +1,7 @@
 import { formatDateTime } from "@shared/utils/FormatDate";
 import { useUser } from "@context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 import {
   showSuccess,
   showError,
@@ -80,47 +80,8 @@ export default function TutoringCard({
     tutoring.capacity != null && tutoring.capacity > tutoring.enrolled;
   const soyTutor = tutoring.tutor_id === user?.id;
   const esCreador = tutoring.created_by_id === user?.id;
+  const soyEstudiante = tutoring.user_enrolled;
 
-  const [soyEstudiante, setSoyEstudiante] = useState(false);
-
-  useEffect(() => {
-    let cancel = false;
-    async function run() {
-      if (!user?.id || !tutoring?.id) {
-        setSoyEstudiante(false);
-        return;
-      }
-
-      try {
-        const res = await fetch(
-          `/api/v1/tutorings/${tutoring.id}/exists_user_tutoring`,
-          {
-            credentials: "include",
-          }
-        );
-
-        if (cancel) return;
-
-        if (!res.ok) {
-          console.warn("exists_user_tutoring no OK:", res.status);
-          setSoyEstudiante(false);
-          return;
-        }
-
-        const { exists } = await res.json().catch(() => ({ exists: false }));
-        setSoyEstudiante(!!exists);
-      } catch (e) {
-        if (!cancel) {
-          console.warn("fetch error:", e);
-          setSoyEstudiante(false);
-        }
-      }
-    }
-    run();
-    return () => {
-      cancel = true;
-    };
-  }, [user?.id, tutoring?.id]);
 
   // Use externalMode if provided, otherwise calculate mode based on state
   let mode = externalMode;
