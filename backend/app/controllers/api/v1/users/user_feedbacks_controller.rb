@@ -3,7 +3,7 @@ module Api
   module V1
     module Users
       class UserFeedbacksController < ApplicationController
-        before_action :authenticate_user!
+        before_action :authenticate_user!, except: [:top_rated]
 
         # GET /api/v1/users/user_feedbacks
         def index
@@ -125,6 +125,25 @@ module Api
           else
             render json: { ok: false, errors: feedback.errors.full_messages }, status: :unprocessable_entity
           end
+        end
+
+        def top_rated
+          top_tutors = User
+            .joins("INNER JOIN feedbacks ON feedbacks.tutor_id = users.id")
+            .select("users.*, AVG(feedbacks.rating) AS average_rating, COUNT(feedbacks.id) AS total_feedbacks")
+            .group("users.id")
+            .order("average_rating DESC, total_feedbacks DESC")
+            .limit(5)
+
+          render json: top_tutors.map { |t|
+            {
+              id: t.id,
+              name: t.name,
+              email: t.email,
+              average_rating: t.average_rating.to_f.round(1),
+              total_feedbacks: t.total_feedbacks
+            }
+          }
         end
 
         private

@@ -5,6 +5,7 @@ import { useCourses } from "../hooks/useCourses";
 import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
 import PageTitle from "@components/PageTitle";
+import TopTutors from "../components/TopTutors";
 import { useUser } from "@context/UserContext";
 
 export default function CoursePage() {
@@ -34,10 +35,11 @@ export default function CoursePage() {
   }, [query, setPage, setSearch]);
 
   return (
-    <div className="flex flex-col ">
-      <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
-        <div className="max-w-5xl mx-auto">
-          <PageTitle title="Materias Disponibles" className="titulo"></PageTitle>
+    <div className="flex flex-col py-6 content-scroll">
+      <div className="flex justify-center gap-10 pl-32 pr-10">
+        {/* Columna izquierda: cursos */}
+        <div className="flex-[1.6]">
+          <PageTitle title="Materias Disponibles" className="titulo" />
           <SearchInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -57,8 +59,12 @@ export default function CoursePage() {
           )}
 
           <CourseList courses={courses} loading={loading} error={error} />
-
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
+        </div>
+
+        {/* Columna derecha: ranking */}
+        <div className="flex-[0.8]">
+          <TopTutors />
         </div>
       </div>
     </div>
