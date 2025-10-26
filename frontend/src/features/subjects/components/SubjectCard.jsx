@@ -9,7 +9,6 @@ export default function SubjectCard({
 }) {
   const navigate = useNavigate();
   const { courseId } = useParams();
-  const { user } = useUser();
 
   const handleClick = () => {
     if (type === "button") {
