@@ -6,7 +6,7 @@ import Pagination from "@components/Pagination";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import PageTitle from "@components/PageTitle";
 
-export default function TutoringPage({ filters = {}, mode = "", titleClass = "titulo" }) {
+export default function TutoringPage({ filters = {}, mode = "", titleClass = "titulo",  showSearchBar = true }) {
   const { courseId } = useParams();
   const navigate = useNavigate();
 
@@ -98,25 +98,28 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
               </button>
             )}
           </PageTitle>
-        <TutoringSearchBar
-            query={query}
-            onQueryChange={(e) => setQuery(e.target.value)}
-            searchBy={forceSubjectSearch ? "subject" : searchBy}
-            onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
-            options={
-              forceSubjectSearch
-                ? [{ value: "subject", label: "Tema" }]
-                : [
-                    { value: "course", label: "Materia" },
-                    { value: "subject", label: "Tema" },
-                  ]
-            }
-            placeholder={
-              (forceSubjectSearch ? "subject" : searchBy) === "course"
-                ? "Buscar por materia..."
-                : "Buscar por tema..."
-            }
-          />
+
+          {showSearchBar && (
+            <TutoringSearchBar
+              query={query}
+              onQueryChange={(e) => setQuery(e.target.value)}
+              searchBy={forceSubjectSearch ? "subject" : searchBy}
+              onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
+              options={
+                forceSubjectSearch
+                  ? [{ value: "subject", label: "Tema" }]
+                  : [
+                      { value: "course", label: "Materia" },
+                      { value: "subject", label: "Tema" },
+                    ]
+              }
+              placeholder={
+                (forceSubjectSearch ? "subject" : searchBy) === "course"
+                  ? "Buscar por materia..."
+                  : "Buscar por tema..."
+              }
+            />
+          )}
 
           {/* Filter toggle */}
           {mode !== "serTutor" && mode !== "serEstudiante" && (

@@ -1,4 +1,5 @@
 import TutoringCard from "./TutoringCard";
+import TutoringCardSkeleton from "./TutoringCardSkeleton";
 
 export default function TutoringList({
   courseName,
@@ -8,7 +9,13 @@ export default function TutoringList({
   mode = "",
   onDesuscribirse
 }) {
-  if (loading) return <div>Cargando tutorías...</div>;
+  if (loading)  return (
+      <div className="flex flex-col">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <TutoringCardSkeleton key={i} />
+        ))}
+      </div>
+    );
   if (error) return <div>Error al cargar las tutorías. </div>;
   if (!tutorings || tutorings.length === 0)
     return (
