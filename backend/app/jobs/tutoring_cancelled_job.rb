@@ -2,7 +2,7 @@ class TutoringCancelledJob < ApplicationJob
   queue_as :default
 
   def perform(tutoring_data, cancelled_by_user_id, cancellation_reason = nil)
-    cancelled_by_user = User.find(cancelled_by_user_id)
+    User.find(cancelled_by_user_id)
 
     # Obtener todos los participantes (tutor, creador y estudiantes)
     participants = []

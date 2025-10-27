@@ -45,7 +45,7 @@ module Api
               review_id: review.id,
               reviewer_id: current_user.id
             ).deliver_later(review.reviewed)
-            
+
             render json: review, status: :created
           else
             render json: { errors: review.errors.full_messages }, status: :unprocessable_entity

@@ -208,9 +208,9 @@ module Api
 
             # Notificar a usuarios con esta materia (course) como favorita
             favoriters = User.joins(:favorite_courses)
-                            .where(favorite_courses: { course_id: tutoring.course_id })
-                            .where.not(id: tutoring.created_by_id) # no notificar al creador
-                            .distinct
+                             .where(favorite_courses: { course_id: tutoring.course_id })
+                             .where.not(id: tutoring.created_by_id) # no notificar al creador
+                             .distinct
 
             if favoriters.exists?
               favoriters.find_each do |user|
@@ -249,7 +249,7 @@ module Api
       def destroy
         # Enviar notificaciones de cancelación antes de eliminar
         TutoringCancelledJob.perform_later(@tutoring.id, current_user.id, "Tutoría eliminada")
-        
+
         @tutoring.destroy
         head :no_content
       end
@@ -537,10 +537,12 @@ module Api
         end
 
         # Programar notificaciones automáticas
-        puts "🔔 [DEBUG] Controller: Programando ScheduleTutoringNotificationsJob para tutoring_id: #{@tutoring.id}"
+        Rails.logger.debug {
+          "🔔 [DEBUG] Controller: Programando ScheduleTutoringNotificationsJob para tutoring_id: #{@tutoring.id}"
+        }
         Rails.logger.info "🔔 [DEBUG] Controller: Programando ScheduleTutoringNotificationsJob para tutoring_id: #{@tutoring.id}"
         ScheduleTutoringNotificationsJob.perform_later(@tutoring.id)
-        puts "🔔 [DEBUG] Controller: ✅ ScheduleTutoringNotificationsJob programado exitosamente"
+        Rails.logger.debug "🔔 [DEBUG] Controller: ✅ ScheduleTutoringNotificationsJob programado exitosamente"
         Rails.logger.info "🔔 [DEBUG] Controller: ✅ ScheduleTutoringNotificationsJob programado exitosamente"
 
         # Enviar notificaciones según el rol
@@ -649,13 +651,13 @@ module Api
             tutoring_data = capture_tutoring_data(@tutoring)
             # Notificar a estudiantes que el tutor canceló
             TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Tutor se desuscribió")
-            
+
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
               Rails.logger.error "Calendar delete_event (se va tutor) error: #{e.message}"
             end
-            
+
             @tutoring.destroy!
             return head :no_content
           end
@@ -673,13 +675,13 @@ module Api
             tutoring_data = capture_tutoring_data(@tutoring)
             # Notificar a participantes que el creador canceló
             TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Creador se desuscribió")
-            
+
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
               Rails.logger.error "Calendar delete_event (se va creador y sin estudiantes) error: #{e.message}"
             end
-            
+
             @tutoring.destroy!
             return head :no_content
           end
@@ -690,13 +692,13 @@ module Api
             tutoring_data = capture_tutoring_data(@tutoring)
             # Notificar a participantes que la tutoría fue cancelada
             TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Sin participantes")
-            
+
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
               Rails.logger.error "Calendar delete_event (no tutor y sin estudiantes) error: #{e.message}"
             end
-            
+
             @tutoring.destroy!
             return head :no_content
           end
@@ -799,6 +801,7 @@ module Api
                 )
                 .distinct
       end
+
       def capture_tutoring_data(tutoring)
         {
           id: tutoring.id,
