@@ -806,7 +806,8 @@ module Api
           tutor_id: tutoring.tutor_id,
           scheduled_at: tutoring.scheduled_at,
           enrolled: tutoring.enrolled,
-          created_by_id: tutoring.created_by_id
+          created_by_id: tutoring.created_by_id,
+          users: tutoring.users.as_json(only: [:id])
         }
       end
 
