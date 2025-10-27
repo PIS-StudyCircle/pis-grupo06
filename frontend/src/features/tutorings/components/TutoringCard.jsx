@@ -144,6 +144,17 @@ export default function TutoringCard({
   const navigate = useNavigate();
 
   return (
+      <div
+    className="w-full bg-white rounded-lg shadow p-4 my-4 cursor-pointer hover:shadow-md transition-shadow"
+    role="button"
+    tabIndex={0}
+    onClick={() => navigate(`/tutorias/${tutoring.id}`)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        navigate(`/tutorias/${tutoring.id}`);
+      }
+    }}
+  >
     <div className="w-full bg-white rounded-lg shadow p-4 my-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex-1 flex flex-col text-left">
@@ -276,5 +287,6 @@ export default function TutoringCard({
         )}
       </div>
     </div>
+     </div>
   );
 }
