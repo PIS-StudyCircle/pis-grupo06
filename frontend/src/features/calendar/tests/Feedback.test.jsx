@@ -4,7 +4,6 @@ import userEvent from "@testing-library/user-event";
 import SessionCard from "../components/SessionCard";
 
 jest.mock("lucide-react", () => {
-  const React = require("react");
   return new Proxy(
     {},
     {
