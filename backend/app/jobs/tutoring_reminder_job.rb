@@ -27,7 +27,6 @@ class TutoringReminderJob < ApplicationJob
     Rails.logger.debug {
       "🔔 [DEBUG] Tiempo hasta la tutoría: #{time_until_tutoring} (#{time_until_tutoring / 1.hour} horas)"
     }
-    Rails.logger.info "🔔 [DEBUG] Tiempo hasta la tutoría: #{time_until_tutoring} (#{time_until_tutoring / 1.hour} horas)"
 
     # Enviar recordatorio si está entre 20-28 horas antes (ventana de 8 horas)
     unless time_until_tutoring.between?(20.hours, 28.hours)

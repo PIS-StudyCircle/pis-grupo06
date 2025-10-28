@@ -537,13 +537,7 @@ module Api
         end
 
         # Programar notificaciones automáticas
-        Rails.logger.debug {
-          "🔔 [DEBUG] Controller: Programando ScheduleTutoringNotificationsJob para tutoring_id: #{@tutoring.id}"
-        }
-        Rails.logger.info "🔔 [DEBUG] Controller: Programando ScheduleTutoringNotificationsJob para tutoring_id: #{@tutoring.id}"
         ScheduleTutoringNotificationsJob.perform_later(@tutoring.id)
-        Rails.logger.debug "🔔 [DEBUG] Controller: ✅ ScheduleTutoringNotificationsJob programado exitosamente"
-        Rails.logger.info "🔔 [DEBUG] Controller: ✅ ScheduleTutoringNotificationsJob programado exitosamente"
 
         # Enviar notificaciones según el rol
         if user_role == 'student'

@@ -20,15 +20,8 @@ class Api::V1::DevController < ApplicationController
     end
 
     begin
-      Rails.logger.debug {
-        "🔔 [DEBUG] DevController: Ejecutando TutoringReminderJob manualmente para tutoring_id: #{tutoring_id}"
-      }
-      Rails.logger.info "🔔 [DEBUG] DevController: Ejecutando TutoringReminderJob manualmente para tutoring_id: #{tutoring_id}"
-
       TutoringReminderJob.perform_now(tutoring_id)
 
-      Rails.logger.debug "🔔 [DEBUG] DevController: ✅ TutoringReminderJob ejecutado exitosamente"
-      Rails.logger.info "🔔 [DEBUG] DevController: ✅ TutoringReminderJob ejecutado exitosamente"
 
       render json: {
         ok: true,
@@ -36,9 +29,6 @@ class Api::V1::DevController < ApplicationController
         tutoring_id: tutoring_id
       }
     rescue => e
-      Rails.logger.debug { "🔔 [DEBUG] DevController: ❌ Error ejecutando TutoringReminderJob: #{e.message}" }
-      Rails.logger.error "🔔 [DEBUG] DevController: ❌ Error ejecutando TutoringReminderJob: #{e.message}"
-
       render json: {
         error: "Error ejecutando TutoringReminderJob: #{e.message}",
         tutoring_id: tutoring_id

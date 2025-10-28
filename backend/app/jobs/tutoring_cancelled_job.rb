@@ -40,7 +40,8 @@ class TutoringCancelledJob < ApplicationJob
       ).deliver_later(user)
     end
 
-    Rails.logger.info "Sent cancellation notifications for tutoring #{tutoring_data['id']} to #{participants.count} participants"
+    Rails.logger.info "Sent cancellation notifications for tutoring #{tutoring_data['id']} " \
+                      "to #{participants.count} participants"
   rescue ActiveRecord::RecordNotFound => e
     Rails.logger.warn "TutoringCancelledJob: Record not found - #{e.message}"
   end
