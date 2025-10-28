@@ -34,9 +34,13 @@ module Api
         # los que aun no tienen tutor asignado
         if params[:no_tutor].present? && ActiveModel::Type::Boolean.new.cast(params[:no_tutor])
           tutorings = tutorings.without_tutor
-
           # no aparecen las tutorias creadas por el usuario
           tutorings = tutorings.where.not(created_by_id: current_user.id)
+        end
+
+        # muestra la opción de desuscribirse. Esto desde el listado general o tutorías de un tema
+        if params[:no_tutor_incluyendo_mias].present? && ActiveModel::Type::Boolean.new.cast(params[:no_tutor_incluyendo_mias])
+          tutorings = tutorings.without_tutor
         end
 
         # los que ya tienen tutor asignado y no estan pending
@@ -117,6 +121,7 @@ module Api
                 { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
               end,
               tutor_email: t.tutor&.email,
+              user_enrolled: t.users.exists?(id: current_user.id)
             }
           end,
           pagination: pagy_metadata(@pagy)
