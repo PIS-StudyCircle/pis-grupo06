@@ -10,10 +10,7 @@ class Feedback < ApplicationRecord
   validate  :rating_in_half_star_steps
 
   validates :student_id,
-            uniqueness: {
-              scope: [:tutor_id, :tutoring_id],
-              message: "ya dejó calificación para esta tutoría de este tutor"
-            }
+            uniqueness: {scope: [:tutor_id, :tutoring_id]}
 
   validate :student_cannot_be_tutor
 
