@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Bell as BellIcon } from "lucide-react";
 import { useNotifications } from "@/shared/context/NotificationContext";
 
 export function Bell() {
@@ -85,7 +85,7 @@ export function Bell() {
         className="relative inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-500"
         title={unread > 0 ? `${unread} notificaciones sin leer` : "Notificaciones"}
       >
-        <span role="img" aria-label="bell" className="text-xl">🔔</span>
+      <BellIcon className="w-5 h-5 text-white" />
 
         {/* Punto azul en la campana si hay no vistas */}
         {unseen > 0 && (
