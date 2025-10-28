@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor, act } from "@testing-library/react"
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import UserProfilePage from "../pages/UserProfilePage";
 import { useUser } from "@context/UserContext";
+import { getFeedbacks } from "../services/feedbackServices";
 
 // --- Mocks ---
 jest.mock("@context/UserContext");
@@ -15,6 +16,9 @@ jest.mock("../services/usersServices", () => ({
 }));
 jest.mock("../hooks/useUserReviews", () => ({
   useUserReviews: jest.fn(),
+}));
+jest.mock("../services/feedbackServices", () => ({
+  getFeedbacks: jest.fn(),
 }));
 
 // --- Imports reales de los mocks ---
@@ -70,6 +74,7 @@ describe("UserProfilePage", () => {
     getUserById.mockResolvedValueOnce(mockUser);
     canReviewUser.mockResolvedValueOnce(false);
     getReviewsByUser.mockResolvedValueOnce(mockReviews);
+    getFeedbacks.mockResolvedValueOnce({ average_rating: 4.5, total_feedbacks: 10 });
     useUserReviews.mockReturnValue({
       reviews: mockReviews,
       loading: false,
