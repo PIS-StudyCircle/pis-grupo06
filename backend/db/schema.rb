@@ -72,6 +72,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
     t.index ["user_id"], name: "index_favorite_courses_on_user_id"
   end
 
+  create_table "feedbacks", force: :cascade do |t|
+    t.integer "tutor_id", null: false
+    t.integer "student_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "tutoring_id", null: false
+    t.decimal "rating", precision: 2, scale: 1, default: "5.0", null: false
+    t.index ["student_id", "tutor_id", "tutoring_id"], name: "index_feedbacks_on_user_tutor_tutoring", unique: true
+    t.index ["tutoring_id"], name: "index_feedbacks_on_tutoring_id"
+  end
+
   create_table "noticed_events", force: :cascade do |t|
     t.string "type"
     t.string "record_type"
@@ -335,6 +346,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
   add_foreign_key "faculties", "universities"
   add_foreign_key "favorite_courses", "courses"
   add_foreign_key "favorite_courses", "users"
+  add_foreign_key "feedbacks", "tutorings"
+  add_foreign_key "feedbacks", "users", column: "student_id"
+  add_foreign_key "feedbacks", "users", column: "tutor_id"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

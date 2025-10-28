@@ -42,6 +42,18 @@ class User < ApplicationRecord
            inverse_of: :reviewed,
            dependent: :destroy
 
+  has_many :given_feedbacks,
+           class_name: "Feedback",
+           foreign_key: "student_id",
+           inverse_of: :student,
+           dependent: :destroy
+
+  has_many :received_feedbacks,
+           class_name: "Feedback",
+           foreign_key: "tutor_id",
+           inverse_of: :tutor,
+           dependent: :destroy
+
   belongs_to :faculty
 
   has_one_attached :profile_photo

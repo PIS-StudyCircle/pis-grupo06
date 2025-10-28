@@ -33,3 +33,8 @@ es:
               less_than_enrolled: "La cantidad de inscriptos no puede ser mayor a la capacidad"
             modality:
               inclusion: "%{value} no es una modalidad válida"
+        feedback:
+          attributes:
+            base:
+              duplicate: "El tutor ya tiene feedback para esta tutoría"
+
