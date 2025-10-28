@@ -21,7 +21,6 @@ class ScheduleTutoringNotificationsJob < ApplicationJob
     Rails.logger.debug { "  - current_time: #{current_time}" }
     Rails.logger.debug { "  - reminder_time > current_time: #{reminder_time > current_time}" }
 
-
     if reminder_time > current_time
       TutoringReminderJob.set(wait_until: reminder_time).perform_later(tutoring_id)
     end

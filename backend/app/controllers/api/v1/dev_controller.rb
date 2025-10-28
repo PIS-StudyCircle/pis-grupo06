@@ -22,7 +22,6 @@ class Api::V1::DevController < ApplicationController
     begin
       TutoringReminderJob.perform_now(tutoring_id)
 
-
       render json: {
         ok: true,
         message: "TutoringReminderJob ejecutado exitosamente para tutoring_id: #{tutoring_id}",
