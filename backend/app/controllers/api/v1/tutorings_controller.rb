@@ -258,7 +258,7 @@ module Api
         @tutoring.update!(enrolled: @tutoring.enrolled + 1)
 
         # Si no existe evento, crearlo con el tutor y agregarse
-        join_user_calendar(current_user, @tutoring.scheduled_time)
+        join_user_calendar(current_user, @tutoring.scheduled_at)
 
         render json: {
           ok: true,
@@ -510,7 +510,7 @@ module Api
         end
 
         if UserTutoring.exists?(user_id: current_user.id, tutoring_id: @tutoring.id)
-          "Ya estás registrado en esta tutoría"
+          "Ya estás inscrito en esta tutoría"
         end
       end
 
