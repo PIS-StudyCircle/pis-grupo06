@@ -1,4 +1,5 @@
 class ApplicationNotifier < Noticed::Event
+  deliver_by :database
   deliver_by :action_cable,
              channel: "NotificationsChannel",
              stream: -> { "users:#{recipient.id}:notifications" },

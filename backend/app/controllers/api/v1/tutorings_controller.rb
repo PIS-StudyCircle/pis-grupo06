@@ -34,9 +34,13 @@ module Api
         # los que aun no tienen tutor asignado
         if params[:no_tutor].present? && ActiveModel::Type::Boolean.new.cast(params[:no_tutor])
           tutorings = tutorings.without_tutor
-
           # no aparecen las tutorias creadas por el usuario
           tutorings = tutorings.where.not(created_by_id: current_user.id)
+        end
+
+        # muestra la opción de desuscribirse. Esto desde el listado general o tutorías de un tema
+        if params[:no_tutor_incluyendo_mias].present? && ActiveModel::Type::Boolean.new.cast(params[:no_tutor_incluyendo_mias])
+          tutorings = tutorings.without_tutor
         end
 
         # los que ya tienen tutor asignado y no estan pending
@@ -117,6 +121,7 @@ module Api
                 { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
               end,
               tutor_email: t.tutor&.email,
+              user_enrolled: t.users.exists?(id: current_user.id)
             }
           end,
           pagination: pagy_metadata(@pagy)
@@ -477,6 +482,13 @@ module Api
 
           # Si queda tutor pero ya no quedan estudiantes (enrolled == 0), limpiar el horario
           if had_tutor && new_enrolled.zero?
+            # Remover el tutor del evento de su propio calendario
+            begin
+              calendar.delete_event(@tutoring) if event_confirmed
+            rescue => e
+              Rails.logger.error "Calendar leave_event (tutor sin estudiantes) error: #{e.message}"
+            end
+
             @tutoring.update!(scheduled_at: nil)
             @tutoring.tutoring_availabilities.each { |a| a.update(is_booked: false) }
           end
