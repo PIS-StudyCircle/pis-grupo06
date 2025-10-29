@@ -76,9 +76,14 @@ export default function UserProvider({ children }) {
     saveItem("user", unpackedUser);
     saveItem("token", data.token);
   };
-  
+
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    saveItem("user", updatedUser);
+  };
+
   return (
-    <Ctx.Provider value={{ user, booting, signIn, signup, signOut, forgotPassword, resetPassword }}>
+    <Ctx.Provider value={{ user, booting, signIn, signup, signOut, forgotPassword, resetPassword, updateUser }}>
       {children}
     </Ctx.Provider>
   );
