@@ -34,7 +34,7 @@ Rails.application.routes.draw do
       post "/notification_token", to: "notification_tokens#create"
 
       # index y show de UsersController
-      resources :users, module: :users, only: [:index, :show]
+      resources :users, module: :users, only: [:index, :show, :update]
 
       resources :courses do
         resources :subjects
