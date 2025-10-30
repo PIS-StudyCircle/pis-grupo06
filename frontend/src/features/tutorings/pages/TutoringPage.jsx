@@ -23,7 +23,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
     const baseFilters = { ...filters };
 
     if (showWithoutTutor) {
-      baseFilters.no_tutor = true;
+      baseFilters.no_tutor_incluyendo_mias = true;
     }
 
     if (courseId) baseFilters.course_id = courseId;

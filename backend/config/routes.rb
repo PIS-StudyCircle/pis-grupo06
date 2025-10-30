@@ -24,6 +24,11 @@ Rails.application.routes.draw do
             get :can_review
           end
         end
+        resources :user_feedbacks, only: [:index, :create, :destroy] do
+          collection do
+            get :check
+          end
+        end
       end
 
       post "/notification_token", to: "notification_tokens#create"
@@ -38,6 +43,7 @@ Rails.application.routes.draw do
 
       resources :tutorings do
         get "upcoming", on: :collection
+        get "past", on: :collection
         post "confirm_schedule", on: :member
         post "join_tutoring", on: :member
         get "exists_user_tutoring", on: :member

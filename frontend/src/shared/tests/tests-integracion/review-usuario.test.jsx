@@ -20,7 +20,10 @@ jest.mock("@shared/utils/toastService", () => ({
 jest.mock("../../../shared/context/UserContext", () => ({
   useUser: () => ({ user: { id: 999, name: "Test", last_name: "User" } }),
 }));
-
+jest.mock("../../../features/users/services/feedbackServices", () => ({
+  getFeedbacks: jest.fn(),
+}));
+import { getFeedbacks } from "../../../features/users/services/feedbackServices";
 
 import {
   getUserById,
@@ -62,6 +65,7 @@ describe("UserProfile", () => {
     getUserById.mockResolvedValueOnce(mockUser);
     canReviewUser.mockResolvedValueOnce(false);
     getReviewsByUser.mockResolvedValueOnce(mockReviews);
+    getFeedbacks.mockResolvedValueOnce({ average_rating: 4.5, total_feedbacks: 10 });
 
     renderWithRouter();
 
