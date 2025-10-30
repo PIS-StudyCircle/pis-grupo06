@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useFormSubmit } from "@utils/UseFormSubmit";
 import { useFormState } from "@utils/UseFormState";
 import { updateProfile } from "../services/usersServices";
+import { validateCharacters } from "@utils/validation";
+import { useValidation } from "@hooks/useValidation";
+
 import { Input } from "@/shared/components/Input";
 import { Textarea } from "@/shared/components/Textarea";
 import { SubmitButton } from "@/shared/components/SubmitButton";
@@ -11,6 +14,11 @@ import { ErrorAlert } from "@/shared/components/ErrorAlert";
 import { ProfilePhotoEditor } from "../components/ProfilePhotoEditor";
 import { DEFAULT_PHOTO } from "@/shared/config";
 import { ArrowLeft } from "lucide-react";
+
+const validators = {
+  name: (value) => validateCharacters(value, "Nombre"),
+  last_name: (value) => validateCharacters(value, "Apellido"),
+};
 
 export default function EditProfilePage() {
   const { user, updateUser } = useUser();
@@ -27,6 +35,8 @@ export default function EditProfilePage() {
   const [preview, setPreview] = useState(null);
   const [fileUrl, setFileUrl] = useState(null);
 
+  const { errors, validate } = useValidation(validators);
+
   const { error, onSubmit } = useFormSubmit(
     async (formData) => {
       const updatedUser = await updateProfile(formData, user.id);
@@ -37,7 +47,6 @@ export default function EditProfilePage() {
     "/perfil"
   );
 
-  // Initialize form with user data
   useEffect(() => {
     if (user) {
       setField("name", user.name || "");
@@ -50,6 +59,16 @@ export default function EditProfilePage() {
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      alert("Solo se permiten imágenes en formato JPG o PNG.");
+      e.target.value = "";
+      return;
+    }
+
     if (file) {
       const url = URL.createObjectURL(file);
       setFileUrl(url);
@@ -59,7 +78,9 @@ export default function EditProfilePage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    if (validate(form)) {
+      onSubmit(form);
+    }
   };
 
   if (!user) {
@@ -123,7 +144,7 @@ export default function EditProfilePage() {
               placeholder="Nombre"
               label="Nombre"
               required
-              // error={errors.name} agregar esto cuando agregue el useValidator
+              error={errors.name}
             />
 
             {/* Last Name */}
@@ -135,7 +156,7 @@ export default function EditProfilePage() {
               placeholder="Apellido"
               label="Apellido"
               required
-              // error={errors.last_name}
+              error={errors.last_name}
             />
 
             {/* Description */}
