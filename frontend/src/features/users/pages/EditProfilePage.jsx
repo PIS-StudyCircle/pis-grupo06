@@ -120,7 +120,6 @@ export default function EditProfilePage() {
                 type="file"
                 onChange={handleFileChange}
                 accept="image/*"
-                label="Foto de perfil"
               />
             </div>
 
