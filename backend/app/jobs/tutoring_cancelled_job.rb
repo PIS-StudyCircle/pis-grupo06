@@ -22,14 +22,11 @@ class TutoringCancelledJob < ApplicationJob
       end
     end
 
-
     # Eliminar duplicados y al usuario que canceló (no necesita notificarse a sí mismo)
     participants.compact!
     participants.uniq!
 
-
     participants.reject! { |user| user.id == cancelled_by_user_id }
-
 
     # Determinar el tipo de cancelación
     cancelled_by_tutor = tutoring_data[:tutor_id] == cancelled_by_user_id

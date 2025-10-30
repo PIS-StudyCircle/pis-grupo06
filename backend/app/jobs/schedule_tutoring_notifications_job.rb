@@ -19,8 +19,10 @@ class ScheduleTutoringNotificationsJob < ApplicationJob
     feedback_time = tutoring.scheduled_at + 2.hours
 
     TutoringFeedbackJob.set(wait_until: feedback_time).perform_later(tutoring_id)
-  rescue ActiveRecord::RecordNotFound
-  rescue => e
+  rescue ActiveRecord::RecordNotFound => e
+    Rails.logger.warn "Record not found: #{e.message}"
+  rescue StandardError => e
+    Rails.logger.error "Unexpected error: #{e.message}"
     raise e
   end
 end

@@ -55,8 +55,10 @@ class TutoringReminderJob < ApplicationJob
         tutoring_id: tutoring.id
       ).deliver_later(user)
     end
-  rescue ActiveRecord::RecordNotFound
-  rescue => e
+  rescue ActiveRecord::RecordNotFound => e
+    Rails.logger.warn "Record not found: #{e.message}"
+  rescue StandardError => e
+    Rails.logger.error "Unexpected error: #{e.message}"
     raise e
   end
 end
