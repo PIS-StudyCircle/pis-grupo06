@@ -179,7 +179,7 @@ export default function EditProfilePage() {
             )}
 
             {/* Submit Button */}
-            <SubmitButton text="Guardar cambios" />
+            <SubmitButton text="Guardar" />
           </form>
         </div>
 
