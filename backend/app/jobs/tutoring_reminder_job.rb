@@ -18,7 +18,6 @@ class TutoringReminderJob < ApplicationJob
 
     time_until_tutoring = tutoring.scheduled_at - Time.current
 
-
     # Enviar recordatorio si está entre 20-28 horas antes (ventana de 8 horas)
     unless time_until_tutoring.between?(20.hours, 28.hours)
 
