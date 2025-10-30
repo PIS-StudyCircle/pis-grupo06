@@ -65,8 +65,7 @@ Rails.application.configure do
   config.active_job.verbose_enqueue_logs = true
 
   # Configure SolidQueue for development
-  config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :primary } }
+  config.active_job.queue_adapter = :async
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
