@@ -3,6 +3,8 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useUser } from "@context/UserContext";
 import { formatDateTime } from "@shared/utils/FormatDate";
 import { showSuccess, showError, showConfirm } from "@shared/utils/toastService";
+import { useTutoring, useTutorings } from "../hooks/useTutorings"; // 🎯 AGREGAR ESTA LÍNEA
+import { DEFAULT_PHOTO } from "@/shared/config";
 
 /**
  * SHOW PAGE DE TUTORÍA (ampliada)
@@ -15,45 +17,19 @@ export default function ShowPageTutoring() {
   const navigate = useNavigate();
   const { user } = useUser();
 
-  const [loading, setLoading] = useState(true);
+  // 🎯 REEMPLAZAR ESTADOS MANUALES CON EL HOOK
+  const tutoringId = useMemo(() => Number(id), [id]);
+  const { data: tutoring, loading, error, refetch } = useTutoring(null, tutoringId);
+
+  // 🎯 AGREGAR ESTA LÍNEA QUE FALTA
+  const { onDesuscribirse } = useTutorings();
+
+  // 🎯 MANTENER SOLO ESTOS ESTADOS
   const [saving, setSaving] = useState(false);
-  const [tutoring, setTutoring] = useState(null);
   const [soyEstudiante, setSoyEstudiante] = useState(false);
 
-  const tutoringId = useMemo(() => Number(id), [id]);
-
   // --------------------------------------
-  // Fetch: detalle de la tutoría
-  // --------------------------------------
-  useEffect(() => {
-    let cancel = false;
-
-    async function fetchTutoring() {
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/v1/tutorings/${tutoringId}`, {
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error(`GET /tutorings/${tutoringId} -> ${res.status}`);
-        const data = await res.json();
-        if (!cancel) setTutoring(data);
-      } catch (e) {
-        console.error(e);
-        if (!cancel) showError("No se pudo cargar la tutoría.");
-      } finally {
-        if (!cancel) setLoading(false);
-      }
-    }
-
-    if (tutoringId) fetchTutoring();
-
-    return () => {
-      cancel = true;
-    };
-  }, [tutoringId]);
-
-  // --------------------------------------
-  // Fetch: ¿existo como estudiante en esta tutoría?
+  // Fetch: ¿existo como estudiante en esta tutoría? (MANTENER)
   // --------------------------------------
   useEffect(() => {
     let cancel = false;
@@ -89,12 +65,12 @@ export default function ShowPageTutoring() {
   }, [user?.id, tutoringId]);
 
   // --------------------------------------
-  // Derivados de estado
+  // Derivados de estado (MANTENER)
   // --------------------------------------
   const noTieneTutor = tutoring?.tutor_id == null;
   const cuposDisponibles = useMemo(() => {
     if (!tutoring) return false;
-    if (tutoring.capacity == null) return true; // "a definir" -> no bloquea
+    if (tutoring.capacity == null) return true;
     return (tutoring.capacity ?? 0) > (tutoring.enrolled ?? 0);
   }, [tutoring]);
 
@@ -102,7 +78,7 @@ export default function ShowPageTutoring() {
   const esCreador = tutoring?.created_by_id === user?.id;
 
   // --------------------------------------
-  // Acciones
+  // Acciones (ACTUALIZAR)
   // --------------------------------------
   const handleSerTutor = () => {
     if (!tutoring) return;
@@ -131,8 +107,13 @@ export default function ShowPageTutoring() {
         throw new Error(data.error || "No se pudo unir a la tutoría");
       }
       showSuccess("Te uniste a la tutoría con éxito");
-      // refresco datos para ver el nuevo enrolled
-      await refetchTutoring();
+      
+      // 🎯 USAR REFETCH DEL HOOK EN LUGAR DE FUNCIÓN MANUAL
+      if (refetch) {
+        await refetch();
+      } else {
+        window.location.reload(); // fallback si no hay refetch
+      }
     } catch (e) {
       console.error(e);
       showError(e.message || "Error en la conexión con el servidor");
@@ -141,30 +122,20 @@ export default function ShowPageTutoring() {
     }
   };
 
+  // 🎯 SIMPLIFICAR LA FUNCIÓN
   const handleDesuscribirme = async () => {
     if (!tutoring) return;
+    
     showConfirm("¿Seguro que querés desuscribirte de la tutoría?", async () => {
       try {
         setSaving(true);
-        // endpoint de desuscripción (delego en el backend la lógica completa)
-        const res = await fetch(`/api/v1/tutorings/${tutoring.id}/unsubscribe`, {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        });
-        if (res.status === 204 || res.ok) {
-          showSuccess("Te desuscribiste correctamente.");
-          // si el backend eliminó la tutoría, volver al listado
-          if (res.status === 204) {
-            navigate(-1);
-          } else {
-            await refetchTutoring();
-          }
-        } else {
-          const data = await res.json().catch(() => ({}));
-          throw new Error(data.error || "No se pudo desuscribir de la tutoría");
-        }
+        
+        // 🎯 USAR EL MÉTODO DEL HOOK EN LUGAR DE FETCH MANUAL
+        await onDesuscribirse(tutoring.id);
+        
+        showSuccess("Te desuscribiste correctamente.");
+        navigate(-1); // Volver atrás
+        
       } catch (e) {
         console.error(e);
         showError(e.message || "Ocurrió un error al intentar desuscribirte.");
@@ -174,26 +145,15 @@ export default function ShowPageTutoring() {
     });
   };
 
-  async function refetchTutoring() {
-    try {
-      const res = await fetch(`/api/v1/tutorings/${tutoringId}`, { credentials: "include" });
-      if (!res.ok) return;
-      const data = await res.json();
-      setTutoring(data);
-    } catch (e) {
-      console.warn("refetch error", e);
-    }
-  }
-
   // --------------------------------------
-  // Modo (replica el criterio de la card cuando no viene forzado)
+  // Modo (MANTENER)
   // --------------------------------------
   const mode = useMemo(() => {
     if (!tutoring) return "loading";
 
     if (soyTutor || soyEstudiante) return "misTutorias";
     if (esCreador) return "creador";
-    if (noTieneTutor && cuposDisponibles) return "ambos"; // transitorio como en la Card
+    if (noTieneTutor && cuposDisponibles) return "ambos";
     if (noTieneTutor) return "serTutor";
     if (!cuposDisponibles && !noTieneTutor) return "completo";
     if (cuposDisponibles) return "serEstudiante";
@@ -201,18 +161,48 @@ export default function ShowPageTutoring() {
     return "default";
   }, [tutoring, soyTutor, soyEstudiante, esCreador, noTieneTutor, cuposDisponibles]);
 
+  // 🎯 ACTUALIZAR MANEJO DE ESTADOS
   if (loading) return <ShowTutoringSkeleton />;
+  
+  if (error) return (
+    <div className="max-w-5xl mx-auto p-4">
+      <div className="rounded-lg border bg-white p-6 shadow">
+        <div className="text-center">
+          <p className="text-red-600 mb-2">Error al cargar la tutoría</p>
+          <p className="text-gray-600 text-sm mb-4">{error}</p>
+          <div className="flex gap-2 justify-center">
+            <button 
+              onClick={() => refetch?.()} 
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Reintentar
+            </button>
+            <Link 
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" 
+              to="/tutorias"
+            >
+              Volver
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+  
   if (!tutoring) return (
     <div className="max-w-5xl mx-auto p-4">
       <div className="rounded-lg border bg-white p-6 shadow">
-        <p className="text-gray-700">No se encontró la tutoría.</p>
-        <div className="mt-4">
-          <Link className="text-blue-600 underline" to="/tutorias">Volver</Link>
+        <div className="text-center">
+          <p className="text-gray-700 mb-4">No se encontró la tutoría.</p>
+          <Link className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" to="/tutorias">
+            Volver al listado
+          </Link>
         </div>
       </div>
     </div>
   );
 
+  // 🎯 MANTENER TODO EL JSX IGUAL
   return (
     <div className="max-w-5xl mx-auto p-4">
       {/* Encabezado */}
@@ -281,22 +271,50 @@ export default function ShowPageTutoring() {
             <section>
               <h2 className="text-base font-semibold text-gray-900">Detalles</h2>
               <dl className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-                <div>
-                  <dt className="text-gray-500">Creada por</dt>
-                  <dd className="text-gray-900">{tutoring.created_by_name || "-"}</dd>
-                </div>
-                <div>
-                  <dt className="text-gray-500">Estado</dt>
-                  <dd className="text-gray-900 capitalize">{tutoring.state}</dd>
-                </div>
+               <div>
+                <dt className="text-gray-500">Creada por</dt>
+                <dd className="text-gray-900">
+                  {tutoring.created_by ? (
+                    <Link 
+                      to={`/usuarios/${tutoring.created_by.id}`}
+                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline w-fit"
+                    >
+                      <div className="w-5 h-5 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                        <img 
+                          src={tutoring.created_by.profile_photo_url || DEFAULT_PHOTO} 
+                          alt={`${tutoring.created_by.name} ${tutoring.created_by.last_name}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <span>
+                        {`${tutoring.created_by.name || ''} ${tutoring.created_by.last_name || ''}`.trim() || 
+                         tutoring.created_by.email || 
+                         "Ver perfil"
+                        }
+                      </span>
+                    </Link>
+                  ) : "-"}
+                </dd>
+              </div>
                 {tutoring.tutor_id != null && (
                   <div className="sm:col-span-2">
                     <dt className="text-gray-500">Tutor</dt>
                     <dd className="text-gray-900">
-                      {`${tutoring.tutor_name ?? ""} ${tutoring.tutor_last_name ?? ""}`.trim()}
-                      {tutoring.tutor_email ? (
-                        <span className="text-gray-500"> {`(${tutoring.tutor_email})`}</span>
-                      ) : null}
+                      <Link 
+                        to={`/usuarios/${tutoring.tutor.id}`}
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline w-fit"
+                      >
+                        <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                          <img 
+                            src={tutoring.tutor.profile_photo_url || DEFAULT_PHOTO} 
+                            alt={`${tutoring.tutor.name} ${tutoring.tutor.last_name}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <span>
+                          {`${tutoring.tutor.name || ''} ${tutoring.tutor.last_name || ''}`.trim() || "Ver perfil"}
+                        </span>
+                      </Link>
                     </dd>
                   </div>
                 )}

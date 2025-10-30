@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useUser } from "@context/UserContext"
 import { useCourse } from "../../courses/hooks/useCourse"
 import { createTutoringByTutor } from "../services/tutoringService"
@@ -19,6 +19,7 @@ const validators = {
 }
 
 export default function CreateTutoringByTutor() {
+  const navigate = useNavigate()
   const { user, userLoading, userError } = useUser()
 
   const { courseId } = useParams()
@@ -36,7 +37,7 @@ export default function CreateTutoringByTutor() {
   const [availabilityError, setAvailabilityError] = useState("")
 
   const { errors, validate } = useValidation(validators)
-  const { error, onSubmit } = useFormSubmit(createTutoringByTutor, "/")
+  const { error, onSubmit } = useFormSubmit(createTutoringByTutor)
 
   const addAvailability = () => {
     setAvailabilities([...availabilities, { date: "", startTime: "", endTime: "" }])
@@ -150,9 +151,17 @@ export default function CreateTutoringByTutor() {
         availabilities_attributes,
       }
 
-      await onSubmit(payload)
+      const result = await createTutoringByTutor(payload)
+    
       localStorage.removeItem("selectedSubjects")
       showSuccess("Tutoría creada con éxito.");
+      
+      // REDIRIGIR A LA SHOW PAGE de la tutoría
+      if (result && result.tutoring.id) {
+        navigate(`/tutorias/${result.tutoring.id}`)
+      } else {
+        navigate("/tutorias")
+      }
     } catch (err) {
       showError("Error al crear la tutoría: " + err.message);
       console.error("Error creating tutoring sessions:", err)

@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useUser } from "@context/UserContext"
 import { useCourse } from "../../courses/hooks/useCourse"
 import { createTutoringByStudent } from "../services/tutoringService"
@@ -15,6 +15,7 @@ const MAX_REQUEST_COMMENT = 500
 const MAX_LOCATION_COMMENT = 255
 
 export default function CreateTutoringByStudent() {
+  const navigate = useNavigate()
   const { user, userLoading, userError } = useUser()
   const { courseId } = useParams()
   const { course, loadingCourse, errorCourse } = useCourse(courseId)

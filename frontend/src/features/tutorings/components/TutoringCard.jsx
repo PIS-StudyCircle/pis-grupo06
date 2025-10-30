@@ -221,11 +221,12 @@ export default function TutoringCard({
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
                   navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
                     state: { tutoring },
-                  })
-                }
+                  });
+                }}
               >
                 Ser tutor
               </button>
@@ -235,7 +236,10 @@ export default function TutoringCard({
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => handleUnirmeClick(tutoring)}
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
+                  handleUnirmeClick(tutoring);
+                }}
               >
                 Unirme
               </button>
@@ -246,18 +250,22 @@ export default function TutoringCard({
                 <button
                   type="button"
                   className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                  onClick={() =>
+                  onClick={(e) => {
+                    e.stopPropagation(); // para que no se dispare el onClick del card
                     navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
                       state: { tutoring },
-                    })
-                  }
+                    });
+                  }}
                 >
                   Ser tutor
                 </button>
                 <button
                   type="button"
                   className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                  onClick={() => handleUnirmeClick(tutoring)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // para que no se dispare el onClick del card
+                    handleUnirmeClick(tutoring);
+                  }}
                 >
                   Unirme
                 </button>
@@ -268,7 +276,10 @@ export default function TutoringCard({
               <button
                 type="button"
                 className="btn w-full bg-red-500 hover:bg-red-600 text-white"
-                onClick={() => handleDesuscribirmeClick(tutoring)}
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
+                  handleDesuscribirmeClick(tutoring);
+                }}
               >
                 Desuscribirme
               </button>
