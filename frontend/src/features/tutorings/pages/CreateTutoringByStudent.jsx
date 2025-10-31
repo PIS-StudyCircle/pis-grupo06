@@ -161,12 +161,17 @@ export default function CreateTutoringByStudent() {
             value={form.request_comment}
             onChange={(e) => setField("request_comment", e.target.value)}
             className="p-2 border rounded-md text-sm"
-            placeholder="Preferencia de cupos"
+            placeholder="¿Algo que deba saber el tutor?"
           />
-          <div
-            className={`text-xs mt-1 ${form.request_comment.length === MAX_REQUEST_COMMENT ? "text-red-600" : "text-gray-500"}`}
-          >
-            {form.request_comment.length}/{MAX_REQUEST_COMMENT}
+          <div className="flex justify-between">
+            <p id="request_comment_help" className="mt-1 text-[11px] text-gray-500">
+              Ejemplos: preferencia de cupos, objetivos de la tutoría, etc.
+            </p>
+            <div
+              className={`text-xs mt-1 ${form.request_comment.length === MAX_REQUEST_COMMENT ? "text-red-600" : "text-gray-500"}`}
+            >
+              {form.request_comment.length}/{MAX_REQUEST_COMMENT}
+            </div>
           </div>
           {errs.request_comment && <span className="text-red-500 text-xs mt-1">{errs.request_comment}</span>}
         </div>
