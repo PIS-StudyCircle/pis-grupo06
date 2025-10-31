@@ -43,6 +43,7 @@ export default function ShowPageTutoring() {
       } catch (e) {
         if (!cancel) {
           console.warn("fetch error:", e);
+          showError("No se pudo cargar la tutoría.");
           setSoyEstudiante(false);
         }
       }
@@ -132,7 +133,8 @@ export default function ShowPageTutoring() {
 
   if (loading) return <ShowTutoringSkeleton />;
 
-  if (error)
+  if (error) {
+    showError("No se pudo cargar la tutoría.");
     return (
       <div className="max-w-5xl mx-auto p-4">
         <div className="rounded-lg border bg-white p-6 shadow">
@@ -154,8 +156,8 @@ export default function ShowPageTutoring() {
         </div>
       </div>
     );
-
-  if (!tutoring)
+  }
+  if (!tutoring && !error)
     return (
       <div className="max-w-5xl mx-auto p-4">
         <div className="rounded-lg border bg-white p-6 shadow">

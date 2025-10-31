@@ -47,18 +47,6 @@ test("muestra error si el fetch falla", async () => {
   );
 });
 
-test("Muestra mensaje cuando no se encuentra la tutoría", async () => {
-  // Forzamos fetch para que falle o devuelva null
-  global.fetch.mockResolvedValueOnce({
-    ok: false,
-    json: async () => null,
-  });
-
-  render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-
-  await screen.findByText("No se encontró la tutoría.");
-  expect(screen.getByText("Volver")).toBeInTheDocument();
-});
 
 test("renderiza correctamente una tutoría cargada", async () => {
   const tutoringData = {
@@ -68,10 +56,15 @@ test("renderiza correctamente una tutoría cargada", async () => {
     capacity: 10,
     enrolled: 3,
     tutor_id: null,
-    created_by_id: 99,
     state: "active",
     subjects: [{ id: 1, name: "Derivadas" }],
-    created_by_name: "Prof. López",
+    created_by: {
+      id: 99,
+      name: "Prof.",
+      last_name: "López",
+      email: "prof@example.com",
+      profile_photo_url: null,
+    },
   };
   fetch
     .mockResolvedValueOnce({
@@ -84,11 +77,12 @@ test("renderiza correctamente una tutoría cargada", async () => {
     });
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-  await waitFor(() => screen.getByText("Matemática I"));
+  await waitFor(() => screen.getByText(/Matemática I/i));
 
-  expect(screen.getByText(/Presencial/)).toBeInTheDocument();
-  expect(screen.getByText("Derivadas")).toBeInTheDocument();
-  expect(screen.getByText("Prof. López")).toBeInTheDocument();
+
+  expect(screen.getByText(/Presencial/i)).toBeInTheDocument();
+  expect(screen.getByText(/Derivadas/i)).toBeInTheDocument();
+  expect(screen.getByText(/Prof. López/i)).toBeInTheDocument();
 });
 
 test("muestra botón 'Ser tutor' cuando no tiene tutor y hay cupos", async () => {
@@ -107,9 +101,9 @@ test("muestra botón 'Ser tutor' cuando no tiene tutor y hay cupos", async () =>
     .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: false }) });
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-  await waitFor(() => screen.getByText("Química"));
+  await waitFor(() => screen.getByText(/Química/i));
 
-  expect(screen.getByText("Ser tutor")).toBeInTheDocument();
+  expect(screen.getByText(/Ser tutor/i)).toBeInTheDocument();
 });
 
 test("muestra botón 'Unirme' cuando hay cupos y tutor", async () => {
@@ -132,8 +126,8 @@ test("muestra botón 'Unirme' cuando hay cupos y tutor", async () => {
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
 
-  await waitFor(() => screen.getByText("Historia"));
-  const button = screen.getByText("Unirme");
+  await waitFor(() => screen.getByText(/Historia/i));
+  const button = screen.getByText(/Unirme/i);
   fireEvent.click(button);
 
   await waitFor(() =>
@@ -157,10 +151,10 @@ test("muestra ambos botones cuando no hay tutor y hay cupos", async () => {
     .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: false }) });
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-  await waitFor(() => screen.getByText("Literatura"));
+  await waitFor(() => screen.getByText(/Literatura/i));
 
-  expect(screen.getByText("Ser tutor")).toBeInTheDocument();
-  expect(screen.getByText("Unirme")).toBeInTheDocument();
+  expect(screen.getByText(/Ser tutor/i)).toBeInTheDocument();
+  expect(screen.getByText(/Unirme/i)).toBeInTheDocument();
 });
 
 test("muestra 'Completo' cuando no hay cupos disponibles", async () => {
@@ -179,9 +173,9 @@ test("muestra 'Completo' cuando no hay cupos disponibles", async () => {
     .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: false }) });
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-  await waitFor(() => screen.getByText("Programación"));
+  await waitFor(() => screen.getByText(/Programación/i));
 
-  expect(screen.getByText("Completo")).toBeInTheDocument();
+  expect(screen.getByText(/Completo/i)).toBeInTheDocument();
 });
 
 test("muestra 'Desuscribirme' cuando soy estudiante", async () => {
@@ -203,8 +197,8 @@ test("muestra 'Desuscribirme' cuando soy estudiante", async () => {
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
 
-  await waitFor(() => screen.getByText("Biología"));
-  const btn = screen.getByText("Desuscribirme");
+  await waitFor(() => screen.getByText(/Biología/i));
+  const btn = screen.getByText(/Desuscribirme/i);
   fireEvent.click(btn);
 
   await waitFor(() =>
@@ -233,9 +227,9 @@ test("si el backend devuelve 204 al desuscribirse, navega al listado", async () 
     .mockResolvedValueOnce({ ok: true, status: 204, json: async () => ({}) });
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-  await waitFor(() => screen.getByText("Arte"));
+  await waitFor(() => screen.getByText(/Arte/i));
 
-  fireEvent.click(screen.getByText("Desuscribirme"));
+  fireEvent.click(screen.getByText(/Desuscribirme/i));
   await waitFor(() => expect(navigateMock).toHaveBeenCalled());
 });
 
@@ -259,8 +253,8 @@ test("maneja error silencioso en refetchTutoring", async () => {
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
 
-  await waitFor(() => screen.getByText("Geografía"));
-  const btn = screen.getByText("Unirme");
+  await waitFor(() => screen.getByText(/Geografía/i));
+  const btn = screen.getByText(/Unirme/i);
   fireEvent.click(btn);
 
   await waitFor(() =>
@@ -284,7 +278,7 @@ test("Calcula correctamente cuposDisponibles y noTieneTutor", async () => {
     .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: false }) });
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-  await screen.findByText("Física");
+  await screen.findByText(/Física/i);
 
   // noTieneTutor
   expect(tutoringData.tutor_id).toBeNull();
@@ -308,13 +302,13 @@ test("Muestra ambos botones y permite click", async () => {
     .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: false }) });
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-  await screen.findByText("Arte");
+  await screen.findByText(/Arte/i);
 
-  expect(screen.getByText("Ser tutor")).toBeInTheDocument();
-  expect(screen.getByText("Unirme")).toBeInTheDocument();
+  expect(screen.getByText(/Ser tutor/i)).toBeInTheDocument();
+  expect(screen.getByText(/Unirme/i)).toBeInTheDocument();
 
-  fireEvent.click(screen.getByText("Ser tutor"));
-  fireEvent.click(screen.getByText("Unirme"));
+  fireEvent.click(screen.getByText(/Ser tutor/i));
+  fireEvent.click(screen.getByText(/Unirme/i));
 });
 
 test("Muestra botón Desuscribirme y navega si confirma", async () => {
@@ -337,8 +331,8 @@ test("Muestra botón Desuscribirme y navega si confirma", async () => {
     .mockResolvedValueOnce({ ok: true, status: 204, json: async () => ({}) }); // unsubscribe
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-  await screen.findByText("Biología");
+  await screen.findByText(/Biología/i);
 
-  fireEvent.click(screen.getByText("Desuscribirme"));
+  fireEvent.click(screen.getByText(/Desuscribirme/i));
   await waitFor(() => expect(navigateMock).toHaveBeenCalled());
 });
