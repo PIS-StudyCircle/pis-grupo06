@@ -1,3 +1,5 @@
+/* eslint-env jest, node */
+/* global global, require */
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import ShowPageTutoring from "../pages/ShowPageTutoring";

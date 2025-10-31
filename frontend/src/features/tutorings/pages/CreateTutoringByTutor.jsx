@@ -37,7 +37,7 @@ export default function CreateTutoringByTutor() {
   const [availabilityError, setAvailabilityError] = useState("")
 
   const { errors, validate } = useValidation(validators)
-  const { error, onSubmit } = useFormSubmit(createTutoringByTutor)
+  const { error} = useFormSubmit(createTutoringByTutor)
 
   const addAvailability = () => {
     setAvailabilities([...availabilities, { date: "", startTime: "", endTime: "" }])

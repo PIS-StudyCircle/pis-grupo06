@@ -16,7 +16,7 @@ export default function ShowPageTutoring() {
   const { user } = useUser();
   const tutoringId = useMemo(() => Number(id), [id]);
   const { data: tutoring, loading, error, refetch } = useTutoring(null, tutoringId);
-  const onDesuscribirse = (tid) => desuscribirseTutoring(tid);
+  const onDesuscribirse = (tid) => unsubscribeFromTutoring(tid);
   const [saving, setSaving] = useState(false);
   const [soyEstudiante, setSoyEstudiante] = useState(false);
 
