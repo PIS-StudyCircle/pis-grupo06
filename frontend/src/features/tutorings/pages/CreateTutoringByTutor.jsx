@@ -65,20 +65,20 @@ export default function CreateTutoringByTutor() {
 
   const validateAvailabilities = () => {
     // Validar campos completos y lógica básica
-    const invalidAvailability = availabilities.some((av) => {
-      if (!av.date || !av.startTime || !av.endTime) return true
+    for (const av of availabilities) {
+    // campos incompletos
+      if (!av.date || !av.startTime || !av.endTime) {
+        return "Por favor completa fecha, hora de inicio y hora final en cada disponibilidad."
+      }
+      // fecha inválida / en el pasado (del helper)
+      const dateError = validateDate(av.date)
+      if (dateError) return dateError
 
-      const dateError = validateDate(av.date, "Fecha de inicio")
-      if (dateError) return true
-
+      // reglas de horas: aquí devuelve el mensaje correcto:
+      // - "La hora de fin debe ser posterior a la de inicio"
+      // - "La sesión debe durar al menos 1 hora"
       const hoursError = validateHoursTutoring(av.date, av.startTime, av.endTime)
-      if (hoursError) return true
-
-      return false
-    })
-
-    if (invalidAvailability) {
-      return "Por favor completa todas las disponibilidades correctamente. La hora de fin debe ser posterior a la hora de inicio."
+      if (hoursError) return hoursError
     }
 
     // Validar fechas en el pasado
@@ -231,9 +231,31 @@ export default function CreateTutoringByTutor() {
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label className="text-gray-600 text-sm font-semibold">
-              Disponibilidad <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="text-gray-600 text-sm font-semibold">
+                Disponibilidad <span className="text-gray-500 font-normal">(fecha y rango horario)</span> <span className="text-red-500">*</span>
+              </label>
+
+              {/* Tooltip “?” */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  aria-describedby="disp_help"
+                  className="w-5 h-5 inline-flex items-center justify-center rounded-full border text-[11px] leading-none"
+                >
+                  ?
+                </button>
+                <div
+                  id="disp_help"
+                  role="tooltip"
+                  className="absolute z-10 hidden group-hover:block mt-2 p-2 text-xs bg-gray-900 text-white rounded-md w-72"
+                >
+                  El primer estudiante que se anote podrá elegir un horario <b>dentro del rango</b> que definas para esa fecha.
+                  El rango debe ser de al menos 1 hora.
+                </div>
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={addAvailability}
@@ -304,7 +326,7 @@ export default function CreateTutoringByTutor() {
           {availabilityError && <span className="text-red-500 text-xs">{availabilityError}</span>}
         </div>
 
-        {error.length > 0 && (
+        {error.length > 0 && !availabilityError && (
           <ErrorAlert>
             {error.map((err, idx) => (
               <p key={idx}>{err}</p>
