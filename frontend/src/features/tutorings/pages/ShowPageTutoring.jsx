@@ -3,34 +3,24 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useUser } from "@context/UserContext";
 import { formatDateTime } from "@shared/utils/FormatDate";
 import { showSuccess, showError, showConfirm } from "@shared/utils/toastService";
-import { useTutoring, useTutorings } from "../hooks/useTutorings"; // 🎯 AGREGAR ESTA LÍNEA
+import { useTutoring } from "../hooks/useTutorings";
+import {unsubscribeFromTutoring} from "../services/tutoringService";
 import { DEFAULT_PHOTO } from "@/shared/config";
 
 /**
  * SHOW PAGE DE TUTORÍA (ampliada)
- * - URL sugerida: /tutorias/:id
- * - Basada en la TutoringCard pero con layout de "detalle" a pantalla completa
- * - Muestra información ampliada + acciones contextuales (unirse, ser tutor, desuscribirse)
  */
 export default function ShowPageTutoring() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useUser();
-
-  // 🎯 REEMPLAZAR ESTADOS MANUALES CON EL HOOK
   const tutoringId = useMemo(() => Number(id), [id]);
   const { data: tutoring, loading, error, refetch } = useTutoring(null, tutoringId);
-
-  // 🎯 AGREGAR ESTA LÍNEA QUE FALTA
-  const { onDesuscribirse } = useTutorings();
-
-  // 🎯 MANTENER SOLO ESTOS ESTADOS
+  const onDesuscribirse = (tid) => desuscribirseTutoring(tid);
   const [saving, setSaving] = useState(false);
   const [soyEstudiante, setSoyEstudiante] = useState(false);
 
-  // --------------------------------------
-  // Fetch: ¿existo como estudiante en esta tutoría? (MANTENER)
-  // --------------------------------------
+  // ¿existo como estudiante en esta tutoría?
   useEffect(() => {
     let cancel = false;
 
@@ -64,9 +54,6 @@ export default function ShowPageTutoring() {
     };
   }, [user?.id, tutoringId]);
 
-  // --------------------------------------
-  // Derivados de estado (MANTENER)
-  // --------------------------------------
   const noTieneTutor = tutoring?.tutor_id == null;
   const cuposDisponibles = useMemo(() => {
     if (!tutoring) return false;
@@ -77,9 +64,6 @@ export default function ShowPageTutoring() {
   const soyTutor = tutoring?.tutor_id === user?.id;
   const esCreador = tutoring?.created_by_id === user?.id;
 
-  // --------------------------------------
-  // Acciones (ACTUALIZAR)
-  // --------------------------------------
   const handleSerTutor = () => {
     if (!tutoring) return;
     navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, { state: { tutoring } });
@@ -107,13 +91,8 @@ export default function ShowPageTutoring() {
         throw new Error(data.error || "No se pudo unir a la tutoría");
       }
       showSuccess("Te uniste a la tutoría con éxito");
-      
-      // 🎯 USAR REFETCH DEL HOOK EN LUGAR DE FUNCIÓN MANUAL
-      if (refetch) {
-        await refetch();
-      } else {
-        window.location.reload(); // fallback si no hay refetch
-      }
+      if (refetch) await refetch();
+      else window.location.reload();
     } catch (e) {
       console.error(e);
       showError(e.message || "Error en la conexión con el servidor");
@@ -122,20 +101,15 @@ export default function ShowPageTutoring() {
     }
   };
 
-  // 🎯 SIMPLIFICAR LA FUNCIÓN
   const handleDesuscribirme = async () => {
     if (!tutoring) return;
-    
+
     showConfirm("¿Seguro que querés desuscribirte de la tutoría?", async () => {
       try {
         setSaving(true);
-        
-        // 🎯 USAR EL MÉTODO DEL HOOK EN LUGAR DE FETCH MANUAL
         await onDesuscribirse(tutoring.id);
-        
         showSuccess("Te desuscribiste correctamente.");
-        navigate(-1); // Volver atrás
-        
+        navigate(-1);
       } catch (e) {
         console.error(e);
         showError(e.message || "Ocurrió un error al intentar desuscribirte.");
@@ -145,64 +119,56 @@ export default function ShowPageTutoring() {
     });
   };
 
-  // --------------------------------------
-  // Modo (MANTENER)
-  // --------------------------------------
   const mode = useMemo(() => {
     if (!tutoring) return "loading";
-
     if (soyTutor || soyEstudiante) return "misTutorias";
     if (esCreador) return "creador";
     if (noTieneTutor && cuposDisponibles) return "ambos";
     if (noTieneTutor) return "serTutor";
     if (!cuposDisponibles && !noTieneTutor) return "completo";
     if (cuposDisponibles) return "serEstudiante";
-
     return "default";
   }, [tutoring, soyTutor, soyEstudiante, esCreador, noTieneTutor, cuposDisponibles]);
 
-  // 🎯 ACTUALIZAR MANEJO DE ESTADOS
   if (loading) return <ShowTutoringSkeleton />;
-  
-  if (error) return (
-    <div className="max-w-5xl mx-auto p-4">
-      <div className="rounded-lg border bg-white p-6 shadow">
-        <div className="text-center">
-          <p className="text-red-600 mb-2">Error al cargar la tutoría</p>
-          <p className="text-gray-600 text-sm mb-4">{error}</p>
-          <div className="flex gap-2 justify-center">
-            <button 
-              onClick={() => refetch?.()} 
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Reintentar
-            </button>
-            <Link 
-              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" 
-              to="/tutorias"
-            >
-              Volver
+
+  if (error)
+    return (
+      <div className="max-w-5xl mx-auto p-4">
+        <div className="rounded-lg border bg-white p-6 shadow">
+          <div className="text-center">
+            <p className="text-red-600 mb-2">Error al cargar la tutoría</p>
+            <p className="text-gray-600 text-sm mb-4">{error}</p>
+            <div className="flex gap-2 justify-center">
+              <button
+                onClick={() => refetch?.()}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Reintentar
+              </button>
+              <Link className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" to="/tutorias">
+                Volver
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+  if (!tutoring)
+    return (
+      <div className="max-w-5xl mx-auto p-4">
+        <div className="rounded-lg border bg-white p-6 shadow">
+          <div className="text-center">
+            <p className="text-gray-700 mb-4">No se encontró la tutoría.</p>
+            <Link className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" to="/tutorias">
+              Volver al listado
             </Link>
           </div>
         </div>
       </div>
-    </div>
-  );
-  
-  if (!tutoring) return (
-    <div className="max-w-5xl mx-auto p-4">
-      <div className="rounded-lg border bg-white p-6 shadow">
-        <div className="text-center">
-          <p className="text-gray-700 mb-4">No se encontró la tutoría.</p>
-          <Link className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" to="/tutorias">
-            Volver al listado
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+    );
 
-  // 🎯 MANTENER TODO EL JSX IGUAL
   return (
     <div className="max-w-5xl mx-auto p-4">
       {/* Encabezado */}
@@ -211,18 +177,18 @@ export default function ShowPageTutoring() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">
-                {tutoring.course?.name || "Materia"}
+                Tutoría de: {tutoring.course?.name || "Materia"}
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 <b>Modalidad:</b> {tutoring.modality}
                 {tutoring.state === "active" && tutoring.duration_mins ? (
                   <>
-                    {" · "}<b>Duración:</b> {tutoring.duration_mins} min
+                    {" · "} <b>Duración:</b> {tutoring.duration_mins} min
                   </>
                 ) : null}
                 {tutoring.scheduled_at ? (
                   <>
-                    {" · "}<b>Fecha:</b> {formatDateTime(tutoring.scheduled_at)}
+                    {" · "} <b>Fecha:</b> {formatDateTime(tutoring.scheduled_at)}
                   </>
                 ) : null}
               </p>
@@ -230,7 +196,10 @@ export default function ShowPageTutoring() {
             <div className="flex items-center gap-2">
               <EstadoBadge state={tutoring.state} />
               <span className="text-sm text-gray-700 bg-white border rounded-full px-3 py-1">
-                Cupos: {tutoring.capacity == null ? "A definir" : `${Math.max((tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0), 0)} disp.`}
+                Cupos:{" "}
+                {tutoring.capacity == null
+                  ? "A definir"
+                  : `${Math.max((tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0), 0)} disp.`}
               </span>
             </div>
           </div>
@@ -238,26 +207,108 @@ export default function ShowPageTutoring() {
 
         {/* Contenido */}
         <div className="px-6 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Columna izquierda: info principal */}
+          {/* Columna izquierda */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Temas */}
-            <section>
-              <h2 className="text-base font-semibold text-gray-900">Temas</h2>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {(tutoring.subjects || []).slice(0, 12).map((s) => (
-                  <span key={s.id} className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
-                    {s.name}
-                  </span>
-                ))}
-                {tutoring.subjects?.length > 12 && (
-                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
-                    +{tutoring.subjects.length - 12}
-                  </span>
-                )}
-              </div>
-            </section>
+            {/* Temas + Detalles alineados */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Temas */}
+              <section>
+                <h2 className="text-base font-semibold text-gray-900">Temas</h2>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {(tutoring.subjects || []).slice(0, 12).map((s) => (
+                    <span
+                      key={s.id}
+                      className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full"
+                    >
+                      {s.name}
+                    </span>
+                  ))}
+                  {tutoring.subjects?.length > 12 && (
+                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                      +{tutoring.subjects.length - 12}
+                    </span>
+                  )}
+                </div>
+              </section>
 
-            {/* Descripción */}
+              {/* Detalles */}
+              <section>
+                <h2 className="text-base font-semibold text-gray-900">Detalles</h2>
+                <dl className="mt-2 grid grid-cols-1 gap-y-3 text-sm">
+                  <div>
+                    <dt className="text-gray-500">Creada por</dt>
+                    <dd className="text-gray-900">
+                      {tutoring.created_by ? (
+                        <Link
+                          to={`/usuarios/${tutoring.created_by.id}`}
+                          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline w-fit"
+                        >
+                          <div className="w-5 h-5 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                            <img
+                              src={tutoring.created_by.profile_photo_url || DEFAULT_PHOTO}
+                              alt={`${tutoring.created_by.name} ${tutoring.created_by.last_name}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <span>
+                            {`${tutoring.created_by.name || ""} ${tutoring.created_by.last_name || ""}`.trim() ||
+                              tutoring.created_by.email ||
+                              "Ver perfil"}
+                          </span>
+                        </Link>
+                      ) : (
+                        "-"
+                      )}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt className="text-gray-500">Tutor</dt>
+                    <dd className="text-gray-900">
+                      {tutoring.tutor ? (
+                        <Link
+                          to={`/usuarios/${tutoring.tutor.id}`}
+                          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline w-fit"
+                        >
+                          <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                            <img
+                              src={tutoring.tutor.profile_photo_url || DEFAULT_PHOTO}
+                              alt={`${tutoring.tutor.name} ${tutoring.tutor.last_name}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <span>
+                            {`${tutoring.tutor.name || ""} ${tutoring.tutor.last_name || ""}`.trim() ||
+                              "Ver perfil"}
+                          </span>
+                        </Link>
+                      ) : (
+                        <div className="flex items-center gap-2 text-gray-500">
+                          <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+                            <svg
+                              className="w-4 h-4 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                              />
+                            </svg>
+                          </div>
+                          <span>Sin tutor asignado</span>
+                        </div>
+                      )}
+                    </dd>
+                  </div>
+                </dl>
+              </section>
+            </div>
+
+            {/* Descripción debajo */}
             {tutoring.description && (
               <section>
                 <h2 className="text-base font-semibold text-gray-900">Descripción</h2>
@@ -266,60 +317,6 @@ export default function ShowPageTutoring() {
                 </p>
               </section>
             )}
-
-            {/* Detalles adicionales */}
-            <section>
-              <h2 className="text-base font-semibold text-gray-900">Detalles</h2>
-              <dl className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-               <div>
-                <dt className="text-gray-500">Creada por</dt>
-                <dd className="text-gray-900">
-                  {tutoring.created_by ? (
-                    <Link 
-                      to={`/usuarios/${tutoring.created_by.id}`}
-                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline w-fit"
-                    >
-                      <div className="w-5 h-5 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                        <img 
-                          src={tutoring.created_by.profile_photo_url || DEFAULT_PHOTO} 
-                          alt={`${tutoring.created_by.name} ${tutoring.created_by.last_name}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <span>
-                        {`${tutoring.created_by.name || ''} ${tutoring.created_by.last_name || ''}`.trim() || 
-                         tutoring.created_by.email || 
-                         "Ver perfil"
-                        }
-                      </span>
-                    </Link>
-                  ) : "-"}
-                </dd>
-              </div>
-                {tutoring.tutor_id != null && (
-                  <div className="sm:col-span-2">
-                    <dt className="text-gray-500">Tutor</dt>
-                    <dd className="text-gray-900">
-                      <Link 
-                        to={`/usuarios/${tutoring.tutor.id}`}
-                        className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline w-fit"
-                      >
-                        <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                          <img 
-                            src={tutoring.tutor.profile_photo_url || DEFAULT_PHOTO} 
-                            alt={`${tutoring.tutor.name} ${tutoring.tutor.last_name}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <span>
-                          {`${tutoring.tutor.name || ''} ${tutoring.tutor.last_name || ''}`.trim() || "Ver perfil"}
-                        </span>
-                      </Link>
-                    </dd>
-                  </div>
-                )}
-              </dl>
-            </section>
           </div>
 
           {/* Columna derecha: acciones */}
@@ -415,9 +412,7 @@ function EstadoBadge({ state }) {
     cancelled: { text: "Cancelada", cls: "bg-red-100 text-red-700" },
   };
   const info = mapping[state] || { text: state, cls: "bg-gray-100 text-gray-800" };
-  return (
-    <span className={`text-sm px-3 py-1 rounded-full ${info.cls}`}>{info.text}</span>
-  );
+  return <span className={`text-sm px-3 py-1 rounded-full ${info.cls}`}>{info.text}</span>;
 }
 
 function ShowTutoringSkeleton() {
