@@ -11,4 +11,9 @@ class UserSerializer
       nil
     end
   end
+  
+  attribute :email do |user, params|
+    mask = params&.fetch(:mask_email, true) # por defecto true
+    mask ? user.email_masked : user.email
+  end
 end
