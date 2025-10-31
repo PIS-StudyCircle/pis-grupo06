@@ -209,7 +209,7 @@ module Api
               end
             end
 
-            create_user_tutoring(current_user.id, tutoring.id)
+            create_user_tutoring(current_user.id, tutoring.id) unless tutoring.tutor_id.present?
             render json: {
               tutoring: tutoring.as_json.merge(
                 availabilities: tutoring.tutoring_availabilities.as_json
@@ -325,9 +325,6 @@ module Api
           else # tutor
             # Asignar el tutor en la tabla tutorings
             @tutoring.update!(tutor_id: current_user.id)
-
-            # Crear registro en user_tutorings para el tutor
-            UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
             # Agregar también al estudiante creador si no está registrado aún
             if @tutoring.created_by_id.present? &&
