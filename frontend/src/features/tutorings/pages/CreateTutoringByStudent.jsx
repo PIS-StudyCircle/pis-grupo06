@@ -53,6 +53,8 @@ export default function CreateTutoringByStudent() {
     const updated = [...availabilities]
     updated[index][field] = value
     setAvailabilities(updated)
+
+    setField("_errors", { ...(form._errors ?? {}), availabilities: undefined });
   }
 
   const validate = () => {
@@ -61,40 +63,49 @@ export default function CreateTutoringByStudent() {
       errs.request_comment = `Máximo ${MAX_REQUEST_COMMENT} caracteres.`
     if (form.location.length > MAX_LOCATION_COMMENT) errs.location = `Máximo ${MAX_LOCATION_COMMENT} caracteres.`
   
-    // Validar que las disponibilidades estén completas y sean válidas
-    const invalidAvailability = availabilities.some(
-      (av) => !av.date || !av.startTime || !av.endTime || av.startTime >= av.endTime,
-    )
-    if (invalidAvailability) {
-      errs.availabilities = "Completa todas las disponibilidades. La hora final debe ser posterior a la hora de inicio."
-      return errs // Retornar temprano si hay campos vacíos
+    // 1) Campos completos
+    for (const av of availabilities) {
+      if (!av.date || !av.startTime || !av.endTime) {
+        errs.availabilities = "Completa fecha, hora de inicio y hora final en cada disponibilidad.";
+        return errs;
+      }
     }
-  
-    //  Fechas en el pasado
-    const now = new Date()
-    const hasPastDate = availabilities.some((av) => {
-      const avDate = new Date(`${av.date}T${av.startTime}:00`)
-      return avDate < now
-    })
-    if (hasPastDate) {
-      errs.availabilities = "No puedes seleccionar fechas u horas en el pasado."
-      return errs
+
+    // 2) Reglas de horas (por slot): fin > inicio y duración >= 1h
+    for (const av of availabilities) {
+      if (av.startTime >= av.endTime) {
+        errs.availabilities = "La hora final debe ser posterior a la hora de inicio.";
+        return errs;
+      }
+      const [sh, sm] = av.startTime.split(":").map(Number);
+      const [eh, em] = av.endTime.split(":").map(Number);
+      const duration = (eh * 60 + em) - (sh * 60 + sm);
+      if (duration < MIN_RANGE_MINUTES) {
+        errs.availabilities = "El rango horario debe ser de al menos 1 hora.";
+        return errs;
+      }
     }
-  
-    // VALIDACIÓN: Solapamientos
+
+    // 3) Fechas/horas en el pasado
+    const now = new Date();
+    for (const av of availabilities) {
+      const start = new Date(`${av.date}T${av.startTime}:00`);
+      if (start < now) {
+        errs.availabilities = "No puedes seleccionar fechas u horas en el pasado.";
+        return errs;
+      }
+    }
+
+    // 4) Solapamientos dentro del formulario
     for (let i = 0; i < availabilities.length; i++) {
-      const av1Start = new Date(`${availabilities[i].date}T${availabilities[i].startTime}:00`)
-      const av1End = new Date(`${availabilities[i].date}T${availabilities[i].endTime}:00`)
-  
+      const a1s = new Date(`${availabilities[i].date}T${availabilities[i].startTime}:00`);
+      const a1e = new Date(`${availabilities[i].date}T${availabilities[i].endTime}:00`);
       for (let j = i + 1; j < availabilities.length; j++) {
-        const av2Start = new Date(`${availabilities[j].date}T${availabilities[j].startTime}:00`)
-        const av2End = new Date(`${availabilities[j].date}T${availabilities[j].endTime}:00`)
-  
-        // Verificar si hay solapamiento
-        const overlap = av1Start < av2End && av2Start < av1End
-        if (overlap) {
-          errs.availabilities = `Las disponibilidades ${i + 1} y ${j + 1} se solapan. Por favor ajusta los horarios.`
-          return errs
+        const a2s = new Date(`${availabilities[j].date}T${availabilities[j].startTime}:00`);
+        const a2e = new Date(`${availabilities[j].date}T${availabilities[j].endTime}:00`);
+        if (a1s < a2e && a2s < a1e) {
+          errs.availabilities = `Las disponibilidades ${i + 1} y ${j + 1} se solapan. Por favor ajusta los horarios.`;
+          return errs;
         }
       }
     }
@@ -216,9 +227,31 @@ export default function CreateTutoringByStudent() {
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label className="text-gray-600 text-sm font-semibold">
-              Disponibilidad <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="text-gray-600 text-sm font-semibold">
+                Disponibilidad <span className="text-gray-500 font-normal">(fecha y rango horario)</span> <span className="text-red-500">*</span>
+              </label>
+
+              {/* Tooltip “?” */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  aria-describedby="disp_help"
+                  className="w-5 h-5 inline-flex items-center justify-center rounded-full border text-[11px] leading-none"
+                >
+                  ?
+                </button>
+                <div
+                  id="disp_help"
+                  role="tooltip"
+                  className="absolute z-10 hidden group-hover:block mt-2 p-2 text-xs bg-gray-900 text-white rounded-md w-72"
+                >
+                  El tutor elegirá un horario <b>dentro del rango</b> que definas para esa fecha.
+                  El rango debe ser de al menos 1 hora.
+                </div>
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={addAvailability}
@@ -289,7 +322,7 @@ export default function CreateTutoringByStudent() {
           {errs.availabilities && <span className="text-red-500 text-xs">{errs.availabilities}</span>}
         </div>
 
-        {error.length > 0 && (
+        {error.length > 0 && !errs.availabilities && (
           <ErrorAlert>
             {error.map((err, idx) => (
               <p key={idx}>{err}</p>
