@@ -128,23 +128,27 @@ module Api
         end
 
         def top_rated
-        top_tutors = User
-          .joins("INNER JOIN feedbacks ON feedbacks.tutor_id = users.id")
-          .select("users.*, AVG(feedbacks.rating) AS average_rating, COUNT(feedbacks.id) AS total_feedbacks")
-          .group("users.id")
-          .order("average_rating DESC, total_feedbacks DESC")
-          .limit(5)
+          top_tutors = User
+                       .joins("INNER JOIN feedbacks ON feedbacks.tutor_id = users.id")
+                       .select(
+                         "users.*, " \
+                         "AVG(feedbacks.rating) AS average_rating, " \
+                         "COUNT(feedbacks.id) AS total_feedbacks"
+                       )
+                       .group("users.id")
+                       .order(average_rating: :desc, total_feedbacks: :desc)
+                       .limit(5)
 
-        render json: top_tutors.map { |t|
-          {
-            id: t.id,
-            name: t.name,
-            email: t.email,
-            average_rating: t.average_rating.to_f.round(1),
-            total_feedbacks: t.total_feedbacks
+          render json: top_tutors.map { |t|
+            {
+              id: t.id,
+              name: t.name,
+              email: t.email,
+              average_rating: t.average_rating.to_f.round(1),
+              total_feedbacks: t.total_feedbacks
+            }
           }
-        }
-      end
+        end
 
         private
 
