@@ -26,7 +26,9 @@ module Api
           @pagy, @users = pagy(users, items: params[:per_page] || 20)
 
           render json: {
-            users: UserSerializer.new(@users).serializable_hash[:data].map { |u| u[:attributes] },
+            users: UserSerializer
+              .new(@users, params: { current_user: current_user })
+              .serializable_hash[:data].pluck(:attributes),
             pagination: pagy_metadata(@pagy)
           }
         end
@@ -34,7 +36,9 @@ module Api
         def show
           user = User.find_by(id: params[:id])
           if user
-            render json: UserSerializer.new(user).serializable_hash[:data][:attributes]
+            render json: UserSerializer
+              .new(user, params: { current_user: current_user })
+              .serializable_hash[:data][:attributes]
           else
             render json: { error: "No se encontró el usuario solicitado" }, status: :not_found
           end
