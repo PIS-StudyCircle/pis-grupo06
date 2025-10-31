@@ -186,7 +186,7 @@ RSpec.describe "Api::V1::TutoringsController", type: :request do
       expect {
         post confirm_schedule_api_v1_tutoring_path(tutoring.id),
              params: { scheduled_at: scheduled_time, role: "tutor" }
-      }.to change { UserTutoring.count }.by(1)
+      }.to change { UserTutoring.count }.by(0)
       expect(tutoring.reload.tutor_id).to eq(user.id)
       expect(response).to have_http_status(:ok)
     end

@@ -80,7 +80,7 @@ export default function CreateTutoringByStudent() {
       const [sh, sm] = av.startTime.split(":").map(Number);
       const [eh, em] = av.endTime.split(":").map(Number);
       const duration = (eh * 60 + em) - (sh * 60 + sm);
-      if (duration < MIN_RANGE_MINUTES) {
+      if (duration < 60) {
         errs.availabilities = "El rango horario debe ser de al menos 1 hora.";
         return errs;
       }
