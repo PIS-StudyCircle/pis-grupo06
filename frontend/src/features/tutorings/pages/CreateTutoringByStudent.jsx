@@ -1,13 +1,12 @@
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useUser } from "@context/UserContext"
 import { useCourse } from "../../courses/hooks/useCourse"
 import { createTutoringByStudent } from "../services/tutoringService"
-
+import { showSuccess, showError } from "@shared/utils/toastService"
 import { AuthLayout } from "../../users/components/AuthLayout.jsx"
 import { ErrorAlert } from "@components/ErrorAlert"
 import { SubmitButton } from "@components/SubmitButton"
 import { useFormState } from "@utils/UseFormState"
-import { useFormSubmit } from "@utils/UseFormSubmit"
 import { useState } from "react"
 import PageTitle from "@/shared/components/PageTitle";
 
@@ -15,6 +14,7 @@ const MAX_REQUEST_COMMENT = 500
 const MAX_LOCATION_COMMENT = 255
 
 export default function CreateTutoringByStudent() {
+  const navigate = useNavigate()
   const { user, userLoading, userError } = useUser()
   const { courseId } = useParams()
   const { course, loadingCourse, errorCourse } = useCourse(courseId)
@@ -28,8 +28,7 @@ export default function CreateTutoringByStudent() {
   })
 
   const [availabilities, setAvailabilities] = useState([{ date: "", startTime: "", endTime: "" }])
-
-  const { error, onSubmit } = useFormSubmit(createTutoringByStudent, "/")
+  const [submitError, setSubmitError] = useState([])
 
   if (userLoading) return <p className="text-center mt-10">Cargando usuario...</p>
   if (userError) return <p className="text-center mt-10">Error al cargar perfil.</p>
@@ -111,13 +110,6 @@ export default function CreateTutoringByStudent() {
     }
 
     const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
-    // Validación: no continuar si no hay temas seleccionados
-    /*if (selectedSubjects.length === 0) {
-      alert('No se pudieron obtener los temas seleccionados. Al aceptar será redirigido a la selección de temas para intentarlo nuevamente.');
-      window.history.back(); // redirige a la página anterior
-      return; //para que no continúe con el envío del formulario
-    }*/
-
 
     const payload = {
       request_comment: form.request_comment.trim() || undefined,
@@ -133,8 +125,23 @@ export default function CreateTutoringByStudent() {
       })),
     }
 
-    onSubmit(payload)
-    localStorage.removeItem("selectedSubjects")
+    try {
+      const result = await createTutoringByStudent(payload)
+      
+      localStorage.removeItem("selectedSubjects")
+      showSuccess("Solicitud de tutoría enviada con éxito.")
+      
+      if (result && result.tutoring && result.tutoring.id) {
+        navigate(`/tutorias/${result.tutoring.id}`)
+      } else {
+        navigate("/tutorias")
+      }
+      
+    } catch (err) {
+      showError("Error al crear la solicitud: " + err.message)
+      console.error("Error creating tutoring request:", err)
+      setSubmitError([err.message || "Error desconocido"])
+    }
   }
 
   const errs = form._errors || {}
@@ -284,9 +291,19 @@ export default function CreateTutoringByStudent() {
           {errs.availabilities && <span className="text-red-500 text-xs">{errs.availabilities}</span>}
         </div>
 
-        {error.length > 0 && (
+        {/* 🎯 CAMBIAR EL MANEJO DE ERRORES */}
+        {submitError.length > 0 && (
           <ErrorAlert>
-            {error.map((err, idx) => (
+            {submitError.map((err, idx) => (
+              <p key={idx}>{err}</p>
+            ))}
+          </ErrorAlert>
+        )}
+
+        {/* 🎯 MANTENER TAMBIÉN LOS ERRORES DE VALIDACIÓN */}
+        {Object.keys(errs).length > 0 && (
+          <ErrorAlert>
+            {Object.values(errs).map((err, idx) => (
               <p key={idx}>{err}</p>
             ))}
           </ErrorAlert>

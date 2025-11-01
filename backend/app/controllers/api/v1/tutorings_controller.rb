@@ -157,6 +157,7 @@ module Api
             name: @tutoring.tutor.name,
             last_name: @tutoring.tutor.last_name
           } : nil,
+          user_enrolled: @tutoring.users.exists?(id: current_user.id),
           availabilities: @tutoring.tutoring_availabilities.map do |a|
             {
               id: a.id,
