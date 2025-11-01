@@ -169,12 +169,6 @@ module Api
       end
 
       def create
-        # if params[:tutoring][:subject_ids].blank?
-        #   render json: { errors: ["No se recibieron correctamente los temas seleccionados. Inténtelo nuevamente."] },
-        #          status: :unprocessable_entity
-        #   return
-        # end
-
         tutoring = Tutoring.new(tutoring_params)
         tutoring.created_by_id = current_user.id
         tutoring.tutor_id      = params.dig(:tutoring, :tutor_id)
@@ -209,7 +203,7 @@ module Api
               end
             end
 
-            create_user_tutoring(current_user.id, tutoring.id)
+            create_user_tutoring(current_user.id, tutoring.id) if tutoring.tutor_id.blank?
             render json: {
               tutoring: tutoring.as_json.merge(
                 availabilities: tutoring.tutoring_availabilities.as_json
@@ -325,9 +319,6 @@ module Api
           else # tutor
             # Asignar el tutor en la tabla tutorings
             @tutoring.update!(tutor_id: current_user.id)
-
-            # Crear registro en user_tutorings para el tutor
-            UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
             # Agregar también al estudiante creador si no está registrado aún
             if @tutoring.created_by_id.present? &&
