@@ -36,7 +36,6 @@ class TutoringCancelledJob < ApplicationJob
     participants.each do |user|
       TutoringCancelledNotifier.with(
         title: "Tutoría cancelada",
-        url: "/tutorings", # Lleva a la lista de tutorías
         course_name: tutoring_data[:course_name] || "Tutoría",
         tutoring_id: tutoring_data[:id],
         cancelled_by_tutor: cancelled_by_tutor,
