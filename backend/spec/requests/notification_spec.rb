@@ -9,7 +9,7 @@ RSpec.describe "Notifications Messages", type: :request do
   before(:all) do
     ActiveJob::Base.queue_adapter = :test
   end
-  
+
   around(:each) do |example|
     perform_enqueued_jobs { example.run }
   end
@@ -20,7 +20,7 @@ RSpec.describe "Notifications Messages", type: :request do
     allow_any_instance_of(GoogleCalendarService).to receive(:join_event).and_return(true)
     allow_any_instance_of(GoogleCalendarService).to receive(:delete_event).and_return(true)
   end
-  
+
   def json
     response.parsed_body
   end
@@ -189,22 +189,27 @@ RSpec.describe "Notifications Messages", type: :request do
 
         availability = tutoring.tutoring_availabilities.create!(
           start_time: tutoring.scheduled_at - 1.hour,
-          end_time:   tutoring.scheduled_at + 2.hours,
-          is_booked:  false
+          end_time: tutoring.scheduled_at + 2.hours,
+          is_booked: false
         )
 
         UserTutoring.create!(user: student1, tutoring: tutoring)
 
         sign_in tutor
         post "/api/v1/tutorings/#{tutoring.id}/confirm_schedule",
-            params: { scheduled_at: tutoring.scheduled_at, role: "tutor", tutoring_availability_id: availability.id }.to_json,
-            headers: { "CONTENT_TYPE" => "application/json" }
-
+             params: {
+               scheduled_at: tutoring.scheduled_at,
+               role: "tutor",
+               tutoring_availability_id: availability.id
+             }.to_json,
+             headers: { "CONTENT_TYPE" => "application/json" }
         expect(response).to have_http_status(:ok).or have_http_status(:created)
 
         notif = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
         expect(notif).to be_present
-        expect(notif.title).to include("Tu solicitud de tutoría de #{course.name} fue confirmada")
+        expect(notif.title).to include(
+          "Tu solicitud de tutoría de #{course.name} fue confirmada"
+        )
       end
 
       it "notifica al tutor creador cuando un estudiante confirma la tutoría" do
@@ -221,19 +226,25 @@ RSpec.describe "Notifications Messages", type: :request do
 
         availability = tutoring.tutoring_availabilities.create!(
           start_time: tutoring.scheduled_at - 1.hour,
-          end_time:   tutoring.scheduled_at + 2.hours,
-          is_booked:  false
+          end_time: tutoring.scheduled_at + 2.hours,
+          is_booked: false
         )
 
         sign_in student1
         post "/api/v1/tutorings/#{tutoring.id}/confirm_schedule",
-            params: { scheduled_at: tutoring.scheduled_at, role: "student", tutoring_availability_id: availability.id }.to_json,
-            headers: { "CONTENT_TYPE" => "application/json" }
+             params: {
+               scheduled_at: tutoring.scheduled_at,
+               role: "student",
+               tutoring_availability_id: availability.id
+             }.to_json,
+             headers: { "CONTENT_TYPE" => "application/json" }
         expect(response).to have_http_status(:ok).or have_http_status(:created)
 
         notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
         expect(notif).to be_present
-        expect(notif.title).to include("El estudiante #{student1.name} confirmó la tutoría de #{course.name}").or be_truthy
+        expect(notif.title).to include(
+          "El estudiante #{student1.name} confirmó la tutoría de #{course.name}"
+        ).or be_truthy
       end
 
       it "notifica a usuarios que tienen la materia como favorita cuando se crea una nueva tutoría" do
@@ -241,17 +252,17 @@ RSpec.describe "Notifications Messages", type: :request do
 
         sign_in tutor
         post "/api/v1/tutorings",
-          params: {
-            tutoring: {
-              course_id: course.id,
-              tutor_id: tutor.id,
-              scheduled_at: 2.days.from_now.iso8601,
-              modality: "virtual",
-              capacity: 5,
-              subject_ids: [subject.id]
-            }
-          }.to_json,
-          headers: { "CONTENT_TYPE" => "application/json" }
+             params: {
+               tutoring: {
+                 course_id: course.id,
+                 tutor_id: tutor.id,
+                 scheduled_at: 2.days.from_now.iso8601,
+                 modality: "virtual",
+                 capacity: 5,
+                 subject_ids: [subject.id]
+               }
+             }.to_json,
+             headers: { "CONTENT_TYPE" => "application/json" }
 
         expect(response).to have_http_status(:created).or have_http_status(:ok)
 
@@ -276,8 +287,12 @@ RSpec.describe "Notifications Messages", type: :request do
         # autenticamos y hacemos POST con las keys que el controller espera
         sign_in student1
         post "/api/v1/users/user_reviews",
-          params: { reviewed_id: tutor.id, review: "Excelente tutoría!" }.to_json,
-          headers: { "CONTENT_TYPE" => "application/json" }
+             params: {
+               reviewed_id: tutor.id,
+               review: "Excelente tutoría!"
+             }.to_json,
+             headers: { "CONTENT_TYPE" => "application/json" }
+
         expect(response).to have_http_status(:created).or have_http_status(:ok)
 
         notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
@@ -301,7 +316,7 @@ RSpec.describe "Notifications Messages", type: :request do
         UserTutoring.create!(user: student2, tutoring: tutoring)
 
         # Ejecutar el job que genera las notificaciones de feedback (síncrono)
-        TutoringFeedbackNotifierJob.perform_now(tutoring.id)
+        TutoringFeedbackJob.perform_now(tutoring.id)
 
         notif_tutor = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
         notif_student1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
@@ -332,14 +347,14 @@ RSpec.describe "Notifications Messages", type: :request do
         UserTutoring.create!(user: student1, tutoring: tutoring)
 
         # simular job/endpoint que envía recordatorios
-        TutoringReminderNotifierJob.perform_now(tutoring.id)
+        TutoringReminderJob.perform_now(tutoring.id)
 
         notif_tutor = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
         notif_student = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
         expect(notif_tutor).to be_present
         expect(notif_student).to be_present
         expect(notif_student.title).to include("Recordatorio: tu tutoría de #{course.name}")
-       end
+      end
     end
   end
 end
