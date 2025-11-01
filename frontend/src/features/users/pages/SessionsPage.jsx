@@ -1,10 +1,8 @@
 import { useUser } from "@context/UserContext";
 import { SessionListPage } from "@/features/calendar";
-import { useNotifications } from "@/context/NotificationsContext";
 
-export default function Notifications() {
+export default function Sessions() {
   const { user, loading, error } = useUser();
-  const { setNotifications } = useNotifications();
 
   if (loading) return <p className="text-center mt-10">Cargando...</p>;
   
@@ -18,12 +16,17 @@ export default function Notifications() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex justify-center">
-      <div className="max-w-3xl w-full">
+      <div className="max-w-3xl w-full space-y-8">
         <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full border border-gray-200">
           <SessionListPage
             userId={user.id}
-            type="invited"
-            onCountChange={(n) => setNotifications(n)}
+            type="upcoming"
+          />
+        </div>
+        <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full border border-gray-200">
+          <SessionListPage
+            userId={user.id}
+            type="finalized"
           />
         </div>
       </div>

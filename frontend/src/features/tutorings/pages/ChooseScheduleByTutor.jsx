@@ -4,6 +4,7 @@ import { formatDateTime } from "@shared/utils/FormatDate";
 
 import { useTutoring } from "../hooks/useTutorings";
 import { confirmSchedule } from "../services/tutoringService";
+import { showSuccess } from "@/shared/utils/toastService";
 
 export default function ChooseScheduleByTutor() {
   const { tutoringId } = useParams(); 
@@ -15,7 +16,6 @@ export default function ChooseScheduleByTutor() {
 
 
   const [availableSchedules, setAvailableSchedules] = useState([]);
-  const [selectedTime, setSelectedTime] = useState(null);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [requestComment, setRequestComment] = useState(null);
@@ -83,8 +83,8 @@ export default function ChooseScheduleByTutor() {
         role: "tutor",
         capacity,
       });
-      setMessage("Tutoría confirmada con éxito.");
-      setTimeout(() => navigate("/"), 2000);
+      showSuccess("Tutoría confirmada con éxito.");
+      navigate("/notificaciones");
     } catch (e) {
       console.error(e);
       const msg = e instanceof Error ? e.message : String(e);
@@ -194,10 +194,6 @@ export default function ChooseScheduleByTutor() {
                     value={schedule.start}
                     onChange={() => {
                       setSelectedScheduleId(schedule.id);
-                      setSelectedTime({
-                        start: customStart || schedule.start,
-                        end: customEnd || schedule.end,
-                      });
                     }}
                   />
 
@@ -211,18 +207,6 @@ export default function ChooseScheduleByTutor() {
                           ...prev,
                           [schedule.id]: { ...prev[schedule.id], start: value },
                         }));
-                        const localDate = new Date(schedule.start);
-                        const localDateStr = `${localDate.getFullYear()}-${String(
-                          localDate.getMonth() + 1
-                        ).padStart(2, "0")}-${String(
-                          localDate.getDate()
-                        ).padStart(2, "0")}`;
-                        setSelectedTime({
-                          start: `${localDateStr}T${value}:00`,
-                          end: `${localDateStr}T${
-                            customEnd || new Date(schedule.end).toISOString().slice(11, 16)
-                          }:00`,
-                        });
                       }}
                       min={toLocalTimeString(schedule.start)}
                       max={toLocalTimeString(schedule.end)}
@@ -240,18 +224,6 @@ export default function ChooseScheduleByTutor() {
                           ...prev,
                           [schedule.id]: { ...prev[schedule.id], end: value },
                         }));
-                        const localDate = new Date(schedule.start);
-                        const localDateStr = `${localDate.getFullYear()}-${String(
-                          localDate.getMonth() + 1
-                        ).padStart(2, "0")}-${String(
-                          localDate.getDate()
-                        ).padStart(2, "0")}`;
-                        setSelectedTime({
-                          start: `${localDateStr}T${
-                            customStart || new Date(schedule.start).toISOString().slice(11, 16)
-                          }:00`,
-                          end: `${localDateStr}T${value}:00`,
-                        });
                       }}
                       min={toLocalTimeString(schedule.start)}
                       max={toLocalTimeString(schedule.end)}

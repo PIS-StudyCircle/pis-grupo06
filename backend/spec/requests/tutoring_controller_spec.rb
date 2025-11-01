@@ -254,7 +254,7 @@ RSpec.describe "Api::V1::TutoringsController", type: :request do
 
     it "devuelve error si hay overlapping con otra tutoría del usuario" do
       allow_any_instance_of(Api::V1::TutoringsController)
-        .to receive(:has_availability_overlaps?).and_return(true)
+        .to receive(:availability_overlaps?).and_return(true)
 
       post api_v1_tutorings_path, params: params
 
@@ -306,6 +306,86 @@ RSpec.describe "Api::V1::TutoringsController", type: :request do
       get exists_user_tutoring_api_v1_tutoring_path(tutoring.id)
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body["exists"]).to be false
+    end
+  end
+
+  describe "GET #upcoming" do
+    it "devuelve solo las tutorías futuras en las que el usuario está inscripto" do
+      alumno = User.create!(
+        name: "Alumno",
+        last_name: "Prueba",
+        email: "alumno@mail.com",
+        password: "password123",
+        password_confirmation: "password123",
+        faculty: faculty
+      )
+
+      course2 = Course.create!(name: "Matemática I", faculty: faculty)
+      tutor2  = User.create!(
+        name: "Tutor 2",
+        last_name: "Test",
+        email: "tutor2@mail.com",
+        password: "password123",
+        password_confirmation: "password123",
+        faculty: faculty
+      )
+
+      tutoring_future = Tutoring.create!(
+        course: course2,
+        tutor: tutor2,
+        capacity: 3,
+        modality: "virtual",
+        duration_mins: 60,
+        scheduled_at: 1.day.from_now,
+        state: "active"
+      )
+
+      # Crear tutoría como futura y luego cambiarle la fecha a pasada sin validación
+      tutoring_past = Tutoring.create!(
+        course: course2,
+        tutor: tutor2,
+        capacity: 3,
+        modality: "virtual",
+        duration_mins: 60,
+        scheduled_at: 1.day.from_now,
+        state: "active"
+      )
+      tutoring_past.update_column(:scheduled_at, 2.days.ago) # rubocop:disable Rails/SkipsModelValidations
+
+      UserTutoring.create!(user: alumno, tutoring: tutoring_future)
+      UserTutoring.create!(user: alumno, tutoring: tutoring_past)
+
+      get upcoming_api_v1_tutorings_path, params: { user_id: alumno.id }
+
+      expect(response).to have_http_status(:ok)
+      json = response.parsed_body
+
+      expect(json.size).to eq(1)
+      expect(json.first["id"]).to eq(tutoring_future.id)
+      expect(json.first["subject"]).to eq(course2.name)
+      expect(json.first["role"]).to eq("student")
+    end
+  end
+
+  describe "DELETE #unsubscribe" do
+    it "permite que un estudiante se desinscriba de una tutoría activa" do
+      UserTutoring.create!(user: user, tutoring: tutoring)
+      UserTutoring.create!(user: tutor, tutoring: tutoring)
+      allow_any_instance_of(Api::V1::TutoringsController).to receive(:current_user).and_return(user)
+
+      delete unsubscribe_api_v1_tutoring_path(tutoring.id)
+      expect(response).to have_http_status(:no_content)
+      expect(UserTutoring.where(user: user, tutoring: tutoring)).to be_empty
+    end
+
+    it "elimina la tutoría completa si se desinscribe el tutor" do
+      allow_any_instance_of(Api::V1::TutoringsController).to receive(:current_user).and_return(tutor)
+      UserTutoring.create!(user: tutor, tutoring: tutoring)
+
+      expect {
+        delete unsubscribe_api_v1_tutoring_path(tutoring.id)
+      }.to change { Tutoring.count }.by(-1)
+      expect(response).to have_http_status(:no_content)
     end
   end
 end

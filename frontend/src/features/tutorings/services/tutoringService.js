@@ -4,12 +4,13 @@ const filtersFromMode = (mode) => {
   switch (mode) {
     case "serTutor":
       return { no_tutor: true };
-    // case "serEstudiante":
-    //   return { with_tutor: true };
-    // Se comenta ya que un estudiante puede unirse a una tutoria pending sin tutor asignado, no lo borro por si hay que hacer alguna 
-    // validacion que se me esté pasando
+    case "serEstudiante":
+      return { with_tutor_not_full: true };
+    // Se cambia with_tutor por with_tutor_not_full ya que un estudiante ya que no tiene sentido mostrar tutorías que ya estén completas 
     case "misTutorias":
       return { enrolled: true };
+    case "serTutorIncluyendoMias":
+      return { no_tutor_incluyendo_mias: true };
     default:
       return {};
   }
@@ -112,6 +113,28 @@ export const createTutoringByStudent = async (payload) => {
   return data;
 };
 
+export const unsubscribeFromTutoring = async (tutoringId) => {
+  if (!tutoringId) throw { message: "Falta el ID de la tutoría" };
+
+  const resp = await fetch(`${API_BASE}/tutorings/${tutoringId}/unsubscribe`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  // Puede venir 204 No Content
+  if (resp.status === 204) return null;
+
+  const data = await resp.json().catch(() => null);
+
+  if (!resp.ok) {
+    throw data || { message: "Error al desuscribirse de la tutoría" };
+  }
+
+  return data;
+};
 export async function getTutoring(tutoringId) {
   const res = await fetch(`${API_BASE}/tutorings/${tutoringId}`, {
     credentials: "include",
@@ -132,7 +155,9 @@ export async function confirmSchedule(tutoringId, payload) {
     // Log útil y mensaje claro
     const raw = await res.text().catch(() => "");
     let parsed = null;
-    try { parsed = raw ? JSON.parse(raw) : null; } catch {}
+    try { parsed = raw ? JSON.parse(raw) : null; } catch {
+      // Ignore JSON parse errors, parsed will remain null
+    }
     const msg = (parsed && (parsed.error || parsed.message)) || raw || "Error al confirmar la tutoría.";
     console.error("confirmSchedule error:", res.status, res.statusText, raw);
     const err = new Error(msg);

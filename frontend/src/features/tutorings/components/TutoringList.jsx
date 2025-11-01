@@ -1,4 +1,5 @@
 import TutoringCard from "./TutoringCard";
+import TutoringCardSkeleton from "./TutoringCardSkeleton";
 
 export default function TutoringList({
   courseName,
@@ -6,10 +7,17 @@ export default function TutoringList({
   loading,
   error,
   mode = "",
+  onDesuscribirse
 }) {
-  if (loading) return <div>Cargando tutorías...</div>;
+  if (loading)  return (
+      <div className="flex flex-col">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <TutoringCardSkeleton key={i} />
+        ))}
+      </div>
+    );
   if (error) return <div>Error al cargar las tutorías. </div>;
-  if (tutorings.length === 0)
+  if (!tutorings || tutorings.length === 0)
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] px-6 py-8 text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
@@ -27,7 +35,7 @@ export default function TutoringList({
   return (
     <div className="flex flex-col">
       {tutorings.map((tutoring) => (
-        <TutoringCard key={tutoring.id} tutoring={tutoring} mode={mode} />
+        <TutoringCard key={tutoring.id} tutoring={tutoring} mode={mode} onDesuscribirse={onDesuscribirse} />
       ))}
     </div>
   );

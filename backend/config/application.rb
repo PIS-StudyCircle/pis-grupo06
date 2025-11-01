@@ -22,6 +22,16 @@ module Backend
     config.i18n.available_locales = [:es, :en]
     config.i18n.default_locale = :es
 
+    config.to_prepare do
+      Noticed::Notification.include Noticed::NotificationExtensions
+    end
+
+    config.paths.add "app/channels", eager_load: true
+
+    config.active_job.queue_adapter = :solid_queue
+
+    require "action_cable/engine"
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

@@ -2,6 +2,7 @@ import React from "react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { render } from "@testing-library/react";
 import * as tutoringHooks from "../hooks/useTutorings";
+import { Ctx } from "@context/UserContext";
 import { jest } from "@jest/globals";
 
 // Datos de prueba
@@ -38,13 +39,15 @@ export const baseTutorings = [
 ];
 
 // Render con router
-export const renderWithRouter = (ui, path = "/tutorias/123") =>
+export const renderWithRouter = (ui, path = "/tutorias/123", user = { id: 999, name: "Test User", email: "test@example.com" }) =>
   render(
-    <MemoryRouter initialEntries={[path]}>
-      <Routes>
-        <Route path="/tutorias/:courseId" element={ui} />
-      </Routes>
-    </MemoryRouter>
+    <Ctx.Provider value={{ user }}>
+      <MemoryRouter initialEntries={[path]}>
+        <Routes>
+          <Route path="/tutorias/:courseId" element={ui} />
+        </Routes>
+      </MemoryRouter>
+    </Ctx.Provider>
   );
 
   export const setPageMock = jest.fn();
@@ -100,7 +103,7 @@ export const renderWithRouter = (ui, path = "/tutorias/123") =>
               ? (mergedFilters?.tutorings ?? tutorings).slice()
               : [];
           
-            const noTutorFlag = mergedFilters?.no_tutor ?? includeUndefinedTutor;
+            const noTutorFlag = mergedFilters?.no_tutor_incluyendo_mias ?? includeUndefinedTutor;
             let list = noTutorFlag ? listSource.filter((t) => !t.tutor_id) : listSource;
           
             if (currentQuery) {
@@ -117,7 +120,7 @@ export const renderWithRouter = (ui, path = "/tutorias/123") =>
             }
           
             return list;
-          }, [mergedFilters?.tutorings, currentQuery, currentSearchBy, mergedFilters?.no_tutor]);
+          }, [mergedFilters?.tutorings, currentQuery, currentSearchBy, mergedFilters?.no_tutor_incluyendo_mias]);
   
         return {
           tutorings: filtered,

@@ -4,6 +4,7 @@ import { formatDateTime } from "@shared/utils/FormatDate";
 
 import { useTutoring } from "../hooks/useTutorings";
 import { confirmSchedule } from "../services/tutoringService";
+import {showSuccess, showError} from '@shared/utils/toastService';
 
 export default function ChooseScheduleByStudent() {
   const { tutoringId } = useParams(); 
@@ -14,10 +15,8 @@ export default function ChooseScheduleByStudent() {
   const { data, loading, error: loadError } = useTutoring(tutoring, tutoringId);
 
   const [availableSchedules, setAvailableSchedules] = useState([]);
-  const [selectedTime, setSelectedTime] = useState(null);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
-  const [requestComment, setRequestComment] = useState(null);
   const [capacity, setCapacity] = useState(1);
   const [customTimes, setCustomTimes] = useState({});
   const [selectedScheduleId, setSelectedScheduleId] = useState(null);
@@ -31,7 +30,6 @@ export default function ChooseScheduleByStudent() {
         end: a.end_time,
       }))
     );
-    setRequestComment(data.request_comment || null);
     setCapacity(data.capacity || 1);
   }, [data]);
 
@@ -82,12 +80,12 @@ export default function ChooseScheduleByStudent() {
         role: "student",
         capacity,
       });
-      setMessage("Tutoría confirmada con éxito.");
-      setTimeout(() => navigate("/"), 2000);
+      showSuccess("Tutoría confirmada con éxito.");
+      navigate("/notificaciones");
     } catch (e) {
       console.error(e);
       const msg = e instanceof Error ? e.message : String(e);
-      setError(msg || "Error en la conexión con el servidor.");
+      showError(msg || "Error en la conexión con el servidor.");
     }
   };
 
@@ -155,10 +153,6 @@ export default function ChooseScheduleByStudent() {
                     value={schedule.start}
                     onChange={() => {
                       setSelectedScheduleId(schedule.id);
-                      setSelectedTime({
-                        start: customStart || schedule.start,
-                        end: customEnd || schedule.end,
-                      });
                     }}
                   />
 
@@ -172,18 +166,6 @@ export default function ChooseScheduleByStudent() {
                           ...prev,
                           [schedule.id]: { ...prev[schedule.id], start: value },
                         }));
-                        const localDate = new Date(schedule.start);
-                        const localDateStr = `${localDate.getFullYear()}-${String(
-                          localDate.getMonth() + 1
-                        ).padStart(2, "0")}-${String(
-                          localDate.getDate()
-                        ).padStart(2, "0")}`;
-                        setSelectedTime({
-                          start: `${localDateStr}T${value}:00`,
-                          end: `${localDateStr}T${
-                            customEnd || new Date(schedule.end).toISOString().slice(11, 16)
-                          }:00`,
-                        });
                       }}
                       min={toLocalTimeString(schedule.start)}
                       max={toLocalTimeString(schedule.end)}
@@ -201,18 +183,6 @@ export default function ChooseScheduleByStudent() {
                           ...prev,
                           [schedule.id]: { ...prev[schedule.id], end: value },
                         }));
-                        const localDate = new Date(schedule.start);
-                        const localDateStr = `${localDate.getFullYear()}-${String(
-                          localDate.getMonth() + 1
-                        ).padStart(2, "0")}-${String(
-                          localDate.getDate()
-                        ).padStart(2, "0")}`;
-                        setSelectedTime({
-                          start: `${localDateStr}T${
-                            customStart || new Date(schedule.start).toISOString().slice(11, 16)
-                          }:00`,
-                          end: `${localDateStr}T${value}:00`,
-                        });
                       }}
                       min={toLocalTimeString(schedule.start)}
                       max={toLocalTimeString(schedule.end)}

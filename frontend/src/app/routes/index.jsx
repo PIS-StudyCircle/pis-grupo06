@@ -6,12 +6,12 @@ import {
   ProfilePage,
   SignInPage,
   RegisterPage,
-  TutorPage,
+  UserPage,
   VisitorFlow,
   ForgotPasswordPage,
   ResetPasswordPage,
   UserProfilePage,
-  NotificationsPage,
+  SessionsPage,
 } from "@/features/users";
 import { SubjectPage } from "@/features/subjects";
 import SubjectDetailPage from "@/features/subjects/pages/SubjectDetailPage";
@@ -41,13 +41,11 @@ export function AppRoutes() {
           element={<TutoringPage filters={{}} mode="" />}
         />
         <Route path="/perfil" element={<ProfilePage />} />
-        <Route path="/tutores" element={<TutorPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
-        <Route path="/notificaciones" element={<NotificationsPage />} />
+        <Route path="/notificaciones" element={<SessionsPage />} />
 
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
         <Route path="/perfil" element={<ProfilePage />} />
-        <Route path="/tutores" element={<TutorPage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
         <Route path="/tutorias/:tutoringId/elegir_horario_tutor" element={<ChooseScheduleByTutor />} />
         <Route path="/tutorias/:tutoringId/elegir_horario_estudiante" element={<ChooseScheduleByStudent />} />
@@ -68,9 +66,17 @@ export function AppRoutes() {
           path="/tutorias/solicitar/:courseId"
           element={<CreateTutoringByStudent />}
         />
+        <Route path="/perfil" element={<ProfilePage />} />
+        <Route path="/usuarios" element={<UserPage />} />
+        <Route path="/usuarios/:id" element={<UserProfilePage />} />
         <Route
           path="/tutorias/materia/:courseId"
           element={<TutoringPage filters={{}} mode="serEstudiante" />}
+        />
+        
+        <Route
+          path="/materias/:courseId/temas/:subjectId"
+          element={<SubjectDetailPage />}
         />
       </Route>
 
@@ -83,11 +89,7 @@ export function AppRoutes() {
       <Route path="/prototipoCalendar" element={<SessionListPage />} />
       <Route path="/appoint" element={<AppointClassPage />} />
 
-      <Route
-        path="/materias/:courseId/temas/:subjectId"
-        element={<SubjectDetailPage />}
-      />
-      <Route path="/tutores" element={<TutorPage />} />
+      <Route path="/usuarios" element={<UserPage />} />
       <Route path="*" element={<Error404Page />} />
     </Routes>
   );

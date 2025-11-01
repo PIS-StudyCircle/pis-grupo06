@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
-import { useTutorings } from "../hooks/useTutorings";
+import { useTutorings} from "../hooks/useTutorings";
 import TutoringList from "../components/TutoringList";
 import TutoringSearchBar from "../components/TutoringSearchBar";
 import Pagination from "@components/Pagination";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import PageTitle from "@components/PageTitle";
 
-export default function TutoringPage({ filters = {}, mode = "", titleClass = "titulo" }) {
+export default function TutoringPage({ filters = {}, mode = "", titleClass = "titulo",  showSearchBar = true }) {
   const { courseId } = useParams();
   const navigate = useNavigate();
 
@@ -23,7 +23,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
     const baseFilters = { ...filters };
 
     if (showWithoutTutor) {
-      baseFilters.no_tutor = true;
+      baseFilters.no_tutor_incluyendo_mias = true;
     }
 
     if (courseId) baseFilters.course_id = courseId;
@@ -42,6 +42,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
     setPage,
     search,
     setSearch,
+    onDesuscribirse, // PIS-23
   } = useTutorings(1, 20, mergedFilters, mode);
 
   const totalPages = pagination?.last || 1;
@@ -97,25 +98,28 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
               </button>
             )}
           </PageTitle>
-        <TutoringSearchBar
-            query={query}
-            onQueryChange={(e) => setQuery(e.target.value)}
-            searchBy={forceSubjectSearch ? "subject" : searchBy}
-            onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
-            options={
-              forceSubjectSearch
-                ? [{ value: "subject", label: "Tema" }]
-                : [
-                    { value: "course", label: "Materia" },
-                    { value: "subject", label: "Tema" },
-                  ]
-            }
-            placeholder={
-              (forceSubjectSearch ? "subject" : searchBy) === "course"
-                ? "Buscar por materia..."
-                : "Buscar por tema..."
-            }
-          />
+
+          {showSearchBar && (
+            <TutoringSearchBar
+              query={query}
+              onQueryChange={(e) => setQuery(e.target.value)}
+              searchBy={forceSubjectSearch ? "subject" : searchBy}
+              onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
+              options={
+                forceSubjectSearch
+                  ? [{ value: "subject", label: "Tema" }]
+                  : [
+                      { value: "course", label: "Materia" },
+                      { value: "subject", label: "Tema" },
+                    ]
+              }
+              placeholder={
+                (forceSubjectSearch ? "subject" : searchBy) === "course"
+                  ? "Buscar por materia..."
+                  : "Buscar por tema..."
+              }
+            />
+          )}
 
           {/* Filter toggle */}
           {mode !== "serTutor" && mode !== "serEstudiante" && (
@@ -123,10 +127,13 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
               <input
                 type="checkbox"
                 checked={showWithoutTutor}
-                onChange={(e) => setShowWithoutTutor(e.target.checked)}
+                onChange={(e) => {
+                  setShowWithoutTutor(e.target.checked);
+                  setPage(1);
+                }}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-gray-700">Tutor Indefinido</span>
+              <span className="text-gray-700">Solo sin tutor</span>
             </label>
           )}
 
@@ -136,6 +143,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
             mode={mode}
             loading={loading}
             error={error}
+            onDesuscribirse={onDesuscribirse}
           />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />

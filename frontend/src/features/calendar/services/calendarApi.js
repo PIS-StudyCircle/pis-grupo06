@@ -83,3 +83,23 @@ export const deleteClassEvent = async (tutoringId) => {
   }
   return await response.json();
 };
+
+// Desuscribirse de una sesión/tutoría (igual que en tutorías)
+export const unsubscribeFromClassEvent = async (tutoringId) => {
+  if (!tutoringId) throw new Error("Falta el ID de la tutoría");
+
+  const response = await fetch(`${API_BASE}/tutorings/${tutoringId}/unsubscribe`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
+
+  if (response.status === 204) return null;
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || "Error al desuscribirse de la tutoría");
+  }
+
+  try { return await response.json(); } catch { return null; }
+};
