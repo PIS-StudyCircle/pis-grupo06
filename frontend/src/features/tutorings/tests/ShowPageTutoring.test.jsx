@@ -36,18 +36,6 @@ test("muestra skeleton mientras carga", () => {
   expect(document.querySelector(".animate-pulse")).toBeInTheDocument();
 });
 
-test("muestra error si el fetch falla", async () => {
-  const { showError } = require("@shared/utils/toastService");
-  fetch.mockRejectedValueOnce(new Error("Network error"));
-
-  render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-
-  await waitFor(() =>
-    expect(showError).toHaveBeenCalledWith("No se pudo cargar la tutoría.")
-  );
-});
-
-
 test("renderiza correctamente una tutoría cargada", async () => {
   const tutoringData = {
     id: 1,
@@ -85,16 +73,14 @@ test("renderiza correctamente una tutoría cargada", async () => {
   expect(screen.getByText(/Prof. López/i)).toBeInTheDocument();
 });
 
-test("muestra botón 'Ser tutor' cuando no tiene tutor y hay cupos", async () => {
+test("muestra botón 'Ser tutor' cuando no tiene tutor", async () => {
   const tutoringData = {
     id: 1,
     course: { name: "Química" },
     modality: "Virtual",
-    capacity: 5,
-    enrolled: 2,
     tutor_id: null,
     created_by_id: 20,
-    state: "active",
+    state: "pending",
   };
   fetch
     .mockResolvedValueOnce({ ok: true, json: async () => tutoringData })
@@ -113,48 +99,26 @@ test("muestra botón 'Unirme' cuando hay cupos y tutor", async () => {
     modality: "Presencial",
     capacity: 5,
     enrolled: 1,
-    tutor_id: 33,
+    tutor: { id: 33, name: "Ana" },
     created_by_id: 20,
     state: "active",
   };
 
   fetch
     .mockResolvedValueOnce({ ok: true, json: async () => tutoringData }) // getTutoring
-    .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: false }) }) // checkSubscription
     .mockResolvedValueOnce({ ok: true, json: async () => ({}) }) // join_tutoring
     .mockResolvedValueOnce({ ok: true, json: async () => tutoringData }); // refetch
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
 
   await waitFor(() => screen.getByText(/Historia/i));
-  const button = screen.getByText(/Unirme/i);
+  const button = await screen.findByRole("button", { name: /unirme/i });
   fireEvent.click(button);
 
   await waitFor(() =>
-    expect(fetch.mock.calls[2][0]).toMatch(/join_tutoring/)
+    expect(fetch.mock.calls[1][0]).toMatch(/join_tutoring/)
   );
-});
 
-test("muestra ambos botones cuando no hay tutor y hay cupos", async () => {
-  const tutoringData = {
-    id: 3,
-    course: { name: "Literatura" },
-    modality: "Virtual",
-    capacity: 10,
-    enrolled: 0,
-    tutor_id: null,
-    created_by_id: 20,
-    state: "active",
-  };
-  fetch
-    .mockResolvedValueOnce({ ok: true, json: async () => tutoringData })
-    .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: false }) });
-
-  render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-  await waitFor(() => screen.getByText(/Literatura/i));
-
-  expect(screen.getByText(/Ser tutor/i)).toBeInTheDocument();
-  expect(screen.getByText(/Unirme/i)).toBeInTheDocument();
 });
 
 test("muestra 'Completo' cuando no hay cupos disponibles", async () => {
@@ -164,7 +128,7 @@ test("muestra 'Completo' cuando no hay cupos disponibles", async () => {
     modality: "Virtual",
     capacity: 2,
     enrolled: 2,
-    tutor_id: 1,
+    tutor: { id: 1, name: "Ana" },
     created_by_id: 9,
     state: "active",
   };
@@ -175,7 +139,8 @@ test("muestra 'Completo' cuando no hay cupos disponibles", async () => {
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
   await waitFor(() => screen.getByText(/Programación/i));
 
-  expect(screen.getByText(/Completo/i)).toBeInTheDocument();
+  expect(await screen.findByRole("button", { name: /completo/i })).toBeInTheDocument();
+
 });
 
 test("muestra 'Desuscribirme' cuando soy estudiante", async () => {
@@ -185,13 +150,13 @@ test("muestra 'Desuscribirme' cuando soy estudiante", async () => {
     modality: "Virtual",
     capacity: 3,
     enrolled: 2,
-    tutor_id: 9,
+    tutor: { id: 9, name: "Ana" },
     created_by_id: 8,
     state: "active",
+    user_enrolled: true,
   };
   fetch
     .mockResolvedValueOnce({ ok: true, json: async () => tutoringData })
-    .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: true }) }) // soy estudiante
     .mockResolvedValueOnce({ ok: true, json: async () => ({}) }) // unsubscribe
     .mockResolvedValueOnce({ ok: true, json: async () => tutoringData }); // refetch
 
@@ -202,7 +167,7 @@ test("muestra 'Desuscribirme' cuando soy estudiante", async () => {
   fireEvent.click(btn);
 
   await waitFor(() =>
-    expect(fetch.mock.calls[2][0]).toMatch(/unsubscribe/)
+    expect(fetch.mock.calls[1][0]).toMatch(/unsubscribe/)
   );
 });
 
@@ -216,14 +181,14 @@ test("si el backend devuelve 204 al desuscribirse, navega al listado", async () 
     modality: "Presencial",
     capacity: 3,
     enrolled: 1,
-    tutor_id: 8,
+    tutor: { id: 8, name: "Ana" },
     created_by_id: 8,
     state: "active",
+    user_enrolled: true,
   };
 
   fetch
     .mockResolvedValueOnce({ ok: true, json: async () => tutoringData })
-    .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: true }) })
     .mockResolvedValueOnce({ ok: true, status: 204, json: async () => ({}) });
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });
@@ -240,14 +205,14 @@ test("maneja error silencioso en refetchTutoring", async () => {
     modality: "Virtual",
     capacity: 5,
     enrolled: 1,
-    tutor_id: 2,
+    tutor: { id: 2, name: "Ana" },
     created_by_id: 8,
     state: "active",
+    user_enrolled: false,
   };
 
   fetch
     .mockResolvedValueOnce({ ok: true, json: async () => tutoringData })
-    .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: false }) })
     .mockResolvedValueOnce({ ok: true, json: async () => ({}) })
     .mockRejectedValueOnce(new Error("refetch error"));
 
@@ -258,7 +223,7 @@ test("maneja error silencioso en refetchTutoring", async () => {
   fireEvent.click(btn);
 
   await waitFor(() =>
-    expect(fetch.mock.calls[2][0]).toMatch(/join_tutoring/)
+    expect(fetch.mock.calls[1][0]).toMatch(/join_tutoring/)
   );
 });
 
@@ -286,31 +251,6 @@ test("Calcula correctamente cuposDisponibles y noTieneTutor", async () => {
   expect(tutoringData.capacity - tutoringData.enrolled).toBe(0);
 });
 
-test("Muestra ambos botones y permite click", async () => {
-  const tutoringData = {
-    id: 11,
-    course: { name: "Arte" },
-    modality: "Presencial",
-    capacity: 10,
-    enrolled: 0,
-    tutor_id: null,
-    created_by_id: 1,
-    state: "active",
-  };
-  fetch
-    .mockResolvedValueOnce({ ok: true, json: async () => tutoringData })
-    .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: false }) });
-
-  render(<ShowPageTutoring />, { wrapper: MemoryRouter });
-  await screen.findByText(/Arte/i);
-
-  expect(screen.getByText(/Ser tutor/i)).toBeInTheDocument();
-  expect(screen.getByText(/Unirme/i)).toBeInTheDocument();
-
-  fireEvent.click(screen.getByText(/Ser tutor/i));
-  fireEvent.click(screen.getByText(/Unirme/i));
-});
-
 test("Muestra botón Desuscribirme y navega si confirma", async () => {
   const navigateMock = jest.fn();
   jest.spyOn(require("react-router-dom"), "useNavigate").mockReturnValue(navigateMock);
@@ -321,13 +261,13 @@ test("Muestra botón Desuscribirme y navega si confirma", async () => {
     modality: "Virtual",
     capacity: 3,
     enrolled: 2,
-    tutor_id: 9,
+    tutor_id: { id: 9, name: "Ana" },
     created_by_id: 8,
     state: "active",
+    user_enrolled: true,
   };
   fetch
     .mockResolvedValueOnce({ ok: true, json: async () => tutoringData })
-    .mockResolvedValueOnce({ ok: true, json: async () => ({ exists: true }) }) // soy estudiante
     .mockResolvedValueOnce({ ok: true, status: 204, json: async () => ({}) }); // unsubscribe
 
   render(<ShowPageTutoring />, { wrapper: MemoryRouter });

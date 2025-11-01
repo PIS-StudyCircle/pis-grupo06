@@ -20,7 +20,7 @@ export default function ShowPageTutoring() {
   const onDesuscribirse = (tid) => unsubscribeFromTutoring(tid);
   const [saving, setSaving] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
     if (error || (!tutoring && !loading)) {
       navigate('/404', { replace: true });
     }
