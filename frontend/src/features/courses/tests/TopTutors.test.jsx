@@ -42,7 +42,7 @@ describe("TopTutors", () => {
     ]);
 
     render(<TopTutors />);
-    await screen.findByText(/Mejores Tutores/i);
+    await screen.findByText(/Tutores Destacados/i);
 
     // Top 3 con medallas y prefijo "n. Nombre"
     expect(screen.getByText("🥇")).toBeInTheDocument();
