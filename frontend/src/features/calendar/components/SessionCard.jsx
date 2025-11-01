@@ -162,7 +162,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
                       key={idx}
                       className="flex justify-between items-center bg-gray-50 px-3 py-1 rounded"
                     >
-                      <span className="text-gray-700">{attendee.email}</span>
+                      <span className="text-gray-700">{attendee.id === user?.id ? "Tú" : attendee.email}</span>
                       <span
                         className={
                           attendee.status === "confirmada"

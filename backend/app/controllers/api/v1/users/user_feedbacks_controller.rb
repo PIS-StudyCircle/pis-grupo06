@@ -26,7 +26,7 @@ module Api
             total_feedbacks: feedbacks.size,
             feedbacks: feedbacks.as_json(
               include: {
-                student: { only: [:id, :name, :last_name, :email] },
+                student: { only: [:id] },
                 tutoring: {
                   only: [:id],
                   include: {
