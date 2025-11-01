@@ -6,6 +6,7 @@ import { showSuccess, showError, showConfirm } from "@shared/utils/toastService"
 import { useTutoring } from "../hooks/useTutorings";
 import {unsubscribeFromTutoring} from "../services/tutoringService";
 import { DEFAULT_PHOTO } from "@/shared/config";
+import { EstadoBadge, ShowTutoringSkeleton } from "@shared/utils/showTutorings"
 
 /**
  * SHOW PAGE DE TUTORÍA (ampliada)
@@ -18,50 +19,20 @@ export default function ShowPageTutoring() {
   const { data: tutoring, loading, error, refetch } = useTutoring(null, tutoringId);
   const onDesuscribirse = (tid) => unsubscribeFromTutoring(tid);
   const [saving, setSaving] = useState(false);
-  const [soyEstudiante, setSoyEstudiante] = useState(false);
 
-  // ¿existo como estudiante en esta tutoría?
-  useEffect(() => {
-    let cancel = false;
-
-    async function checkSoyEstudiante() {
-      if (!user?.id || !tutoringId) {
-        setSoyEstudiante(false);
-        return;
-      }
-      try {
-        const res = await fetch(`/api/v1/tutorings/${tutoringId}/exists_user_tutoring`, {
-          credentials: "include",
-        });
-        if (!res.ok) {
-          console.warn("exists_user_tutoring no OK:", res.status);
-          setSoyEstudiante(false);
-          return;
-        }
-        const { exists } = await res.json().catch(() => ({ exists: false }));
-        if (!cancel) setSoyEstudiante(!!exists);
-      } catch (e) {
-        if (!cancel) {
-          console.warn("fetch error:", e);
-          showError("No se pudo cargar la tutoría.");
-          setSoyEstudiante(false);
-        }
-      }
+    useEffect(() => {
+    if (error || (!tutoring && !loading)) {
+      navigate('/404', { replace: true });
     }
+  }, [error, tutoring, loading, navigate]);
 
-    checkSoyEstudiante();
-    return () => {
-      cancel = true;
-    };
-  }, [user?.id, tutoringId]);
 
-  const noTieneTutor = tutoring?.tutor_id == null;
-  const cuposDisponibles = useMemo(() => {
-    if (!tutoring) return false;
-    if (tutoring.capacity == null) return true;
-    return (tutoring.capacity ?? 0) > (tutoring.enrolled ?? 0);
-  }, [tutoring]);
-
+  const soyEstudiante = tutoring?.user_enrolled || false;
+  const noTieneTutor = !(tutoring?.tutor?.id);
+ const cuposDisponibles = useMemo(() => {
+  if (!tutoring) return false;
+  return tutoring.capacity != null && tutoring.capacity > (tutoring.enrolled ?? 0);
+}, [tutoring]);
   const soyTutor = tutoring?.tutor_id === user?.id;
   const esCreador = tutoring?.created_by_id === user?.id;
 
@@ -133,46 +104,8 @@ export default function ShowPageTutoring() {
 
   if (loading) return <ShowTutoringSkeleton />;
 
-  if (error) {
-    showError("No se pudo cargar la tutoría.");
-    return (
-      <div className="max-w-5xl mx-auto p-4">
-        <div className="rounded-lg border bg-white p-6 shadow">
-          <div className="text-center">
-            <p className="text-red-600 mb-2">Error al cargar la tutoría</p>
-            <p className="text-gray-600 text-sm mb-4">{error}</p>
-            <div className="flex gap-2 justify-center">
-              <button
-                onClick={() => refetch?.()}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                Reintentar
-              </button>
-              <Link className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" to="/tutorias">
-                Volver
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  if (!tutoring && !error)
-    return (
-      <div className="max-w-5xl mx-auto p-4">
-        <div className="rounded-lg border bg-white p-6 shadow">
-          <div className="text-center">
-            <p className="text-gray-700 mb-4">No se encontró la tutoría.</p>
-            <Link className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" to="/tutorias">
-              Volver al listado
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-
   return (
-    <div className="max-w-5xl mx-auto p-4">
+    <div className="max-w-5xl mx-auto p-4 min-h-screen">
       {/* Encabezado */}
       <div className="rounded-2xl bg-white shadow overflow-hidden">
         <div className="px-6 py-5 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
@@ -212,12 +145,12 @@ export default function ShowPageTutoring() {
           {/* Columna izquierda */}
           <div className="lg:col-span-2 space-y-6">
             {/* Temas + Detalles alineados */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
               {/* Temas */}
               <section>
                 <h2 className="text-base font-semibold text-gray-900">Temas</h2>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {(tutoring.subjects || []).slice(0, 12).map((s) => (
+                  {(tutoring.subjects || []).map((s) => (
                     <span
                       key={s.id}
                       className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full"
@@ -225,27 +158,22 @@ export default function ShowPageTutoring() {
                       {s.name}
                     </span>
                   ))}
-                  {tutoring.subjects?.length > 12 && (
-                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
-                      +{tutoring.subjects.length - 12}
-                    </span>
-                  )}
                 </div>
               </section>
 
               {/* Detalles */}
-              <section>
+              <section className="space-y-3">
                 <h2 className="text-base font-semibold text-gray-900">Detalles</h2>
-                <dl className="mt-2 grid grid-cols-1 gap-y-3 text-sm">
+                <dl className="space-y-3 text-sm">
                   <div>
                     <dt className="text-gray-500">Creada por</dt>
                     <dd className="text-gray-900">
                       {tutoring.created_by ? (
-                        <Link
+                         <Link
                           to={`/usuarios/${tutoring.created_by.id}`}
-                          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline w-fit"
+                          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline"
                         >
-                          <div className="w-5 h-5 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                          <div className="w-5 h-5 rounded-full overflow-hidden bg-gray-200">
                             <img
                               src={tutoring.created_by.profile_photo_url || DEFAULT_PHOTO}
                               alt={`${tutoring.created_by.name} ${tutoring.created_by.last_name}`}
@@ -255,7 +183,7 @@ export default function ShowPageTutoring() {
                           <span>
                             {`${tutoring.created_by.name || ""} ${tutoring.created_by.last_name || ""}`.trim() ||
                               tutoring.created_by.email ||
-                              "Ver perfil"}
+                              "---"}
                           </span>
                         </Link>
                       ) : (
@@ -268,11 +196,11 @@ export default function ShowPageTutoring() {
                     <dt className="text-gray-500">Tutor</dt>
                     <dd className="text-gray-900">
                       {tutoring.tutor ? (
-                        <Link
+                         <Link
                           to={`/usuarios/${tutoring.tutor.id}`}
-                          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline w-fit"
+                          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline"
                         >
-                          <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                          <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-200">
                             <img
                               src={tutoring.tutor.profile_photo_url || DEFAULT_PHOTO}
                               alt={`${tutoring.tutor.name} ${tutoring.tutor.last_name}`}
@@ -281,45 +209,21 @@ export default function ShowPageTutoring() {
                           </div>
                           <span>
                             {`${tutoring.tutor.name || ""} ${tutoring.tutor.last_name || ""}`.trim() ||
-                              "Ver perfil"}
+                              "---"}
                           </span>
                         </Link>
                       ) : (
-                        <div className="flex items-center gap-2 text-gray-500">
-                          <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                            <svg
-                              className="w-4 h-4 text-gray-400"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                              />
-                            </svg>
-                          </div>
-                          <span>Sin tutor asignado</span>
-                        </div>
+                      <div className="text-center text-gray-500">
+                        <span>Sin tutor asignado</span>
+                      </div>
                       )}
                     </dd>
                   </div>
                 </dl>
               </section>
             </div>
-
-            {/* Descripción debajo */}
-            {tutoring.description && (
-              <section>
-                <h2 className="text-base font-semibold text-gray-900">Descripción</h2>
-                <p className="mt-2 text-gray-700 leading-relaxed whitespace-pre-line">
-                  {tutoring.description}
-                </p>
-              </section>
-            )}
           </div>
+    
 
           {/* Columna derecha: acciones */}
           <aside className="lg:col-span-1">
@@ -399,39 +303,6 @@ export default function ShowPageTutoring() {
               </div>
             </div>
           </aside>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function EstadoBadge({ state }) {
-  if (!state) return null;
-  const mapping = {
-    active: { text: "Activa", cls: "bg-green-100 text-green-800" },
-    scheduled: { text: "Agendada", cls: "bg-blue-100 text-blue-800" },
-    finished: { text: "Finalizada", cls: "bg-gray-200 text-gray-700" },
-    cancelled: { text: "Cancelada", cls: "bg-red-100 text-red-700" },
-  };
-  const info = mapping[state] || { text: state, cls: "bg-gray-100 text-gray-800" };
-  return <span className={`text-sm px-3 py-1 rounded-full ${info.cls}`}>{info.text}</span>;
-}
-
-function ShowTutoringSkeleton() {
-  return (
-    <div className="max-w-5xl mx-auto p-4 animate-pulse">
-      <div className="rounded-2xl bg-white shadow overflow-hidden">
-        <div className="px-6 py-5 border-b bg-gray-100" />
-        <div className="px-6 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="h-6 bg-gray-200 rounded w-1/3" />
-            <div className="h-24 bg-gray-100 rounded" />
-            <div className="h-6 bg-gray-200 rounded w-1/4" />
-            <div className="h-20 bg-gray-100 rounded" />
-          </div>
-          <div className="lg:col-span-1">
-            <div className="rounded-xl border bg-gray-50 p-4 h-48" />
-          </div>
         </div>
       </div>
     </div>
