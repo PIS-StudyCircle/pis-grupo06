@@ -36,20 +36,20 @@ RSpec.describe "GET /api/v1/users/user_feedbacks/top_rated", type: :request do
     tutor_b = User.create!(email: "tb@ex.com", password: "12345678", password_confirmation: "12345678",
                            name: "B", last_name: "L", faculty: faculty)
 
-    student_1 = User.create!(email: "s1@ex.com", password: "12345678", password_confirmation: "12345678",
-                             name: "S1", last_name: "X", faculty: faculty)
-    student_2 = User.create!(email: "s2@ex.com", password: "12345678", password_confirmation: "12345678",
-                             name: "S2", last_name: "X", faculty: faculty)
+    student1 = User.create!(email: "s1@ex.com", password: "12345678", password_confirmation: "12345678",
+                            name: "S1", last_name: "X", faculty: faculty)
+    student2 = User.create!(email: "s2@ex.com", password: "12345678", password_confirmation: "12345678",
+                            name: "S2", last_name: "X", faculty: faculty)
 
     tutoring_a1 = build_tutoring_for(tutor_a)
     tutoring_a2 = build_tutoring_for(tutor_a)
-    Feedback.create!(tutor_id: tutor_a.id, student_id: student_1.id, tutoring_id: tutoring_a1.id, rating: 5.0)
-    Feedback.create!(tutor_id: tutor_a.id, student_id: student_2.id, tutoring_id: tutoring_a2.id, rating: 4.5)
+    Feedback.create!(tutor_id: tutor_a.id, student_id: student1.id, tutoring_id: tutoring_a1.id, rating: 5.0)
+    Feedback.create!(tutor_id: tutor_a.id, student_id: student2.id, tutoring_id: tutoring_a2.id, rating: 4.5)
 
     tutoring_b1 = build_tutoring_for(tutor_b)
     tutoring_b2 = build_tutoring_for(tutor_b)
-    Feedback.create!(tutor_id: tutor_b.id, student_id: student_1.id, tutoring_id: tutoring_b1.id, rating: 4.5)
-    Feedback.create!(tutor_id: tutor_b.id, student_id: student_2.id, tutoring_id: tutoring_b2.id, rating: 4.0)
+    Feedback.create!(tutor_id: tutor_b.id, student_id: student1.id, tutoring_id: tutoring_b1.id, rating: 4.5)
+    Feedback.create!(tutor_id: tutor_b.id, student_id: student2.id, tutoring_id: tutoring_b2.id, rating: 4.0)
 
     get "/api/v1/users/user_feedbacks/top_rated"
     expect(response).to have_http_status(:ok)
@@ -67,41 +67,41 @@ RSpec.describe "GET /api/v1/users/user_feedbacks/top_rated", type: :request do
   end
 
   it "ordena por promedio DESC y, en empate, por total_feedbacks DESC" do
-    tutor_1 = User.create!(email: "t1@ex.com", password: "12345678", password_confirmation: "12345678",
-                           name: "T1", last_name: "L", faculty: faculty)
-    tutor_2 = User.create!(email: "t2@ex.com", password: "12345678", password_confirmation: "12345678",
-                           name: "T2", last_name: "L", faculty: faculty)
+    tutor1 = User.create!(email: "t1@ex.com", password: "12345678", password_confirmation: "12345678",
+                          name: "T1", last_name: "L", faculty: faculty)
+    tutor2 = User.create!(email: "t2@ex.com", password: "12345678", password_confirmation: "12345678",
+                          name: "T2", last_name: "L", faculty: faculty)
 
-    student_x1 = User.create!(email: "sx1@ex.com", password: "12345678", password_confirmation: "12345678",
-                              name: "SX1", last_name: "L", faculty: faculty)
-    student_x2 = User.create!(email: "sx2@ex.com", password: "12345678", password_confirmation: "12345678",
-                              name: "SX2", last_name: "L", faculty: faculty)
-    student_x3 = User.create!(email: "sx3@ex.com", password: "12345678", password_confirmation: "12345678",
-                              name: "SX3", last_name: "L", faculty: faculty)
+    studentx1 = User.create!(email: "sx1@ex.com", password: "12345678", password_confirmation: "12345678",
+                             name: "SX1", last_name: "L", faculty: faculty)
+    studentx2 = User.create!(email: "sx2@ex.com", password: "12345678", password_confirmation: "12345678",
+                             name: "SX2", last_name: "L", faculty: faculty)
+    studentx3 = User.create!(email: "sx3@ex.com", password: "12345678", password_confirmation: "12345678",
+                             name: "SX3", last_name: "L", faculty: faculty)
 
     [5.0, 4.5, 5.0].each_with_index do |rating, i|
-      tutoring = build_tutoring_for(tutor_1)
-      student  = [student_x1, student_x2, student_x3][i]
-      Feedback.create!(tutor_id: tutor_1.id, student_id: student.id, tutoring_id: tutoring.id, rating: rating)
+      tutoring = build_tutoring_for(tutor1)
+      student  = [studentx1, studentx2, studentx3][i]
+      Feedback.create!(tutor_id: tutor1.id, student_id: student.id, tutoring_id: tutoring.id, rating: rating)
     end
 
     [5.0, 4.5].each_with_index do |rating, i|
-      tutoring = build_tutoring_for(tutor_2)
-      student  = [student_x1, student_x2][i]
-      Feedback.create!(tutor_id: tutor_2.id, student_id: student.id, tutoring_id: tutoring.id, rating: rating)
+      tutoring = build_tutoring_for(tutor2)
+      student  = [studentx1, studentx2][i]
+      Feedback.create!(tutor_id: tutor2.id, student_id: student.id, tutoring_id: tutoring.id, rating: rating)
     end
 
     get "/api/v1/users/user_feedbacks/top_rated"
     expect(response).to have_http_status(:ok)
 
     ids_in_order = json.pluck("id")
-    expect(ids_in_order.index(tutor_1.id)).to be < ids_in_order.index(tutor_2.id)
+    expect(ids_in_order.index(tutor1.id)).to be < ids_in_order.index(tutor2.id)
 
-    hash_1 = json.find { |h| h["id"] == tutor_1.id }
-    hash_2 = json.find { |h| h["id"] == tutor_2.id }
-    expect(hash_1["average_rating"]).to eq(4.8)
-    expect(hash_2["average_rating"]).to eq(4.8)
-    expect(hash_1["total_feedbacks"]).to be > hash_2["total_feedbacks"]
+    hash1 = json.find { |h| h["id"] == tutor1.id }
+    hash2 = json.find { |h| h["id"] == tutor2.id }
+    expect(hash1["average_rating"]).to eq(4.8)
+    expect(hash2["average_rating"]).to eq(4.8)
+    expect(hash1["total_feedbacks"]).to be > hash2["total_feedbacks"]
   end
 
   it "limita a 5 resultados" do
