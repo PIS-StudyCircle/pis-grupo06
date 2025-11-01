@@ -16,6 +16,8 @@ class Tutoring < ApplicationRecord
 
   enum :state, { pending: 0, active: 1, finished: 2, canceled: 3 }, default: :pending
 
+  has_one :chat, dependent: :destroy
+
   # Tutorías en las que un usuario está inscripto
   scope :enrolled_by, ->(user) {
     return none if user.blank?
