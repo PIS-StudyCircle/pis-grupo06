@@ -1203,7 +1203,7 @@ tutoring_offered.state = 2
 tutoring_offered.scheduled_at = 10.days.ago
 tutoring_offered.save!(validate: false) # para que me deje poner una fecha del pasado aunque la db no lo permite
 
-#Feedback de la tutoria
+# Feedback de la tutoria
 Feedback.find_or_create_by!(tutor_id: creator.id,
                             student_id: User.find_by!(email: "andresmendez@gmail.com").id,
                             tutoring_id: tutoring_offered.id,
