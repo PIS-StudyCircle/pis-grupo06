@@ -31,97 +31,98 @@ RSpec.describe "GET /api/v1/users/user_feedbacks/top_rated", type: :request do
   end
 
   it "retorna campos esperados y average_rating redondeado a 1 decimal" do
-    tA = User.create!(email: "ta@ex.com", password: "12345678", password_confirmation: "12345678",
-                      name: "A", last_name: "L", faculty: faculty)
-    tB = User.create!(email: "tb@ex.com", password: "12345678", password_confirmation: "12345678",
-                      name: "B", last_name: "L", faculty: faculty)
+    tutor_a = User.create!(email: "ta@ex.com", password: "12345678", password_confirmation: "12345678",
+                           name: "A", last_name: "L", faculty: faculty)
+    tutor_b = User.create!(email: "tb@ex.com", password: "12345678", password_confirmation: "12345678",
+                           name: "B", last_name: "L", faculty: faculty)
 
-    s1 = User.create!(email: "s1@ex.com", password: "12345678", password_confirmation: "12345678",
-                      name: "S1", last_name: "X", faculty: faculty)
-    s2 = User.create!(email: "s2@ex.com", password: "12345678", password_confirmation: "12345678",
-                      name: "S2", last_name: "X", faculty: faculty)
+    student_1 = User.create!(email: "s1@ex.com", password: "12345678", password_confirmation: "12345678",
+                             name: "S1", last_name: "X", faculty: faculty)
+    student_2 = User.create!(email: "s2@ex.com", password: "12345678", password_confirmation: "12345678",
+                             name: "S2", last_name: "X", faculty: faculty)
 
-    tutA1 = build_tutoring_for(tA)
-    tutA2 = build_tutoring_for(tA)
-    Feedback.create!(tutor_id: tA.id, student_id: s1.id, tutoring_id: tutA1.id, rating: 5.0)
-    Feedback.create!(tutor_id: tA.id, student_id: s2.id, tutoring_id: tutA2.id, rating: 4.5)
+    tutoring_a1 = build_tutoring_for(tutor_a)
+    tutoring_a2 = build_tutoring_for(tutor_a)
+    Feedback.create!(tutor_id: tutor_a.id, student_id: student_1.id, tutoring_id: tutoring_a1.id, rating: 5.0)
+    Feedback.create!(tutor_id: tutor_a.id, student_id: student_2.id, tutoring_id: tutoring_a2.id, rating: 4.5)
 
-    tutB1 = build_tutoring_for(tB)
-    tutB2 = build_tutoring_for(tB)
-    Feedback.create!(tutor_id: tB.id, student_id: s1.id, tutoring_id: tutB1.id, rating: 4.5)
-    Feedback.create!(tutor_id: tB.id, student_id: s2.id, tutoring_id: tutB2.id, rating: 4.0)
+    tutoring_b1 = build_tutoring_for(tutor_b)
+    tutoring_b2 = build_tutoring_for(tutor_b)
+    Feedback.create!(tutor_id: tutor_b.id, student_id: student_1.id, tutoring_id: tutoring_b1.id, rating: 4.5)
+    Feedback.create!(tutor_id: tutor_b.id, student_id: student_2.id, tutoring_id: tutoring_b2.id, rating: 4.0)
 
     get "/api/v1/users/user_feedbacks/top_rated"
     expect(response).to have_http_status(:ok)
     expect(json).to be_an(Array)
 
-    itemA = json.find { |h| h["id"] == tA.id }
-    itemB = json.find { |h| h["id"] == tB.id }
+    item_a = json.find { |h| h["id"] == tutor_a.id }
+    item_b = json.find { |h| h["id"] == tutor_b.id }
 
-    expect(itemA).to include("id" => tA.id, "name" => "A", "email" => "ta@ex.com")
-    expect(itemA["average_rating"]).to eq(4.8)
-    expect(itemA["total_feedbacks"]).to eq(2)
+    expect(item_a).to include("id" => tutor_a.id, "name" => "A", "email" => "ta@ex.com")
+    expect(item_a["average_rating"]).to eq(4.8)
+    expect(item_a["total_feedbacks"]).to eq(2)
 
-    expect(itemB["average_rating"]).to eq(4.3)
-    expect(itemB["total_feedbacks"]).to eq(2)
+    expect(item_b["average_rating"]).to eq(4.3)
+    expect(item_b["total_feedbacks"]).to eq(2)
   end
 
   it "ordena por promedio DESC y, en empate, por total_feedbacks DESC" do
-    t1 = User.create!(email: "t1@ex.com", password: "12345678", password_confirmation: "12345678",
-                      name: "T1", last_name: "L", faculty: faculty)
-    t2 = User.create!(email: "t2@ex.com", password: "12345678", password_confirmation: "12345678",
-                      name: "T2", last_name: "L", faculty: faculty)
+    tutor_1 = User.create!(email: "t1@ex.com", password: "12345678", password_confirmation: "12345678",
+                           name: "T1", last_name: "L", faculty: faculty)
+    tutor_2 = User.create!(email: "t2@ex.com", password: "12345678", password_confirmation: "12345678",
+                           name: "T2", last_name: "L", faculty: faculty)
 
-    s1 = User.create!(email: "sx1@ex.com", password: "12345678", password_confirmation: "12345678",
-                      name: "SX1", last_name: "L", faculty: faculty)
-    s2 = User.create!(email: "sx2@ex.com", password: "12345678", password_confirmation: "12345678",
-                      name: "SX2", last_name: "L", faculty: faculty)
-    s3 = User.create!(email: "sx3@ex.com", password: "12345678", password_confirmation: "12345678",
-                      name: "SX3", last_name: "L", faculty: faculty)
+    student_x1 = User.create!(email: "sx1@ex.com", password: "12345678", password_confirmation: "12345678",
+                              name: "SX1", last_name: "L", faculty: faculty)
+    student_x2 = User.create!(email: "sx2@ex.com", password: "12345678", password_confirmation: "12345678",
+                              name: "SX2", last_name: "L", faculty: faculty)
+    student_x3 = User.create!(email: "sx3@ex.com", password: "12345678", password_confirmation: "12345678",
+                              name: "SX3", last_name: "L", faculty: faculty)
 
-    [5.0, 4.5, 5.0].each_with_index do |r, i|
-      tut = build_tutoring_for(t1)
-      stu = [s1, s2, s3][i]
-      Feedback.create!(tutor_id: t1.id, student_id: stu.id, tutoring_id: tut.id, rating: r)
+    [5.0, 4.5, 5.0].each_with_index do |rating, i|
+      tutoring = build_tutoring_for(tutor_1)
+      student  = [student_x1, student_x2, student_x3][i]
+      Feedback.create!(tutor_id: tutor_1.id, student_id: student.id, tutoring_id: tutoring.id, rating: rating)
     end
 
-    [5.0, 4.5].each_with_index do |r, i|
-      tut = build_tutoring_for(t2)
-      stu = [s1, s2][i]
-      Feedback.create!(tutor_id: t2.id, student_id: stu.id, tutoring_id: tut.id, rating: r)
+    [5.0, 4.5].each_with_index do |rating, i|
+      tutoring = build_tutoring_for(tutor_2)
+      student  = [student_x1, student_x2][i]
+      Feedback.create!(tutor_id: tutor_2.id, student_id: student.id, tutoring_id: tutoring.id, rating: rating)
     end
 
     get "/api/v1/users/user_feedbacks/top_rated"
     expect(response).to have_http_status(:ok)
 
-    ids_en_orden = json.map { |h| h["id"] }
-    expect(ids_en_orden.index(t1.id)).to be < ids_en_orden.index(t2.id)
+    ids_in_order = json.pluck("id")
+    expect(ids_in_order.index(tutor_1.id)).to be < ids_in_order.index(tutor_2.id)
 
-    h1 = json.find { |h| h["id"] == t1.id }
-    h2 = json.find { |h| h["id"] == t2.id }
-    expect(h1["average_rating"]).to eq(4.8)
-    expect(h2["average_rating"]).to eq(4.8)
-    expect(h1["total_feedbacks"]).to be > h2["total_feedbacks"]
+    hash_1 = json.find { |h| h["id"] == tutor_1.id }
+    hash_2 = json.find { |h| h["id"] == tutor_2.id }
+    expect(hash_1["average_rating"]).to eq(4.8)
+    expect(hash_2["average_rating"]).to eq(4.8)
+    expect(hash_1["total_feedbacks"]).to be > hash_2["total_feedbacks"]
   end
 
   it "limita a 5 resultados" do
-    students = 6.times.map do |i|
+    students = Array.new(6) do |i|
       User.create!(email: "st#{i}@ex.com", password: "12345678", password_confirmation: "12345678",
                    name: "ST#{i}", last_name: "L", faculty: faculty)
     end
 
-    tutors = 6.times.map do |i|
+    tutors = Array.new(6) do |i|
       User.create!(email: "tt#{i}@ex.com", password: "12345678", password_confirmation: "12345678",
                    name: "TT#{i}", last_name: "L", faculty: faculty)
     end
 
-    tutors.each_with_index do |t, i|
-      tut = build_tutoring_for(t)
+    tutors.each_with_index do |tutor, i|
+      tutoring = build_tutoring_for(tutor)
+      rating_value = (3.0 + ((i % 3) * 1.0))
       Feedback.create!(
-        tutor_id: t.id,
+        tutor_id: tutor.id,
         student_id: students[i % students.size].id,
-        tutoring_id: tut.id,
-        rating: 3.0 + (i % 3) * 1.0
+        tutoring_id: tutoring.id,
+        rating: rating_value
       )
     end
 
