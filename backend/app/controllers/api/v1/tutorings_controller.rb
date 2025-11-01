@@ -409,7 +409,7 @@ module Api
             location: t.location.presence || "Virtual",
             status: t.state,
             role: is_tutor ? "tutor" : "student",
-            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "confirmada" } },
+            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "active" } },
             url: nil
           }
         }
@@ -435,7 +435,7 @@ module Api
             location: t.location.presence || "Virtual",
             status: t.state,
             role: is_tutor ? "tutor" : "student",
-            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "confirmada" } },
+            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "finished" } },
             url: nil
           }
         }
