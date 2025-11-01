@@ -131,7 +131,7 @@ export default function ChooseScheduleByStudent() {
                 key={schedule.id}
                 className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <label className="font-medium text-gray-800 block mb-2">
+                <label className="font-medium text-gray-800 block mb-2" htmlFor={`s-${schedule.id}`}>
                   {sameDay
                     ? `${formatDateTime(schedule.start)} – ${new Date(
                         schedule.end
@@ -159,6 +159,7 @@ export default function ChooseScheduleByStudent() {
                   <div className="flex gap-2 items-center">
                     <input
                       type="time"
+                      data-testid="time-input"
                       value={customStart}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -176,6 +177,7 @@ export default function ChooseScheduleByStudent() {
 
                     <input
                       type="time"
+                      data-testid="time-input"
                       value={customEnd}
                       onChange={(e) => {
                         const value = e.target.value;
