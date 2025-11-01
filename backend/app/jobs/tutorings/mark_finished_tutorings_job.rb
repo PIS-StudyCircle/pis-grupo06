@@ -64,12 +64,6 @@ class Tutorings::MarkFinishedTutoringsJob < ApplicationJob
 
       if tutoring.state == 'pending'
         should_destroy = true
-      elsif tutoring.state == 'active' && tutoring.created_by_id == tutoring.tutor_id
-        # Verifica si solo existe un UserTutoring y pertenece al tutor
-        user_tutorings = tutoring.user_tutorings
-        if user_tutorings.count == 1 && user_tutorings.first.user_id == tutoring.tutor_id
-          should_destroy = true
-        end
       end
 
       if should_destroy

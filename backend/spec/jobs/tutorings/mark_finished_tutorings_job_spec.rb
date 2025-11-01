@@ -176,40 +176,6 @@ RSpec.describe Tutorings::MarkFinishedTutoringsJob, type: :job do
       end
     end
 
-    context "cuando hay una tutoría active creada por el tutor con solo el tutor como participante" do
-      let!(:active_tutoring_by_tutor) do
-        Tutoring.create!(
-          course: course,
-          tutor: tutor,
-          created_by_id: tutor.id,
-          capacity: 5,
-          modality: "virtual",
-          state: "active"
-        )
-      end
-
-      let!(:expired_availability) do
-        TutoringAvailability.create!(
-          tutoring: active_tutoring_by_tutor,
-          start_time: current_time - 2.hours,
-          end_time: current_time - 1.hour
-        )
-      end
-
-      let!(:tutor_user_tutoring) do
-        UserTutoring.create!(
-          user: tutor,
-          tutoring: active_tutoring_by_tutor
-        )
-      end
-
-      it "elimina la tutoría activa" do
-        expect {
-          described_class.perform_now
-        }.to change { Tutoring.exists?(active_tutoring_by_tutor.id) }.from(true).to(false)
-      end
-    end
-
     context "cuando hay una tutoría active con múltiples participantes" do
       let!(:student) do
         User.create!(
