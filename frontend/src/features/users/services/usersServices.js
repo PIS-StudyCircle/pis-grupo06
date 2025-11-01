@@ -1,4 +1,7 @@
 import { API_BASE } from "@/shared/config";
+import { storeUserMaybe } from "./auth.api";
+import { http } from "./https";
+import { saveItem } from "@utils/storage";
 
 const API_URL = `${API_BASE}/users`;
 
@@ -9,17 +12,35 @@ export const getUsers = async (page = 1, perPage = 20, search = "", role = "") =
 
   const response = await fetch(`${API_URL}?${params}`);
   if (!response.ok & role == "tutor") throw new Error("Error al obtener tutores");
-  if (!response.ok) throw new Error("Error al obtener usuarios"); 
+  if (!response.ok) throw new Error("Error al obtener usuarios");
 
-  const data = await response.json(); 
+  const data = await response.json();
   return data;
 };
-
 
 export const getUserById = async (id) => {
   const response = await fetch(`${API_URL}/${id}`);
   if (!response.ok) throw new Error(`Error al obtener usuario con id ${id}`);
   return await response.json();
+};
+
+export async function updateProfile(form, id) {
+  const formData = new FormData();
+
+  formData.append("user[name]", form.name);
+  formData.append("user[last_name]", form.last_name);
+  formData.append("user[description]", form.description || "");
+
+  if (form.profile_photo) {
+    formData.append("user[profile_photo]", form.profile_photo);
+  }
+
+  const data = await http(`/users/${id}`, {
+    method: "PUT",
+    body: formData,
+  });
+
+  return storeUserMaybe(data);
 };
 
 export const getReviewsByUser = async (userId) => {

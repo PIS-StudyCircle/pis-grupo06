@@ -1,7 +1,7 @@
 import { http } from "./https";
 import { saveItem, removeItem } from "@utils/storage";
 
-function storeUserMaybe(data) {
+export function storeUserMaybe(data) {
   const user = data?.data?.user || data?.user || null;
   if (user) saveItem("user", user);
   else removeItem("user");
@@ -28,8 +28,7 @@ export async function signup(form) {
   });
 
   return storeUserMaybe(data);
-}
-
+};
 
 export async function signIn(form) {
   const data = await http("/users/sign_in", {
@@ -39,12 +38,12 @@ export async function signIn(form) {
       password: form.password } }),
   });
   return storeUserMaybe(data);
-}
+};
 
 export async function signOut() {
   await http("/users/sign_out", { method: "DELETE" });
   removeItem("user");
-}
+};
 
 export async function forgotPassword(form) {
   const body = {
@@ -53,7 +52,7 @@ export async function forgotPassword(form) {
     },
   };
   return await http("/users/password", { method: "POST", body: JSON.stringify(body) });
-}
+};
 
 export async function resetPassword(form) {
   const body = {
@@ -64,4 +63,4 @@ export async function resetPassword(form) {
     },
   };
   return await http("/users/password", { method: "PUT", body: JSON.stringify(body) });
-}
+};
