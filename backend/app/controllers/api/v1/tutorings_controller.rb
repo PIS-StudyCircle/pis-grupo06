@@ -257,6 +257,9 @@ module Api
         # Inscribir al estudiante
         UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
+        # Se une al chat de la tutoria (siempre deberia existir si no es el primer estudiante en unirse ni el tutor)
+        @tutoring.chat.users << current_user unless @tutoring.chat.users.exists?(current_user.id)
+
         # Incrementar contador de inscritos
         # Sin esto testeando me di cuenta que por alguna razón crea la tutoría igual a pesar de la capacidad habría que
         # cambiarlo por otro chequeo
@@ -312,6 +315,9 @@ module Api
           # Confirmar el horario de la tutoría
           @tutoring.update!(scheduled_at: scheduled_time, duration_mins: duration, state: 'active')
 
+          # Crear chat si no existe
+          @tutoring.create_chat! unless @tutoring.chat
+
           # Marcar la disponibilidad como reservada
           availability.update!(is_booked: true)
 
@@ -339,6 +345,12 @@ module Api
 
             "Fuiste asignado como tutor exitosamente"
           end
+
+          # Agregar los usuarios al chat
+          @tutoring.users.each do |user|
+            @tutoring.chat.users << user unless @tutoring.chat.users.exists?(user.id)
+          end
+
         end
 
         # Enviar notificaciones según el rol
@@ -395,7 +407,7 @@ module Api
                     .enrolled_by(user)
                     .upcoming
                     .where(state: :active)
-                    .includes(:tutor, :course)
+                    .includes(:tutor, :course, :chat)
                     .order(:scheduled_at)
 
         render json: tutorings.map { |t|
@@ -410,7 +422,8 @@ module Api
             status: t.state,
             role: is_tutor ? "tutor" : "student",
             attendees: t.users.map { |u| { email: u.email, status: "confirmada" } },
-            url: nil
+            url: nil,
+            chat_id: t.chat&.id
           }
         }
       end
@@ -462,6 +475,12 @@ module Api
               Rails.logger.error "Calendar delete_event (se va tutor) error: #{e.message}"
             end
 
+            # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
+            chat = @tutoring.chat
+            if chat
+              chat.destroy
+            end 
+
             @tutoring.destroy!
             return head :no_content
           end
@@ -469,6 +488,9 @@ module Api
           # 2) Es estudiante: quitar relación + actualizar contador
           user_tutoring = UserTutoring.find_by!(user_id: current_user.id, tutoring_id: @tutoring.id)
           user_tutoring.destroy!
+
+          # Lo elimino del chat de la tutoria
+          @tutoring.chat.users.delete(current_user.id)
 
           new_enrolled = [prev_enrolled - 1, 0].max
           @tutoring.update!(enrolled: new_enrolled)
@@ -481,6 +503,12 @@ module Api
               Rails.logger.error "Calendar delete_event (se va creador y sin estudiantes) error: #{e.message}"
             end
 
+            # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
+            chat = @tutoring.chat
+            if chat
+              chat.destroy
+            end 
+
             @tutoring.destroy!
             return head :no_content
           end
@@ -492,6 +520,12 @@ module Api
             rescue => e
               Rails.logger.error "Calendar delete_event (no tutor y sin estudiantes) error: #{e.message}"
             end
+
+            # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
+            chat = @tutoring.chat
+            if chat
+              chat.destroy
+            end 
 
             @tutoring.destroy!
             return head :no_content
@@ -506,13 +540,19 @@ module Api
             end
           end
 
-          # Si queda tutor pero ya no quedan estudiantes (enrolled == 0), limpiar el horario
+          # Si queda tutor pero ya no quedan estudiantes (enrolled == 0), limpiar el horario y eliminar chat
           if had_tutor && new_enrolled.zero?
             # Remover el tutor del evento de su propio calendario
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
               Rails.logger.error "Calendar leave_event (tutor sin estudiantes) error: #{e.message}"
+            end
+
+            # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
+            chat = @tutoring.chat
+            if chat
+              chat.destroy
             end
 
             @tutoring.update!(scheduled_at: nil)
