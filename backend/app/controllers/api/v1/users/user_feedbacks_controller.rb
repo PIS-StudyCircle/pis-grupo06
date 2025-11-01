@@ -143,7 +143,7 @@ module Api
             {
               id: t.id,
               name: t.name,
-              email: t.email,
+              last_name: t.last_name,
               average_rating: t.average_rating.to_f.round(1),
               total_feedbacks: t.total_feedbacks
             }
