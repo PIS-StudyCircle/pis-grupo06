@@ -27,6 +27,7 @@ Rails.application.routes.draw do
         resources :user_feedbacks, only: [:index, :create, :destroy] do
           collection do
             get :check
+            get :top_rated
           end
         end
       end
