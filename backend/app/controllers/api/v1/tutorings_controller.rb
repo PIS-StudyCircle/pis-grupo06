@@ -183,7 +183,7 @@ module Api
         if params[:tutoring][:availabilities_attributes].present?
           if availability_overlaps?(params[:tutoring][:availabilities_attributes], current_user.id)
             render json: {
-              errors: ["Ya tienes una tutoría programada en esa fecha y horario"]
+              error: "Ya tienes una tutoría programada en esa fecha y horario"
             }, status: :unprocessable_entity
             return
           end

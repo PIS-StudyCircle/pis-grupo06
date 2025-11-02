@@ -12,7 +12,7 @@ import { useState } from "react"
 import { validateDate, validateHoursTutoring, validateInteger } from "@utils/validation"
 import { useValidation } from "@hooks/useValidation"
 import { useFormSubmit } from "@utils/UseFormSubmit"
-import {showSuccess, showError} from '@shared/utils/toastService';
+import {showSuccess} from '@shared/utils/toastService';
 
 const validators = {
   limit: (value) => validateInteger(value, "Límite de estudiantes"),
@@ -179,7 +179,6 @@ export default function CreateTutoringByTutor() {
         navigate("/tutorias")
       }
     } catch (err) {
-      showError("Error al crear la tutoría: " + err.message);
       console.error("Error creating tutoring sessions:", err)
     }
   }

@@ -259,7 +259,7 @@ RSpec.describe "Api::V1::TutoringsController", type: :request do
       post api_v1_tutorings_path, params: params
 
       expect(response).to have_http_status(:unprocessable_entity)
-      expect(response.parsed_body["errors"].first).to include("Ya tienes una tutoría programada")
+      expect(response.parsed_body["error"]).to include("Ya tienes una tutoría programada")
     end
   end
 
