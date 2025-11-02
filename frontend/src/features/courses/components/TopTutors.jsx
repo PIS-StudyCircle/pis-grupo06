@@ -33,7 +33,7 @@ export default function TopTutors() {
   if (!user) {
     return (
       <div className="bg-white rounded-xl shadow-md p-4 mt-8 w-full max-w-md text-center">
-        <h2 className="text-lg font-semibold mb-3 text-blue-700">
+        <h2 className="text-lg font-semibold mb-3">
           🏆 Tutores Destacados
         </h2>
         <p className="text-gray-700">
