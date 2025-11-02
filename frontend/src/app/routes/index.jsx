@@ -17,7 +17,7 @@ import EditProfilePage from "@/features/users/pages/EditProfilePage";
 import { SubjectPage } from "@/features/subjects";
 import SubjectDetailPage from "@/features/subjects/pages/SubjectDetailPage";
 import { RequireGuestRoute } from "./RequireGuestRoute";
-import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent, ChooseScheduleByTutor, ChooseScheduleByStudent} from "@/features/tutorings";
+import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent, ChooseScheduleByTutor, ChooseScheduleByStudent, ShowPageTutoring} from "@/features/tutorings";
 import { Error404Page } from "@components/Error404";
 
 
@@ -80,6 +80,7 @@ export function AppRoutes() {
           path="/materias/:courseId/temas/:subjectId"
           element={<SubjectDetailPage />}
         />
+        <Route path="/tutorias/:id" element={<ShowPageTutoring />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/materias" replace />} />

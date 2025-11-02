@@ -120,7 +120,7 @@ module Api
               availabilities: t.tutoring_availabilities.map do |a|
                 { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
               end,
-              tutor_email: t.tutor&.email,
+              tutor_email: t.tutor&.email_masked,
               user_enrolled: t.users.exists?(id: current_user.id)
             }
           end,
@@ -157,6 +157,7 @@ module Api
             name: @tutoring.tutor.name,
             last_name: @tutoring.tutor.last_name
           } : nil,
+          user_enrolled: @tutoring.users.exists?(id: current_user.id),
           availabilities: @tutoring.tutoring_availabilities.map do |a|
             {
               id: a.id,
@@ -409,7 +410,7 @@ module Api
             location: t.location.presence || "Virtual",
             status: t.state,
             role: is_tutor ? "tutor" : "student",
-            attendees: t.users.map { |u| { email: u.email, status: "confirmada" } },
+            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "active" } },
             url: nil
           }
         }
@@ -435,7 +436,7 @@ module Api
             location: t.location.presence || "Virtual",
             status: t.state,
             role: is_tutor ? "tutor" : "student",
-            attendees: t.users.map { |u| { email: u.email, status: "finalizada" } },
+            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "finished" } },
             url: nil
           }
         }

@@ -5,3 +5,4 @@ export { default as CreateTutoringByTutor } from "./pages/CreateTutoringByTutor"
 export { default as CreateTutoringByStudent } from "./pages/CreateTutoringByStudent"
 export { default as ChooseScheduleByTutor } from "./pages/ChooseScheduleByTutor";
 export { default as ChooseScheduleByStudent } from "./pages/ChooseScheduleByStudent";
+export { default as ShowPageTutoring } from "./pages/ShowPageTutoring";

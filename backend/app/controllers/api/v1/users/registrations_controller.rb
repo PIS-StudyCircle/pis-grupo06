@@ -51,7 +51,9 @@ module Api
         if resource.persisted?
           success_response(
             message: 'Signed up successfully.',
-            data: { user: UserSerializer.new(resource).serializable_hash[:data][:attributes] },
+            data: { user: UserSerializer
+            .new(resource, params: { current_user: resource })
+            .serializable_hash[:data][:attributes] },
             status: :created
           )
         else
