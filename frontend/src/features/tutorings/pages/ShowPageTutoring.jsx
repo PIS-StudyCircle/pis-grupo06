@@ -93,10 +93,10 @@ export default function ShowPageTutoring() {
     return "default";
   }, [tutoring, soyTutor, soyEstudiante, esCreador, noTieneTutor, cuposDisponibles]);
 
-    const tutoriaYaPaso = useMemo(() => {
-    if (!tutoring?.scheduled_at) return false;
-    return new Date(tutoring.scheduled_at) < new Date();
-  }, [tutoring?.scheduled_at]);
+  const tutoriaYaPaso = useMemo(() => {
+     return tutoring?.state === "finished";
+  }, [tutoring?.state]);
+
 
   const estudiantesAsistieron = useMemo(() => {
   if (!tutoring) return 0;
@@ -132,7 +132,7 @@ export default function ShowPageTutoring() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <EstadoBadge state={tutoriaYaPaso ? "finished" : tutoring.state} />
+               <EstadoBadge state={tutoring.state} />
               {!tutoriaYaPaso && (
               <span className="text-sm text-gray-700 bg-white border rounded-full px-3 py-1">
                   Cupos:{" "}
