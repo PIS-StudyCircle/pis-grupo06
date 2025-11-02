@@ -1,7 +1,6 @@
 import { formatDateTime } from "@shared/utils/FormatDate";
 import { useUser } from "@context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import {
   showSuccess,
   showError,
@@ -80,47 +79,8 @@ export default function TutoringCard({
     tutoring.capacity != null && tutoring.capacity > tutoring.enrolled;
   const soyTutor = tutoring.tutor_id === user?.id;
   const esCreador = tutoring.created_by_id === user?.id;
+  const soyEstudiante = tutoring.user_enrolled;
 
-  const [soyEstudiante, setSoyEstudiante] = useState(false);
-
-  useEffect(() => {
-    let cancel = false;
-    async function run() {
-      if (!user?.id || !tutoring?.id) {
-        setSoyEstudiante(false);
-        return;
-      }
-
-      try {
-        const res = await fetch(
-          `/api/v1/tutorings/${tutoring.id}/exists_user_tutoring`,
-          {
-            credentials: "include",
-          }
-        );
-
-        if (cancel) return;
-
-        if (!res.ok) {
-          console.warn("exists_user_tutoring no OK:", res.status);
-          setSoyEstudiante(false);
-          return;
-        }
-
-        const { exists } = await res.json().catch(() => ({ exists: false }));
-        setSoyEstudiante(!!exists);
-      } catch (e) {
-        if (!cancel) {
-          console.warn("fetch error:", e);
-          setSoyEstudiante(false);
-        }
-      }
-    }
-    run();
-    return () => {
-      cancel = true;
-    };
-  }, [user?.id, tutoring?.id]);
 
   // Use externalMode if provided, otherwise calculate mode based on state
   let mode = externalMode;
@@ -144,6 +104,17 @@ export default function TutoringCard({
   const navigate = useNavigate();
 
   return (
+      <div
+    className="w-full bg-white rounded-lg shadow p-4 my-4 cursor-pointer hover:shadow-md transition-shadow"
+    role="button"
+    tabIndex={0}
+    onClick={() => navigate(`/tutorias/${tutoring.id}`)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        navigate(`/tutorias/${tutoring.id}`);
+      }
+    }}
+  >
     <div className="w-full bg-white rounded-lg shadow p-4 my-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex-1 flex flex-col text-left">
@@ -210,11 +181,12 @@ export default function TutoringCard({
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
                   navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
                     state: { tutoring },
-                  })
-                }
+                  });
+                }}
               >
                 Ser tutor
               </button>
@@ -224,7 +196,10 @@ export default function TutoringCard({
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => handleUnirmeClick(tutoring)}
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
+                  handleUnirmeClick(tutoring);
+                }}
               >
                 Unirme
               </button>
@@ -235,18 +210,22 @@ export default function TutoringCard({
                 <button
                   type="button"
                   className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                  onClick={() =>
+                  onClick={(e) => {
+                    e.stopPropagation(); // para que no se dispare el onClick del card
                     navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
                       state: { tutoring },
-                    })
-                  }
+                    });
+                  }}
                 >
                   Ser tutor
                 </button>
                 <button
                   type="button"
                   className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                  onClick={() => handleUnirmeClick(tutoring)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // para que no se dispare el onClick del card
+                    handleUnirmeClick(tutoring);
+                  }}
                 >
                   Unirme
                 </button>
@@ -257,7 +236,10 @@ export default function TutoringCard({
               <button
                 type="button"
                 className="btn w-full bg-red-500 hover:bg-red-600 text-white"
-                onClick={() => handleDesuscribirmeClick(tutoring)}
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
+                  handleDesuscribirmeClick(tutoring);
+                }}
               >
                 Desuscribirme
               </button>
@@ -276,5 +258,6 @@ export default function TutoringCard({
         )}
       </div>
     </div>
+     </div>
   );
 }

@@ -42,6 +42,18 @@ class User < ApplicationRecord
            inverse_of: :reviewed,
            dependent: :destroy
 
+  has_many :given_feedbacks,
+           class_name: "Feedback",
+           foreign_key: "student_id",
+           inverse_of: :student,
+           dependent: :destroy
+
+  has_many :received_feedbacks,
+           class_name: "Feedback",
+           foreign_key: "tutor_id",
+           inverse_of: :tutor,
+           dependent: :destroy
+
   belongs_to :faculty
 
   has_one_attached :profile_photo
@@ -96,5 +108,21 @@ class User < ApplicationRecord
 
   def devise_mailer
     UserMailer
+  end
+
+  # Devuelve el email ofuscado siempre
+  def email_masked
+    return "" if email.blank?
+
+    nombre, dominio = email.split('@')
+
+    if nombre.length < 4
+      ofuscado = '*' * nombre.length
+    else
+      visibles = nombre[0, 4]
+      ofuscado = visibles + ('*' * (nombre.length - 4))
+    end
+
+    "#{ofuscado}@#{dominio}"
   end
 end

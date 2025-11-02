@@ -10,7 +10,8 @@ module Api
 
         def show
           render json: {
-            user: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
+            user: UserSerializer.new(current_user,
+                                     params: { current_user: current_user }).serializable_hash[:data][:attributes]
           }
         end
       end

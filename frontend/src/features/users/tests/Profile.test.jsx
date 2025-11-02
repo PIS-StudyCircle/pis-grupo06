@@ -68,14 +68,10 @@ describe("<Profile />", () => {
     ).toBeInTheDocument();
 
     // Email en input readOnly con su valor
-    const emailInput = screen.getByDisplayValue(fakeUser.email);
-    expect(emailInput).toBeInTheDocument();
-    expect(emailInput).toHaveAttribute("readonly");
+    expect(screen.getByText(fakeUser.email)).toBeInTheDocument();
 
     // Descripción en textarea
-    const textarea = screen.getByDisplayValue(fakeUser.description);
-    expect(textarea.tagName.toLowerCase()).toBe("textarea");
-    expect(textarea).toHaveAttribute("readonly");
+    expect(screen.getByText(fakeUser.description)).toBeInTheDocument();
 
     // Avatar
     const avatar = screen.getByAltText("avatar");
@@ -99,7 +95,7 @@ describe("<Profile />", () => {
     ).toBeInTheDocument();
 
     // Email presente
-    expect(screen.getByDisplayValue(fakeUser.email)).toBeInTheDocument();
+    expect(screen.getByText(fakeUser.email)).toBeInTheDocument();
 
     // No hay textarea de descripción cuando description es vacía
     expect(screen.queryByLabelText("Descripción")).not.toBeInTheDocument();
