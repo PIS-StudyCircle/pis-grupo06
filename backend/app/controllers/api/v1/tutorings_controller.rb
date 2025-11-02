@@ -121,7 +121,7 @@ module Api
                 { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
               end,
               tutor_email: t.tutor&.email_masked,
-              user_enrolled: t.users.exists?(id: current_user.id)
+              user_enrolled: t.users.exists?(id: current_user.id) || t.tutor_id == current_user.id
             }
           end,
           pagination: pagy_metadata(@pagy)
@@ -157,7 +157,7 @@ module Api
             name: @tutoring.tutor.name,
             last_name: @tutoring.tutor.last_name
           } : nil,
-          user_enrolled: @tutoring.users.exists?(id: current_user.id),
+          user_enrolled: @tutoring.users.exists?(id: current_user.id) || @tutoring.tutor_id == current_user.id,
           availabilities: @tutoring.tutoring_availabilities.map do |a|
             {
               id: a.id,
@@ -439,7 +439,7 @@ module Api
         user = User.find(params[:user_id])
 
         tutorings = Tutoring
-                    .enrolled_by(user)
+                    .enrolled_or_tutor_by(user)
                     .upcoming
                     .where(state: :active)
                     .includes(:tutor, :course)
@@ -466,7 +466,7 @@ module Api
         user = User.find(params[:user_id])
 
         tutorings = Tutoring
-                    .enrolled_by(user)
+                    .enrolled_or_tutor_by(user)
                     .past
                     .includes(:tutor, :course)
                     .order(scheduled_at: :desc)
