@@ -104,6 +104,17 @@ export default function TutoringCard({
   const navigate = useNavigate();
 
   return (
+      <div
+    className="w-full bg-white rounded-lg shadow p-4 my-4 cursor-pointer hover:shadow-md transition-shadow"
+    role="button"
+    tabIndex={0}
+    onClick={() => navigate(`/tutorias/${tutoring.id}`)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        navigate(`/tutorias/${tutoring.id}`);
+      }
+    }}
+  >
     <div className="w-full bg-white rounded-lg shadow p-4 my-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex-1 flex flex-col text-left">
@@ -170,11 +181,12 @@ export default function TutoringCard({
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
                   navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
                     state: { tutoring },
-                  })
-                }
+                  });
+                }}
               >
                 Ser tutor
               </button>
@@ -184,7 +196,10 @@ export default function TutoringCard({
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => handleUnirmeClick(tutoring)}
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
+                  handleUnirmeClick(tutoring);
+                }}
               >
                 Unirme
               </button>
@@ -195,18 +210,22 @@ export default function TutoringCard({
                 <button
                   type="button"
                   className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                  onClick={() =>
+                  onClick={(e) => {
+                    e.stopPropagation(); // para que no se dispare el onClick del card
                     navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
                       state: { tutoring },
-                    })
-                  }
+                    });
+                  }}
                 >
                   Ser tutor
                 </button>
                 <button
                   type="button"
                   className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                  onClick={() => handleUnirmeClick(tutoring)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // para que no se dispare el onClick del card
+                    handleUnirmeClick(tutoring);
+                  }}
                 >
                   Unirme
                 </button>
@@ -217,7 +236,10 @@ export default function TutoringCard({
               <button
                 type="button"
                 className="btn w-full bg-red-500 hover:bg-red-600 text-white"
-                onClick={() => handleDesuscribirmeClick(tutoring)}
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
+                  handleDesuscribirmeClick(tutoring);
+                }}
               >
                 Desuscribirme
               </button>
@@ -236,5 +258,6 @@ export default function TutoringCard({
         )}
       </div>
     </div>
+     </div>
   );
 }
