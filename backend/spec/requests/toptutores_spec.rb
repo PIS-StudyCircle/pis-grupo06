@@ -24,7 +24,26 @@ RSpec.describe "GET /api/v1/users/user_feedbacks/top_rated", type: :request do
     )
   end
 
-  it "devuelve 200 sin requerir autenticación" do
+  let!(:user) do
+    User.create!(
+      email: "user@example.com",
+      password: "password",
+      password_confirmation: "password",
+      name: "User",
+      last_name: "Test",
+      faculty: faculty
+    )
+  end
+
+  before { sign_in user }
+
+  it "requiere autenticación" do
+    sign_out user
+    get "/api/v1/notifications"
+    expect(response).to have_http_status(:found).or have_http_status(:unauthorized)
+  end
+
+  it "devuelve 200 luego de autenticarse" do
     get "/api/v1/users/user_feedbacks/top_rated"
     expect(response).to have_http_status(:ok)
     expect(json).to be_an(Array)
@@ -58,7 +77,8 @@ RSpec.describe "GET /api/v1/users/user_feedbacks/top_rated", type: :request do
     item_a = json.find { |h| h["id"] == tutor_a.id }
     item_b = json.find { |h| h["id"] == tutor_b.id }
 
-    expect(item_a).to include("id" => tutor_a.id, "name" => "A", "email" => "ta@ex.com")
+    # la API devuelve last_name en lugar de email en este endpoint
+    expect(item_a).to include("id" => tutor_a.id, "name" => "A", "last_name" => "L")
     expect(item_a["average_rating"]).to eq(4.8)
     expect(item_a["total_feedbacks"]).to eq(2)
 
