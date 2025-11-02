@@ -211,6 +211,24 @@ module Api
             end
 
             create_user_tutoring(current_user.id, tutoring.id)
+
+            # Notificar a usuarios con esta materia (course) como favorita
+            favoriters = User.joins(:favorite_courses)
+                             .where(favorite_courses: { course_id: tutoring.course_id })
+                             .where.not(id: tutoring.created_by_id) # no notificar al creador
+                             .distinct
+
+            course_name = tutoring.course&.name || Course.find(tutoring.course_id).name
+            encoded_name = URI.encode_www_form_component(course_name)
+            if favoriters.exists?
+              favoriters.find_each do |user|
+                ApplicationNotifier.with(
+                  title: "Se creó una nueva tutoría de #{course_name}!",
+                  url: "/tutorias/materia/#{tutoring.course_id}?course_name=#{encoded_name}"
+                ).deliver_later(user)
+              end
+            end
+
             render json: {
               tutoring: tutoring.as_json.merge(
                 availabilities: tutoring.tutoring_availabilities.as_json
@@ -237,6 +255,9 @@ module Api
       end
 
       def destroy
+        # Enviar notificaciones de cancelación antes de eliminar
+        TutoringCancelledJob.perform_later(@tutoring.id, current_user.id, "Tutoría eliminada")
+
         @tutoring.destroy
         head :no_content
       end
@@ -265,6 +286,14 @@ module Api
 
         # Si no existe evento, crearlo con el tutor y agregarse
         join_user_calendar(current_user, @tutoring.scheduled_at)
+
+        # Notificar al tutor que un nuevo estudiante se unió
+        if @tutoring.tutor.present?
+          ApplicationNotifier.with(
+            title: "#{current_user.name} se unió a tu tutoría de #{@tutoring.course.name}.",
+            url: "/notificaciones"
+          ).deliver_later(@tutoring.tutor)
+        end
 
         render json: {
           ok: true,
@@ -342,11 +371,28 @@ module Api
           end
         end
 
+        # Programar notificaciones automáticas
+        ScheduleTutoringNotificationsJob.perform_later(@tutoring.id)
+
         # Enviar notificaciones según el rol
         if user_role == 'student'
           # TutoringMailer.student_enrolled(@tutoring, current_user).deliver_later
         else
           # TutoringMailer.tutor_assigned(@tutoring, current_user).deliver_later
+        end
+
+        # Notificar al otro usuario (el creador de la tutoría)
+        if @tutoring.creator.present? && @tutoring.creator != current_user
+          title_msg =
+            if user_role == "tutor"
+              "Tu solicitud de tutoría de #{@tutoring.course.name} fue confirmada por el tutor #{current_user.name}."
+            else
+              "El estudiante #{current_user.name} confirmó la tutoría de #{@tutoring.course.name}."
+            end
+          ApplicationNotifier.with(
+            title: title_msg,
+            url: "/notificaciones"
+          ).deliver_later(@tutoring.creator)
         end
 
         render json: {
@@ -456,7 +502,11 @@ module Api
 
           # 1) Si el que se va es el tutor -> SIEMPRE borrar tutoría (+ evento si existe)
           if was_tutor
-            # (Comentario futuro) notificar a estudiantes que el tutor canceló
+            # Guardar datos antes de borrar para el job
+            tutoring_data = capture_tutoring_data(@tutoring)
+            # Notificar a estudiantes que el tutor canceló
+            TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Tutor se desuscribió")
+
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
@@ -476,6 +526,11 @@ module Api
 
           # 2.5) Si el que se va es el creador y no quedan estudiantes -> eliminar tutoría
           if current_user.id == @tutoring.created_by_id && new_enrolled.zero?
+            # Guardar datos antes de borrar para el job
+            tutoring_data = capture_tutoring_data(@tutoring)
+            # Notificar a participantes que el creador canceló
+            TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Creador se desuscribió")
+
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
@@ -488,6 +543,11 @@ module Api
 
           # 3) Caso borde: si NO hay tutor y NO quedan estudiantes -> borrar todo
           if !had_tutor && new_enrolled.zero?
+            # Guardar datos antes de borrar para el job
+            tutoring_data = capture_tutoring_data(@tutoring)
+            # Notificar a participantes que la tutoría fue cancelada
+            TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Sin participantes")
+
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
@@ -519,6 +579,14 @@ module Api
             @tutoring.update!(scheduled_at: nil)
             @tutoring.tutoring_availabilities.each { |a| a.update(is_booked: false) }
           end
+        end
+
+        # Notificar al tutor que un estudiante se dio de baja
+        if @tutoring.tutor.present?
+          ApplicationNotifier.with(
+            title: "#{current_user.name} se dio de baja de tu tutoría de #{@tutoring.course.name}.",
+            url: "/notificaciones"
+          ).deliver_later(@tutoring.tutor)
         end
 
         head :no_content
@@ -717,6 +785,18 @@ module Api
                   user_id, user_id, user_id
                 )
                 .distinct
+      end
+
+      def capture_tutoring_data(tutoring)
+        {
+          id: tutoring.id,
+          course_name: tutoring.course&.name,
+          tutor_id: tutoring.tutor_id,
+          scheduled_at: tutoring.scheduled_at,
+          enrolled: tutoring.enrolled,
+          created_by_id: tutoring.created_by_id,
+          users: tutoring.users.as_json(only: [:id])
+        }
       end
 
       def availability_overlaps?(availabilities_params, user_id)
