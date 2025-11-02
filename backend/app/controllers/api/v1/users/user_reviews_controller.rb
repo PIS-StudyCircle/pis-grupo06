@@ -8,7 +8,7 @@ module Api
           reviewed_id = params[:reviewed_id]
           reviews = UserReview.where(reviewed_id: reviewed_id)
           render json: reviews.as_json(
-            include: { reviewer: { only: [:id, :name, :last_name, :email] } }
+            include: { reviewer: { only: [:id, :name, :last_name], methods: [:email_masked] } }
           )
         end
 
