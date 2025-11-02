@@ -64,52 +64,67 @@ export default function CreateTutoringByTutor() {
   if (!course) return <p className="text-center mt-10">No hay curso cargado.</p>
 
   const validateAvailabilities = () => {
-    // Validar campos completos y lógica básica
-    for (const av of availabilities) {
-    // campos incompletos
-      if (!av.date || !av.startTime || !av.endTime) {
-        return "Por favor completa fecha, hora de inicio y hora final en cada disponibilidad."
+    const errors = [];
+
+    // helper para construir Date solo si hay datos
+    const toDate = (date, time) =>
+      date && time ? new Date(`${date}T${time}:00`) : null;
+
+    // 1) Chequeos por slot (completitud, fecha válida, reglas de horas, pasado)
+    availabilities.forEach((av, i) => {
+      const label = `Disponibilidad ${i + 1}`;
+      const missing = [];
+      if (!av.date)      missing.push("fecha");
+      if (!av.startTime) missing.push("hora de inicio");
+      if (!av.endTime)   missing.push("hora final");
+      if (missing.length) {
+        errors.push(`${label}: completa ${missing.join(", ")}.`);
+        // si faltan campos, no seguimos chequeando este slot
+        return;
       }
-      // fecha inválida / en el pasado (del helper)
-      const dateError = validateDate(av.date)
-      if (dateError) return dateError
 
-      // reglas de horas: aquí devuelve el mensaje correcto:
-      // - "La hora de fin debe ser posterior a la de inicio"
-      // - "La sesión debe durar al menos 1 hora"
-      const hoursError = validateHoursTutoring(av.date, av.startTime, av.endTime)
-      if (hoursError) return hoursError
-    }
+      const dateErr = validateDate(av.date);
+      if (dateErr) {
+        errors.push(`${label}: ${dateErr}.`);
+        // aún así seguimos con reglas de horas para mostrar todo
+      }
 
-    // Validar fechas en el pasado
-    const now = new Date()
-    const hasPastDate = availabilities.some((av) => {
-      const avDate = new Date(`${av.date}T${av.startTime}:00`)
-      return avDate < now
-    })
-    if (hasPastDate) {
-      return "No puedes seleccionar fechas u horas en el pasado."
-    }
+      const hoursErr = validateHoursTutoring(av.date, av.startTime, av.endTime);
+      if (hoursErr) {
+        // mensajes esperados: "La hora de fin..." o "La sesión debe durar al menos 1 hora"
+        errors.push(`${label}: ${hoursErr}.`);
+      }
 
-    // Validar solapamientos
+      // Pasado (más específico por slot)
+      const start = toDate(av.date, av.startTime);
+      if (start && start < new Date()) {
+        errors.push(`${label}: la fecha/hora de inicio no puede ser en el pasado.`);
+      }
+    });
+
+    // 2) Solapamientos entre slots (solo si todos los necesarios tienen campos completos)
     for (let i = 0; i < availabilities.length; i++) {
-      const av1Start = new Date(`${availabilities[i].date}T${availabilities[i].startTime}:00`)
-      const av1End = new Date(`${availabilities[i].date}T${availabilities[i].endTime}:00`)
+      const a = availabilities[i];
+      const aStart = toDate(a.date, a.startTime);
+      const aEnd   = toDate(a.date, a.endTime);
+      if (!aStart || !aEnd) continue;
 
       for (let j = i + 1; j < availabilities.length; j++) {
-        const av2Start = new Date(`${availabilities[j].date}T${availabilities[j].startTime}:00`)
-        const av2End = new Date(`${availabilities[j].date}T${availabilities[j].endTime}:00`)
+        const b = availabilities[j];
+        const bStart = toDate(b.date, b.startTime);
+        const bEnd   = toDate(b.date, b.endTime);
+        if (!bStart || !bEnd) continue;
 
-        // Verificar si hay solapamiento
-        const overlap = av1Start < av2End && av2Start < av1End
+        const sameDay = a.date === b.date;
+        const overlap = sameDay && aStart < bEnd && bStart < aEnd;
         if (overlap) {
-          return `Las disponibilidades ${i + 1} y ${j + 1} se solapan. Por favor ajusta los horarios.`
+          errors.push(`Las disponibilidades ${i + 1} y ${j + 1} se solapan. Ajusta los horarios.`);
         }
       }
     }
 
-    return null // Sin errores
-  }
+    return errors.length ? errors : null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -120,12 +135,13 @@ export default function CreateTutoringByTutor() {
     }
 
     // Validar disponibilidades
-    const availabilityErrors = validateAvailabilities()
+    const availabilityErrors = validateAvailabilities();
     if (availabilityErrors) {
-      setAvailabilityError(availabilityErrors)
-      return
+      setAvailabilityError(availabilityErrors); // array
+      return;
     }
-    setAvailabilityError("") // Limpiar si está ok
+    setAvailabilityError(null);
+
 
     try {
       // Transformar availabilities al formato esperado por el backend
@@ -323,7 +339,13 @@ export default function CreateTutoringByTutor() {
             </div>
           ))}
 
-          {availabilityError && <span className="text-red-500 text-xs">{availabilityError}</span>}
+          {Array.isArray(availabilityError) && availabilityError.length > 0 && (
+            <div className="text-red-500 text-xs space-y-1">
+              {availabilityError.map((msg, i) => (
+                <p key={i}>• {msg}</p>
+              ))}
+            </div>
+          )}
         </div>
 
         {error.length > 0 && !availabilityError && (

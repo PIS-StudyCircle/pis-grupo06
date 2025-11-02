@@ -57,67 +57,79 @@ export default function CreateTutoringByStudent() {
   }
 
   const validate = () => {
-    const errs = {}
+    const errs = {};
+    const availMsgs = [];
+
     if (form.request_comment.length > MAX_REQUEST_COMMENT)
-      errs.request_comment = `Máximo ${MAX_REQUEST_COMMENT} caracteres.`
-    if (form.location.length > MAX_LOCATION_COMMENT) errs.location = `Máximo ${MAX_LOCATION_COMMENT} caracteres.`
-  
-    // 1) Campos completos
-    for (const av of availabilities) {
-      if (!av.date || !av.startTime || !av.endTime) {
-        errs.availabilities = "Completa fecha, hora de inicio y hora final en cada disponibilidad.";
-        return errs;
-      }
-    }
+      errs.request_comment = `Máximo ${MAX_REQUEST_COMMENT} caracteres.`;
+    if (form.location.length > MAX_LOCATION_COMMENT)
+      errs.location = `Máximo ${MAX_LOCATION_COMMENT} caracteres.`;
 
-    // 2) Reglas de horas (por slot): fin > inicio y duración >= 1h
-    for (const av of availabilities) {
-      if (av.startTime >= av.endTime) {
-        errs.availabilities = "La hora final debe ser posterior a la hora de inicio.";
-        return errs;
-      }
-      const [sh, sm] = av.startTime.split(":").map(Number);
-      const [eh, em] = av.endTime.split(":").map(Number);
-      const duration = (eh * 60 + em) - (sh * 60 + sm);
-      if (duration < 60) {
-        errs.availabilities = "El rango horario debe ser de al menos 1 hora.";
-        return errs;
-      }
-    }
-
-    // 3) Fechas/horas en el pasado
+    const toDate = (d, t) => (d && t ? new Date(`${d}T${t}:00`) : null);
     const now = new Date();
-    for (const av of availabilities) {
-      const start = new Date(`${av.date}T${av.startTime}:00`);
-      if (start < now) {
-        errs.availabilities = "No puedes seleccionar fechas u horas en el pasado.";
-        return errs;
-      }
-    }
 
-    // 4) Solapamientos dentro del formulario
+    availabilities.forEach((av, i) => {
+      const label = `Disponibilidad ${i + 1}`;
+
+      const missing = [];
+      if (!av.date) missing.push("fecha");
+      if (!av.startTime) missing.push("hora de inicio");
+      if (!av.endTime) missing.push("hora final");
+      if (missing.length) {
+        availMsgs.push(`${label}: completa ${missing.join(", ")}.`);
+        return;
+      }
+
+      if (av.startTime >= av.endTime) {
+        availMsgs.push(`${label}: la hora final debe ser posterior a la hora de inicio.`);
+      } else {
+        const [sh, sm] = av.startTime.split(":").map(Number);
+        const [eh, em] = av.endTime.split(":").map(Number);
+        const duration = (eh * 60 + em) - (sh * 60 + sm);
+        if (duration < 60) {
+          availMsgs.push(`${label}: el rango horario debe ser de al menos 1 hora.`);
+        }
+      }
+
+      const start = toDate(av.date, av.startTime);
+      if (start && start < now) {
+        availMsgs.push(`${label}: la fecha/hora de inicio no puede ser en el pasado.`);
+      }
+    });
+
     for (let i = 0; i < availabilities.length; i++) {
-      const a1s = new Date(`${availabilities[i].date}T${availabilities[i].startTime}:00`);
-      const a1e = new Date(`${availabilities[i].date}T${availabilities[i].endTime}:00`);
+      const a = availabilities[i];
+      const aStart = toDate(a.date, a.startTime);
+      const aEnd   = toDate(a.date, a.endTime);
+      if (!aStart || !aEnd) continue;
+
       for (let j = i + 1; j < availabilities.length; j++) {
-        const a2s = new Date(`${availabilities[j].date}T${availabilities[j].startTime}:00`);
-        const a2e = new Date(`${availabilities[j].date}T${availabilities[j].endTime}:00`);
-        if (a1s < a2e && a2s < a1e) {
-          errs.availabilities = `Las disponibilidades ${i + 1} y ${j + 1} se solapan. Por favor ajusta los horarios.`;
-          return errs;
+        const b = availabilities[j];
+        const bStart = toDate(b.date, b.startTime);
+        const bEnd   = toDate(b.date, b.endTime);
+        if (!bStart || !bEnd) continue;
+
+        const sameDay = a.date === b.date;
+        const overlap = sameDay && aStart < bEnd && bStart < aEnd;
+        if (overlap) {
+          availMsgs.push(`Las disponibilidades ${i + 1} y ${j + 1} se solapan. Ajusta los horarios.`);
         }
       }
     }
-  
-    return errs
+
+    if (availMsgs.length > 0) {
+      errs.availabilities = availMsgs;
+    }
+
+    return errs;
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const errs = validate()
+    const errs = validate();
     if (Object.keys(errs).length > 0) {
-      setField("_errors", errs)
-      return
+      setField("_errors", errs);
+      return;
     }
 
     const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
@@ -326,7 +338,13 @@ export default function CreateTutoringByStudent() {
             </div>
           ))}
 
-          {errs.availabilities && <span className="text-red-500 text-xs">{errs.availabilities}</span>}
+          {Array.isArray(errs.availabilities) && errs.availabilities.length > 0 && (
+            <div className="text-red-500 text-xs space-y-1">
+              {errs.availabilities.map((m, idx) => (
+                <p key={idx}>• {m}</p>
+              ))}
+            </div>
+          )}
         </div>
 
         {submitError.length > 0 && !errs.availabilities && (
