@@ -11,7 +11,9 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
   const navigate = useNavigate();
 
   const location = useLocation();
-  const courseName = location.state?.courseName || "";
+  const params = new URLSearchParams(location.search);
+  const courseNameFromUrl = params.get("course_name");
+  const courseName = location.state?.courseName || courseNameFromUrl || "";
 
   // selector de búsqueda (por materia/tema) proveniente de origin/dev
   const [searchBy, setSearchBy] = useState("course");
