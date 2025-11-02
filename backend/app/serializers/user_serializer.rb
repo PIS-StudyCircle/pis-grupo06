@@ -11,4 +11,14 @@ class UserSerializer
       nil
     end
   end
+
+  attribute :email do |user, params|
+    current_user = params[:current_user]
+
+    if current_user && user.id == current_user.id
+      user.email
+    else
+      user.email_masked
+    end
+  end
 end
