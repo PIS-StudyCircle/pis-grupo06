@@ -93,7 +93,19 @@ export default function ShowPageTutoring() {
     return "default";
   }, [tutoring, soyTutor, soyEstudiante, esCreador, noTieneTutor, cuposDisponibles]);
 
-  if (loading) return <ShowTutoringSkeleton />;
+    const tutoriaYaPaso = useMemo(() => {
+    if (!tutoring?.scheduled_at) return false;
+    return new Date(tutoring.scheduled_at) < new Date();
+  }, [tutoring?.scheduled_at]);
+
+  const estudiantesAsistieron = useMemo(() => {
+  if (!tutoring) return 0;
+  let total = tutoring.enrolled ?? 0;
+
+  return total;
+}, [tutoring]);
+
+    if (loading) return <ShowTutoringSkeleton />;
 
   return (
     <div className="max-w-5xl mx-auto p-4 min-h-screen">
@@ -120,13 +132,24 @@ export default function ShowPageTutoring() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <EstadoBadge state={tutoring.state} />
+              <EstadoBadge state={tutoriaYaPaso ? "finished" : tutoring.state} />
+              {!tutoriaYaPaso && (
               <span className="text-sm text-gray-700 bg-white border rounded-full px-3 py-1">
-                Cupos:{" "}
-                {tutoring.capacity == null
-                  ? "A definir"
-                  : `${Math.max((tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0), 0)} disp.`}
+                  Cupos:{" "}
+                  {tutoring.capacity == null
+                    ? "A definir"
+                    : `${Math.max((tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0), 0)} disp.`}
+                </span>
+              )}
+             {tutoriaYaPaso && (
+              <span className="text-sm text-gray-700 bg-green-100 border border-green-200 rounded-full px-3 py-1">
+                📊 {(() => {
+                  if (estudiantesAsistieron === 0) return 'No asistió ningún estudiante';
+                  if (estudiantesAsistieron === 1) return 'Asistió 1 estudiante';
+                  return `Asistieron ${estudiantesAsistieron} estudiantes`;
+                })()}
               </span>
+            )}
             </div>
           </div>
         </div>
@@ -223,6 +246,7 @@ export default function ShowPageTutoring() {
               onSerTutor={handleSerTutor}
               onUnirme={handleUnirme}
               onDesuscribirme={handleDesuscribirme}
+              isFinished={tutoriaYaPaso}
             />
           </div>
         </div>

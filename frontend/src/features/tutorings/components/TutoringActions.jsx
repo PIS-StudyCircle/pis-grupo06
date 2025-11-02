@@ -5,8 +5,25 @@ export default function TutoringActions({
   saving, 
   onSerTutor, 
   onUnirme, 
-  onDesuscribirme 
+  onDesuscribirme,
+  isFinished = false
 }) {
+  if (isFinished) {
+    return (
+      <aside className="lg:col-span-1">
+        <div className="rounded-xl border bg-gray-50 p-4">
+          <h3 className="text-sm font-semibold text-gray-900">Tutoría finalizada</h3>
+           <Link
+            to="/tutorias"
+            className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 w-full mt-3"
+          >
+            Volver al listado
+          </Link>
+        </div>
+      </aside>
+    );
+  }
+
   return (
     <aside className="lg:col-span-1">
       <div className="rounded-xl border bg-gray-50 p-4">
