@@ -46,7 +46,7 @@ export default function TopTutors() {
   // 🔹 Si hay usuario logueado:
   return (
     <div className="bg-white rounded-xl shadow-md p-4 mt-8 w-full max-w-md">
-      <h2 className="text-lg font-semibold mb-3 text-center text-blue-700">
+      <h2 className="text-lg font-semibold mb-3 text-center text-black">
         🏆 Tutores Destacados
       </h2>
 
