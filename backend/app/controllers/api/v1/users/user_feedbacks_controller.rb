@@ -3,7 +3,7 @@ module Api
   module V1
     module Users
       class UserFeedbacksController < ApplicationController
-        before_action :authenticate_user!, except: [:top_rated]
+        before_action :authenticate_user!
 
         # GET /api/v1/users/user_feedbacks
         def index
