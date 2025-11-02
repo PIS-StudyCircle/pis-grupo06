@@ -211,13 +211,14 @@ module Api
                              .where(favorite_courses: { course_id: tutoring.course_id })
                              .where.not(id: tutoring.created_by_id) # no notificar al creador
                              .distinct
-            
+
             course_name = tutoring.course&.name || Course.find(tutoring.course_id).name
+            encoded_name = URI.encode_www_form_component(course_name)
             if favoriters.exists?
               favoriters.find_each do |user|
                 ApplicationNotifier.with(
                   title: "Se creó una nueva tutoría de #{course_name}!",
-                  url: "/tutorias/materia/#{tutoring.course_id}?course_name=#{URI.encode_www_form_component(course_name)}"
+                  url: "/tutorias/materia/#{tutoring.course_id}?course_name=#{encoded_name}"
                 ).deliver_later(user)
               end
             end
