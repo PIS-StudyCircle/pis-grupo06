@@ -291,19 +291,9 @@ export default function CreateTutoringByStudent() {
           {errs.availabilities && <span className="text-red-500 text-xs">{errs.availabilities}</span>}
         </div>
 
-        {/* 🎯 CAMBIAR EL MANEJO DE ERRORES */}
         {submitError.length > 0 && (
           <ErrorAlert>
             {submitError.map((err, idx) => (
-              <p key={idx}>{err}</p>
-            ))}
-          </ErrorAlert>
-        )}
-
-        {/* 🎯 MANTENER TAMBIÉN LOS ERRORES DE VALIDACIÓN */}
-        {Object.keys(errs).length > 0 && (
-          <ErrorAlert>
-            {Object.values(errs).map((err, idx) => (
               <p key={idx}>{err}</p>
             ))}
           </ErrorAlert>
