@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SessionCard from "../components/SessionCard";
+import { MemoryRouter } from "react-router-dom";
 
 jest.mock("lucide-react", () => {
   return new Proxy(
@@ -61,11 +62,13 @@ describe("SessionCard - puntuar_tutor", () => {
     mockCreateFeedback.mockResolvedValueOnce({ feedback: { rating: 5 } });
 
     render(
-      <SessionCard
-        session={{ ...baseSession, status: "confirmada" }}
-        type="finalized"
-        refresh={jest.fn()}
-      />
+      <MemoryRouter>
+        <SessionCard
+          session={{ ...baseSession, status: "active" }}
+          type="finalized"
+          refresh={jest.fn()}
+        />
+      </MemoryRouter>
     );
 
     // Espera a que termine la verificación de feedback y aparezca el botón
@@ -115,11 +118,13 @@ describe("SessionCard - puntuar_tutor", () => {
     mockHasFeedback.mockResolvedValueOnce({ has_feedback: true, rating: 4.5 });
 
     render(
-      <SessionCard
-        session={{ ...baseSession, status: "confirmada" }}
-        type="finalized"
-        refresh={jest.fn()}
-      />
+      <MemoryRouter>
+        <SessionCard
+          session={{ ...baseSession, status: "active" }}
+          type="finalized"
+          refresh={jest.fn()}
+        />
+      </MemoryRouter>
     );
 
     await waitFor(() => {
