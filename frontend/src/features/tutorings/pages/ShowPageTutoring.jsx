@@ -4,10 +4,10 @@ import { useUser } from "@context/UserContext";
 import { formatDateTime } from "@shared/utils/FormatDate";
 import { showSuccess, showError, showConfirm } from "@shared/utils/toastService";
 import { useTutoring } from "../hooks/useTutorings";
-import {unsubscribeFromTutoring} from "../services/tutoringService";
+import {unsubscribeFromTutoring, joinTutoring} from "../services/tutoringService";
 import { DEFAULT_PHOTO } from "@/shared/config";
 import { EstadoBadge, ShowTutoringSkeleton } from "@shared/utils/showTutorings"
-
+import TutoringActions from "../components/TutoringActions";
 /**
  * SHOW PAGE DE TUTORÍA (ampliada)
  */
@@ -52,16 +52,7 @@ export default function ShowPageTutoring() {
 
     try {
       setSaving(true);
-      const res = await fetch(`/api/v1/tutorings/${tutoring.id}/join_tutoring`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: "student" }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "No se pudo unir a la tutoría");
-      }
+      await joinTutoring(tutoring.id);
       showSuccess("Te uniste a la tutoría con éxito");
       if (refetch) await refetch();
       else window.location.reload();
@@ -224,85 +215,16 @@ export default function ShowPageTutoring() {
             </div>
           </div>
     
-
-          {/* Columna derecha: acciones */}
-          <aside className="lg:col-span-1">
-            <div className="rounded-xl border bg-gray-50 p-4">
-              <h3 className="text-sm font-semibold text-gray-900">Acciones</h3>
-              <div className="mt-3 flex flex-col gap-2">
-                {mode === "serTutor" && (
-                  <button
-                    type="button"
-                    className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                    onClick={handleSerTutor}
-                    disabled={saving}
-                  >
-                    Ser tutor
-                  </button>
-                )}
-
-                {mode === "serEstudiante" && (
-                  <button
-                    type="button"
-                    className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                    onClick={handleUnirme}
-                    disabled={saving}
-                  >
-                    Unirme
-                  </button>
-                )}
-
-                {mode === "ambos" && (
-                  <>
-                    <button
-                      type="button"
-                      className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                      onClick={handleSerTutor}
-                      disabled={saving}
-                    >
-                      Ser tutor
-                    </button>
-                    <button
-                      type="button"
-                      className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                      onClick={handleUnirme}
-                      disabled={saving}
-                    >
-                      Unirme
-                    </button>
-                  </>
-                )}
-
-                {mode === "misTutorias" && (
-                  <button
-                    type="button"
-                    className="btn w-full bg-red-500 hover:bg-red-600 text-white"
-                    onClick={handleDesuscribirme}
-                    disabled={saving}
-                  >
-                    Desuscribirme
-                  </button>
-                )}
-
-                {mode === "completo" && (
-                  <button
-                    type="button"
-                    className="btn w-full bg-gray-400 text-gray-700 cursor-not-allowed"
-                    disabled
-                  >
-                    Completo
-                  </button>
-                )}
-
-                <Link
-                  to="/tutorias"
-                  className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  Volver al listado
-                </Link>
-              </div>
-            </div>
-          </aside>
+          {/* Columna derecha - Acciones */}
+          <div>
+            <TutoringActions
+              mode={mode}
+              saving={saving}
+              onSerTutor={handleSerTutor}
+              onUnirme={handleUnirme}
+              onDesuscribirme={handleDesuscribirme}
+            />
+          </div>
         </div>
       </div>
     </div>
