@@ -64,7 +64,7 @@ RSpec.describe "Notifications Messages", type: :request do
   let!(:course) { Course.create!(name: "Álgebra", faculty: facultad) }
   let!(:subject) { Subject.create!(name: "Matrices", course: course) }
 
-  describe "Notificaciones relacionadas con tutorías" do
+  describe "Notificaciones (Exitosas) relacionadas con tutorías" do
     context "Notificaciones dirigidas a tutores" do
       it "envía notificación al tutor cuando un estudiante se une a la tutoría" do
         tutoring = Tutoring.create!(
@@ -87,11 +87,10 @@ RSpec.describe "Notifications Messages", type: :request do
 
         notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
         expect(notif).to be_present
-        # destinatario correcto
         expect(notif.recipient).to eq(tutor)
-        # mensaje esperado
         expect(notif.title).to include("#{student2.name} se unió a tu tutoría de #{course.name}")
         expect(notif.event).to be_present
+        expect(notif.url).to eq("/notificaciones")
       end
 
       it "envía notificación al tutor cuando un estudiante se da de baja" do
@@ -108,7 +107,7 @@ RSpec.describe "Notifications Messages", type: :request do
           subjects: [subject]
         )
         UserTutoring.create!(user: student1, tutoring: tutoring)
-        # crear inscripción previa
+
         sign_in student1
         delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe"
         expect(response).to have_http_status(:ok).or have_http_status(:no_content)
@@ -118,6 +117,7 @@ RSpec.describe "Notifications Messages", type: :request do
         expect(notif.recipient).to eq(tutor)
         expect(notif.title).to include("#{student1.name} se dio de baja de tu tutoría de #{course.name}")
         expect(notif.event).to be_present
+        expect(notif.url).to eq("/notificaciones")
       end
 
       it "cancela la tutoría y notifica a inscritos si se desuscribe el tutor" do
@@ -130,25 +130,25 @@ RSpec.describe "Notifications Messages", type: :request do
           capacity: 5,
           event_id: "evento1",
           state: :active,
-          enrolled: 1,
+          enrolled: 2,
           subjects: [subject]
         )
         UserTutoring.create!(user: student1, tutoring: tutoring)
-        # inscribir otro estudiante
         UserTutoring.create!(user: student2, tutoring: tutoring)
 
         sign_in tutor
         delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe"
         expect(response).to have_http_status(:ok).or have_http_status(:no_content)
 
-        # la tutoría debe marcarse cancelada (state distinto de active/pending) o borrada: verificamos notificaciones
         notif_to_s1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
         expect(notif_to_s1).to be_present
         expect(notif_to_s1.title).to include("Tutoría cancelada")
+        expect(notif_to_s1.url).to eq("/tutorias") # Como que recibe Tutorings?
 
         notif_to_s2 = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
         expect(notif_to_s2).to be_present
         expect(notif_to_s2.title).to include("Tutoría cancelada")
+        expect(notif_to_s2.url).to eq("/tutorias") # Como que recibe Tutorings?
       end
 
       it "si el creador se desuscribe y no quedan inscritos, notifica al tutor y cancela" do
@@ -164,15 +164,16 @@ RSpec.describe "Notifications Messages", type: :request do
           subjects: [subject]
         )
         UserTutoring.create!(user: student1, tutoring: tutoring)
-        # crear tutoría con creador distinto y sin inscritos
+
         sign_in student1
-        delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe" # creator se da de baja
+        delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe"
         expect(response).to have_http_status(:ok).or have_http_status(:no_content)
         expect(Tutoring.find_by(id: tutoring.id)).to be_nil
 
         notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
         expect(notif).to be_present
         expect(notif.title).to include("Tutoría cancelada")
+        expect(notif.url).to eq("/tutorias") # Como que recibe Tutorings?
       end
     end
 
@@ -210,6 +211,7 @@ RSpec.describe "Notifications Messages", type: :request do
         expect(notif.title).to include(
           "Tu solicitud de tutoría de #{course.name} fue confirmada"
         )
+        expect(notif.url).to eq("/notificaciones")
       end
 
       it "notifica al tutor creador cuando un estudiante confirma la tutoría" do
@@ -244,7 +246,8 @@ RSpec.describe "Notifications Messages", type: :request do
         expect(notif).to be_present
         expect(notif.title).to include(
           "El estudiante #{student1.name} confirmó la tutoría de #{course.name}"
-        ).or be_truthy
+        )
+        expect(notif.url).to eq("/notificaciones")
       end
 
       it "notifica a usuarios que tienen la materia como favorita cuando se crea una nueva tutoría" do
@@ -269,6 +272,7 @@ RSpec.describe "Notifications Messages", type: :request do
         notif = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
         expect(notif).to be_present
         expect(notif.title).to include("Se creó una nueva tutoría de #{course.name}")
+        expect(notif.url).to eq("/tutorias/materia/#{course.id}")
       end
 
       it "envía notificación al recibir una review" do
@@ -284,7 +288,6 @@ RSpec.describe "Notifications Messages", type: :request do
         )
         UserTutoring.create!(user: student1, tutoring: tutoring)
 
-        # autenticamos y hacemos POST con las keys que el controller espera
         sign_in student1
         post "/api/v1/users/user_reviews",
              params: {
@@ -298,6 +301,7 @@ RSpec.describe "Notifications Messages", type: :request do
         notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
         expect(notif).to be_present
         expect(notif.title).to include("Nueva reseña recibida")
+        expect(notif.url).to eq("/usuarios/#{tutor.id}/reviews") # Como que Users?
       end
 
       it "notifica a participantes que la tutoría finalizó y pueden dejar feedback" do
@@ -309,12 +313,11 @@ RSpec.describe "Notifications Messages", type: :request do
           modality: "virtual",
           capacity: 5,
           enrolled: 2,
-          state: :finished, # puede estar active; el job marcará finished / o la dejamos finished directamente
+          state: :finished,
           subjects: [subject]
         )
         UserTutoring.create!(user: student1, tutoring: tutoring)
         UserTutoring.create!(user: student2, tutoring: tutoring)
-
         # Ejecutar el job que genera las notificaciones de feedback (síncrono)
         TutoringFeedbackJob.perform_now(tutoring.id)
 
@@ -325,13 +328,15 @@ RSpec.describe "Notifications Messages", type: :request do
         expect(notif_tutor).to be_present
         expect(notif_student1).to be_present
         expect(notif_student2).to be_present
-        expect(notif_tutor.title).to include("Tu tutoría de #{course.name} finalizó").or be_truthy
-        expect(notif_student1.title).to include("Tu tutoría de #{course.name} finalizó").or be_truthy
-        expect(notif_student2.title).to include("Tu tutoría de #{course.name} finalizó").or be_truthy
+        expect(notif_tutor.title).to include("Tu tutoría de #{course.name} finalizó")
+        expect(notif_student1.title).to include("Tu tutoría de #{course.name} finalizó")
+        expect(notif_student2.title).to include("Tu tutoría de #{course.name} finalizó")
+        expect(notif_tutor.url).to be_nil # el tutor no tiene link de feedback
+        expect(notif_student1.url).to eq("/tutorias/#{tutoring.id}/feedbacks")
+        expect(notif_student2.url).to eq("/tutorias/#{tutoring.id}/feedbacks")
       end
 
       it "envía recordatorio 24 horas antes a tutor y estudiantes" do
-        # crear una tutoría próxima y un participante reutilizando student2
         tutoring = Tutoring.create!(
           tutor: tutor,
           course: course,
@@ -353,7 +358,10 @@ RSpec.describe "Notifications Messages", type: :request do
         notif_student = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
         expect(notif_tutor).to be_present
         expect(notif_student).to be_present
+        expect(notif_tutor.title).to include("Recordatorio: tu tutoría de #{course.name}")
         expect(notif_student.title).to include("Recordatorio: tu tutoría de #{course.name}")
+        expect(notif_tutor.url).to eq("/notificaciones")
+        expect(notif_student.url).to eq("/notificaciones")
       end
     end
   end
