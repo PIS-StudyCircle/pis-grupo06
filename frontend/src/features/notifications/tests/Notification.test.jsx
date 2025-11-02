@@ -141,7 +141,7 @@ function backendNotif(event, params = {}) {
     case "review":
       return { id: params.id ?? "rev1", title: `Nueva reseña recibida`, url: `/usuarios/${TUTOR.id}/reviews`, created_at: new Date().toISOString() };
     case "feedback":
-      return { id: params.id ?? "fb1", title: `Tu tutoría de ${courseName} finalizó. ¡Deja tu feedback!`, url: `/tutorias/${params.tutoringId}/feedbacks`, created_at: new Date().toISOString() };
+      return { id: params.id ?? "fb1", title: `Tu tutoría de ${courseName} finalizó. ¡Deja tu feedback!`, url: `/usuarios/${TUTOR.id}`, created_at: new Date().toISOString() };
     case "reminder":
       return { id: params.id ?? "rem1", title: `Recordatorio: tu tutoría de ${courseName}`, url: '/notificaciones', created_at: new Date().toISOString() };
     default:
@@ -343,14 +343,14 @@ describe("Notification", () => {
     const bells = await screen.findAllByTestId("mock-bell-button");
     fireEvent.click(bells[0]);
 
-    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent("/tutorias/99/feedbacks");
+    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent(`/usuarios/${TUTOR.id}`);
 
     const assignSpy = jest.fn();
     globalThis.__navigate__ = assignSpy;
     try {
       const item = await screen.findByText(/Tu tutoría de Álgebra finalizó/i);
       fireEvent.click(item);
-      expect(assignSpy).toHaveBeenCalledWith("/tutorias/99/feedbacks");
+      expect(assignSpy).toHaveBeenCalledWith(`/usuarios/${TUTOR.id}`);
     } finally {
       delete globalThis.__navigate__;
     }
