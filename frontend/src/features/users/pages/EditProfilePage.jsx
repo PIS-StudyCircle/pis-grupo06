@@ -97,7 +97,7 @@ export default function EditProfilePage() {
             className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver al perfil
+            Ir al perfil
           </button>
           <h1 className="text-2xl font-bold text-gray-900">Editar perfil</h1>
         </div>
