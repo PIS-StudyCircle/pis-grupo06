@@ -11,7 +11,6 @@ import { useFormState } from "@utils/UseFormState"
 import { useState } from "react"
 import { validateDate, validateHoursTutoring, validateInteger } from "@utils/validation"
 import { useValidation } from "@hooks/useValidation"
-import { useFormSubmit } from "@utils/UseFormSubmit"
 import {showSuccess} from '@shared/utils/toastService';
 
 const validators = {
@@ -37,7 +36,7 @@ export default function CreateTutoringByTutor() {
   const [availabilityError, setAvailabilityError] = useState("")
 
   const { errors, validate } = useValidation(validators)
-  const { error} = useFormSubmit(createTutoringByTutor)
+  const [submitError, setSubmitError] = useState(null);
 
   const addAvailability = () => {
     setAvailabilities([...availabilities, { date: "", startTime: "", endTime: "" }])
@@ -93,12 +92,6 @@ export default function CreateTutoringByTutor() {
       if (hoursErr) {
         // mensajes esperados: "La hora de fin..." o "La sesión debe durar al menos 1 hora"
         errors.push(`${label}: ${hoursErr}.`);
-      }
-
-      // Pasado (más específico por slot)
-      const start = toDate(av.date, av.startTime);
-      if (start && start < new Date()) {
-        errors.push(`${label}: la fecha/hora de inicio no puede ser en el pasado.`);
       }
     });
 
@@ -180,6 +173,8 @@ export default function CreateTutoringByTutor() {
       }
     } catch (err) {
       console.error("Error creating tutoring sessions:", err)
+      const message = err?.error || err?.message || "Error desconocido al crear la tutoría";
+      setSubmitError(message);
     }
   }
 
@@ -347,12 +342,8 @@ export default function CreateTutoringByTutor() {
           )}
         </div>
 
-        {error.length > 0 && !availabilityError && (
-          <ErrorAlert>
-            {error.map((err, idx) => (
-              <p key={idx}>{err}</p>
-            ))}
-          </ErrorAlert>
+        {submitError && !availabilityError && (
+          <ErrorAlert>{submitError}</ErrorAlert>
         )}
 
         <SubmitButton text="Confirmar" />
