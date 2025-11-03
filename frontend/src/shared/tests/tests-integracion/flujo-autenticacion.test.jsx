@@ -1,7 +1,13 @@
+import { jest, describe, test, expect, beforeEach } from "@jest/globals";
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import {
+  MemoryRouter,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 import SideBar from "../../components/layout/SideBar";
 
 const mockedNavigate = jest.fn();
@@ -54,6 +60,7 @@ import {
   __reset,
   __actions,
   __state,
+  useUser,
 } from "../../context/UserContext";
 
 function renderWithRouter(ui, initialPath = "/") {
@@ -63,9 +70,8 @@ function renderWithRouter(ui, initialPath = "/") {
 }
 
 function RegisterPageMock() {
-  const { useUser } = require("../../context/UserContext");
   const { signUp } = useUser();
-  const navigate = require("react-router-dom").useNavigate();
+  const navigate = useNavigate();
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -110,9 +116,8 @@ function RegisterPageMock() {
 }
 
 function LoginPageMock() {
-  const { useUser } = require("../../context/UserContext");
   const { signIn } = useUser();
-  const navigate = require("react-router-dom").useNavigate();
+  const navigate = useNavigate();
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -166,13 +171,13 @@ const expectMenuHidden = (label) => {
 describe("Flujo de Autenticación", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    __reset(); 
+    __reset();
   });
 
   test("Sin sesión la SideBar no muestra 'Usuarios', 'Mis Clases' ni 'Tutorías'", () => {
     renderWithRouter(<SideBar />);
     expectMenuHidden("Usuarios");
-    expectMenuHidden("Mis Clases"); 
+    expectMenuHidden("Mis Clases");
     expectMenuHidden("Tutorías");
   });
 
