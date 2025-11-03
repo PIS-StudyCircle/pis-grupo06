@@ -11,12 +11,12 @@ import {
   ForgotPasswordPage,
   ResetPasswordPage,
   UserProfilePage,
-  NotificationsPage,
+  SessionsPage,
 } from "@/features/users";
 import { SubjectPage } from "@/features/subjects";
 import SubjectDetailPage from "@/features/subjects/pages/SubjectDetailPage";
 import { RequireGuestRoute } from "./RequireGuestRoute";
-import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent, ChooseScheduleByTutor, ChooseScheduleByStudent} from "@/features/tutorings";
+import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent, ChooseScheduleByTutor, ChooseScheduleByStudent, ShowPageTutoring} from "@/features/tutorings";
 import { Error404Page } from "@components/Error404";
 
 
@@ -42,7 +42,7 @@ export function AppRoutes() {
         />
         <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
-        <Route path="/notificaciones" element={<NotificationsPage />} />
+        <Route path="/notificaciones" element={<SessionsPage />} />
 
         <Route path="/tutorias" element={<TutoringPage filters={{}} mode="" />} />
         <Route path="/perfil" element={<ProfilePage />} />
@@ -73,6 +73,12 @@ export function AppRoutes() {
           path="/tutorias/materia/:courseId"
           element={<TutoringPage filters={{}} mode="serEstudiante" />}
         />
+        
+        <Route
+          path="/materias/:courseId/temas/:subjectId"
+          element={<SubjectDetailPage />}
+        />
+        <Route path="/tutorias/:id" element={<ShowPageTutoring />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/materias" replace />} />
@@ -84,10 +90,6 @@ export function AppRoutes() {
       <Route path="/prototipoCalendar" element={<SessionListPage />} />
       <Route path="/appoint" element={<AppointClassPage />} />
 
-      <Route
-        path="/materias/:courseId/temas/:subjectId"
-        element={<SubjectDetailPage />}
-      />
       <Route path="/usuarios" element={<UserPage />} />
       <Route path="*" element={<Error404Page />} />
     </Routes>

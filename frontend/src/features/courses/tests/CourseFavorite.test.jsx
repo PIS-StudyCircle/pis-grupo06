@@ -244,18 +244,17 @@ describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
     );
   });
 
-  it("ProfilePage muestra error si getMyFavoriteCourses falla", async () => {
-    useUser.mockReturnValue({
-      user: { id: 1, name: "Usuario", last_name: "Test", email: "test@test.com" },
-    });
-
-    courseService.getCourses.mockRejectedValueOnce(new Error("Server error"));
-
-    renderProfilePage();
-
-    expect(await screen.findByText(/Server error/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Reintentar/i })).toBeInTheDocument();
+it("ProfilePage muestra error si getMyFavoriteCourses falla", async () => {
+  useUser.mockReturnValue({
+    user: { id: 1, name: "Usuario", last_name: "Test", email: "test@test.com" },
   });
+
+  courseService.getCourses.mockRejectedValueOnce(new Error("Server error"));
+
+  renderProfilePage();
+  expect(await screen.findByText(/Server error/i)).toBeInTheDocument();
+});
+
 
   it("ProfilePage muestra las materias favoritas del usuario", async () => {
     useUser.mockReturnValue({

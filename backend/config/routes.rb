@@ -3,6 +3,9 @@ Rails.application.routes.draw do
     namespace :v1 do
       mount ActionCable.server => "/cable"
 
+      post "dev/cable_test", to: "dev#cable_test" if Rails.env.development?
+      post "dev/notify_test", to: "dev#notify_test" if Rails.env.development?
+
       devise_for :users,
                  defaults: { format: :json },
                  controllers: {
@@ -21,6 +24,12 @@ Rails.application.routes.draw do
             get :can_review
           end
         end
+        resources :user_feedbacks, only: [:index, :create, :destroy] do
+          collection do
+            get :check
+            get :top_rated
+          end
+        end
       end
 
       post "/notification_token", to: "notification_tokens#create"
@@ -35,6 +44,7 @@ Rails.application.routes.draw do
 
       resources :tutorings do
         get "upcoming", on: :collection
+        get "past", on: :collection
         post "confirm_schedule", on: :member
         post "join_tutoring", on: :member
         get "exists_user_tutoring", on: :member

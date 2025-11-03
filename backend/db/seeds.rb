@@ -101,6 +101,17 @@ Subject.find_or_create_by!(name: "Casos de Uso", course: course) do |s|
   s.due_date = 5.months.from_now
 end
 
+# creo un subject con due_date anterior a hoy para testear el job de eliminación/renovación
+Subject.find_or_create_by!(name: "Pruebas de Software", course: course) do |s|
+  s.creator = creator
+  s.due_date = 2.months.ago
+end
+
+Subject.find_or_create_by!(name: "Modelado UML", course: course) do |s|
+  s.creator = creator
+  s.due_date = 1.month.ago
+end
+
 # ========================
 course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
 creator = User.find_by(email: "martadaluz@gmail.com") || User.first
@@ -1191,3 +1202,89 @@ UserTutoring.find_or_create_by!(
 tutoring_offered.state = 2
 tutoring_offered.scheduled_at = 10.days.ago
 tutoring_offered.save!(validate: false) # para que me deje poner una fecha del pasado aunque la db no lo permite
+
+# Feedback de la tutoria
+Feedback.find_or_create_by!(tutor_id: creator.id,
+                            student_id: User.find_by!(email: "andresmendez@gmail.com").id,
+                            tutoring_id: tutoring_offered.id,
+                            rating: 4.5)
+
+# Tutoría 22 (ya finalizada)
+creator = User.find_by!(email: "andresmendez@gmail.com")
+course = Course.find_by(id: 3) # Administración de Infraestructuras
+subject = Subject.find_by!(name: "Gestión de Servidores", course: course)
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 1.day.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 3,
+  enrolled: 2,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id,
+  state: 1
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "clarasuarez@gmail.com"),
+  tutoring: tutoring_offered
+)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "paulacastro@gmail.com"),
+  tutoring: tutoring_offered
+)
+
+tutoring_offered.state = 2
+tutoring_offered.scheduled_at = 6.days.ago
+tutoring_offered.save!(validate: false) # para que me deje poner una fecha del pasado aunque la db no lo permite
+
+# Para probar el ranking con feedback de tutoría pasadas
+
+Feedback.find_or_create_by!(tutor_id: creator.id,
+                            student_id: User.find_by!(email: "clarasuarez@gmail.com").id,
+                            tutoring_id: tutoring_offered.id,
+                            rating: 3)
+
+# Tutoría 23 (ya finalizada)
+creator = User.find_by!(email: "paulacastro@gmail.com")
+course = Course.find_by(id: 3) # Administración de Infraestructuras
+subject = Subject.find_by!(name: "Gestión de Servidores", course: course)
+
+tutoring_offered = Tutoring.find_or_create_by!(
+  scheduled_at: 1.day.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 3,
+  enrolled: 2,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id,
+  state: 1
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "clarasuarez@gmail.com"),
+  tutoring: tutoring_offered
+)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "andresmendez@gmail.com"),
+  tutoring: tutoring_offered
+)
+
+tutoring_offered.state = 2
+tutoring_offered.scheduled_at = 6.days.ago
+tutoring_offered.save!(validate: false) # para que me deje poner una fecha del pasado aunque la db no lo permite
+
+# Para probar el ranking con feedback de tutoría pasadas
+
+Feedback.find_or_create_by!(tutor_id: creator.id,
+                            student_id: User.find_by!(email: "clarasuarez@gmail.com").id,
+                            tutoring_id: tutoring_offered.id,
+                            rating: 3)

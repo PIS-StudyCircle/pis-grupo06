@@ -1,41 +1,54 @@
 import { formatDateTime } from "@shared/utils/FormatDate";
 import { useUser } from "@context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import {
+  showSuccess,
+  showError,
+  showConfirm,
+} from "@shared/utils/toastService";
 
-export default function TutoringCard({ tutoring, mode: externalMode, onDesuscribirse }) {
+export default function TutoringCard({
+  tutoring,
+  mode: externalMode,
+  onDesuscribirse,
+}) {
   const { user } = useUser();
 
   const handleUnirmeClick = async (tutoring) => {
     if (!tutoring) return;
 
     const primerEstudiante = tutoring.enrolled === 0;
-    
+
     // Primer estudiante confirma las horas y se une a la tutoría
     if (primerEstudiante) {
-      navigate(`/tutorias/${tutoring.id}/elegir_horario_estudiante`, { state: { tutoring } });
+      navigate(`/tutorias/${tutoring.id}/elegir_horario_estudiante`, {
+        state: { tutoring },
+      });
       return;
     }
-    
+
     //Si no es el primer estudiante, simplemente se une
     try {
-      const res = await fetch(`/api/v1/tutorings/${tutoring.id}/join_tutoring`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          role: "student",
-        }),
-      });
+      const res = await fetch(
+        `/api/v1/tutorings/${tutoring.id}/join_tutoring`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: "student",
+          }),
+        }
+      );
       if (res.ok) {
-        alert("Te uniste a la tutoría con éxito");
+        showSuccess("Te uniste a la tutoría con éxito");
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || "No se pudo unir a la tutoría");
+        showError(data.error || "No se pudo unir a la tutoría");
       }
     } catch (error) {
       console.error(error);
-      alert("Error en la conexion con el servidor");
+      showError("Error en la conexion con el servidor");
     }
   };
 
@@ -44,60 +57,29 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
   const handleDesuscribirmeClick = async (tutoring) => {
     if (!tutoring) return;
 
-    const confirmar = confirm(`¿Seguro que querés desuscribirte de la tutoría? "${tutoring.id}"?`);
-    if (!confirmar) return;
-
-    try {
-      await onDesuscribirse(tutoring.id);
-      alert("Te desuscribiste correctamente.");
-    } catch (error) {
-      console.error(error);
-      alert("Ocurrió un error al intentar desuscribirte.");
-    }
+    showConfirm(
+      `¿Seguro que querés desuscribirte de la tutoría?`,
+      async () => {
+        try {
+          if (onDesuscribirse) await onDesuscribirse(tutoring.id);
+          showSuccess("Te desuscribiste correctamente.");
+        } catch (error) {
+          console.error(error);
+          showError("Ocurrió un error al intentar desuscribirte.");
+        }
+      },
+      () => {
+        console.log("Usuario canceló la desuscripción");
+      }
+    );
   };
 
-  
-
   const noTieneTutor = tutoring.tutor_id === null;
-  const cuposDisponibles =  tutoring.capacity != null && tutoring.capacity > tutoring.enrolled;
+  const cuposDisponibles =
+    tutoring.capacity != null && tutoring.capacity > tutoring.enrolled;
   const soyTutor = tutoring.tutor_id === user?.id;
-  const esCreador = tutoring.created_by_id === user?.id; 
-
-  const [soyEstudiante, setSoyEstudiante] = useState(false);
-
-  useEffect(() => {
-    let cancel = false;
-    async function run() {
-      if (!user?.id || !tutoring?.id) {
-        setSoyEstudiante(false);
-        return;
-      }
-
-      try {
-        const res = await fetch(`/api/v1/tutorings/${tutoring.id}/exists_user_tutoring`, {
-          credentials: "include",
-        });
-
-        if (cancel) return;
-
-        if (!res.ok) {
-          console.warn("exists_user_tutoring no OK:", res.status);
-          setSoyEstudiante(false);             
-          return;
-        }
-
-        const { exists } = await res.json().catch(() => ({ exists: false }));
-        setSoyEstudiante(!!exists);            
-      } catch (e) {
-        if (!cancel) {
-          console.warn("fetch error:", e);
-          setSoyEstudiante(false);            
-        }
-      }
-    }
-    run();
-    return () => { cancel = true };
-  }, [user?.id, tutoring?.id]);
+  const esCreador = tutoring.created_by_id === user?.id;
+  const soyEstudiante = tutoring.user_enrolled;
 
 
   // Use externalMode if provided, otherwise calculate mode based on state
@@ -122,11 +104,20 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
   const navigate = useNavigate();
 
   return (
+      <div
+    className="w-full bg-white rounded-lg shadow p-4 my-4 cursor-pointer hover:shadow-md transition-shadow"
+    role="button"
+    tabIndex={0}
+    onClick={() => navigate(`/tutorias/${tutoring.id}`)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        navigate(`/tutorias/${tutoring.id}`);
+      }
+    }}
+  >
     <div className="w-full bg-white rounded-lg shadow p-4 my-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        
         <div className="flex-1 flex flex-col text-left">
-
           <p className="tutoring-card-title">
             <b>Materia: </b>
             {tutoring.course.name}
@@ -142,11 +133,17 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
               <b>Duración: </b> {tutoring.duration_mins} minutos
             </p>
           )}
-          <p className="tutoring-card-title mt-1"><b>Modalidad: </b> {tutoring.modality}</p>
+          <p className="tutoring-card-title mt-1">
+            <b>Modalidad: </b> {tutoring.modality}
+          </p>
           {tutoring.tutor_id !== null ? (
             <>
               <p className="tutoring-card-title mt-1">
-                <b>Tutor: </b> {tutoring.tutor_name + " " + tutoring.tutor_last_name} <span className="text-gray-500">{" (" + tutoring.tutor_email + ")"}</span>
+                <b>Tutor: </b>{" "}
+                {tutoring.tutor_name + " " + tutoring.tutor_last_name}{" "}
+                <span className="text-gray-500">
+                  {" (" + tutoring.tutor_email + ")"}
+                </span>
               </p>
             </>
           ) : null}
@@ -154,9 +151,11 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
             <b>Cupos disponibles: </b>
             {tutoring.capacity == null
               ? "A definir"
-              : (tutoring.capacity - (tutoring.enrolled ?? 0))}
+              : tutoring.capacity - (tutoring.enrolled ?? 0)}
           </p>
-          <p className="tutoring-card-title mt-1"><b>Temas:</b></p>
+          <p className="tutoring-card-title mt-1">
+            <b>Temas:</b>
+          </p>
 
           <div className="flex flex-wrap gap-2 mt-1">
             {tutoring.subjects.map((subject) => (
@@ -175,7 +174,6 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
           </div>
         </div>
 
-
         {/* Botones */}
         {mode !== "creador" && (
           <div className="flex flex-col gap-3 md:pr-3">
@@ -183,11 +181,12 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
                   navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
                     state: { tutoring },
-                  })
-                }
+                  });
+                }}
               >
                 Ser tutor
               </button>
@@ -197,7 +196,10 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
               <button
                 type="button"
                 className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => handleUnirmeClick(tutoring)}
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
+                  handleUnirmeClick(tutoring);
+                }}
               >
                 Unirme
               </button>
@@ -208,18 +210,22 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
                 <button
                   type="button"
                   className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                  onClick={() =>
+                  onClick={(e) => {
+                    e.stopPropagation(); // para que no se dispare el onClick del card
                     navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
                       state: { tutoring },
-                    })
-                  }
+                    });
+                  }}
                 >
                   Ser tutor
                 </button>
                 <button
                   type="button"
                   className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-                  onClick={() => handleUnirmeClick(tutoring)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // para que no se dispare el onClick del card
+                    handleUnirmeClick(tutoring);
+                  }}
                 >
                   Unirme
                 </button>
@@ -230,7 +236,10 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
               <button
                 type="button"
                 className="btn w-full bg-red-500 hover:bg-red-600 text-white"
-                onClick={() => handleDesuscribirmeClick(tutoring)}
+                onClick={(e) => {
+                  e.stopPropagation(); // para que no se dispare el onClick del card
+                  handleDesuscribirmeClick(tutoring);
+                }}
               >
                 Desuscribirme
               </button>
@@ -249,5 +258,6 @@ export default function TutoringCard({ tutoring, mode: externalMode, onDesuscrib
         )}
       </div>
     </div>
+     </div>
   );
 }

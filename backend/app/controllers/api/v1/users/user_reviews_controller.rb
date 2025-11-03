@@ -8,7 +8,7 @@ module Api
           reviewed_id = params[:reviewed_id]
           reviews = UserReview.where(reviewed_id: reviewed_id)
           render json: reviews.as_json(
-            include: { reviewer: { only: [:id, :name, :last_name, :email] } }
+            include: { reviewer: { only: [:id, :name, :last_name], methods: [:email_masked] } }
           )
         end
 
@@ -37,6 +37,15 @@ module Api
           )
 
           if review.save
+            # Enviar notificación al usuario que recibió la review
+            ReviewReceivedNotifier.with(
+              title: "Nueva reseña recibida",
+              url: "/usuarios/#{current_user.id}",
+              reviewer_name: "#{current_user.name} #{current_user.last_name}",
+              review_id: review.id,
+              reviewer_id: current_user.id
+            ).deliver_later(review.reviewed)
+
             render json: review, status: :created
           else
             render json: { errors: review.errors.full_messages }, status: :unprocessable_entity

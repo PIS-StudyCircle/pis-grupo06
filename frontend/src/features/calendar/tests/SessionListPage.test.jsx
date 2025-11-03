@@ -69,7 +69,7 @@ describe("SessionList", () => {
 
     render(
       <MemoryRouter initialEntries={["/notificaciones"]}>
-        <SessionList userId="u1" />
+        <SessionList userId="u1" type="invitations" />
       </MemoryRouter>
     );
 

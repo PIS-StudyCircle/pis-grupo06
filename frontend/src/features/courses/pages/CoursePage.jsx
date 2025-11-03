@@ -5,6 +5,7 @@ import { useCourses } from "../hooks/useCourses";
 import SearchInput from "@components/SearchInput";
 import Pagination from "@components/Pagination";
 import PageTitle from "@components/PageTitle";
+import TopTutors from "../components/TopTutors";  
 import { useUser } from "@context/UserContext";
 
 export default function CoursePage() {
@@ -34,10 +35,11 @@ export default function CoursePage() {
   }, [query, setPage, setSearch]);
 
   return (
-    <div className="flex flex-col ">
-      <div className="flex-1 overflow-y-auto px-6 py-4 content-scroll">
-        <div className="max-w-5xl mx-auto">
-          <PageTitle title="Materias Disponibles" className="titulo"></PageTitle>
+    <div className="flex flex-col py-6 content-scroll">
+      <div className="flex flex-col md:flex-row justify-center gap-10 pl-4 md:pl-32 pr-4 md:pr-10">
+        {/* Columna izquierda: cursos */}
+        <div className="flex-[1.6] order-2 md:order-1">
+          <PageTitle title="Materias Disponibles" className="titulo" />
           <SearchInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -49,16 +51,30 @@ export default function CoursePage() {
               <input
                 type="checkbox"
                 checked={showFavorites}
-                onChange={(e) => setShowFavorites(e.target.checked)}
+                onChange={(e) => {
+                  setShowFavorites(e.target.checked);
+                  setPage(1);
+                }}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-gray-700">Favoritos</span>
             </label>
           )}
 
-          <CourseList courses={courses} loading={loading} error={error} />
+          {/* 👇 Ranking visible antes del listado en mobile */}
+          <div className="block md:hidden my-4 flex justify-center">
+            <div className="w-full max-w-sm">
+              <TopTutors />
+            </div>
+          </div>
 
+          <CourseList courses={courses} loading={loading} error={error} />
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />
+        </div>
+
+        {/* Columna derecha: ranking (solo visible en pantallas grandes) */}
+        <div className="hidden md:block flex-[0.8] order-2">
+          <TopTutors />
         </div>
       </div>
     </div>

@@ -23,7 +23,7 @@ export function NotificationsProvider({ children }) {
         const data = await getJson("/notifications");
         if (!cancelled) setList(data.notifications || []);
       } catch (e) {
-        console.error(e);
+        console.error("🔔 [DEBUG] Frontend: Error cargando notificaciones:", e);
       }
     })();
     return () => { cancelled = true; };
@@ -34,6 +34,8 @@ export function NotificationsProvider({ children }) {
 
     (async () => {
       try {
+        if (subRef.current) return;
+
         const tokenResp = await fetch(`${API_BASE}/notification_token`, {
           method: "POST",
           credentials: "include",
@@ -46,7 +48,12 @@ export function NotificationsProvider({ children }) {
         subRef.current = consumer.subscriptions.create(
           { channel: "NotificationsChannel" },
           {
+            connected: () => {
+            },
+            disconnected: () => {
+            },
             received: (payload) => {
+              
               setList(prev => (prev.some(n => n.id === payload.id) ? prev : [payload, ...prev]));
             },
           }
