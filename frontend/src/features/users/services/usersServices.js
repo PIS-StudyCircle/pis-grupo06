@@ -1,7 +1,6 @@
 import { API_BASE } from "@/shared/config";
 import { storeUserMaybe } from "./auth.api";
 import { http } from "./https";
-import { saveItem } from "@utils/storage";
 
 const API_URL = `${API_BASE}/users`;
 
