@@ -48,8 +48,9 @@ class Tutoring < ApplicationRecord
     where("enrolled < capacity and tutor_id IS NOT NULL")
   }
 
-  # Ya pasó (scheduled_at < ahora)
-  scope :past, -> { where(scheduled_at: ...Time.current) }
+  # Ya pasó y tiene estado finalizada
+  # Esto despues habria que cambiarlo para que sea finished y no past, pero lo dejamos asi para la demo.
+  scope :past, -> { where(state: :finished).where(scheduled_at: ...Time.current) }
 
   # Futuras (scheduled_at >= ahora)
   scope :upcoming, -> { where(scheduled_at: Time.current..) }
