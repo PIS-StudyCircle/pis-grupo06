@@ -17,7 +17,7 @@ jest.mock("../../context/UserContext", () => {
     __resetUser: () => { state.user = null; },
   };
 });
-import { __setUser, __resetUser } from "../../context/UserContext";
+import { useUser,__setUser, __resetUser } from "../../context/UserContext";
 
 jest.mock("../../../features/tutorings/services/tutoringService", () => {
   const db = { tutorias: [], nextId: 1 };
@@ -122,7 +122,8 @@ import {
 function MateriaPageMock() {
   const navigate = useNavigate();
   const { courseId } = useParams();
-  const { user } = require("../../context/UserContext").useUser();
+  const { user } = useUser();
+
 
   const onRecibir = async () => {
     await createPendingByStudent({ courseId: Number(courseId), studentId: user.id, capacity: 2 });
@@ -156,7 +157,7 @@ function TutoriasListMock() {
   const courseId = Number(params.get("course"));
   const topicId = params.get("topic") ? Number(params.get("topic")) : null;
 
-  const { user } = require("../../context/UserContext").useUser();
+  const { user } = useUser();
   const [items, setItems] = React.useState([]);
 
   const reload = async () => {
@@ -170,7 +171,6 @@ function TutoriasListMock() {
       return;
     }
     reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, topicId, location.search]);
 
   const handleJoin = async (id) => {
@@ -241,10 +241,6 @@ const expectCupos = async (id, cuposText) => {
   const nodes = await screen.findAllByTestId(`cupos-${id}`);
   const last = nodes[nodes.length - 1];
   expect(last).toHaveTextContent(`Cupos: ${cuposText}`);
-};
-
-const clickLinkByText = (text) => {
-  fireEvent.click(screen.getByRole("link", { name: new RegExp(text, "i") }));
 };
 
 describe("Flujo de crear Tutorías", () => {
