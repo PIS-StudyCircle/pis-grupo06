@@ -1070,3 +1070,69 @@ Feedback.find_or_create_by!(tutor_id: creator.id,
                             student_id: estudiante3.id,
                             tutoring_id: tutoring_offered_finished3.id,
                             rating: 5)
+
+
+# Tutoría 11 - creada por el tutor
+
+# Se crea con fechas futuras y luego se actualiza
+
+creator = User.find_by!(email: "arianarossi@gmail.com")
+course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
+subject = course.subjects.sample(1).first
+
+start_time = 21.days.from_now.change(hour: 13, min: 0) # concide con una de las tutoring availabilities
+
+tutoring_offered_finished4 = Tutoring.find_or_create_by!(
+  scheduled_at: start_time,
+  modality: "virtual",
+  capacity: 4,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id,
+  duration_mins: 60,
+  state: 1
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered_finished4)
+
+
+estudiante = User.find_by!(email: "nicolasfunes@gmail.com")
+UserTutoring.find_or_create_by!(
+  user: estudiante,
+  tutoring: tutoring_offered_finished4
+)
+
+estudiante2 = User.find_by!(email: "silvananavarro@gmail.com")
+UserTutoring.find_or_create_by!(
+  user: estudiante2,
+  tutoring: tutoring_offered_finished4
+)
+
+# Crear disponibilidades para esta tutoría
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered_finished4,
+  start_time: 21.days.from_now.change(hour: 13, min: 0),
+  end_time: 21.days.from_now.change(hour: 19, min: 0),
+  is_booked: true
+)
+
+# BORRAR DESPUES
+UserTutoring.find_or_create_by!(
+  user: creator,
+  tutoring: tutoring_offered_finished4
+)
+
+# Actualizo a finalizada
+
+tutoring_offered_finished4.state = 2
+tutoring_offered_finished4.scheduled_at = 18.days.ago.change(hour: 13, min: 0)
+tutoring_offered_finished4.duration_mins = 60
+tutoring_offered_finished4.save!(validate: false)
+# para que me deje poner una fecha del pasado aunque la db no lo permite
+
+availability = TutoringAvailability.find_by(tutoring: tutoring_offered_finished4)
+availability.update!(
+  start_time: 18.days.ago.change(hour: 13, min: 0),
+  end_time: 18.days.ago.change(hour: 19, min: 0)
+)
+
