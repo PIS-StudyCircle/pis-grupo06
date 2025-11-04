@@ -1,14 +1,15 @@
-import { createConsumer } from "@rails/actioncable";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { API_BASE, WS_BASE } from "@/shared/config";
 import { NotificationsCtx } from "@/shared/context/NotificationContext";
+import { getConsumer } from "@/channels/consumer";
 
 export function NotificationsProvider({ children }) {
   const [list, setList] = useState([]);
-  const subRef = useRef(null);
+  const subRef = useRef(null);          // guarda la suscripción
+  const didInitRef = useRef(false);     // evita StrictMode double-mount
 
   const unread = useMemo(() => list.filter(n => !n.read_at).length, [list]);
-  const unseen = list.filter(n => !n.seen_at).length;
+  const unseen = useMemo(() => list.filter(n => !n.seen_at).length, [list]);
 
   async function getJson(url) {
     const r = await fetch(`${API_BASE}${url}`, { credentials: "include" });
@@ -16,26 +17,16 @@ export function NotificationsProvider({ children }) {
     return r.json();
   }
 
+  // 1) SUSCRIPCIÓN (una sola vez)
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const data = await getJson("/notifications");
-        if (!cancelled) setList(data.notifications || []);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
+    if (didInitRef.current) return;
+    didInitRef.current = true;
 
-  useEffect(() => {
-    let consumer;
+    let subscription;
 
     (async () => {
       try {
-        if (subRef.current) return;
-
+        // token para identificar current_user en ActionCable
         const tokenResp = await fetch(`${API_BASE}/notification_token`, {
           method: "POST",
           credentials: "include",
@@ -43,32 +34,64 @@ export function NotificationsProvider({ children }) {
         if (!tokenResp.ok) throw new Error(`POST /notification_token failed: ${tokenResp.status}`);
         const { notifToken } = await tokenResp.json();
 
-        consumer = createConsumer(`${WS_BASE}?notif_token=${encodeURIComponent(notifToken)}`);
+        // consumer singleton
+        const cable = getConsumer(`${WS_BASE}?notif_token=${encodeURIComponent(notifToken)}`);
 
-        subRef.current = consumer.subscriptions.create(
+        // crear la suscripción UNA sola vez
+        subscription = cable.subscriptions.create(
           { channel: "NotificationsChannel" },
           {
+            connected: () => console.log("📡 connected to NotificationsChannel"),
+            disconnected: () => console.log("🔌 disconnected from NotificationsChannel"),
             received: (payload) => {
-              console.log("Recibida la notificacion"),
-              setList(prev => (prev.some(n => n.id === payload.id) ? prev : [payload, ...prev]));
+              console.log("🔔 received via AC:", payload);
+              // insertar si no existe y mantener orden (created_at desc si viene)
+              setList(prev => {
+                if (prev.some(n => n.id === payload.id)) return prev;
+                const next = [payload, ...prev];
+                return next.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+              });
             },
           }
         );
+
+        subRef.current = subscription;
       } catch (e) {
-        console.error(e);
+        console.error("WS init error:", e);
       }
     })();
 
-   return () => {
+    return () => {
       try {
         subRef.current?.unsubscribe();
-        consumer?.disconnect();
+        subRef.current = null;
       } catch (err) {
-        if (import.meta?.env?.DEV) {
-          console.debug("WS cleanup error:", err);
-        }
+        console.warn("⚠️ Error al desuscribir el canal:", err);
       }
+      
     };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const data = await getJson("/notifications");
+        if (cancelled) return;
+
+        setList(prev => {
+          const incoming = data.notifications || [];
+          const map = new Map(prev.map(n => [n.id, n]));  // mantener las ya llegadas por WS
+          for (const n of incoming) map.set(n.id, { ...map.get(n.id), ...n });
+          return Array.from(map.values()).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        });
+      } catch (e) {
+        console.error("🔔 [DEBUG] Frontend: Error cargando notificaciones:", e);
+      }
+    })();
+
+    return () => { cancelled = true; };
   }, []);
 
   async function markRead(id) {
@@ -78,7 +101,8 @@ export function NotificationsProvider({ children }) {
       credentials: "include",
       body: JSON.stringify({ read: true }),
     });
-    setList(prev => prev.map(n => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)));
+    const nowIso = new Date().toISOString();
+    setList(prev => prev.map(n => (n.id === id ? { ...n, read_at: nowIso } : n)));
   }
 
   async function markAllRead() {
@@ -97,7 +121,7 @@ export function NotificationsProvider({ children }) {
     });
     if (!res.ok) throw new Error("mark_all_seen failed");
     const now = new Date().toISOString();
-    setList(prev => prev.map(n => n.seen_at ? n : { ...n, seen_at: now }));
+    setList(prev => prev.map(n => (n.seen_at ? n : { ...n, seen_at: now })));
   }
 
   async function deleteOne(id) {
@@ -111,7 +135,7 @@ export function NotificationsProvider({ children }) {
 
   async function deleteAll() {
     const res = await fetch(`${API_BASE}/notifications/destroy_all`, {
-      method: "DELETE", 
+      method: "DELETE",
       credentials: "include",
     });
     if (!res.ok) throw new Error("delete all failed");

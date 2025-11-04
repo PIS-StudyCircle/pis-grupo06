@@ -28,3 +28,15 @@ export async function getFeedbacks(tutor_id = null) {
     throw error;
   }
 }
+
+export async function getTopRatedTutors() {
+  try {
+    const res = await fetch(`${API_URL}/top_rated`);
+    if (!res.ok) throw new Error("Error al obtener ranking de tutores");
+    const data = await res.json();
+    return Array.isArray(data) ? data : data.tutors || [];
+  } catch (err) {
+    console.error("Error en getTopRatedTutors:", err);
+    throw err;
+  }
+}

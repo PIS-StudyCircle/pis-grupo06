@@ -3,15 +3,21 @@
 # not a terminal started via bin/rails console! Add "console" to any action or any ERB template view
 # to make the web console appear.
 development:
-  adapter: async
+  adapter: solid_cable
+  polling_interval: 0.1     # 0.1 s
+  message_retention: 86400  # 1 día en segundos
 
 test:
-  adapter: test
+  adapter: solid_cable
+  polling_interval: 0.1     # 0.1 s
+  message_retention: 86400  # 1 día en segundos
 
 production:
   adapter: solid_cable
-  polling_interval: 0.1.seconds
-  message_retention: 1.day
+  polling_interval: 0.1     # 0.1 s
+  message_retention: 86400  # 1 día en segundos
 
 staging:
   adapter: solid_cable
+  polling_interval: 0.1     # 0.1 s
+  message_retention: 86400  # 1 día en segundos

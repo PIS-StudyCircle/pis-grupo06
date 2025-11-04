@@ -82,6 +82,7 @@ class GoogleCalendarService
 
   # Crear el calendario StudyCircle si no existe
   def ensure_calendar(user)
+    # Verificar nuevamente dentro del lock
     return user.calendar_id if user.calendar_id.present?
 
     calendar = Google::Apis::CalendarV3::Calendar.new(
