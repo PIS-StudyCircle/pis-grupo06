@@ -55,7 +55,7 @@ export default function EditProfilePage() {
       setField("profile_photo", null);
       setPreview(user.profile_photo_url || DEFAULT_PHOTO);
     }
-  }, [user]);
+  }, [user, sertField]);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
