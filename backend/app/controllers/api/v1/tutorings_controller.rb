@@ -279,7 +279,9 @@ module Api
         # Inscribir al estudiante
         UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
-        # Se une al chat de la tutoria (siempre deberia existir si no es el primer estudiante en unirse ni el tutor)
+        # Asegurar que exista el chat de la tutoría y agregar al usuario al chat
+        # Garantizar existencia del chat antes de manipular usuarios
+        @tutoring.create_chat! unless @tutoring.chat
         @tutoring.chat.users << current_user unless @tutoring.chat.users.exists?(current_user.id)
 
         # Incrementar contador de inscritos
@@ -380,7 +382,6 @@ module Api
           @tutoring.users.each do |user|
             @tutoring.chat.users << user unless @tutoring.chat.users.exists?(user.id)
           end
-
         end
 
         # Programar notificaciones automáticas
@@ -469,7 +470,7 @@ module Api
             status: t.state,
             role: is_tutor ? "tutor" : "student",
             attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "active" } },
-            url: nil
+            url: nil,
             chat_id: t.chat&.id
           }
         }
@@ -530,7 +531,7 @@ module Api
             chat = @tutoring.chat
             if chat
               chat.destroy
-            end 
+            end
 
             @tutoring.destroy!
             return head :no_content
@@ -541,7 +542,10 @@ module Api
           user_tutoring.destroy!
 
           # Lo elimino del chat de la tutoria
-          @tutoring.chat.users.delete(current_user.id)
+          # Si existe chat, remover al usuario; proteger contra chat nil en tests
+          if @tutoring.chat
+            @tutoring.chat.users.delete(current_user.id)
+          end
 
           new_enrolled = [prev_enrolled - 1, 0].max
           @tutoring.update!(enrolled: new_enrolled)
@@ -563,7 +567,7 @@ module Api
             chat = @tutoring.chat
             if chat
               chat.destroy
-            end 
+            end
 
             @tutoring.destroy!
             return head :no_content
@@ -586,7 +590,7 @@ module Api
             chat = @tutoring.chat
             if chat
               chat.destroy
-            end 
+            end
 
             @tutoring.destroy!
             return head :no_content
