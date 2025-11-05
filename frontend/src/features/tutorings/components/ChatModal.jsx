@@ -6,7 +6,7 @@ export default function ChatModal({ chatId, token, onClose }) {
   const { user } = useUser();
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
-  const { messages, send, ready } = useChat({ chatId, token });
+  const { messages, send } = useChat({ chatId, token });
   const modalRef = useRef(null);
 
   // Scroll automático al último mensaje
