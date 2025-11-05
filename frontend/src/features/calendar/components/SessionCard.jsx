@@ -205,7 +205,8 @@ export default function SessionCard({ session, type = "all", refresh }) {
               )}
               {session.chat_id && (
                 <button
-                  onClick={() => setShowChat(true)}
+                  type="button"
+                  onClick={(e) => handleButtonClick(e, () => setShowChat(true))}
                   className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded"
                 >
                   Abrir chat
