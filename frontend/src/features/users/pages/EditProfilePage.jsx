@@ -21,7 +21,7 @@ const validators = {
 };
 
 export default function EditProfilePage() {
-  const { user, updateUser } = useUser();
+  const { user, loading, updateUser } = useUser();
   const navigate = useNavigate();
 
   const { form, setField, setForm } = useFormState({
@@ -88,6 +88,10 @@ export default function EditProfilePage() {
 
   if (!user) {
     return <p className="text-center mt-10">No hay usuario cargado.</p>;
+  }
+
+  if (loading) {
+    return <p className="text-center mt-10">Cargando...</p>;
   }
 
   return (
