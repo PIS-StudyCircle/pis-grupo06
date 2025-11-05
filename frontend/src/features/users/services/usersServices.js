@@ -4,6 +4,15 @@ import { http } from "./https";
 
 const API_URL = `${API_BASE}/users`;
 
+export const getCurrentUser = async () => {
+  const response = await fetch(`${API_BASE}/users/me`, { credentials: "include" });
+  if (!response.ok) {
+    throw new Error("Error al obtener el usuario actual");
+  }
+  const data = await response.json();
+  return data.user;
+};
+
 export const getUsers = async (page = 1, perPage = 20, search = "", role = "") => {
   const params = new URLSearchParams({ page, per_page: perPage });
   if (search) params.append("search", search);

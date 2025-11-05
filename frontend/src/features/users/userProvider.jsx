@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut } from "./services/auth.api";
+import { useEffect, useState, useCallback } from "react";
+import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut, resetPassword as apiResetPassword } from "./services/auth.api";
 import { getItem, saveItem, removeItem } from "@/shared/utils/storage";
 import { API_BASE } from "@/shared/config";
 import { Ctx } from "@context/UserContext";
-import { resetPassword as apiResetPassword } from "./services/auth.api";
+import { getCurrentUser } from "./services/usersServices";
 
 export default function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -33,6 +33,20 @@ export default function UserProvider({ children }) {
       setBooting(false);
     }
   }
+
+  const refetchCurrentUser = useCallback(async () => {
+    try {
+      const fetchedUser = await getCurrentUser();
+      setUser(fetchedUser);
+      saveItem("user", fetchedUser);
+      return fetchedUser;
+    } catch (err) {
+      console.error("Error al obtener el usuario:", err);
+      setUser(null);
+      removeItem("user");
+      return null;
+    }
+  }, []);
 
   async function handleAuth(fn, ...args) {
     const u = await fn(...args);
@@ -83,7 +97,7 @@ export default function UserProvider({ children }) {
   };
 
   return (
-    <Ctx.Provider value={{ user, booting, signIn, signup, signOut, forgotPassword, resetPassword, updateUser }}>
+    <Ctx.Provider value={{ user, booting, signIn, signup, signOut, forgotPassword, resetPassword, updateUser, refetchCurrentUser }}>
       {children}
     </Ctx.Provider>
   );

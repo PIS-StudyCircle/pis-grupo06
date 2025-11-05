@@ -21,7 +21,7 @@ const validators = {
 };
 
 export default function EditProfilePage() {
-  const { user, loading, updateUser } = useUser();
+  const { user, booting, updateUser, refetchCurrentUser } = useUser();
   const navigate = useNavigate();
 
   const { form, setField, setForm } = useFormState({
@@ -34,6 +34,7 @@ export default function EditProfilePage() {
   const [showEditor, setShowEditor] = useState(false);
   const [preview, setPreview] = useState(null);
   const [fileUrl, setFileUrl] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const { errors, validate } = useValidation(validators);
 
@@ -47,18 +48,41 @@ export default function EditProfilePage() {
     "/perfil"
   );
 
+  // Fetch fresh user data on mount
   useEffect(() => {
-    if (user) {
-      setForm((prevState) => ({
-        ...prevState,
-        name: user.name || "",
-        last_name: user.last_name || "",
-        description: user.description || "",
-        profile_photo: null,
-      }));
-      setPreview(user.profile_photo_url || DEFAULT_PHOTO);
-    }
-  }, [user, setForm]);
+    let isMounted = true;
+
+    const fetchFreshUser = async () => {
+      if (!booting) {
+        setLoading(true);
+        try {
+          const freshUser = await refetchCurrentUser();
+          if (freshUser && isMounted) {
+            setForm((prevState) => ({
+              ...prevState,
+              name: freshUser.name || "",
+              last_name: freshUser.last_name || "",
+              description: freshUser.description || "",
+              profile_photo: null,
+            }));
+            setPreview(freshUser.profile_photo_url || DEFAULT_PHOTO);
+          }
+        } catch (error) {
+          console.error("Error fetching fresh user data:", error);
+        } finally {
+          if (isMounted) {
+            setLoading(false);
+          }
+        }
+      }
+    };
+
+    fetchFreshUser();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [booting, refetchCurrentUser, setForm]);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -86,12 +110,12 @@ export default function EditProfilePage() {
     }
   };
 
-  if (!user) {
-    return <p className="text-center mt-10">No hay usuario cargado.</p>;
+  if (loading || booting) {
+    return <p className="text-center mt-10">Cargando...</p>;
   }
 
-  if (loading) {
-    return <p className="text-center mt-10">Cargando...</p>;
+  if (!user) {
+    return <p className="text-center mt-10">No hay usuario cargado.</p>;
   }
 
   return (
