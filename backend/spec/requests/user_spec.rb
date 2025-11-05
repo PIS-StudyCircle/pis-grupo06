@@ -78,7 +78,7 @@ RSpec.describe "Api::V1::Users", type: :request do
         attrs = json.fetch("user")
 
         expected_attrs =
-          UserSerializer.new(user).serializable_hash[:data][:attributes].as_json
+          UserSerializer.new(user, params: { current_user: user }).serializable_hash[:data][:attributes].as_json
 
         expect(attrs).to eq(expected_attrs)
 

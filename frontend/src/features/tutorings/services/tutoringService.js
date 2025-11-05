@@ -150,7 +150,7 @@ export async function confirmSchedule(tutoringId, payload) {
     headers: { "Content-Type": "application/json", "Accept": "application/json" },
     body: JSON.stringify(payload),
   });
-
+ 
   if (!res.ok) {
     // Log útil y mensaje claro
     const raw = await res.text().catch(() => "");
@@ -168,3 +168,20 @@ export async function confirmSchedule(tutoringId, payload) {
 
   try { return await res.json(); } catch { return {}; }
 }
+export const joinTutoring = async (tutoringId) => {
+  if (!tutoringId) throw new Error("Falta el ID de la tutoría");
+
+  const resp = await fetch(`${API_BASE}/tutorings/${tutoringId}/join_tutoring`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role: "student" }),
+  });
+
+  if (!resp.ok) {
+    const data = await resp.json().catch(() => ({}));
+    throw new Error(data.error || "No se pudo unir a la tutoría");
+  }
+
+  return await resp.json().catch(() => ({}));
+};

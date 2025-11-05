@@ -1,5 +1,6 @@
 import { Calendar, Clock, User, MapPin, Users, Star } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Agregar esta importación
 import FeedbackModal from "./FeedbackModal";
 import { hasFeedback } from "../hooks/useFeedback"; 
 import { useUser } from "@context/UserContext";
@@ -14,6 +15,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
   const [showChat, setShowChat] = useState(false);
 
   const { user } = useUser();
+  const navigate = useNavigate(); // Agregar esta línea
 
   useEffect(() => {
     if (type === "finalized" && user?.id) {
@@ -59,7 +61,8 @@ export default function SessionCard({ session, type = "all", refresh }) {
     }
   };
 
-  const handleDesuscribirmeClick = (session) => {
+  const handleDesuscribirmeClick = (session, e) => {
+    if (e) e.stopPropagation(); // Evitar propagación del evento
     if (!session) return;
     handleCancel(session.id, refresh);
   };
@@ -72,6 +75,19 @@ export default function SessionCard({ session, type = "all", refresh }) {
     if (value == null) return;
     setShowFeedbackModal(false);
     setUserRating(Number(value)); 
+  };
+
+  // Nuevo manejador para redirigir a la show page
+  const handleCardClick = () => {
+    if (session?.id) {
+      navigate(`/tutorias/${session.id}`);
+    }
+  };
+
+  // Manejador para evitar propagación en botones específicos
+  const handleButtonClick = (e, callback) => {
+    e.stopPropagation();
+    if (callback) callback();
   };
 
   const StarRow = ({ value }) => {
@@ -100,7 +116,10 @@ export default function SessionCard({ session, type = "all", refresh }) {
 
   return (
     <>
-      <div className="bg-white border border-gray-300 rounded-xl p-6 shadow-lg hover:shadow-xl hover:scale-[1.01] transition transform">
+      <div 
+        className="bg-white border border-gray-300 rounded-xl p-6 shadow-lg hover:shadow-xl hover:scale-[1.01] transition transform cursor-pointer"
+        onClick={handleCardClick}
+      >
         <div className="flex items-start justify-between mb-4">
           <div>
             <h3 className="font-semibold text-gray-900 text-lg">
@@ -150,7 +169,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
           <>
             <div className="mt-4">
               <button
-                onClick={() => setShowAttendees(!showAttendees)}
+                onClick={(e) => handleButtonClick(e, () => setShowAttendees(!showAttendees))}
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
               >
                 <Users className="w-4 h-4" />
@@ -164,7 +183,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
                       key={idx}
                       className="flex justify-between items-center bg-gray-50 px-3 py-1 rounded"
                     >
-                      <span className="text-gray-700">{attendee.email}</span>
+                      <span className="text-gray-700">{attendee.id === user?.id ? "Tú" : attendee.email}</span>
                       <span
                         className={
                           attendee.status === "confirmada"
@@ -197,7 +216,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
               <button
                 type="button"
                 className="btn w-full bg-red-500 hover:bg-red-600 text-white mt-3"
-                onClick={() => handleDesuscribirmeClick(session)}
+                onClick={(e) => handleDesuscribirmeClick(session, e)}
               >
                 Desuscribirme
               </button>
@@ -216,7 +235,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
               </div>
             ) : (
               <button
-                onClick={() => setShowFeedbackModal(true)}
+                onClick={(e) => handleButtonClick(e, () => setShowFeedbackModal(true))}
                 className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800"
               >
                 <Star className="w-4 h-4" />

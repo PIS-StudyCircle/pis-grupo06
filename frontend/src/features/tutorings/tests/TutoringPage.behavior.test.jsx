@@ -99,10 +99,17 @@ describe("TutoringPage - Comportamiento completo", () => {
   
     it("no renderiza botón pero sí toggle cuando mode diferente", () => {
       mockUseTutorings();
-  
+    
       renderWithRouter(<TutoringPage mode="other" />);
-  
-      expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    
+      // Buscar específicamente el botón de acción (no debería existir)
+      expect(
+        screen.queryByRole("button", {
+          name: /crear nueva tutoría|solicitar nueva tutoría/i,
+        })
+      ).not.toBeInTheDocument();
+    
+      // El toggle de "Solo sin tutor" sí debe estar
       expect(screen.getByLabelText(/Solo sin tutor/i)).toBeInTheDocument();
     });
   

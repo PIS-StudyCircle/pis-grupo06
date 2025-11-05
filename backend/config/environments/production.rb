@@ -48,6 +48,7 @@ Rails.application.configure do
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.logger = ActiveSupport::Logger.new(STDOUT)
 
   config.solid_queue.supervisor = true
 
@@ -83,6 +84,10 @@ Rails.application.configure do
   config.action_cable.allowed_request_origins = [
     "https://studycircle-frontend-production.netlify.app"
   ]
+
+  config.action_cable.mount_path = "/api/v1/cable"
+  config.action_cable.disable_request_forgery_protection = true
+
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
   #   "example.com",     # Allow requests from example.com
