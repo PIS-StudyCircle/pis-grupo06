@@ -24,7 +24,7 @@ export default function EditProfilePage() {
   const { user, updateUser } = useUser();
   const navigate = useNavigate();
 
-  const { form, setField } = useFormState({
+  const { form, setField, setForm } = useFormState({
     name: "",
     last_name: "",
     description: "",
@@ -49,13 +49,16 @@ export default function EditProfilePage() {
 
   useEffect(() => {
     if (user) {
-      setField("name", user.name || "");
-      setField("last_name", user.last_name || "");
-      setField("description", user.description || "");
-      setField("profile_photo", null);
+      setForm((prevState) => ({
+        ...prevState,
+        name: user.name || "",
+        last_name: user.last_name || "",
+        description: user.description || "",
+        profile_photo: null,
+      }));
       setPreview(user.profile_photo_url || DEFAULT_PHOTO);
     }
-  }, [user, setField]);
+  }, [user, setForm]);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
