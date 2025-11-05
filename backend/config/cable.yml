@@ -4,20 +4,12 @@
 # to make the web console appear.
 development:
   adapter: async
-  polling_interval: 0.1     # 0.1 s
-  message_retention: 86400  # 1 día en segundos
 
 test:
   adapter: async
-  polling_interval: 0.1     # 0.1 s
-  message_retention: 86400  # 1 día en segundos
 
 production:
   adapter: async
-  polling_interval: 0.1     # 0.1 s
-  message_retention: 86400  # 1 día en segundos
 
 staging:
   adapter: async
-  polling_interval: 0.1     # 0.1 s
-  message_retention: 86400  # 1 día en segundos
