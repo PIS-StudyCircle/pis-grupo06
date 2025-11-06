@@ -73,6 +73,18 @@ export default function UserProfile() {
     }
   };
 
+  const tutorias_dadas = user.tutorias_dadas || 0;
+  const tutorias_recibidas = user.tutorias_recibidas || 0;
+  const resenas_dadas = user.resenas_dadas || 0;
+  const feedback_dado = user.feedback_dado || 0;
+
+  const insignas = useBadges({
+    tutorias_dadas,
+    tutorias_recibidas,
+    resenas_dadas,
+    feedback_dado,
+  });
+
   if (loadingUser || reviewsLoading)
     return <p className="text-center mt-10">Cargando...</p>;
 
@@ -82,18 +94,10 @@ export default function UserProfile() {
 
   const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
 
-  const counts = user?.counts ?? {};
-  const insignas = useBadges(counts);
-
   const BADGE_TUTORIAS_DADAS = insignas.tutorias_dadas;
   const BADGE_TUTORIAS_RECIBIDAS = insignas.tutorias_recibidas;
   const BADGE_RESENAS_DADAS = insignas.resenas_dadas;
   const BADGE_FEEDBACK_DADO = insignas.feedback_dado;
-
-  const tutorias_dadas = counts.tutorias_dadas || 0;
-  const tutorias_recibidas = counts.tutorias_recibidas || 0;
-  const resenas_dadas = counts.resenas_dadas || 0;
-  const feedback_dado = counts.feedback_dado || 0;
 
   const StarRow = ({ value }) => {
     const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1)));

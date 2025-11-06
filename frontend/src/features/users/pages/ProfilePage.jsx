@@ -77,6 +77,9 @@ export default function Profile() {
     }
   }
 
+  const counts = user?.counts ?? {};
+  const insignas = useBadges(counts);
+
   if (loading) return <p className="text-center mt-10">Cargando...</p>;
   if (error)
     return <p className="text-center mt-10">Error al cargar perfil.</p>;
@@ -84,9 +87,6 @@ export default function Profile() {
     return <p className="text-center mt-10">No hay usuario cargado.</p>;
 
   const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
-
-  const counts = user?.counts ?? {};
-  const insignas = useBadges(counts);
 
   const BADGE_TUTORIAS_DADAS = insignas.tutorias_dadas;
   const BADGE_TUTORIAS_RECIBIDAS = insignas.tutorias_recibidas;
@@ -97,7 +97,7 @@ export default function Profile() {
   const tutorias_recibidas = counts.tutorias_recibidas || 0;
   const resenas_dadas = counts.resenas_dadas || 0;
   const feedback_dado = counts.feedback_dado || 0;
-  
+
   // Estrellas con medias (visual del promedio)
   const StarRow = ({ value }) => {
     const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1))); // 0..1
@@ -194,6 +194,7 @@ export default function Profile() {
               )}
             </div>
           </div>
+
           {/* Segunda fila: Insignias */}
           <div className="mt-8">
             <h2 className="text-lg font-semibold text-center mb-4">

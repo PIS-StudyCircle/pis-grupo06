@@ -121,6 +121,16 @@ class Tutoring < ApplicationRecord
     user_tutorings.where.not(user_id: tutor_id).count
   end
 
+  def incrementar_contadores_insignas
+    with_lock do
+      tutor&.increment!(:tutorias_dadas_count)
+
+      users.where.not(id: tutor_id).find_each do |u|
+        u.increment!(:tutorias_recibidas_count)
+      end
+    end
+  end
+
   private
 
   def scheduled_at_cannot_be_in_past
