@@ -23,16 +23,16 @@ jest.mock("../../../features/tutorings/services/tutoringService", () => {
   const db = { tutorias: [], nextId: 1 };
   const now = () => new Date();
 
-  const createPendingByStudent = async ({ courseId, topicId = null, studentId, capacity = 2 }) => {
+  const createPendingByStudent = async ({ courseId, temaId = null, studentId, capacity = 2 }) => {
     const t = {
       id: db.nextId++,
       courseId: Number(courseId),
-      topicId,
+      temaId,
       tutorId: null,
       students: [studentId],
       capacity,
       scheduledAt: new Date(now().getTime() + 60 * 60 * 1000),
-      status: "pendiente",
+      status: "pending",
     };
     db.tutorias.push(t);
     return { ...t };
@@ -58,14 +58,14 @@ jest.mock("../../../features/tutorings/services/tutoringService", () => {
     return { ...t };
   };
 
-  const listAvailable = async ({ courseId, topicId = null }) => {
+  const listAvailable = async ({ courseId, temaId = null }) => {
     const nowTs = now().getTime();
     return db.tutorias
       .filter(
         (t) =>
           t.courseId === Number(courseId) &&
-          (topicId === null || t.topicId === Number(topicId)) &&
-          t.status !== "finalizada" &&
+          (temaId === null || t.temaId === Number(temaId)) &&
+          t.status !== "finished " &&
           t.scheduledAt.getTime() >= nowTs
       )
       .map((t) => ({ ...t }));
@@ -77,16 +77,16 @@ jest.mock("../../../features/tutorings/services/tutoringService", () => {
     return { ...t };
   };
 
-  const __seedFinalizada = ({ courseId, topicId = null }) => {
+  const __seedFinalizada = ({ courseId, temaId = null }) => {
     const t = {
       id: db.nextId++,
       courseId: Number(courseId),
-      topicId: topicId === null ? null : Number(topicId),
+      temaId: temaId === null ? null : Number(temaId),
       tutorId: 900,
       students: [800, 801],
       capacity: 2,
       scheduledAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      status: "finalizada",
+      status: "finished ",
     };
     db.tutorias.push(t);
     return { ...t };
@@ -132,9 +132,9 @@ function MateriaPageMock() {
 
   const onBrindar = async () => {
     const all = await listAvailable({ courseId: Number(courseId) });
-    const pendiente = [...all].reverse().find((t) => !t.tutorId);
-    if (pendiente) {
-      await joinAsTutor({ tutoringId: pendiente.id, tutorId: user.id });
+    const pending = [...all].reverse().find((t) => !t.tutorId);
+    if (pending) {
+      await joinAsTutor({ tutoringId: pending.id, tutorId: user.id });
     }
     navigate(`/tutorias?course=${courseId}`);
   };
@@ -155,13 +155,13 @@ function TutoriasListMock() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const courseId = Number(params.get("course"));
-  const topicId = params.get("topic") ? Number(params.get("topic")) : null;
+  const temaId = params.get("topic") ? Number(params.get("topic")) : null;
 
   const { user } = useUser();
   const [items, setItems] = React.useState([]);
 
   const reload = async () => {
-    const data = await listAvailable({ courseId, topicId });
+    const data = await listAvailable({ courseId, temaId });
     setItems(data);
   };
 
@@ -171,7 +171,7 @@ function TutoriasListMock() {
       return;
     }
     reload();
-  }, [courseId, topicId, location.search]);
+  }, [courseId, temaId, location.search]);
 
   const handleJoin = async (id) => {
     await joinAsStudent({ tutoringId: id, studentId: user.id });
@@ -194,7 +194,7 @@ function TutoriasListMock() {
               style={{ border: "1px solid #ddd", margin: 8, padding: 8 }}
             >
               <div>Curso: {t.courseId}</div>
-              <div>Tema: {t.topicId ?? "-"}</div>
+              <div>Tema: {t.temaId ?? "-"}</div>
               <div data-testid={`tutor-${t.id}`}>Tutor: {t.tutorId ?? "Sin tutor"}</div>
               <div data-testid={`cupos-${t.id}`}>Cupos: {cupos}</div>
               <div>Estado: {t.status}</div>
@@ -212,13 +212,13 @@ function TutoriasListMock() {
 }
 
 function TemaPageMock() {
-  const { courseId, topicId } = useParams();
+  const { courseId, temaId } = useParams();
   return (
     <div>
       <h1>
-        Tema {topicId} de Materia {courseId}
+        Tema {temaId} de Materia {courseId}
       </h1>
-      <Link to={`/tutorias?course=${courseId}&topic=${topicId}`}>Ver tutorías del tema</Link>
+      <Link to={`/tutorias?course=${courseId}&topic=${temaId}`}>Ver tutorías del tema</Link>
     </div>
   );
 }
@@ -264,13 +264,13 @@ describe("Flujo de crear Tutorías", () => {
     expect(el).toHaveTextContent(`Cupos: ${cuposText}`);
   };
 
-  // 1) A crea pendiente desde Materia
+  // 1) A crea pending desde Materia
   __setUser({ id: 101, name: "Estudiante A" });
   const rA = renderWithRouter(
     <Routes>
       <Route path="/" element={<div>Home</div>} />
       <Route path="/materias/:courseId" element={<MateriaPageMock />} />
-      <Route path="/materias/:courseId/temas/:topicId" element={<TemaPageMock />} />
+      <Route path="/materias/:courseId/temas/:temaId" element={<TemaPageMock />} />
       <Route path="/tutorias" element={<TutoriasListMock />} />
     </Routes>,
     "/materias/1"
@@ -298,14 +298,14 @@ describe("Flujo de crear Tutorías", () => {
 
   const t1 = await getById(1);
   __resetDb();
-  await createPendingByStudent({ courseId: t1.courseId, topicId: 10, studentId: 101, capacity: 2 });
+  await createPendingByStudent({ courseId: t1.courseId, temaId: 10, studentId: 101, capacity: 2 });
   await joinAsTutor({ tutoringId: 1, tutorId: 201 });
 
   // 3) C entra por Materia y se une a la tutoría
   __setUser({ id: 301, name: "Estudiante C" });
   const rC = renderWithRouter(
     <Routes>
-      <Route path="/materias/:courseId/temas/:topicId" element={<TemaPageMock />} />
+      <Route path="/materias/:courseId/temas/:temaId" element={<TemaPageMock />} />
       <Route path="/tutorias" element={<TutoriasListMock />} />
     </Routes>,
     "/materias/1/temas/10"
@@ -377,9 +377,9 @@ describe("Flujo de crear Tutorías", () => {
   });
 
   test("No se listan tutorías finalizadas", async () => {
-    __seedFinalizada({ courseId: 1, topicId: 10 }); 
+    __seedFinalizada({ courseId: 1, temaId: 10 }); 
     __setUser({ id: 101, name: "A" });
-    await createPendingByStudent({ courseId: 1, topicId: 10, studentId: 101, capacity: 2 }); 
+    await createPendingByStudent({ courseId: 1, temaId: 10, studentId: 101, capacity: 2 }); 
     await joinAsTutor({ tutoringId: 2, tutorId: 201 });
 
     __setUser({ id: 301, name: "C" });
