@@ -8,6 +8,7 @@ import {unsubscribeFromTutoring, joinTutoring} from "../services/tutoringService
 import { DEFAULT_PHOTO } from "@/shared/config";
 import { EstadoBadge, ShowTutoringSkeleton } from "@shared/utils/showTutorings"
 import TutoringActions from "../components/TutoringActions";
+import ChatModal from "../../tutorings/components/ChatModal";
 /**
  * SHOW PAGE DE TUTORÍA (ampliada)
  */
@@ -19,6 +20,7 @@ export default function ShowPageTutoring() {
   const { data: tutoring, loading, error, refetch } = useTutoring(null, tutoringId);
   const onDesuscribirse = (tid) => unsubscribeFromTutoring(tid);
   const [saving, setSaving] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     if (error || (!tutoring && !loading)) {
@@ -246,11 +248,20 @@ export default function ShowPageTutoring() {
               onSerTutor={handleSerTutor}
               onUnirme={handleUnirme}
               onDesuscribirme={handleDesuscribirme}
+              onOpenChat={() => setShowChat(true)}
               isFinished={tutoriaYaPaso}
             />
           </div>
         </div>
       </div>
+      {showChat && (
+        <ChatModal
+          chatId={tutoring.chat_id}
+          token={user.token}
+          tutoringUsers={tutoring.enrolled_students || []}
+          onClose={() => setShowChat(false)}
+        />
+      )}
     </div>
   );
 }

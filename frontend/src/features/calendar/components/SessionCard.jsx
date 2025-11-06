@@ -5,14 +5,12 @@ import FeedbackModal from "./FeedbackModal";
 import { hasFeedback } from "../hooks/useFeedback"; 
 import { useUser } from "@context/UserContext";
 import { handleCancel } from "@/features/calendar/hooks/useCancelSession";
-import ChatModal from "../../tutorings/components/ChatModal";
 
 export default function SessionCard({ session, type = "all", refresh }) {
   const [showAttendees, setShowAttendees] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [userRating, setUserRating] = useState(null); 
   const [loadingFeedback, setLoadingFeedback] = useState(false);
-  const [showChat, setShowChat] = useState(false);
 
   const { user } = useUser();
   const navigate = useNavigate(); // Agregar esta línea
@@ -203,15 +201,6 @@ export default function SessionCard({ session, type = "all", refresh }) {
                   ))}
                 </ul>
               )}
-              {session.chat_id && (
-                <button
-                  type="button"
-                  onClick={(e) => handleButtonClick(e, () => setShowChat(true))}
-                  className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded"
-                >
-                  Abrir chat
-                </button>
-              )}
             </div>
             {type !== "finalized" && (
               <button
@@ -255,13 +244,6 @@ export default function SessionCard({ session, type = "all", refresh }) {
           tutoria={session.subject}
           onClose={() => setShowFeedbackModal(false)}
           onSubmit={(rating) => handleSubmitReview(rating)}
-        />
-      )}
-      {showChat && (
-        <ChatModal
-          chatId={session.chat_id}
-          token={user.token}
-          onClose={() => setShowChat(false)}
         />
       )}
     </>

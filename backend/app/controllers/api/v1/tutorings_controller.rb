@@ -140,6 +140,7 @@ module Api
           request_comment: @tutoring.request_comment,
           request_due_at: @tutoring.request_due_at,
           location: @tutoring.location,
+          chat_id: @tutoring.chat&.id,
           course: {
             id: @tutoring.course.id,
             name: @tutoring.course.name,
@@ -164,6 +165,12 @@ module Api
               start_time: a.start_time,
               end_time: a.end_time,
               is_booked: a.is_booked
+            }
+          end,
+          enrolled_students: @tutoring.users.map do |user|
+            {
+              id: user.id,
+              photo_url: UserSerializer.new(user).serializable_hash[:data][:attributes][:profile_photo_url],
             }
           end
         }

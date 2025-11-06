@@ -6,6 +6,7 @@ export default function TutoringActions({
   onSerTutor, 
   onUnirme, 
   onDesuscribirme,
+  onOpenChat,
   isFinished = false
 }) {
   if (isFinished) {
@@ -73,14 +74,23 @@ export default function TutoringActions({
           )}
 
           {mode === "misTutorias" && (
-            <button
-              type="button"
-              className="btn w-full bg-red-500 hover:bg-red-600 text-white"
-              onClick={onDesuscribirme}
-              disabled={saving}
-            >
-              Desuscribirme
-            </button>
+            <div className="flex gap-2 flex-col">
+              <button
+                type="button"
+                onClick={onOpenChat}
+                className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Abrir chat
+              </button>
+              <button
+                type="button"
+                className="btn w-full bg-red-500 hover:bg-red-600 text-white"
+                onClick={onDesuscribirme}
+                disabled={saving}
+              >
+                Desuscribirme
+              </button>
+            </div>
           )}
 
           {mode === "completo" && (
