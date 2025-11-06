@@ -84,8 +84,8 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
           <PageTitle 
             title={
                 ["serTutor", "serEstudiante"].includes(mode)
-                  ? `Tutorías Disponibles para ${courseName || ""}`
-                  : "Tutorías Disponibles"
+                  ? `Tutorías disponibles para ${courseName || ""}`
+                  : "Tutorías disponibles"
               }
             className={titleClass}>
             {["serTutor", "serEstudiante"].includes(mode) && (
