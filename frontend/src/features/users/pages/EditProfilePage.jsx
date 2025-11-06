@@ -173,7 +173,6 @@ export default function EditProfilePage() {
               onChange={(e) => setField("name", e.target.value)}
               placeholder="Nombre"
               label="Nombre"
-              required
               error={errors.name}
             />
 
@@ -185,7 +184,6 @@ export default function EditProfilePage() {
               onChange={(e) => setField("last_name", e.target.value)}
               placeholder="Apellido"
               label="Apellido"
-              required
               error={errors.last_name}
             />
 
