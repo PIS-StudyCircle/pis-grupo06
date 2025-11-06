@@ -258,7 +258,7 @@ export default function ShowPageTutoring() {
         <ChatModal
           chatId={tutoring.chat_id}
           token={user.token}
-          tutoringUsers={tutoring.enrolled_students || []}
+          tutoringUsers={tutoring.enrolled_users}
           onClose={() => setShowChat(false)}
         />
       )}

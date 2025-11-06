@@ -172,7 +172,16 @@ module Api
               id: user.id,
               photo_url: UserSerializer.new(user).serializable_hash[:data][:attributes][:profile_photo_url],
             }
-          end
+          end,
+          enrolled_users: @tutoring.users.map do |user|
+            {
+              id: user.id,
+              photo_url: UserSerializer.new(user).serializable_hash[:data][:attributes][:profile_photo_url],
+            }
+          end.append(@tutoring.tutor ? [{
+            id: @tutoring.tutor.id,
+            photo_url: UserSerializer.new(@tutoring.tutor).serializable_hash[:data][:attributes][:profile_photo_url],
+          }] : [])
         }
       end
 
