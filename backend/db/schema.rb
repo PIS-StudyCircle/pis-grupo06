@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_03_172549) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_05_223219) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -286,11 +286,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_172549) do
     t.bigint "tutor_id"
     t.integer "enrolled", default: 0, null: false
     t.bigint "course_id", null: false
+    t.string "event_id"
     t.integer "state", default: 0, null: false
     t.text "request_comment"
     t.datetime "request_due_at"
     t.string "location"
-    t.string "event_id"
     t.index ["course_id"], name: "index_tutorings_on_course_id"
     t.index ["created_by_id"], name: "index_tutorings_on_created_by_id"
     t.index ["state"], name: "index_tutorings_on_state"
@@ -343,6 +343,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_172549) do
     t.string "google_refresh_token"
     t.datetime "google_expires_at"
     t.string "calendar_id"
+    t.integer "tutorias_dadas_count", default: 0, null: false
+    t.integer "tutorias_recibidas_count", default: 0, null: false
+    t.integer "resenas_dadas_count", default: 0, null: false
+    t.integer "feedback_dado_count", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true

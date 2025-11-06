@@ -35,10 +35,20 @@ module Api
 
         def show
           user = User.find_by(id: params[:id])
+
           if user
-            render json: UserSerializer
-              .new(user, params: { current_user: current_user })
-              .serializable_hash[:data][:attributes]
+            serialized_user = UserSerializer
+                                .new(user, params: { current_user: current_user })
+                                .serializable_hash[:data][:attributes]
+
+            counts = {
+              tutorias_dadas: user.tutorias_dadas_count || 0,
+              tutorias_recibidas: user.tutorias_recibidas_count || 0,
+              resenas_dadas: user.resenas_dadas_count || 0,
+              feedback_dado: user.feedback_dado_count || 0
+            }
+
+            render json: serialized_user.merge(counts)
           else
             render json: { error: "No se encontró el usuario solicitado" }, status: :not_found
           end
