@@ -123,10 +123,18 @@ class Tutoring < ApplicationRecord
 
   def incrementar_contadores_insignas
     with_lock do
-      tutor&.increment!(:tutorias_dadas_count)
+      if tutor
+        tutor.with_lock do
+          tutor.increment(:tutorias_dadas_count)
+          tutor.save!
+        end
+      end
 
       users.where.not(id: tutor_id).find_each do |u|
-        u.increment!(:tutorias_recibidas_count)
+        u.with_lock do
+          u.increment(:tutorias_recibidas_count)
+          u.save!
+        end
       end
     end
   end

@@ -15,15 +15,15 @@ module Api
           ).serializable_hash[:data][:attributes]
 
           render json: {
-                   user: serialized_user.merge(
-                     counts: {
-                       tutorias_dadas: current_user.tutorias_dadas_count,
-                       tutorias_recibidas: current_user.tutorias_recibidas_count,
-                       resenas_dadas: current_user.resenas_dadas_count,
-                       feedback_dado: current_user.feedback_dado_count,
-                     },
-                   ),
-                 }
+            user: serialized_user.merge(
+              counts: {
+                tutorias_dadas: current_user.tutorias_dadas_count,
+                tutorias_recibidas: current_user.tutorias_recibidas_count,
+                resenas_dadas: current_user.resenas_dadas_count,
+                feedback_dado: current_user.feedback_dado_count,
+              },
+            ),
+          }
         end
       end
     end

@@ -38,8 +38,9 @@ module Api
 
           if review.save
             # Incrementar contador de reseñas dadas
-            current_user.increment!(:resenas_dadas_count)
-            
+            current_user.increment(:resenas_dadas_count)
+            current_user.save!
+
             # Enviar notificación al usuario que recibió la review
             ReviewReceivedNotifier.with(
               title: "Nueva reseña recibida",

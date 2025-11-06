@@ -38,8 +38,8 @@ module Api
 
           if user
             serialized_user = UserSerializer
-                                .new(user, params: { current_user: current_user })
-                                .serializable_hash[:data][:attributes]
+                              .new(user, params: { current_user: current_user })
+                              .serializable_hash[:data][:attributes]
 
             counts = {
               tutorias_dadas: user.tutorias_dadas_count || 0,

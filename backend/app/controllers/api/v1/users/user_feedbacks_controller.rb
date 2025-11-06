@@ -93,7 +93,8 @@ module Api
 
           if feedback.save
             # Incrementar contador de feedback dado
-            current_user.increment!(:feedback_dado_count)
+            current_user.increment(:feedback_dado_count)
+            current_user.save!
 
             # promedio actualizado del tutor
             avg = Feedback.where(tutor_id: tutor_id).average(:rating)
