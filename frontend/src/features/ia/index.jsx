@@ -1,0 +1,1 @@
+export { default as ChooseType } from "./pages/ChooseType";
