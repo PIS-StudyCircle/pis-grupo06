@@ -73,10 +73,10 @@ export default function UserProfile() {
     }
   };
 
-  const tutorias_dadas = user.tutorias_dadas || 0;
-  const tutorias_recibidas = user.tutorias_recibidas || 0;
-  const resenas_dadas = user.resenas_dadas || 0;
-  const feedback_dado = user.feedback_dado || 0;
+  const tutorias_dadas = user?.tutorias_dadas ?? 0;
+  const tutorias_recibidas = user?.tutorias_recibidas ?? 0;
+  const resenas_dadas = user?.resenas_dadas ?? 0;
+  const feedback_dado = user?.feedback_dado ?? 0;
 
   const insignas = useBadges({
     tutorias_dadas,
