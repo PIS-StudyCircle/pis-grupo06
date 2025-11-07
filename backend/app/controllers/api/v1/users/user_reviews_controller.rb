@@ -41,6 +41,25 @@ module Api
             current_user.increment(:resenas_dadas_count)
             current_user.save!
 
+            if current_user.resenas_dadas_count == 1
+              msj = "Recibiste una insignia de nivel 1 (reseñas)"
+            elsif current_user.resenas_dadas_count == 3
+              msj = "Recibiste una insignia de nivel 2 (reseñas)"
+            elsif current_user.resenas_dadas_count == 6
+              msj = "Recibiste una insignia de nivel 3 (reseñas)"
+            end
+
+            begin
+              if msj.present?
+                ApplicationNotifier.with(
+                  title: msj,
+                  url: "/perfil"
+                ).deliver(current_user)
+              end
+            rescue => e
+              Rails.logger.error "Error notificando insignia al usuario #{current_user.id}: #{e.message}"
+            end
+
             # Enviar notificación al usuario que recibió la review
             ReviewReceivedNotifier.with(
               title: "Nueva reseña recibida",
