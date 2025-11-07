@@ -129,12 +129,12 @@ class Tutoring < ApplicationRecord
           tutor.save!
 
           if tutor.tutorias_dadas_count == 1
-              msj = "Recibiste una insignia de nivel 1 (tutorías dadas)"
-            elsif tutor.tutorias_dadas_count == 3
-              msj = "Recibiste una insignia de nivel 2 (tutorías dadas)"
-            elsif tutor.tutorias_dadas_count == 6
-              msj = "Recibiste una insignia de nivel 3 (tutorías dadas)"
-            end
+            msj = "Recibiste una insignia de nivel 1 (tutorías dadas)"
+          elsif tutor.tutorias_dadas_count == 3
+            msj = "Recibiste una insignia de nivel 2 (tutorías dadas)"
+          elsif tutor.tutorias_dadas_count == 6
+            msj = "Recibiste una insignia de nivel 3 (tutorías dadas)"
+          end
 
           begin
             if msj.present?
@@ -155,12 +155,12 @@ class Tutoring < ApplicationRecord
           u.save!
 
           if u.tutorias_recibidas_count == 1
-              msj = "Recibiste una insignia de nivel 1 (tutorías recibidas)"
-            elsif u.tutorias_recibidas_count == 3
-              msj = "Recibiste una insignia de nivel 2 (tutorías recibidas)"
-            elsif u.tutorias_recibidas_count == 6
-              msj = "Recibiste una insignia de nivel 3 (tutorías recibidas)"
-            end
+            msj = "Recibiste una insignia de nivel 1 (tutorías recibidas)"
+          elsif u.tutorias_recibidas_count == 3
+            msj = "Recibiste una insignia de nivel 2 (tutorías recibidas)"
+          elsif u.tutorias_recibidas_count == 6
+            msj = "Recibiste una insignia de nivel 3 (tutorías recibidas)"
+          end
 
           begin
             if msj.present?
