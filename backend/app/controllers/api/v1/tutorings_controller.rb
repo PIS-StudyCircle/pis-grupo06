@@ -351,7 +351,7 @@ module Api
             @tutoring.update!(tutor_id: current_user.id)
 
             # Agregar también al estudiante creador si no está registrado aún
-            if @tutoring.created_by_id.present? &&
+            if @tutoring.created_by_id.present? && @tutoring.created_by_id != @tutoring.tutor_id &&
                !UserTutoring.exists?(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
               UserTutoring.create!(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
             end
