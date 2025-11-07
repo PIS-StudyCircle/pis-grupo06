@@ -1284,11 +1284,13 @@ tutoring_offered.save!(validate: false) # para que me deje poner una fecha del p
 
 # Para probar el ranking con feedback de tutoría pasadas
 
-Feedback.find_or_create_by!(tutor_id: creator.id,
-                            student_id: User.find_by!(email: "clarasuarez@gmail.com").id,
-                            tutoring_id: tutoring_offered.id,
-                            rating: 3)
-                     
+Feedback.find_or_create_by!(
+  tutor_id: creator.id,
+  student_id: User.find_by!(email: "clarasuarez@gmail.com").id,
+  tutoring_id: tutoring_offered.id,
+  rating: 3
+)
+
 # Tutoría 24 (Activa con mensaje inicial asociado al chat)
 creator = User.find_by!(email: "martadaluz@gmail.com")
 student = User.find_by!(email: "veronicagimenez@gmail.com")
@@ -1333,7 +1335,8 @@ participants.each do |u|
 end
 
 if tutoring_offered.chat.messages.count.zero?
-  tutoring_offered.chat.messages.create!(user: creator, content: "Bienvenidos al chat de la tutoría. Cualquier duda escriban aquí.")
+  tutoring_offered.chat.messages.create!(
+    user: creator,
+    content: "Bienvenidos al chat de la tutoría. Cualquier duda escriban aquí."
+  )
 end
-
-puts "Creada tutoring id=#{tutoring_offered.id} chat_id=#{tutoring_offered.chat&.id}"
