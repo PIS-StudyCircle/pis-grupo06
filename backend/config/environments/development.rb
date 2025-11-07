@@ -38,6 +38,9 @@ Rails.application.configure do
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
+  config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.logger = ActiveSupport::Logger.new(STDOUT)
+
   # Cómo se entregan los mails en dev
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
