@@ -121,7 +121,7 @@ export default function ChatModal({ chatId, token, tutoringUsers, onClose }) {
                       userPhotos[msg.user_id] ? (
                         <img
                           src={userPhotos[msg.user_id]}
-                          alt={`${msg.user_name || ""} ${msg.user_last_name || ""}`.trim()}
+                          alt={`${msg.user_name} ${msg.user_last_name}`.trim()}
                           className="w-8 h-8 rounded-full object-cover shrink-0"
                         />
                       ) : (

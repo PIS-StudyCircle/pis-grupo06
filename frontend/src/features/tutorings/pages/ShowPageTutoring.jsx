@@ -31,10 +31,10 @@ export default function ShowPageTutoring() {
 
   const soyEstudiante = tutoring?.user_enrolled || false;
   const noTieneTutor = !(tutoring?.tutor?.id);
- const cuposDisponibles = useMemo(() => {
-  if (!tutoring) return false;
-  return tutoring.capacity != null && tutoring.capacity > (tutoring.enrolled ?? 0);
-}, [tutoring]);
+  const cuposDisponibles = useMemo(() => {
+    if (!tutoring) return false;
+    return tutoring.capacity != null && tutoring.capacity > (tutoring.enrolled ?? 0);
+  }, [tutoring]);
   const soyTutor = tutoring?.tutor_id === user?.id;
   const esCreador = tutoring?.created_by_id === user?.id;
 
@@ -258,7 +258,7 @@ export default function ShowPageTutoring() {
         <ChatModal
           chatId={tutoring.chat_id}
           token={user.token}
-          tutoringUsers={tutoring.enrolled_users}
+          tutoringUsers={tutoring.enrolled_users || []}
           onClose={() => setShowChat(false)}
         />
       )}

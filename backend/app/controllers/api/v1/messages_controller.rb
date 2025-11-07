@@ -15,8 +15,8 @@ module Api
           {
             id: m.id,
             user_id: m.user_id,
-            user_name: m.user.try(:name) || m.user.try(:email),
-            user_last_name: m.user.try(:last_name) || '',
+            user_name: m.user.try(:name),
+            user_last_name: m.user.try(:last_name),
             content: m.content,
             created_at: m.created_at.iso8601
           }

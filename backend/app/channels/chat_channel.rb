@@ -28,7 +28,8 @@ class ChatChannel < ApplicationCable::Channel
     {
       id: message.id,
       user_id: message.user_id,
-      user_name: message.user.try(:name) || message.user.try(:email),
+      user_name: message.user.try(:name),
+      user_last_name: message.user.try(:last_name),
       content: message.content,
       created_at: message.created_at.iso8601
     }

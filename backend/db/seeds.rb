@@ -1288,3 +1288,52 @@ Feedback.find_or_create_by!(tutor_id: creator.id,
                             student_id: User.find_by!(email: "clarasuarez@gmail.com").id,
                             tutoring_id: tutoring_offered.id,
                             rating: 3)
+                     
+# Tutoría 24 (Activa con mensaje inicial asociado al chat)
+creator = User.find_by!(email: "martadaluz@gmail.com")
+student = User.find_by!(email: "veronicagimenez@gmail.com")
+course = Course.find_by(id: 8) # Agrimensura Legal 1
+subjects = Subject.where(course: course).shuffle.take(rand(1..3))
+
+# Normalizar scheduled_at para evitar duplicados por segundos
+schedule = 4.days.from_now.change(hour: 16, min: 30, sec: 0)
+
+tutoring_offered = Tutoring.find_or_initialize_by(
+  created_by_id: creator.id,
+  tutor_id: creator.id,
+  scheduled_at: schedule
+)
+
+tutoring_offered.assign_attributes(
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 5,
+  course: course,
+  enrolled: 1,
+  state: :active
+)
+
+subjects.each do |subject|
+  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+end
+
+UserTutoring.find_or_create_by!(user_id: student.id, tutoring_id: tutoring_offered.id)
+
+TutoringAvailability.find_or_create_by!(
+  tutoring: tutoring_offered,
+  start_time: schedule + 3.hours,
+  end_time: schedule + 4.hours,
+  is_booked: true
+)
+
+tutoring_offered.create_chat! unless tutoring_offered.chat
+participants = [creator, student]
+participants.each do |u|
+  tutoring_offered.chat.users << u unless tutoring_offered.chat.users.exists?(u.id)
+end
+
+if tutoring_offered.chat.messages.count.zero?
+  tutoring_offered.chat.messages.create!(user: creator, content: "Bienvenidos al chat de la tutoría. Cualquier duda escriban aquí.")
+end
+
+puts "Creada tutoring id=#{tutoring_offered.id} chat_id=#{tutoring_offered.chat&.id}"
