@@ -40,3 +40,37 @@ export async function getTopRatedTutors() {
     throw err;
   }
 }
+
+export async function getMonthlyRanking(year = null, month = null) {
+  try {
+    let url = `${API_URL}/mejores_tutores_por_mes`;
+    
+    // Agregar parámetros de año/mes si se proporcionan
+    const params = new URLSearchParams();
+    if (year) params.append('year', year);
+    if (month) params.append('month', month);
+    
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+
+    const response = await fetch(url, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Error al obtener ranking mensual");
+    }
+
+    return data.rankings_mensuales || [];
+  } catch (error) {
+    console.error("Error al obtener ranking mensual:", error);
+    throw error;
+  }
+}

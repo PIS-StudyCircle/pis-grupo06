@@ -1288,3 +1288,191 @@ Feedback.find_or_create_by!(tutor_id: creator.id,
                             student_id: User.find_by!(email: "clarasuarez@gmail.com").id,
                             tutoring_id: tutoring_offered.id,
                             rating: 3)
+
+
+                            # ========== TUTORÍAS ADICIONALES PARA RANKING HISTÓRICO ========== #
+
+# ---- TUTORÍAS DE SEPTIEMBRE 2025 ---- #
+
+# Tutoría 24 (septiembre) - Jorge Vega
+creator = User.find_by!(email: "jorgevega@gmail.com")
+course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
+subject = course.subjects.first
+
+tutoring_sept1 = Tutoring.find_or_create_by!(
+  scheduled_at: 1.day.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 3,
+  enrolled: 2,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id,
+  state: 1
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_sept1)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "luisgomez@gmail.com"),
+  tutoring: tutoring_sept1
+)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "mariarodriguez@gmail.com"),
+  tutoring: tutoring_sept1
+)
+
+# Cambiar a septiembre y finalizar
+tutoring_sept1.state = 2
+tutoring_sept1.scheduled_at = Date.new(2025, 9, 15)
+tutoring_sept1.save!(validate: false)
+
+# Feedback septiembre
+Feedback.find_or_create_by!(
+  tutor_id: creator.id,
+  student_id: User.find_by!(email: "luisgomez@gmail.com").id,
+  tutoring_id: tutoring_sept1.id,
+  rating: 5.0,
+  created_at: Date.new(2025, 9, 15)
+)
+
+# Tutoría 25 (septiembre) - Valentina Silva
+creator = User.find_by!(email: "valentinasilva@gmail.com") 
+course = Course.find_by(id: 145) # Física I
+subject = course.subjects.first
+
+tutoring_sept2 = Tutoring.find_or_create_by!(
+  scheduled_at: 1.day.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 3,
+  enrolled: 2,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id,
+  state: 1
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_sept2)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "mariarodriguez@gmail.com"),
+  tutoring: tutoring_sept2
+)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "juanperez@gmail.com"),
+  tutoring: tutoring_sept2
+)
+
+# Cambiar a septiembre y finalizar
+tutoring_sept2.state = 2
+tutoring_sept2.scheduled_at = Date.new(2025, 9, 20)
+tutoring_sept2.save!(validate: false)
+
+# Feedback septiembre
+Feedback.find_or_create_by!(
+  tutor_id: creator.id,
+  student_id: User.find_by!(email: "mariarodriguez@gmail.com").id,
+  tutoring_id: tutoring_sept2.id,
+  rating: 4.0,
+  created_at: Date.new(2025, 9, 20)
+)
+
+# Tutoría 26 (septiembre) - Rodrigo Torres
+creator = User.find_by!(email: "rodrigotorres@gmail.com")
+course = Course.find_by(id: 39) # Cálculo
+subject = course.subjects.first
+
+tutoring_sept3 = Tutoring.find_or_create_by!(
+  scheduled_at: 1.day.from_now,
+  duration_mins: 60,
+  modality: "virtual",
+  capacity: 2,
+  enrolled: 1,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id,
+  state: 1
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_sept3)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "anaperez@gmail.com"),
+  tutoring: tutoring_sept3
+)
+
+# Cambiar a septiembre y finalizar
+tutoring_sept3.state = 2
+tutoring_sept3.scheduled_at = Date.new(2025, 9, 25)
+tutoring_sept3.save!(validate: false)
+
+# Feedback septiembre
+Feedback.find_or_create_by!(
+  tutor_id: creator.id,
+  student_id: User.find_by!(email: "anaperez@gmail.com").id,
+  tutoring_id: tutoring_sept3.id,
+  rating: 3.5,
+  created_at: Date.new(2025, 9, 25)
+)
+
+# ---- TUTORÍAS ADICIONALES DE OCTUBRE 2025 ---- #
+
+# Modificar Tutoría 22 para que también esté en octubre
+tutoring_22 = Tutoring.find_by!(tutor: User.find_by!(email: "andresmendez@gmail.com"))
+if tutoring_22 && tutoring_22.scheduled_at < 1.month.ago
+  tutoring_22.scheduled_at = Date.new(2025, 10, 20)
+  tutoring_22.save!(validate: false)
+  
+  # Actualizar feedback a octubre
+  feedback_22 = Feedback.find_by(tutoring_id: tutoring_22.id)
+  if feedback_22
+    feedback_22.created_at = Date.new(2025, 10, 20)
+    feedback_22.save!
+  end
+end
+
+# Tutoría 27 (octubre) - Florencia Pintos
+creator = User.find_by!(email: "florenciapintos@gmail.com")
+course = Course.find_by(id: 116) # Electrotécnica I
+subject = course.subjects.first
+
+tutoring_oct1 = Tutoring.find_or_create_by!(
+  scheduled_at: 1.day.from_now,
+  duration_mins: 60,
+  modality: "presencial",
+  capacity: 3,
+  enrolled: 2,
+  course: course,
+  created_by_id: creator.id,
+  tutor_id: creator.id,
+  state: 1
+)
+
+SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_oct1)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "carloslopez@gmail.com"),
+  tutoring: tutoring_oct1
+)
+
+UserTutoring.find_or_create_by!(
+  user: User.find_by!(email: "luciafernandez@gmail.com"),
+  tutoring: tutoring_oct1
+)
+
+# Cambiar a octubre y finalizar
+tutoring_oct1.state = 2
+tutoring_oct1.scheduled_at = Date.new(2025, 10, 25)
+tutoring_oct1.save!(validate: false)
+
+# Feedback octubre
+Feedback.find_or_create_by!(
+  tutor_id: creator.id,
+  student_id: User.find_by!(email: "carloslopez@gmail.com").id,
+  tutoring_id: tutoring_oct1.id,
+  rating: 2.5,
+  created_at: Date.new(2025, 10, 25)
+)

@@ -151,6 +151,60 @@ module Api
           }
         end
 
+        def mejores_tutores_por_mes
+          # Parámetros opcionales para filtrar por año o mes específico
+          year = params[:year]&.to_i
+          month = params[:month]&.to_i
+          
+          query = RankingMonth.includes(:tutor)
+          
+          # Filtrar por año si se proporciona
+          if year.present?
+            if month.present?
+              # Mes específico
+              periodo = Date.new(year, month, 1)
+              query = query.where(periodo: periodo)
+            else
+              # Todo el año
+              start_date = Date.new(year, 1, 1)
+              end_date = Date.new(year, 12, 1)
+              query = query.where(periodo: start_date..end_date)
+            end
+          end
+          
+          rankings = query.order(:periodo, :rank)
+          
+          # Agrupar por mes
+          rankings_por_mes = rankings.group_by(&:periodo)
+          
+          result = rankings_por_mes.map do |periodo, tutores|
+            {
+              periodo: periodo.strftime("%Y-%m"),
+              year: periodo.year,
+              month: periodo.month,
+              mes_nombre: I18n.l(periodo, format: "%B %Y"),
+              top_tutores: tutores.map do |ranking|
+                {
+                  rank: ranking.rank,
+                  tutor: {
+                    id: ranking.tutor.id,
+                    name: ranking.tutor.name,
+                    last_name: ranking.tutor.last_name,
+                    email: ranking.tutor.email
+                  },
+                  average_rating: ranking.average_rating.to_f,
+                  total_feedbacks: ranking.total_feedbacks
+                }
+              end
+            }
+          end
+          
+          render json: {
+            rankings_mensuales: result.sort_by { |r| r[:periodo] }.reverse
+          }, status: :ok
+        end
+
+
         private
 
         def feedback_params
