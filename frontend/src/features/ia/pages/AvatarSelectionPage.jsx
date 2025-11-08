@@ -4,6 +4,7 @@ import avatar2 from "@/assets/avatar2.png"
 import avatar3 from "@/assets/avatar3.png"
 import avatar4 from "@/assets/avatar4.png"
 import avatar5 from "@/assets/avatar5.png"
+import { useNavigate } from "react-router-dom"
 
 
 // Mock avatar data - reemplaza con tus datos reales
@@ -51,7 +52,14 @@ const SAMPLE_AVATARS = [
 ]
 
 
-export default function AvatarSelector({ onSelectAvatar, onBack }) {
+export default function AvatarSelector({ onBack }) {
+    const navigate = useNavigate()
+    const handleSelectAvatar = (avatarUrl) => {
+        // Navegar a EditScreen pasando la imagen
+        navigate('/avatar/editar', { 
+          state: { initialImage: avatarUrl } 
+        })
+      }
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -75,7 +83,7 @@ export default function AvatarSelector({ onSelectAvatar, onBack }) {
           {SAMPLE_AVATARS.map((avatar) => (
             <button
               key={avatar.id}
-              onClick={() => onSelectAvatar(avatar.url)}
+              onClick={() => handleSelectAvatar(avatar.url)}
               className="group relative overflow-hidden rounded-xl bg-white shadow-md hover:shadow-xl transition-all duration-300 aspect-square hover:scale-105 border border-slate-200"
             >
               {/* Imagen */}

@@ -1,9 +1,18 @@
 import { useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { ChevronLeft, Check, X, Undo } from "lucide-react"
 import ImagePreview from "../components/ImagePreview"
 import PromptInput from "../components/PromptInput"
 
-export default function EditScreen({ onBack, initialImage = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop" }) {
+export default function EditScreen() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  
+  // Obtener imagen del state de navegación
+  const initialImage = location.state?.initialImage || 
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop"
+
+  // ⚠️ IMPORTANTE: Todos estos useState deben estar al principio
   const [prompt, setPrompt] = useState("")
   const [currentImage, setCurrentImage] = useState(initialImage)
   const [originalImage] = useState(initialImage)
@@ -12,27 +21,21 @@ export default function EditScreen({ onBack, initialImage = "https://images.unsp
   const [isLoading, setIsLoading] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
+  const handleBack = () => {
+    navigate(-1)
+  }
+
   const handleGenerate = async () => {
     if (!prompt.trim()) return
 
     setIsLoading(true)
     
-    // TODO: Reemplazar con tu API de edición
-    // const response = await fetch('TU_API_ENDPOINT', {
-    //   method: 'POST',
-    //   body: JSON.stringify({ 
-    //     image: currentImage, 
-    //     prompt 
-    //   })
-    // })
-    // const data = await response.json()
-    
-    // Simular llamada a API
+    // Simular API call
     await new Promise((resolve) => setTimeout(resolve, 2000))
     
     const newImage = `https://images.unsplash.com/photo-${Math.random().toString().slice(2, 12)}?w=400&h=400&fit=crop`
     
-    // Agregar al historial (elimina el futuro si estamos en medio del historial)
+    // Agregar al historial
     const newHistory = [...history.slice(0, historyIndex + 1), { image: newImage, prompt }]
     setHistory(newHistory)
     setHistoryIndex(newHistory.length - 1)
@@ -57,9 +60,8 @@ export default function EditScreen({ onBack, initialImage = "https://images.unsp
 
   const handleSaveAsProfile = () => {
     console.log("Guardando como foto de perfil:", currentImage)
-    // TODO: Implementar lógica de guardar
     alert("¡Imagen guardada como foto de perfil!")
-    onBack()
+    navigate(-1)
   }
 
   const handleDiscard = () => {
@@ -78,7 +80,7 @@ export default function EditScreen({ onBack, initialImage = "https://images.unsp
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white">
           <button
-            onClick={onBack}
+            onClick={handleBack}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
