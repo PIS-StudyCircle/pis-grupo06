@@ -130,6 +130,7 @@ module Api
         def top_rated
           top_tutors = User
                        .joins("INNER JOIN feedbacks ON feedbacks.tutor_id = users.id")
+                       .where(feedbacks: { created_at: Time.zone.now.all_month })
                        .select(
                          "users.*, " \
                          "AVG(feedbacks.rating) AS average_rating, " \
