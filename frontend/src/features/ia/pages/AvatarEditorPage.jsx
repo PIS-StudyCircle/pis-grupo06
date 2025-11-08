@@ -1,9 +1,12 @@
 import { useState } from "react"
-import { ChevronLeft, Check, X, Undo } from "lucide-react"
+import { Check, X, Undo } from "lucide-react"
 import ImagePreview from "../components/ImagePreview"
 import PromptInput from "../components/PromptInput"
 
-export default function EditScreen({ onBack, initialImage = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop" }) {
+export default function EditScreen({
+  onBack,
+  initialImage = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
+}) {
   const [prompt, setPrompt] = useState("")
   const [currentImage, setCurrentImage] = useState(initialImage)
   const [originalImage] = useState(initialImage)
@@ -16,23 +19,12 @@ export default function EditScreen({ onBack, initialImage = "https://images.unsp
     if (!prompt.trim()) return
 
     setIsLoading(true)
-    
-    // TODO: Reemplazar con tu API de edición
-    // const response = await fetch('TU_API_ENDPOINT', {
-    //   method: 'POST',
-    //   body: JSON.stringify({ 
-    //     image: currentImage, 
-    //     prompt 
-    //   })
-    // })
-    // const data = await response.json()
-    
-    // Simular llamada a API
     await new Promise((resolve) => setTimeout(resolve, 2000))
-    
-    const newImage = `https://images.unsplash.com/photo-${Math.random().toString().slice(2, 12)}?w=400&h=400&fit=crop`
-    
-    // Agregar al historial (elimina el futuro si estamos en medio del historial)
+
+    const newImage = `https://images.unsplash.com/photo-${Math.random()
+      .toString()
+      .slice(2, 12)}?w=400&h=400&fit=crop`
+
     const newHistory = [...history.slice(0, historyIndex + 1), { image: newImage, prompt }]
     setHistory(newHistory)
     setHistoryIndex(newHistory.length - 1)
@@ -57,7 +49,6 @@ export default function EditScreen({ onBack, initialImage = "https://images.unsp
 
   const handleSaveAsProfile = () => {
     console.log("Guardando como foto de perfil:", currentImage)
-    // TODO: Implementar lógica de guardar
     alert("¡Imagen guardada como foto de perfil!")
     onBack()
   }
@@ -75,17 +66,9 @@ export default function EditScreen({ onBack, initialImage = "https://images.unsp
   return (
     <div className="min-h-screen bg-white text-slate-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full overflow-hidden border border-gray-200">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white">
-          <button
-            onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-            <span>Atrás</span>
-          </button>
+        {/* Header sin botón Atrás */}
+        <div className="flex items-center justify-center border-b border-gray-200 px-6 py-4 bg-white">
           <h2 className="text-xl font-bold text-gray-900">Editar Avatar</h2>
-          <div className="w-20" />
         </div>
 
         {/* Content */}

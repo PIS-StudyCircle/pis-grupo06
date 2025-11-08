@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ChevronLeft, Check, Edit3, Sparkles } from "lucide-react"
+import { Check, Edit3, Sparkles } from "lucide-react"
 import ImagePreview from "../components/ImagePreview"
 import PromptInput from "../components/PromptInput"
 
@@ -15,9 +15,11 @@ export default function CreateScreen({ onBack }) {
     setIsLoading(true)
     setShowOptions(false)
 
-    // TODO: Reemplazar con tu API real
+    // Simular llamada a API
     await new Promise((resolve) => setTimeout(resolve, 2000))
-    const newImage = `https://images.unsplash.com/photo-${Math.random().toString().slice(2, 12)}?w=400&h=400&fit=crop`
+    const newImage = `https://images.unsplash.com/photo-${Math.random()
+      .toString()
+      .slice(2, 12)}?w=400&h=400&fit=crop`
 
     setGeneratedImage(newImage)
     setIsLoading(false)
@@ -43,17 +45,9 @@ export default function CreateScreen({ onBack }) {
   return (
     <div className="min-h-screen bg-white text-slate-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full overflow-hidden border border-gray-200">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white">
-          <button
-            onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-            <span>Atrás</span>
-          </button>
+        {/* Header sin botón Atrás */}
+        <div className="flex items-center justify-center border-b border-gray-200 px-6 py-4 bg-white">
           <h2 className="text-xl font-bold text-gray-900">Crear Avatar</h2>
-          <div className="w-20" />
         </div>
 
         {/* Content */}
