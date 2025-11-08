@@ -3,7 +3,6 @@ import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut, resetP
 import { getItem, saveItem, removeItem } from "@/shared/utils/storage";
 import { API_BASE } from "@/shared/config";
 import { Ctx } from "@context/UserContext";
-import { getCurrentUser } from "./services/usersServices";
 
 export default function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -11,41 +10,42 @@ export default function UserProvider({ children }) {
 
   useEffect(() => { hydrate(); }, []);
 
-  async function hydrate() {
-    const cached = getItem("user", null);
-    if (cached) setUser(cached);
-
+  const getCurrentUser = async () => {
     try {
       const res = await fetch(`${API_BASE}/users/me`, { credentials: "include" });
       if (res.ok) {
         const { user: fetchedUser } = await res.json();
         setUser(fetchedUser);
         saveItem("user", fetchedUser);
+        return fetchedUser;
       } else {
         setUser(null);
         removeItem("user");
+        return null;
       }
     } catch (err) {
       console.error("Error al obtener el usuario:", err);
       setUser(null);
       removeItem("user");
+      return null;
     } finally {
       setBooting(false);
+    }
+  };
+
+  async function hydrate() {
+    const cached = getItem("user", null);
+    if (cached) {
+      setUser(cached);
+      setBooting(false);
+    } else {
+      await getCurrentUser();
     }
   }
 
   const refetchCurrentUser = useCallback(async () => {
-    try {
-      const fetchedUser = await getCurrentUser();
-      setUser(fetchedUser);
-      saveItem("user", fetchedUser);
-      return fetchedUser;
-    } catch (err) {
-      console.error("Error al obtener el usuario:", err);
-      setUser(null);
-      removeItem("user");
-      return null;
-    }
+    const fetchedUser = await getCurrentUser();
+    return fetchedUser;
   }, []);
 
   async function handleAuth(fn, ...args) {
