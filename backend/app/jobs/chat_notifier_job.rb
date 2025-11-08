@@ -10,8 +10,13 @@ class ChatNotifierJob < ApplicationJob
     chat.chat_users.includes(:user).find_each do |chat_user|
       # no notificar al emisor
       next if chat_user.user_id == message.user_id
+
       participant = chat_user.user
-      next unless participant.present?
+
+      # si participante ausente, saltear
+      if participant.blank?
+        next
+      end
 
       # si ya leyó este mensaje o después, no notificar
       if chat_user.last_read_at.present? && chat_user.last_read_at >= message.created_at
@@ -26,8 +31,8 @@ class ChatNotifierJob < ApplicationJob
         url: chat.tutoring_id.present? ? "/tutorias/#{chat.tutoring_id}" : "/notificaciones"
       ).deliver_later(participant)
 
-      # marcar que ya se le notificó (sin callbacks)
-      chat_user.update_columns(last_notified_message_id: message.id)
+      # marcar que ya se le notificó (usar update! para respetar validaciones)
+      chat_user.update!(last_notified_message_id: message.id)
     end
   rescue ActiveRecord::RecordNotFound => e
     Rails.logger.warn "ChatNotifierJob: Record not found - #{e.message}"
