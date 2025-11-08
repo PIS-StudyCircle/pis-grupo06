@@ -30,7 +30,7 @@ function MonthlyPager({ items = [] }) {
 
         {/* Lista de tutores del mes */}
         <div className="w-full space-y-2 mb-4">
-          {month.top_tutores.map((t) => (
+          {month.top_tutores.slice(0, 3).map((t) => ( 
             <TutorCard
               key={t.tutor.id}
               tutor={{

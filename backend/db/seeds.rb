@@ -504,7 +504,8 @@ Feedback.create!(
   student: t1.user_tutorings.first.user,
   tutor: t1.tutor,
   tutoring: t1,
-  rating: 5.0
+  rating: 5.0,
+  created_at: t1.scheduled_at + 1.day
 )
 
 # Feedback 2: From attendee to tutor of t2
@@ -512,7 +513,8 @@ Feedback.create!(
   student: t2.user_tutorings.first.user,
   tutor: t2.tutor,
   tutoring: t2,
-  rating: 4.5
+  rating: 4.5,
+  created_at: t2.scheduled_at + 1.day
 )
 
 # Feedback 3: From attendee to tutor of t4
@@ -520,7 +522,8 @@ Feedback.create!(
   student: t4.user_tutorings.first.user,
   tutor: t4.tutor,
   tutoring: t4,
-  rating: 4.0
+  rating: 4.0,
+  created_at: t4.scheduled_at + 1.day
 )
 
 # Feedback 4: From attendee to tutor of t6
@@ -528,7 +531,8 @@ Feedback.create!(
   student: t6.user_tutorings.first.user,
   tutor: t6.tutor,
   tutoring: t6,
-  rating: 5.0
+  rating: 5.0,
+  created_at: t6.scheduled_at + 1.day
 )
 
 # Feedback 5: From attendee to tutor of t9
@@ -536,7 +540,8 @@ Feedback.create!(
   student: t9.user_tutorings.first.user,
   tutor: t9.tutor,
   tutoring: t9,
-  rating: 3.5
+  rating: 3.5,
+  created_at: t9.scheduled_at + 1.day
 )
 
 Rails.logger.debug "  Created 5 feedbacks"
