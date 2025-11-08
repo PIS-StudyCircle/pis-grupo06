@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent, within, act, waitFor } from "@testing-library/react";
+import { render, fireEvent, within, act, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { MemoryRouter, Routes, Route, useNavigate, useParams, Link, useLocation } from "react-router-dom";
 
@@ -120,7 +120,6 @@ import {
   joinAsTutor,
   joinAsStudent,
   listAvailable,
-  getById,
   __seedFinalizada,
   __resetDb,
 } from "../../../features/tutorings/services/tutoringService";
