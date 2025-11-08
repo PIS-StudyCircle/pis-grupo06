@@ -19,7 +19,7 @@ export default function AvatarModeSelector() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-3xl w-full">
         {/* Edit Option */}
         <button
-          onClick={() => navigate("/avatar/editar")}
+          onClick={() => navigate("/avatar/elegir_avatar")}
           className="group relative overflow-hidden rounded-xl border-2 border-slate-200 dark:border-slate-700 p-8 hover:border-blue-600 hover:shadow-2xl transition-all duration-300 bg-white dark:bg-slate-800"
         >
           <div className="relative z-10 flex flex-col items-center gap-4">
