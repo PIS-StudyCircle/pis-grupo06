@@ -39,7 +39,7 @@ export default function CoursePage() {
       <div className="flex flex-col md:flex-row justify-center gap-10 pl-4 md:pl-32 pr-4 md:pr-10">
         {/* Columna izquierda: cursos */}
         <div className="flex-[1.6] order-2 md:order-1">
-          <PageTitle title="Materias Disponibles" className="titulo" />
+          <PageTitle title="Materias disponibles" className="titulo" />
           <SearchInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}
