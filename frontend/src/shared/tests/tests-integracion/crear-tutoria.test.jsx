@@ -30,8 +30,8 @@ jest.mock("../../../features/tutorings/services/tutoringService", () => {
       temaId,
       tutorId: null,
       students: [studentId],
-      capacity,
-      scheduledAt: new Date(now().getTime() + 60 * 60 * 1000),
+      capacity: null,
+      scheduledAt: null,  
       status: "pending",
     };
     db.tutorias.push(t);
@@ -42,6 +42,7 @@ jest.mock("../../../features/tutorings/services/tutoringService", () => {
     const t = db.tutorias.find((x) => x.id === Number(tutoringId));
     if (!t) throw new Error("Tutoria no encontrada");
     t.tutorId = tutorId;
+     if (t.capacity == null) t.capacity = 2;
     if (t.students.length > 0) t.status = "activa";
     return { ...t };
   };
@@ -66,9 +67,9 @@ jest.mock("../../../features/tutorings/services/tutoringService", () => {
           t.courseId === Number(courseId) &&
           (temaId === null || t.temaId === Number(temaId)) &&
           t.status !== "finished " &&
-          t.scheduledAt.getTime() >= nowTs
+          (t.scheduledAt == null || t.scheduledAt.getTime() >= nowTs)
       )
-      .map((t) => ({ ...t }));
+      .map((t) => ({ ...t, capacity: t.capacity ?? 2, }));
   };
 
   const getById = async (id) => {
@@ -155,7 +156,7 @@ function TutoriasListMock() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const courseId = Number(params.get("course"));
-  const temaId = params.get("topic") ? Number(params.get("topic")) : null;
+  const temaId = params.get("tema") ? Number(params.get("tema")) : null;
 
   const { user } = useUser();
   const [items, setItems] = React.useState([]);
@@ -218,7 +219,7 @@ function TemaPageMock() {
       <h1>
         Tema {temaId} de Materia {courseId}
       </h1>
-      <Link to={`/tutorias?course=${courseId}&topic=${temaId}`}>Ver tutorías del tema</Link>
+      <Link to={`/tutorias?course=${courseId}&tema=${temaId}`}>Ver tutorías del tema</Link>
     </div>
   );
 }
@@ -387,7 +388,7 @@ describe("Flujo de crear Tutorías", () => {
       <Routes>
         <Route path="/tutorias" element={<TutoriasListMock />} />
       </Routes>,
-      "/tutorias?course=1&topic=10"
+      "/tutorias?course=1&tema=10"
     );
 
     await awaitTutorCard(2); 
