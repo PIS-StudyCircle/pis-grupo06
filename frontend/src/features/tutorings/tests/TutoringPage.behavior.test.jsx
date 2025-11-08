@@ -63,7 +63,7 @@ describe("TutoringPage - Comportamiento completo", () => {
         renderWithRouter(<TutoringPage />);
       
         // Esperamos a que aparezca el título
-        expect(await screen.findByText(/Tutorías Disponibles/i)).toBeInTheDocument();
+        expect(await screen.findByText(/Tutorías disponibles/i)).toBeInTheDocument();
       
         // Validamos que cada tutoría se renderizó con su materia y tutor
         for (const tutoring of baseTutorings) {
