@@ -3,7 +3,7 @@ import { Sparkles } from "lucide-react"
 export default function PromptInput({ prompt, onChange, onSubmit, isLoading, disabled, placeholder }) {
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+      <label className="block text-sm font-semibold text-gray-800">
         Describe tu imagen
       </label>
       <textarea
@@ -11,8 +11,7 @@ export default function PromptInput({ prompt, onChange, onSubmit, isLoading, dis
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
-        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-slate-900 dark:text-white placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
-        rows={4}
+        className="w-full p-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-indigo-400 outline-none"
       />
       <button
         onClick={onSubmit}

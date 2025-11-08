@@ -14,8 +14,7 @@ import {
   SessionsPage,
 } from "@/features/users";
 import { SubjectPage } from "@/features/subjects";
-import { ChooseType } from "@/features/ia";
-import { AvatarCreation, AvatarEditPage } from "@/features/ia";
+import { ChooseType, AvatarCreation, AvatarEditPage } from "@/features/ia";
 import SubjectDetailPage from "@/features/subjects/pages/SubjectDetailPage";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent, ChooseScheduleByTutor, ChooseScheduleByStudent, ShowPageTutoring} from "@/features/tutorings";

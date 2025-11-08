@@ -14,18 +14,11 @@ export default function CreateScreen({ onBack }) {
 
     setIsLoading(true)
     setShowOptions(false)
-    
-    // TODO: Reemplazar con tu API de generación desde cero
-    // const response = await fetch('TU_API_ENDPOINT', {
-    //   method: 'POST',
-    //   body: JSON.stringify({ prompt })
-    // })
-    // const data = await response.json()
-    
-    // Simular llamada a API
+
+    // TODO: Reemplazar con tu API real
     await new Promise((resolve) => setTimeout(resolve, 2000))
-    
     const newImage = `https://images.unsplash.com/photo-${Math.random().toString().slice(2, 12)}?w=400&h=400&fit=crop`
+
     setGeneratedImage(newImage)
     setIsLoading(false)
     setShowOptions(true)
@@ -33,14 +26,12 @@ export default function CreateScreen({ onBack }) {
 
   const handleSaveAsProfile = () => {
     console.log("Guardando como foto de perfil:", generatedImage)
-    // TODO: Implementar lógica de guardar
     alert("¡Imagen guardada como foto de perfil!")
     onBack()
   }
 
   const handleEditImage = () => {
     console.log("Editando imagen:", generatedImage)
-    // TODO: Navegar a EditScreen con la imagen generada
     alert("Pasando al editor... (implementar navegación)")
   }
 
@@ -50,43 +41,43 @@ export default function CreateScreen({ onBack }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 p-4 flex items-center justify-center">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden">
+    <div className="min-h-screen bg-white text-slate-900 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full overflow-hidden border border-gray-200">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             <span>Atrás</span>
           </button>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Crear Avatar</h2>
+          <h2 className="text-xl font-bold text-gray-900">Crear Avatar</h2>
           <div className="w-20" />
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
-          {/* Panel Izquierdo - Controles */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 bg-white">
+          {/* Panel Izquierdo */}
           <div className="space-y-6">
             <PromptInput
               prompt={prompt}
               onChange={setPrompt}
               onSubmit={handleGenerate}
               isLoading={isLoading}
-              disabled={showOptions}
-              placeholder="Ej: Un astronauta realista en el espacio, iluminación cinematográfica..."
+              disabled={false}
+              placeholder="Ej: Un avatar realista, fondo claro, sonrisa suave..."
             />
 
             {showOptions && (
-              <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700">
-                <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">
                   ¿Qué deseas hacer?
                 </h3>
-                
+
                 <button
                   onClick={handleSaveAsProfile}
-                  className="w-full px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-lg"
+                  className="w-full px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-sm"
                 >
                   <Check className="w-4 h-4" />
                   Guardar como Foto de Perfil
@@ -94,7 +85,7 @@ export default function CreateScreen({ onBack }) {
 
                 <button
                   onClick={handleEditImage}
-                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <Edit3 className="w-4 h-4" />
                   Editar Imagen
@@ -102,7 +93,7 @@ export default function CreateScreen({ onBack }) {
 
                 <button
                   onClick={handleTryAgain}
-                  className="w-full px-4 py-3 border-2 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
                 >
                   <Sparkles className="w-4 h-4" />
                   Probar Otro Prompt
@@ -111,10 +102,39 @@ export default function CreateScreen({ onBack }) {
             )}
           </div>
 
-          {/* Panel Derecho - Preview */}
-          <div>
-            <ImagePreview image={generatedImage} isLoading={isLoading} />
+          {/* Panel Derecho */}
+          <div className="flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-xl bg-gray-50 text-center p-6 min-h-[350px] w-full">
+              {isLoading ? (
+                <>
+                  <Sparkles className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
+                  <p className="text-sm text-gray-600">Generando tu imagen...</p>
+                </>
+              ) : generatedImage ? (
+                <img
+                  src={generatedImage}
+                  alt="Avatar generado"
+                  className="rounded-full w-48 h-48 object-cover shadow-md"
+                />
+              ) : (
+                <>
+                  <Sparkles className="w-8 h-8 text-gray-400 mb-3" />
+                  <p className="text-sm text-gray-500">Tu imagen aparecerá aquí</p>
+                </>
+              )}
+            </div>
           </div>
+        </div>
+        {/* Footer Actions */}
+        <div className="border-t border-gray-200 px-6 py-4 flex justify-end bg-white">
+          <button
+            onClick={handleSaveAsProfile}
+            disabled={!generatedImage}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+          >
+            <Check className="w-4 h-4" />
+            Guardar como Foto de Perfil
+          </button>
         </div>
       </div>
     </div>
