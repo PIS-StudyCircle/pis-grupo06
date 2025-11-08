@@ -95,11 +95,6 @@ export default function ShowPageTutoring() {
     return "default";
   }, [tutoring, soyTutor, soyEstudiante, esCreador, noTieneTutor, cuposDisponibles]);
 
-  const tutoriaYaPaso = useMemo(() => {
-     return tutoring?.state === "finished";
-  }, [tutoring?.state]);
-
-
   const estudiantesAsistieron = useMemo(() => {
   if (!tutoring) return 0;
   let total = tutoring.enrolled ?? 0;
@@ -121,7 +116,7 @@ export default function ShowPageTutoring() {
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 <b>Modalidad:</b> {tutoring.modality}
-                {tutoring.state === "active" && tutoring.duration_mins ? (
+                {tutoring?.state === "active" && tutoring.duration_mins ? (
                   <>
                     {" · "} <b>Duración:</b> {tutoring.duration_mins} min
                   </>
@@ -135,7 +130,7 @@ export default function ShowPageTutoring() {
             </div>
             <div className="flex items-center gap-2">
                <EstadoBadge state={tutoring.state} />
-              {!tutoriaYaPaso && (
+              {tutoring?.state !== "finished" && (
               <span className="text-sm text-gray-700 bg-white border rounded-full px-3 py-1">
                   Cupos:{" "}
                   {tutoring.capacity == null
@@ -143,7 +138,7 @@ export default function ShowPageTutoring() {
                     : `${Math.max((tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0), 0)} disp.`}
                 </span>
               )}
-             {tutoriaYaPaso && (
+             {tutoring?.state === "finished" && (
               <span className="text-sm text-gray-700 bg-green-100 border border-green-200 rounded-full px-3 py-1">
                 📊 {(() => {
                   if (estudiantesAsistieron === 0) return 'No asistió ningún estudiante';
@@ -248,8 +243,8 @@ export default function ShowPageTutoring() {
               onSerTutor={handleSerTutor}
               onUnirme={handleUnirme}
               onDesuscribirme={handleDesuscribirme}
-              onOpenChat={() => setShowChat(true)}
-              isFinished={tutoriaYaPaso}
+              onOpenChat={() => { setShowChat(true); }}
+              tutoringState={tutoring?.state}
             />
           </div>
         </div>

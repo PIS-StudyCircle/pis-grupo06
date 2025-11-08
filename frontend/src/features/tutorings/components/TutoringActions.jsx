@@ -7,9 +7,9 @@ export default function TutoringActions({
   onUnirme, 
   onDesuscribirme,
   onOpenChat,
-  isFinished = false
+  tutoringState = "pending",
 }) {
-  if (isFinished) {
+  if (tutoringState === "finished") {
     return (
       <aside className="lg:col-span-1">
         <div className="rounded-xl border bg-gray-50 p-4">
@@ -75,13 +75,15 @@ export default function TutoringActions({
 
           {mode === "misTutorias" && (
             <div className="flex gap-2 flex-col">
-              <button
-                type="button"
-                onClick={onOpenChat}
-                className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Abrir chat
-              </button>
+              {tutoringState !== "pending" && (
+                <button
+                  type="button"
+                  onClick={onOpenChat}
+                  className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Abrir chat
+                </button>
+              )}
               <button
                 type="button"
                 className="btn w-full bg-red-500 hover:bg-red-600 text-white"

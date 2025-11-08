@@ -54,6 +54,8 @@ Rails.application.routes.draw do
 
       # chat de tutoria
       resources :chats, only: [:index, :create, :show, :destroy] do
+        post :mark_read, on: :member
+
         resources :messages, only: [:index, :create]
       end
 

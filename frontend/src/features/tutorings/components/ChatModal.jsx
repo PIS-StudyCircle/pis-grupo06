@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import useChat from "../hooks/useChat";
 import { useUser } from "@context/UserContext";
 import ChatModalSkeleton from "./ChatModalSkeleton";
+import { API_BASE } from "@/shared/config";
 
 export default function ChatModal({ chatId, token, tutoringUsers, onClose }) {
   const { user } = useUser();
@@ -45,6 +46,21 @@ export default function ChatModal({ chatId, token, tutoringUsers, onClose }) {
 
     setUserPhotos(map);
   }, [tutoringUsers]);
+
+  useEffect(() => {
+    // cuando el modal abre, marcar como leído en backend
+    if (!chatId) return;
+    (async () => {
+      try {
+        await fetch(`${API_BASE}/chats/${chatId}/mark_read`, {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch (err) {
+        console.debug("mark_read failed", err);
+      }
+    })();
+  }, [chatId]);
 
   // Mostrar skeleton mientras se cargan los mensajes / se establece la suscripción
   if (!ready && (!messages || messages.length === 0)) {
