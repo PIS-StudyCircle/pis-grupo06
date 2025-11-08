@@ -416,15 +416,15 @@ def create_finished_tutoring(course:, tutor:, creator:, num_attendees:, subjects
   tutoring.state = :finished
   tutoring.scheduled_at = past_date
   tutoring.save!(validate: false)
-  
+
   tutor.increment(:tutorias_dadas_count)
   tutor.save!
-  
+
   for user in users_pool
     user.increment(:tutorias_recibidas_count)
     user.save!
   end
-  
+
   tutoring
 end
 
