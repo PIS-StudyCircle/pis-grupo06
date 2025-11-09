@@ -23,6 +23,14 @@ class Tutoring < ApplicationRecord
     joins(:user_tutorings).where(user_tutorings: { user_id: user.id })
   }
 
+  # Tutorías en las que un usuario está inscripto como estudiante o tutor
+  scope :enrolled_or_tutor_by, ->(user) {
+    return none if user.blank?
+
+    enrolled_ids = UserTutoring.select(:tutoring_id).where(user_id: user.id)
+    where(tutor_id: user.id).or(where(id: enrolled_ids)).distinct
+  }
+
   # Tutorías filtradas por id de materia (course_id)
   scope :by_course_id, ->(id) {
     where(course_id: id)

@@ -121,7 +121,7 @@ module Api
                 { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
               end,
               tutor_email: t.tutor&.email_masked,
-              user_enrolled: t.users.exists?(id: current_user.id)
+              user_enrolled: t.users.exists?(id: current_user.id) || t.tutor_id == current_user.id
             }
           end,
           pagination: pagy_metadata(@pagy)
@@ -157,7 +157,7 @@ module Api
             name: @tutoring.tutor.name,
             last_name: @tutoring.tutor.last_name
           } : nil,
-          user_enrolled: @tutoring.users.exists?(id: current_user.id),
+          user_enrolled: @tutoring.users.exists?(id: current_user.id) || @tutoring.tutor_id == current_user.id,
           availabilities: @tutoring.tutoring_availabilities.map do |a|
             {
               id: a.id,
@@ -170,12 +170,6 @@ module Api
       end
 
       def create
-        # if params[:tutoring][:subject_ids].blank?
-        #   render json: { errors: ["No se recibieron correctamente los temas seleccionados. Inténtelo nuevamente."] },
-        #          status: :unprocessable_entity
-        #   return
-        # end
-
         tutoring = Tutoring.new(tutoring_params)
         tutoring.created_by_id = current_user.id
         tutoring.tutor_id      = params.dig(:tutoring, :tutor_id)
@@ -189,7 +183,7 @@ module Api
         if params[:tutoring][:availabilities_attributes].present?
           if availability_overlaps?(params[:tutoring][:availabilities_attributes], current_user.id)
             render json: {
-              errors: ["Ya tienes una tutoría programada en esa fecha y horario"]
+              error: "Ya tienes una tutoría programada en esa fecha y horario"
             }, status: :unprocessable_entity
             return
           end
@@ -210,7 +204,7 @@ module Api
               end
             end
 
-            create_user_tutoring(current_user.id, tutoring.id)
+            create_user_tutoring(current_user.id, tutoring.id) if tutoring.tutor_id.blank?
 
             # Notificar a usuarios con esta materia (course) como favorita
             favoriters = User.joins(:favorite_courses)
@@ -356,11 +350,8 @@ module Api
             # Asignar el tutor en la tabla tutorings
             @tutoring.update!(tutor_id: current_user.id)
 
-            # Crear registro en user_tutorings para el tutor
-            UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
-
             # Agregar también al estudiante creador si no está registrado aún
-            if @tutoring.created_by_id.present? &&
+            if @tutoring.created_by_id.present? && @tutoring.created_by_id != @tutoring.tutor_id &&
                !UserTutoring.exists?(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
               UserTutoring.create!(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
             end
@@ -439,7 +430,7 @@ module Api
         user = User.find(params[:user_id])
 
         tutorings = Tutoring
-                    .enrolled_by(user)
+                    .enrolled_or_tutor_by(user)
                     .upcoming
                     .where(state: :active)
                     .includes(:tutor, :course)
@@ -466,7 +457,7 @@ module Api
         user = User.find(params[:user_id])
 
         tutorings = Tutoring
-                    .enrolled_by(user)
+                    .enrolled_or_tutor_by(user)
                     .past
                     .includes(:tutor, :course)
                     .order(scheduled_at: :desc)

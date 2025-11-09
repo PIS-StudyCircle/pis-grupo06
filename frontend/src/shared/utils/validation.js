@@ -47,7 +47,7 @@ export function validateHoursTutoring(date, startTime, endTime) {
   const [endH, endM] = endTime.split(":").map(Number);
   const start = startH * 60 + startM;
   const end = endH * 60 + endM;
-  if (end - start < 60) return "La sesión debe durar al menos 1 hora";
+  if (end - start < 60) return "El rango horario debe ser de al menos 1 hora";
 
   // Si se pasa la fecha, validar que la hora de inicio sea al menos 3 horas después de ahora
   if (date) {
