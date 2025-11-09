@@ -1,9 +1,9 @@
 import { User } from "lucide-react"
-import avatar1 from "@/assets/avatar1.png"
-import avatar2 from "@/assets/avatar2.png"
-import avatar3 from "@/assets/avatar3.png"
-import avatar4 from "@/assets/avatar4.png"
-import avatar5 from "@/assets/avatar5.png"
+import avatar1 from "@/assets/Avatar1.png"
+import avatar2 from "@/assets/Avatar2.png"
+import avatar3 from "@/assets/Avatar3.png"
+import avatar4 from "@/assets/Avatar4.png"
+import avatar5 from "@/assets/Avatar5.png"
 import { useNavigate } from "react-router-dom"
 
 
