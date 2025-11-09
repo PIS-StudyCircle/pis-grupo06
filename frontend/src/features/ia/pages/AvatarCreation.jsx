@@ -19,7 +19,7 @@ export default function CreateScreen({ onBack }) {
     try {
       const imageUrl = await generateAvatar(prompt);
       setGeneratedImage(imageUrl);
-    } catch (error) {
+    } catch {
       alert("Hubo un problema generando la imagen. Intenta de nuevo en unos segundos.");
     } finally {
       setIsLoading(false);
