@@ -44,10 +44,10 @@ describe("TutoringPage - Comportamiento general", () => {
     });
   });
 
-  it("muestra mensaje de carga cuando loading es true", () => {
+  it("muestra skeletons cuando loading es true", () => {
     mockUseTutorings({ loading: true, tutorings: [] });
     renderWithRouter(<TutoringPage />);
-    expect(screen.getByText(/Cargando tutorías.../i)).toBeInTheDocument();
+    expect(screen.getAllByRole("progressbar")[0]).toBeInTheDocument();
   });
 });
 
@@ -63,7 +63,7 @@ describe("TutoringPage - Comportamiento completo", () => {
         renderWithRouter(<TutoringPage />);
       
         // Esperamos a que aparezca el título
-        expect(await screen.findByText(/Tutorías Disponibles/i)).toBeInTheDocument();
+        expect(await screen.findByText(/Tutorías disponibles/i)).toBeInTheDocument();
       
         // Validamos que cada tutoría se renderizó con su materia y tutor
         for (const tutoring of baseTutorings) {
@@ -99,19 +99,26 @@ describe("TutoringPage - Comportamiento completo", () => {
   
     it("no renderiza botón pero sí toggle cuando mode diferente", () => {
       mockUseTutorings();
-  
+    
       renderWithRouter(<TutoringPage mode="other" />);
-  
-      expect(screen.queryByRole("button")).not.toBeInTheDocument();
-      expect(screen.getByLabelText(/Tutor Indefinido/i)).toBeInTheDocument();
+    
+      // Buscar específicamente el botón de acción (no debería existir)
+      expect(
+        screen.queryByRole("button", {
+          name: /crear nueva tutoría|solicitar nueva tutoría/i,
+        })
+      ).not.toBeInTheDocument();
+    
+      // El toggle de "Solo sin tutor" sí debe estar
+      expect(screen.getByLabelText(/Solo sin tutor/i)).toBeInTheDocument();
     });
   
-    it("toggle 'Tutor Indefinido' actualiza mergedFilters", () => {
+    it("toggle 'Solo sin tutor' actualiza mergedFilters", () => {
       mockUseTutorings({ setPage: setPageMock, setSearch: setSearchMock });
   
       renderWithRouter(<TutoringPage mode="other" />);
   
-      const toggle = screen.getByLabelText(/Tutor Indefinido/i);
+      const toggle = screen.getByLabelText(/Solo sin tutor/i);
       fireEvent.click(toggle);
   
       expect(toggle).toBeChecked();

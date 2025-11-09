@@ -106,9 +106,9 @@ export default function ReviewsList({ reviews, onUpdate }) {
             >
                 <p className="font-semibold text-black">{rev.review}</p>
                 <p className="text-xs text-gray-500 mt-1">
-                — {rev.reviewer?.name} {rev.reviewer?.last_name}
-                {rev.reviewer?.email && (
-                    <span className="text-gray-400"> ({rev.reviewer.email})</span>
+                — {isOwn ? "Tú" : `${rev.reviewer?.name} ${rev.reviewer?.last_name}`}
+                {!isOwn && rev.reviewer?.email_masked && (
+                    <span className="text-gray-400"> ({rev.reviewer.email_masked})</span>
                 )}
                 </p>
             </div>

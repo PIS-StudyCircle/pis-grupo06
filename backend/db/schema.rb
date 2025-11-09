@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_03_172549) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -72,6 +72,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
     t.index ["user_id"], name: "index_favorite_courses_on_user_id"
   end
 
+  create_table "feedbacks", force: :cascade do |t|
+    t.integer "tutor_id", null: false
+    t.integer "student_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "tutoring_id", null: false
+    t.decimal "rating", precision: 2, scale: 1, default: "5.0", null: false
+    t.index ["student_id", "tutor_id", "tutoring_id"], name: "index_feedbacks_on_user_tutor_tutoring", unique: true
+    t.index ["tutoring_id"], name: "index_feedbacks_on_tutoring_id"
+  end
+
   create_table "noticed_events", force: :cascade do |t|
     t.string "type"
     t.string "record_type"
@@ -98,6 +109,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_noticed_notifications_on_event_id"
     t.index ["recipient_type", "recipient_id"], name: "index_noticed_notifications_on_recipient"
+  end
+
+  create_table "solid_cable_messages", force: :cascade do |t|
+    t.binary "channel", null: false
+    t.binary "payload", null: false
+    t.datetime "created_at", null: false
+    t.bigint "channel_hash", null: false
+    t.index ["channel"], name: "index_solid_cable_messages_on_channel"
+    t.index ["channel_hash"], name: "index_solid_cable_messages_on_channel_hash"
+    t.index ["created_at"], name: "index_solid_cable_messages_on_created_at"
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
@@ -335,6 +356,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
   add_foreign_key "faculties", "universities"
   add_foreign_key "favorite_courses", "courses"
   add_foreign_key "favorite_courses", "users"
+  add_foreign_key "feedbacks", "tutorings"
+  add_foreign_key "feedbacks", "users", column: "student_id"
+  add_foreign_key "feedbacks", "users", column: "tutor_id"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

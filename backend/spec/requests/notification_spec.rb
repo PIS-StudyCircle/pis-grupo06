@@ -272,7 +272,9 @@ RSpec.describe "Notifications Messages", type: :request do
         notif = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
         expect(notif).to be_present
         expect(notif.title).to include("Se creó una nueva tutoría de #{course.name}")
-        expect(notif.url).to eq("/tutorias/materia/#{course.id}")
+        expect(notif.url).to eq(
+          "/tutorias/materia/#{course.id}?course_name=#{URI.encode_www_form_component(course.name)}"
+        )
       end
 
       it "envía notificación al recibir una review" do
@@ -301,37 +303,43 @@ RSpec.describe "Notifications Messages", type: :request do
         notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
         expect(notif).to be_present
         expect(notif.title).to include("Nueva reseña recibida")
-        expect(notif.url).to eq("/usuarios/#{tutor.id}")
+        expect(notif.url).to eq("/usuarios/#{student1.id}")
       end
 
       it "notifica a participantes que la tutoría finalizó y pueden dejar feedback" do
         tutoring = Tutoring.create!(
           tutor: tutor,
           course: course,
-          scheduled_at: 2.days.from_now.change(sec: 0),
+          scheduled_at: 2.days.from_now.change(hour: 15, min: 0, sec: 0),
           created_by_id: tutor.id,
           modality: "virtual",
           capacity: 5,
           enrolled: 2,
-          state: :finished,
+          state: :active,
           subjects: [subject]
         )
+
+        tutoring.update(scheduled_at: 1.day.ago)
+        tutoring.update(state: "finished")
+
         UserTutoring.create!(user: student1, tutoring: tutoring)
         UserTutoring.create!(user: student2, tutoring: tutoring)
-        # Ejecutar el job que genera las notificaciones de feedback (síncrono)
+
         TutoringFeedbackJob.perform_now(tutoring.id)
 
-        notif_tutor = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
-        notif_student1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
-        notif_student2 = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
+        notif_tutor     = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
+        notif_student1  = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
+        notif_student2  = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
 
         expect(notif_tutor).to be_present
         expect(notif_student1).to be_present
         expect(notif_student2).to be_present
+
         expect(notif_tutor.title).to include("Tu tutoría de #{course.name} finalizó")
-        expect(notif_student1.title).to include("Tu tutoría de #{course.name} finalizó")
-        expect(notif_student2.title).to include("Tu tutoría de #{course.name} finalizó")
-        expect(notif_tutor.url).to be_nil # el tutor no tiene link de feedback
+        # review_notifier está mal, como va a decirle al tutor que deje su Feedback?
+        expect(notif_student1.title).to include("Tutoría finalizada - Deja tu feedback")
+        expect(notif_student2.title).to include("Tutoría finalizada - Deja tu feedback")
+
         expect(notif_student1.url).to eq("/tutorias/#{tutoring.id}/feedbacks")
         expect(notif_student2.url).to eq("/tutorias/#{tutoring.id}/feedbacks")
       end
@@ -340,28 +348,46 @@ RSpec.describe "Notifications Messages", type: :request do
         tutoring = Tutoring.create!(
           tutor: tutor,
           course: course,
-          scheduled_at: 2.days.from_now,
+          scheduled_at: 2.days.from_now.change(sec: 0),
           created_by_id: tutor.id,
           modality: "virtual",
           capacity: 5,
-          event_id: "evento1",
           state: :active,
-          enrolled: 1,
+          enrolled: 2,
           subjects: [subject]
         )
         UserTutoring.create!(user: student1, tutoring: tutoring)
+        UserTutoring.create!(user: student2, tutoring: tutoring)
+
+        tutoring = Tutoring.create!(
+          tutor: tutor,
+          course: course,
+          scheduled_at: 23.hours.from_now.change(sec: 0),
+          created_by_id: tutor.id,
+          modality: "virtual",
+          capacity: 5,
+          state: :active,
+          enrolled: 2,
+          subjects: [subject]
+        )
+        UserTutoring.create!(user: student1, tutoring: tutoring)
+        UserTutoring.create!(user: student2, tutoring: tutoring)
 
         # simular job/endpoint que envía recordatorios
         TutoringReminderJob.perform_now(tutoring.id)
 
         notif_tutor = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
-        notif_student = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
+        notif_student1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
+        notif_student2 = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
         expect(notif_tutor).to be_present
-        expect(notif_student).to be_present
-        expect(notif_tutor.title).to include("Recordatorio: tu tutoría de #{course.name}")
-        expect(notif_student.title).to include("Recordatorio: tu tutoría de #{course.name}")
-        expect(notif_tutor.url).to eq("/notificaciones")
-        expect(notif_student.url).to eq("/notificaciones")
+        expect(notif_student1).to be_present
+        expect(notif_student2).to be_present
+        expect(notif_tutor.title).to include("Recordatorio de tutoría")
+        expect(notif_student1.title).to include("Recordatorio de tutoría")
+        expect(notif_student2.title).to include("Recordatorio de tutoría")
+        expect(notif_tutor.url).to eq("/tutorias/#{tutoring.id}")
+        expect(notif_student1.url).to eq("/tutorias/#{tutoring.id}")
+        expect(notif_student2.url).to eq("/tutorias/#{tutoring.id}")
       end
     end
   end

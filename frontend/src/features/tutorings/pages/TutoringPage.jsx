@@ -6,12 +6,14 @@ import Pagination from "@components/Pagination";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import PageTitle from "@components/PageTitle";
 
-export default function TutoringPage({ filters = {}, mode = "", titleClass = "titulo" }) {
+export default function TutoringPage({ filters = {}, mode = "", titleClass = "titulo",  showSearchBar = true }) {
   const { courseId } = useParams();
   const navigate = useNavigate();
 
   const location = useLocation();
-  const courseName = location.state?.courseName || "";
+  const params = new URLSearchParams(location.search);
+  const courseNameFromUrl = params.get("course_name");
+  const courseName = location.state?.courseName || courseNameFromUrl || "";
 
   // selector de búsqueda (por materia/tema) proveniente de origin/dev
   const [searchBy, setSearchBy] = useState("course");
@@ -23,7 +25,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
     const baseFilters = { ...filters };
 
     if (showWithoutTutor) {
-      baseFilters.no_tutor = true;
+      baseFilters.no_tutor_incluyendo_mias = true;
     }
 
     if (courseId) baseFilters.course_id = courseId;
@@ -82,8 +84,8 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
           <PageTitle 
             title={
                 ["serTutor", "serEstudiante"].includes(mode)
-                  ? `Tutorías Disponibles para ${courseName || ""}`
-                  : "Tutorías Disponibles"
+                  ? `Tutorías disponibles para ${courseName || ""}`
+                  : "Tutorías disponibles"
               }
             className={titleClass}>
             {["serTutor", "serEstudiante"].includes(mode) && (
@@ -98,25 +100,28 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
               </button>
             )}
           </PageTitle>
-        <TutoringSearchBar
-            query={query}
-            onQueryChange={(e) => setQuery(e.target.value)}
-            searchBy={forceSubjectSearch ? "subject" : searchBy}
-            onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
-            options={
-              forceSubjectSearch
-                ? [{ value: "subject", label: "Tema" }]
-                : [
-                    { value: "course", label: "Materia" },
-                    { value: "subject", label: "Tema" },
-                  ]
-            }
-            placeholder={
-              (forceSubjectSearch ? "subject" : searchBy) === "course"
-                ? "Buscar por materia..."
-                : "Buscar por tema..."
-            }
-          />
+
+          {showSearchBar && (
+            <TutoringSearchBar
+              query={query}
+              onQueryChange={(e) => setQuery(e.target.value)}
+              searchBy={forceSubjectSearch ? "subject" : searchBy}
+              onSearchByChange={forceSubjectSearch ? () => {} : setSearchBy}
+              options={
+                forceSubjectSearch
+                  ? [{ value: "subject", label: "Tema" }]
+                  : [
+                      { value: "course", label: "Materia" },
+                      { value: "subject", label: "Tema" },
+                    ]
+              }
+              placeholder={
+                (forceSubjectSearch ? "subject" : searchBy) === "course"
+                  ? "Buscar por materia..."
+                  : "Buscar por tema..."
+              }
+            />
+          )}
 
           {/* Filter toggle */}
           {mode !== "serTutor" && mode !== "serEstudiante" && (
@@ -124,10 +129,13 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
               <input
                 type="checkbox"
                 checked={showWithoutTutor}
-                onChange={(e) => setShowWithoutTutor(e.target.checked)}
+                onChange={(e) => {
+                  setShowWithoutTutor(e.target.checked);
+                  setPage(1);
+                }}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-gray-700">Tutor Indefinido</span>
+              <span className="text-gray-700">Solo sin tutor</span>
             </label>
           )}
 

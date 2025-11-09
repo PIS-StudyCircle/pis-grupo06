@@ -23,6 +23,14 @@ class Tutoring < ApplicationRecord
     joins(:user_tutorings).where(user_tutorings: { user_id: user.id })
   }
 
+  # Tutorías en las que un usuario está inscripto como estudiante o tutor
+  scope :enrolled_or_tutor_by, ->(user) {
+    return none if user.blank?
+
+    enrolled_ids = UserTutoring.select(:tutoring_id).where(user_id: user.id)
+    where(tutor_id: user.id).or(where(id: enrolled_ids)).distinct
+  }
+
   # Tutorías filtradas por id de materia (course_id)
   scope :by_course_id, ->(id) {
     where(course_id: id)
@@ -48,8 +56,9 @@ class Tutoring < ApplicationRecord
     where("enrolled < capacity and tutor_id IS NOT NULL")
   }
 
-  # Ya pasó (scheduled_at < ahora)
-  scope :past, -> { where(scheduled_at: ...Time.current) }
+  # Ya pasó y tiene estado finalizada
+  # Esto despues habria que cambiarlo para que sea finished y no past, pero lo dejamos asi para la demo.
+  scope :past, -> { where(state: :finished).where(scheduled_at: ...Time.current) }
 
   # Futuras (scheduled_at >= ahora)
   scope :upcoming, -> { where(scheduled_at: Time.current..) }
