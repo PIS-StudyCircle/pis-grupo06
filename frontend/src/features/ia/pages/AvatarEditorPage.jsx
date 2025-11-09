@@ -1,78 +1,52 @@
 import { useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { ChevronLeft, Check, X, Undo } from "lucide-react"
-import ImagePreview from "../components/ImagePreview"
+import { ChevronLeft, Check, X, Undo, AlertCircle } from "lucide-react"
 import PromptInput from "../components/PromptInput"
+import ImagePreview from "../components/ImagePreview" // ✅ usa el nuevo componente
+import { useImageEditor } from "../hooks/useImageEditor"
 
-export default function EditScreen() {
+export default function AvatarEditorPage() {
   const location = useLocation()
   const navigate = useNavigate()
   
-  // Obtener imagen del state de navegación
-  const initialImage = location.state?.initialImage || 
+  const initialImage =
+    location.state?.initialImage ||
     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop"
 
-  // ⚠️ IMPORTANTE: Todos estos useState deben estar al principio
   const [prompt, setPrompt] = useState("")
-  const [currentImage, setCurrentImage] = useState(initialImage)
-  const [originalImage] = useState(initialImage)
-  const [history, setHistory] = useState([])
-  const [historyIndex, setHistoryIndex] = useState(-1)
-  const [isLoading, setIsLoading] = useState(false)
-  const [hasChanges, setHasChanges] = useState(false)
 
-  const handleBack = () => {
-    navigate(-1)
-  }
+  const {
+    currentImage,
+    history,
+    historyIndex,
+    isLoading,
+    error,
+    hasChanges,
+    canUndo,
+    editImage,
+    undo,
+    discard,
+  } = useImageEditor(initialImage)
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return
-
-    setIsLoading(true)
-    
-    // Simular API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    
-    const newImage = `https://images.unsplash.com/photo-${Math.random().toString().slice(2, 12)}?w=400&h=400&fit=crop`
-    
-    // Agregar al historial
-    const newHistory = [...history.slice(0, historyIndex + 1), { image: newImage, prompt }]
-    setHistory(newHistory)
-    setHistoryIndex(newHistory.length - 1)
-    setCurrentImage(newImage)
-    setPrompt("")
-    setIsLoading(false)
-    setHasChanges(true)
-  }
-
-  const handleUndo = () => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1
-      setHistoryIndex(newIndex)
-      setCurrentImage(history[newIndex].image)
-      setHasChanges(true)
-    } else if (historyIndex === 0) {
-      setHistoryIndex(-1)
-      setCurrentImage(originalImage)
-      setHasChanges(false)
+    try {
+      await editImage(prompt)
+      setPrompt("")
+    } catch (err) {
+      console.error("Error al editar imagen:", err)
     }
   }
 
-  const handleSaveAsProfile = () => {
-    console.log("Guardando como foto de perfil:", currentImage)
-    alert("¡Imagen guardada como foto de perfil!")
+  const handleBack = () => {
+    if (hasChanges && !window.confirm("Tienes cambios sin guardar. ¿Salir igualmente?")) return
     navigate(-1)
   }
 
-  const handleDiscard = () => {
-    setCurrentImage(originalImage)
-    setHistory([])
-    setHistoryIndex(-1)
-    setPrompt("")
-    setHasChanges(false)
+  const handleSaveAsProfile = () => {
+    alert("¡Imagen guardada como foto de perfil!")
+    navigate(-1)
   }
-
-  const canUndo = historyIndex >= 0
 
   return (
     <div className="min-h-screen bg-white text-slate-900 flex items-center justify-center p-4">
@@ -91,30 +65,38 @@ export default function EditScreen() {
 
         {/* Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 bg-white">
-          {/* Panel Izquierdo - Controles */}
+          {/* Panel Izquierdo */}
           <div className="space-y-6">
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-red-900">Error</h4>
+                  <p className="text-sm text-red-700 mt-1">{error}</p>
+                </div>
+              </div>
+            )}
+
             <PromptInput
               prompt={prompt}
               onChange={setPrompt}
               onSubmit={handleGenerate}
               isLoading={isLoading}
-              disabled={false}
+              disabled={isLoading}
               placeholder="Ej: Agregar gafas de sol, cambiar el fondo a una playa..."
             />
 
-            {/* Historial y Undo */}
+            {/* Historial */}
             <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-gray-700">
-                  Historial de Ediciones
-                </h3>
+                <h3 className="text-sm font-semibold text-gray-700">Historial de Ediciones</h3>
                 <span className="text-xs text-gray-500">
                   {history.length} {history.length === 1 ? "edición" : "ediciones"}
                 </span>
               </div>
 
               <button
-                onClick={handleUndo}
+                onClick={undo}
                 disabled={!canUndo}
                 className="w-full px-4 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -124,40 +106,37 @@ export default function EditScreen() {
 
               {history.length > 0 && (
                 <div className="mt-3 space-y-2 max-h-48 overflow-y-auto">
-                  {history
-                    .slice()
-                    .reverse()
-                    .map((entry, idx) => {
-                      const actualIndex = history.length - 1 - idx
-                      return (
-                        <div
-                          key={idx}
-                          className={`text-xs p-2 rounded ${
-                            historyIndex === actualIndex
-                              ? "bg-blue-100 text-blue-900"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
-                        >
-                          {entry.prompt}
-                        </div>
-                      )
-                    })}
+                  {history.slice().reverse().map((entry, idx) => {
+                    const actualIndex = history.length - 1 - idx
+                    return (
+                      <div
+                        key={idx}
+                        className={`text-xs p-2 rounded ${
+                          historyIndex === actualIndex
+                            ? "bg-blue-100 text-blue-900"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {entry.prompt}
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </div>
           </div>
 
-          {/* Panel Derecho - Preview */}
+          {/* Panel Derecho */}
           <div className="flex items-center justify-center">
             <ImagePreview image={currentImage} isLoading={isLoading} />
           </div>
         </div>
 
-        {/* Footer Actions */}
+        {/* Footer */}
         <div className="border-t border-gray-200 px-6 py-4 flex gap-3 justify-end bg-white">
           <button
-            onClick={handleDiscard}
-            disabled={!hasChanges}
+            onClick={discard}
+            disabled={!hasChanges || isLoading}
             className="px-6 py-2 border border-gray-300 text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             <X className="w-4 h-4" />
@@ -166,7 +145,7 @@ export default function EditScreen() {
 
           <button
             onClick={handleSaveAsProfile}
-            disabled={!hasChanges}
+            disabled={!hasChanges || isLoading}
             className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
           >
             <Check className="w-4 h-4" />

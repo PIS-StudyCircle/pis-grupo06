@@ -21,7 +21,43 @@ module Api
         end
       end
 
+      def edit
+        validate_params!
+        prompt_text = params[:prompt].to_s.strip
+
+        if prompt_text.match?(/fondo|background|fondo de|fondo color/i)
+          final_prompt = "#{prompt_text}. No generes una imagen nueva, solo edita la imagen que te doy"
+        else
+          final_prompt = "#{prompt_text}. Mantener el fondo original. No generes una imagen nueva, solo edita la imagen que te doy"
+        end
+        image_url = Deapi.new.edit(
+          image: params[:image],
+          prompt: final_prompt,
+          negative_prompt: "imagen completamente diferente, cara distinta, fondo cambiado, baja resolución, deformaciones, realismo fotográfico, texto, marcas de agua",
+          model: "QwenImageEdit_Plus_NF4",
+          guidance: 7.5,
+          steps: 20,
+          seed: rand(1000..9999),
+        )
+
+        render json: { image_url: image_url }, status: :ok
+      rescue Deapi::EditionError => e
+        render json: { error: e.message }, status: :unprocessable_entity
+      rescue StandardError => e
+        render json: { error: "Error editing image: #{e.message}" }, status: :internal_server_error
+      end
+
       private
+
+      def validate_params!
+        if params[:image].blank?
+          raise DeapiImageEditor::EditionError, "Image is required"
+        end
+
+        if params[:prompt].blank?
+          raise DeapiImageEditor::EditionError, "Prompt is required"
+        end
+      end
 
       # Paso 1 → Crear la solicitud de generación de imagen
       def generate_avatar_with_deapi(prompt)

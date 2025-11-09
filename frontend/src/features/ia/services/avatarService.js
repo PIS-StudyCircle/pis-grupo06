@@ -23,3 +23,44 @@ export async function generateAvatar(prompt) {
     throw err;
   }
 }
+
+const getHeaders = (includeContentType = true) => {
+  const headers = {}
+  
+  if (includeContentType) {
+    headers['Content-Type'] = 'application/json'
+  }
+  
+  return headers
+}
+
+const downloadImage = async (url) => {
+  const response = await fetch(url)
+  const blob = await response.blob()
+  return blob
+}
+
+export const editImage = async (imageUrl, prompt, options = {}) => {
+  const imageBlob = await downloadImage(imageUrl)
+  // Crear un File con el tipo correcto
+  const imageFile = new File([imageBlob], "avatar.jpg", { type: imageBlob.type || "image/jpeg" })
+
+  const formData = new FormData()
+  formData.append('image', imageFile)
+  formData.append('prompt', prompt)
+
+  const response = await fetch(`${API_BASE}/avatars/edit`, {
+    method: 'POST',
+    headers: getHeaders(false),
+    credentials: 'include',
+    body: formData
+  })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.message || 'Error editando imagen')
+  }
+
+  return response.json()
+}
+

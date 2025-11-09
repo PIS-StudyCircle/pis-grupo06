@@ -5,11 +5,12 @@ import ReviewsList from "../components/ReviewsList";
 import { useState, useEffect } from "react";
 import { getCourses } from "../../courses/services/courseService";
 import { getFeedbacks } from "../services/feedbackServices";
-import { Link } from "react-router-dom";
-import { Star } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Star, Camera } from "lucide-react";
 
 export default function Profile() {
   const { user, loading, error } = useUser();
+  const navigate = useNavigate();
   const {
     reviews,
     loading: reviewsLoading,
@@ -20,13 +21,14 @@ export default function Profile() {
   const [favLoading, setFavLoading] = useState(false);
   const [favError, setFavError] = useState("");
 
-  // NEW: rating promedio y total
   const [averageRating, setAverageRating] = useState(0);
   const [totalFeedbacks, setTotalFeedbacks] = useState(0);
 
   const [, setFeedbacks] = useState([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState("");
+
+  const [hovered, setHovered] = useState(false); // 👈 para mostrar overlay en desktop
 
   useEffect(() => {
     if (!user) return;
@@ -54,7 +56,7 @@ export default function Profile() {
 
       if (Array.isArray(data)) {
         setFeedbacks(data);
-        const ratings = data.map(f => Number(f?.rating)).filter(x => !Number.isNaN(x));
+        const ratings = data.map((f) => Number(f?.rating)).filter((x) => !Number.isNaN(x));
         const avg = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
         setAverageRating(Number(avg.toFixed(2)));
         setTotalFeedbacks(ratings.length);
@@ -77,9 +79,8 @@ export default function Profile() {
 
   const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
 
-  // Estrellas con medias (visual del promedio)
   const StarRow = ({ value }) => {
-    const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1))); // 0..1
+    const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1)));
     return (
       <div className="flex items-center gap-1" aria-label={`Calificación promedio ${value.toFixed(1)} de 5`}>
         {[1, 2, 3, 4, 5].map((i) => {
@@ -105,16 +106,50 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="mx-auto max-w-6xl p-6 space-y-8">
-        {/* Panel superior del perfil - 3 columnas */}
+        {/* Panel superior del perfil */}
         <div className="bg-[#001F54] text-white rounded-3xl shadow-lg p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            {/* Col 1: Perfil + datos */}
+            {/* Col 1: Imagen + datos */}
             <div className="flex items-center gap-6">
-              <img
-                src={photoUrl}
-                alt="avatar"
-                className="w-24 h-24 rounded-full border-4 border-white shadow-md"
-              />
+              {/* Contenedor con overlay al hacer hover */}
+              <div
+                className="relative w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden cursor-pointer group"
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+              >
+                <img
+                  src={photoUrl}
+                  alt="avatar"
+                  className="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
+                />
+
+                {/* Overlay visible en hover (desktop) o fijo en mobile */}
+                <div
+                  className={`absolute inset-0 bg-black/50 flex items-center justify-center rounded-full transition-opacity duration-200 ${
+                    hovered ? "opacity-100" : "opacity-0 md:opacity-0"
+                  } md:group-hover:opacity-100 md:bg-black/50`}
+                >
+                  <button
+                    onClick={() => navigate("/avatar/elegir_tipo", { state: { initialImage: photoUrl } })}
+                    className="flex items-center gap-1 text-white text-xs font-medium bg-[#001F54]/80 px-2.5 py-1.5 rounded-full hover:bg-[#001F54]"
+                  >
+                    <Camera className="w-4 h-4" />
+                    Editar
+                  </button>
+                </div>
+
+                {/* Botón fijo para mobile (sin hover) */}
+                <div className="absolute bottom-0 left-0 right-0 md:hidden bg-black/40 text-white text-center py-1 text-xs">
+                  <button
+                    onClick={() => navigate("/avatar/elegir_tipo", { state: { initialImage: photoUrl } })}
+                    className="flex items-center justify-center gap-1 w-full"
+                  >
+                    
+                    Editar 
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <h1 className="text-2xl font-semibold">
                   {user.name} {user.last_name}
@@ -134,7 +169,7 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Col 3: Rating promedio (solo si hay ratings) */}
+            {/* Col 3: Rating */}
             <div className="flex md:justify-end justify-center">
               {feedbackLoading ? (
                 <div className="text-sm bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3">
@@ -188,18 +223,13 @@ export default function Profile() {
             <h3 className="text-xl font-semibold mb-3 text-center text-[#001F54]">
               Mis reseñas
             </h3>
-            {reviewsLoading && (
-              <p className="text-center text-gray-500">Cargando reseñas...</p>
-            )}
-            {reviewsError && (
-              <p className="text-center text-red-500">Error al cargar reseñas.</p>
-            )}
-            {!reviewsLoading && !reviewsError && (
-              <ReviewsList reviews={reviews} />
-            )}
+            {reviewsLoading && <p className="text-center text-gray-500">Cargando reseñas...</p>}
+            {reviewsError && <p className="text-center text-red-500">Error al cargar reseñas.</p>}
+            {!reviewsLoading && !reviewsError && <ReviewsList reviews={reviews} />}
           </div>
         </div>
       </div>
     </div>
   );
 }
+

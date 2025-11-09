@@ -4,6 +4,9 @@ import avatar2 from "@/assets/Avatar2.png"
 import avatar3 from "@/assets/Avatar3.png"
 import avatar4 from "@/assets/Avatar4.png"
 import avatar5 from "@/assets/Avatar5.png"
+import avatar6 from "@/assets/Avatar6.png"
+import avatar7 from "@/assets/Avatar7.png"
+import avatar8 from "@/assets/Avatar8.png"
 import { useNavigate } from "react-router-dom"
 
 
@@ -36,17 +39,17 @@ const SAMPLE_AVATARS = [
   },
   {
     id: 6,
-    url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+    url: avatar6,
     name: "Avatar 6",
   },
   {
     id: 7,
-    url: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
+    url: avatar7,
     name: "Avatar 7",
   },
   {
     id: 8,
-    url: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=400&fit=crop",
+    url: avatar8,
     name: "Avatar 8",
   },
 ]
