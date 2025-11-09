@@ -73,13 +73,22 @@ function RegisterPageMock() {
   const { signUp } = useUser();
   const navigate = useNavigate();
 
+  const [name, setName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [name, setName] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [description, setDescription] = React.useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    await signUp({ email, password, name });
+    
+    if (password !== confirmPassword) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
+
+    await signUp({ name, lastName, email, password, description });
     navigate("/");
   };
 
@@ -91,6 +100,14 @@ function RegisterPageMock() {
           aria-label="Nombre"
           value={name}
           onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+      <label>
+        Apellido
+        <input
+          aria-label="Apellido"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
         />
       </label>
       <label>
@@ -110,7 +127,24 @@ function RegisterPageMock() {
           onChange={(e) => setPassword(e.target.value)}
         />
       </label>
-      <button type="submit">Registrarse</button>
+      <label>
+        Confirmar contraseña
+        <input
+          aria-label="Confirmar contraseña"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+      </label>
+      <label>
+        Descripción
+        <textarea
+          aria-label="Descripción"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </label>
+      <button type="submit">Confirmar</button>
     </form>
   );
 }
@@ -147,7 +181,7 @@ function LoginPageMock() {
           onChange={(e) => setPassword(e.target.value)}
         />
       </label>
-      <button type="submit">Iniciar sesión</button>
+      <button type="submit">Ingresar</button>
     </form>
   );
 }
@@ -193,14 +227,23 @@ describe("Flujo de Autenticación", () => {
     fireEvent.change(screen.getByLabelText(/Nombre/i), {
       target: { value: "Ana" },
     });
+    fireEvent.change(screen.getByLabelText(/Apellido/i), {
+    target: { value: "Pérez" },
+    });
     fireEvent.change(screen.getByLabelText(/Email/i), {
       target: { value: "ana@mail.com" },
     });
-    fireEvent.change(screen.getByLabelText(/Contraseña/i), {
+    fireEvent.change(screen.getByLabelText(/^Contraseña$/i), {
       target: { value: "12345678" },
     });
+    fireEvent.change(screen.getByLabelText(/Confirmar contraseña/i), {
+    target: { value: "12345678" },
+    });
+    fireEvent.change(screen.getByLabelText(/Descripción/i), {
+    target: { value: "Alumna aplicada" },
+    });
 
-    fireEvent.click(screen.getByRole("button", { name: /Registrarse/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Confirmar/i }));
 
     await waitFor(() => expect(mockedNavigate).toHaveBeenCalled());
 
@@ -237,7 +280,7 @@ describe("Flujo de Autenticación", () => {
       target: { value: "secreto123" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /Iniciar sesión/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Ingresar/i }));
 
     await waitFor(() => expect(mockedNavigate).toHaveBeenCalled());
     if (!__state.user)
