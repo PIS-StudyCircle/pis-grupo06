@@ -1,12 +1,18 @@
 import { useState } from "react"
-import { Check, X, Undo } from "lucide-react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { ChevronLeft, Check, X, Undo } from "lucide-react"
 import ImagePreview from "../components/ImagePreview"
 import PromptInput from "../components/PromptInput"
 
-export default function EditScreen({
-  onBack,
-  initialImage = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
-}) {
+export default function EditScreen() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  
+  // Obtener imagen del state de navegación
+  const initialImage = location.state?.initialImage || 
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop"
+
+  // ⚠️ IMPORTANTE: Todos estos useState deben estar al principio
   const [prompt, setPrompt] = useState("")
   const [currentImage, setCurrentImage] = useState(initialImage)
   const [originalImage] = useState(initialImage)
@@ -15,16 +21,21 @@ export default function EditScreen({
   const [isLoading, setIsLoading] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
+  const handleBack = () => {
+    navigate(-1)
+  }
+
   const handleGenerate = async () => {
     if (!prompt.trim()) return
 
     setIsLoading(true)
+    
+    // Simular API call
     await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    const newImage = `https://images.unsplash.com/photo-${Math.random()
-      .toString()
-      .slice(2, 12)}?w=400&h=400&fit=crop`
-
+    
+    const newImage = `https://images.unsplash.com/photo-${Math.random().toString().slice(2, 12)}?w=400&h=400&fit=crop`
+    
+    // Agregar al historial
     const newHistory = [...history.slice(0, historyIndex + 1), { image: newImage, prompt }]
     setHistory(newHistory)
     setHistoryIndex(newHistory.length - 1)
@@ -50,7 +61,7 @@ export default function EditScreen({
   const handleSaveAsProfile = () => {
     console.log("Guardando como foto de perfil:", currentImage)
     alert("¡Imagen guardada como foto de perfil!")
-    onBack()
+    navigate(-1)
   }
 
   const handleDiscard = () => {
@@ -66,8 +77,15 @@ export default function EditScreen({
   return (
     <div className="min-h-screen bg-white text-slate-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full overflow-hidden border border-gray-200">
-        {/* Header sin botón Atrás */}
-        <div className="flex items-center justify-center border-b border-gray-200 px-6 py-4 bg-white">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 bg-white">
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            <span>Atrás</span>
+          </button>
           <h2 className="text-xl font-bold text-gray-900">Editar Avatar</h2>
         </div>
 

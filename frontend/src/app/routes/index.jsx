@@ -14,7 +14,7 @@ import {
   SessionsPage,
 } from "@/features/users";
 import { SubjectPage } from "@/features/subjects";
-import { ChooseType, AvatarCreation, AvatarEditPage } from "@/features/ia";
+import { ChooseType, AvatarCreation, AvatarEditPage, AvatarSelectionPage } from "@/features/ia";
 import SubjectDetailPage from "@/features/subjects/pages/SubjectDetailPage";
 import { RequireGuestRoute } from "./RequireGuestRoute";
 import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent, ChooseScheduleByTutor, ChooseScheduleByStudent, ShowPageTutoring} from "@/features/tutorings";
@@ -54,6 +54,8 @@ export function AppRoutes() {
         <Route path="/avatar/elegir_tipo" element={<ChooseType />} />
         <Route path="/avatar/crear" element={<AvatarCreation />} />
         <Route path="/avatar/editar" element={<AvatarEditPage />} />
+        <Route path="/avatar/elegir_avatar" element={<AvatarSelectionPage />} />
+
         <Route
           path="/tutorias/ser_tutor/:courseId"
           element={<TutoringPage filters={{}} mode="serTutor" />}

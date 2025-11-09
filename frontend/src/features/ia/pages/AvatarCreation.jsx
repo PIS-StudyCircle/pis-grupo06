@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Check, Edit3, Sparkles } from "lucide-react"
 import ImagePreview from "../components/ImagePreview"
 import PromptInput from "../components/PromptInput"
+import { generateAvatar } from "../services/avatarService";
 
 export default function CreateScreen({ onBack }) {
   const [prompt, setPrompt] = useState("")
@@ -10,21 +11,21 @@ export default function CreateScreen({ onBack }) {
   const [showOptions, setShowOptions] = useState(false)
 
   const handleGenerate = async () => {
-    if (!prompt.trim()) return
+    if (!prompt.trim()) return;
 
-    setIsLoading(true)
-    setShowOptions(false)
+    setIsLoading(true);
+    setShowOptions(false);
 
-    // Simular llamada a API
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    const newImage = `https://images.unsplash.com/photo-${Math.random()
-      .toString()
-      .slice(2, 12)}?w=400&h=400&fit=crop`
-
-    setGeneratedImage(newImage)
-    setIsLoading(false)
-    setShowOptions(true)
-  }
+    try {
+      const imageUrl = await generateAvatar(prompt);
+      setGeneratedImage(imageUrl);
+    } catch (error) {
+      alert("Hubo un problema generando la imagen. Intenta de nuevo en unos segundos.");
+    } finally {
+      setIsLoading(false);
+      setShowOptions(true);
+    }
+  };
 
   const handleSaveAsProfile = () => {
     console.log("Guardando como foto de perfil:", generatedImage)
@@ -102,7 +103,7 @@ export default function CreateScreen({ onBack }) {
               {isLoading ? (
                 <>
                   <Sparkles className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
-                  <p className="text-sm text-gray-600">Generando tu imagen...</p>
+                  <p className="text-sm text-gray-600">Generando tu imagen... Esto puede tardar unos segundos</p>
                 </>
               ) : generatedImage ? (
                 <img
@@ -118,17 +119,6 @@ export default function CreateScreen({ onBack }) {
               )}
             </div>
           </div>
-        </div>
-        {/* Footer Actions */}
-        <div className="border-t border-gray-200 px-6 py-4 flex justify-end bg-white">
-          <button
-            onClick={handleSaveAsProfile}
-            disabled={!generatedImage}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
-          >
-            <Check className="w-4 h-4" />
-            Guardar como Foto de Perfil
-          </button>
         </div>
       </div>
     </div>
