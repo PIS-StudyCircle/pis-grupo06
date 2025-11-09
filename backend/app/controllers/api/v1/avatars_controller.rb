@@ -7,20 +7,6 @@ module Api
     class AvatarsController < ApplicationController
       before_action :authenticate_user!
 
-      def create
-        prompt = params[:prompt]
-        return render json: { error: "Prompt vacío" }, status: :unprocessable_entity if prompt.blank?
-
-        image_url = generate_avatar_with_deapi(prompt)
-
-        if image_url
-          #current_user.update(avatar_url: image_url)
-          render json: { image_url: image_url }, status: :ok
-        else
-          render json: { error: "Error generando imagen" }, status: :internal_server_error
-        end
-      end
-
       def edit
         validate_params!
         prompt_text = params[:prompt].to_s.strip
@@ -28,12 +14,14 @@ module Api
         if prompt_text.match?(/fondo|background|fondo de|fondo color/i)
           final_prompt = "#{prompt_text}. No generes una imagen nueva, solo edita la imagen que te doy"
         else
-          final_prompt = "#{prompt_text}. Mantener el fondo original. No generes una imagen nueva, solo edita la imagen que te doy"
+          final_prompt = prompt_text + ". Mantener el fondo original. " +
+                         "No generes una imagen nueva, solo edita la imagen que te doy"
         end
         image_url = Deapi.new.edit(
           image: params[:image],
           prompt: final_prompt,
-          negative_prompt: "imagen completamente diferente, cara distinta, fondo cambiado, baja resolución, deformaciones, realismo fotográfico, texto, marcas de agua",
+          negative_prompt: "imagen completamente diferente, cara distinta, fondo cambiado, baja resolución," +
+            " deformaciones, realismo fotográfico, texto, marcas de agua",
           model: "QwenImageEdit_Plus_NF4",
           guidance: 7.5,
           steps: 20,
@@ -45,6 +33,20 @@ module Api
         render json: { error: e.message }, status: :unprocessable_entity
       rescue StandardError => e
         render json: { error: "Error editing image: #{e.message}" }, status: :internal_server_error
+      end
+
+      def create
+        prompt = params[:prompt]
+        return render json: { error: "Prompt vacío" }, status: :unprocessable_entity if prompt.blank?
+
+        image_url = generate_avatar_with_deapi(prompt)
+
+        if image_url
+          # current_user.update(avatar_url: image_url)
+          render json: { image_url: image_url }, status: :ok
+        else
+          render json: { error: "Error generando imagen" }, status: :internal_server_error
+        end
       end
 
       private

@@ -10,7 +10,7 @@ export default function AvatarModeSelector() {
       <div className="text-center mb-12">
         <div className="flex items-center justify-center gap-2 mb-3">
           <Sparkles className="w-8 h-8 text-blue-600" />
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Crear Foto de Perfil</h2>
+          <h2 className="text-3xl font-bold text-slate-900">Crear Foto de Perfil</h2>
         </div>
         <p className="text-slate-600 dark:text-slate-400">Usa IA para crear o editar tu avatar perfecto</p>
       </div>
