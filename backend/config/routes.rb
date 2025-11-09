@@ -36,6 +36,7 @@ Rails.application.routes.draw do
 
       # index y show de UsersController
       resources :users, module: :users, only: [:index, :show]
+      put "/users/profile_photo", to: "users/users#update_profile_photo"
 
       resources :courses do
         resources :subjects

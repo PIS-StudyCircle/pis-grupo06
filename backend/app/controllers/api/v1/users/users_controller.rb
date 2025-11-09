@@ -43,7 +43,21 @@ module Api
             render json: { error: "No se encontró el usuario solicitado" }, status: :not_found
           end
         end
+
+        def update_profile_photo
+          if params[:profile_photo].present?
+            current_user.profile_photo.attach(params[:profile_photo])
+            if current_user.save
+              render json: UserSerializer.new(current_user).serializable_hash[:data][:attributes], status: :ok
+            else
+              render json: { error: "No se pudo guardar la foto" }, status: :unprocessable_entity
+            end
+          else
+            render json: { error: "No se envió ninguna imagen" }, status: :bad_request
+          end
+        end
       end
+      
     end
   end
 end

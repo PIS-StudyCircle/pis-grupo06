@@ -4,6 +4,7 @@ import { ChevronLeft, Check, X, Undo, AlertCircle } from "lucide-react"
 import PromptInput from "../components/PromptInput"
 import ImagePreview from "../components/ImagePreview" // ✅ usa el nuevo componente
 import { useImageEditor } from "../hooks/useImageEditor"
+import { updateProfilePhoto } from "../services/UpdateProfilePhoto"
 
 export default function AvatarEditorPage() {
   const location = useLocation()
@@ -43,9 +44,16 @@ export default function AvatarEditorPage() {
     navigate(-1)
   }
 
-  const handleSaveAsProfile = () => {
-    alert("¡Imagen guardada como foto de perfil!")
-    navigate(-1)
+  const handleSaveAsProfile = async () => {
+    try {
+      if (!currentImage) return
+      await updateProfilePhoto(currentImage)
+      alert("✅ Foto de perfil actualizada correctamente")
+      navigate(-1)
+    } catch (err) {
+      console.error(err)
+      alert("❌ Error al guardar la foto de perfil")
+    }
   }
 
   return (
