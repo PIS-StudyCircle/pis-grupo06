@@ -14,7 +14,7 @@ class CerrarRankingTutoresMesJob < ApplicationJob
     desde = periodo.beginning_of_month
     hasta = periodo.end_of_month.end_of_day
 
-    sql = <<~SQL
+    sql = <<~SQL.squish
       WITH base AS (
         SELECT
           f.tutor_id,
@@ -42,7 +42,7 @@ class CerrarRankingTutoresMesJob < ApplicationJob
     binds = [
       ActiveRecord::Relation::QueryAttribute.new("desde", desde, ActiveRecord::Type::DateTime.new),
       ActiveRecord::Relation::QueryAttribute.new("hasta", hasta, ActiveRecord::Type::DateTime.new),
-      ActiveRecord::Relation::QueryAttribute.new("topn",  TOP_N,  ActiveRecord::Type::Integer.new),
+      ActiveRecord::Relation::QueryAttribute.new("topn",  TOP_N, ActiveRecord::Type::Integer.new),
     ]
 
     rows = ActiveRecord::Base.connection.exec_query(sql, "ranking_mes", binds)
@@ -51,16 +51,18 @@ class CerrarRankingTutoresMesJob < ApplicationJob
       top_ids = []
 
       rows.each do |r|
-        RankingMonth.upsert(
-          {
-            periodo:         periodo,
-            tutor_id:        r["tutor_id"],
-            average_rating:  r["average_rating"],
-            total_feedbacks: r["total_feedbacks"],
-            rank:            r["rk"]
-          },
-          unique_by: [:periodo, :tutor_id]
+        record = RankingMonth.find_or_initialize_by(
+          periodo: periodo,
+          tutor_id: r["tutor_id"]
         )
+
+        record.assign_attributes(
+          average_rating: r["average_rating"],
+          total_feedbacks: r["total_feedbacks"],
+          rank: r["rk"]
+        )
+
+        record.save! # valida y corre callbacks
         top_ids << r["tutor_id"]
       end
 
@@ -77,6 +79,6 @@ class CerrarRankingTutoresMesJob < ApplicationJob
   private
 
   def already_closed?(periodo)
-    RankingMonth.where(periodo: periodo).exists?
+    RankingMonth.exists?(periodo: periodo)
   end
 end

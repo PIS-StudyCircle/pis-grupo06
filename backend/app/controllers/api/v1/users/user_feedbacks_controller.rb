@@ -155,9 +155,9 @@ module Api
           # Parámetros opcionales para filtrar por año o mes específico
           year = params[:year]&.to_i
           month = params[:month]&.to_i
-          
+
           query = RankingMonth.includes(:tutor)
-          
+
           # Filtrar por año si se proporciona
           if year.present?
             if month.present?
@@ -171,12 +171,12 @@ module Api
               query = query.where(periodo: start_date..end_date)
             end
           end
-          
+
           rankings = query.order(:periodo, :rank)
-          
+
           # Agrupar por mes
           rankings_por_mes = rankings.group_by(&:periodo)
-          
+
           result = rankings_por_mes.map do |periodo, tutores|
             {
               periodo: periodo.strftime("%Y-%m"),
@@ -198,12 +198,11 @@ module Api
               end
             }
           end
-          
+
           render json: {
             rankings_mensuales: result.sort_by { |r| r[:periodo] }.reverse
           }, status: :ok
         end
-
 
         private
 
