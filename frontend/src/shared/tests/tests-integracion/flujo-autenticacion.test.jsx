@@ -260,6 +260,8 @@ describe("Flujo de Autenticación", () => {
         email: "ana@mail.com",
         password: "12345678",
         name: "Ana",
+        lastName: "Pérez",
+        description: "Alumna aplicada",
       })
     );
   });
