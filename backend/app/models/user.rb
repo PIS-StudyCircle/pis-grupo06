@@ -96,7 +96,7 @@ class User < ApplicationRecord
           end
 
     # 3) Notificar solo si corresponde
-    return unless msj.present?
+    return if msj.blank?
 
     begin
       ApplicationNotifier.with(
