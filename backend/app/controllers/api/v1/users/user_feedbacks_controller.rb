@@ -96,24 +96,7 @@ module Api
             current_user.increment(:feedback_dado_count)
             current_user.save!
 
-            if current_user.feedback_dado_count == 1
-              msj = "Recibiste una insignia de nivel 1 (feedback)"
-            elsif current_user.feedback_dado_count == 3
-              msj = "Recibiste una insignia de nivel 2 (feedback)"
-            elsif current_user.feedback_dado_count == 6
-              msj = "Recibiste una insignia de nivel 3 (feedback)"
-            end
-
-            begin
-              if msj.present?
-                ApplicationNotifier.with(
-                  title: msj,
-                  url: "/perfil"
-                ).deliver(current_user)
-              end
-            rescue => e
-              Rails.logger.error "Error notificando insignia al usuario #{current_user.id}: #{e.message}"
-            end
+            current_user.notificar_insignia!(:feedback_dado)
 
             # promedio actualizado del tutor
             avg = Feedback.where(tutor_id: tutor_id).average(:rating)

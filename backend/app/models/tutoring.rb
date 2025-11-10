@@ -136,24 +136,7 @@ class Tutoring < ApplicationRecord
           tutor.increment(:tutorias_dadas_count)
           tutor.save!
 
-          if tutor.tutorias_dadas_count == 1
-            msj = "Recibiste una insignia de nivel 1 (tutorías dadas)"
-          elsif tutor.tutorias_dadas_count == 3
-            msj = "Recibiste una insignia de nivel 2 (tutorías dadas)"
-          elsif tutor.tutorias_dadas_count == 6
-            msj = "Recibiste una insignia de nivel 3 (tutorías dadas)"
-          end
-
-          begin
-            if msj.present?
-              ApplicationNotifier.with(
-                title: msj,
-                url: "/perfil"
-              ).deliver(u)
-            end
-          rescue => e
-            Rails.logger.error "Error notificando insignia al usuario #{tutor.id}: #{e.message}"
-          end
+          tutor.notificar_insignia!(:tutorias_dadas)
         end
       end
 
@@ -162,24 +145,7 @@ class Tutoring < ApplicationRecord
           u.increment(:tutorias_recibidas_count)
           u.save!
 
-          if u.tutorias_recibidas_count == 1
-            msj = "Recibiste una insignia de nivel 1 (tutorías recibidas)"
-          elsif u.tutorias_recibidas_count == 3
-            msj = "Recibiste una insignia de nivel 2 (tutorías recibidas)"
-          elsif u.tutorias_recibidas_count == 6
-            msj = "Recibiste una insignia de nivel 3 (tutorías recibidas)"
-          end
-
-          begin
-            if msj.present?
-              ApplicationNotifier.with(
-                title: msj,
-                url: "/perfil"
-              ).deliver(u)
-            end
-          rescue => e
-            Rails.logger.error "Error notificando insignia al usuario #{u.id}: #{e.message}"
-          end
+          u.notificar_insignia!(:tutorias_recibidas)
         end
       end
     end
