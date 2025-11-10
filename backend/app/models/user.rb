@@ -72,10 +72,10 @@ class User < ApplicationRecord
   }
 
   def notificar_insignia!(tipo)
-    # 1) Obtener el count según el tipo
+    tipo_label = tipo.to_s.tr("_-", " ")
+
     count = case tipo.to_sym
             when :tutorias_dadas
-              # si tenés un método/counter cache, usalo; si no, calculalo
               respond_to?(:tutorias_dadas_count) ? tutorias_dadas_count : created_tutorings.count
             when :tutorias_recibidas
               respond_to?(:tutorias_recibidas_count) ? tutorias_recibidas_count : tutorings.count
@@ -88,14 +88,12 @@ class User < ApplicationRecord
               return
             end
 
-    # 2) Calcular mensaje si cae en hito (1, 3, 6)
     msj = case count
-          when 1 then "Recibiste una insignia de nivel 1 (#{label_de_tipo(tipo)})"
-          when 3 then "Recibiste una insignia de nivel 2 (#{label_de_tipo(tipo)})"
-          when 6 then "Recibiste una insignia de nivel 3 (#{label_de_tipo(tipo)})"
+          when 1 then "Recibiste una insignia de nivel 1 (#{tipo_label})"
+          when 3 then "Recibiste una insignia de nivel 2 (#{tipo_label})"
+          when 6 then "Recibiste una insignia de nivel 3 (#{tipo_label})"
           end
 
-    # 3) Notificar solo si corresponde
     return if msj.blank?
 
     begin
