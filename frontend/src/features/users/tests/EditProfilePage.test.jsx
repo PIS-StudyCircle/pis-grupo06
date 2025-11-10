@@ -45,8 +45,7 @@ jest.mock("@utils/UseFormSubmit", () => ({
     onSubmit: async (formData) => {
       await action(formData);
       if (redirectTo) {
-        const nav = require("react-router-dom").useNavigate();
-        nav(redirectTo);
+        mockNavigate(redirectTo);
       }
     },
   }),
@@ -108,7 +107,7 @@ jest.mock("@/shared/components/ErrorAlert", () => ({
 
 jest.mock("@/shared/config", () => ({ DEFAULT_PHOTO: "about:default-photo" }), { virtual: true });
 
-global.URL.createObjectURL = jest.fn(() => "blob:selected-file");
+globalThis.URL.createObjectURL = jest.fn(() => "blob:selected-file");
 
 jest.mock("../components/ProfilePhotoEditor", () => ({
   ProfilePhotoEditor: ({ onApply }) => (
@@ -169,7 +168,6 @@ describe("EditProfilePage", () => {
     expect(email).toBeDisabled();
 
     expect(screen.getByLabelText(/nombre/i)).toBeInTheDocument();
-
     expect(screen.getByAltText(/profile preview/i)).toBeInTheDocument();
   });
 
