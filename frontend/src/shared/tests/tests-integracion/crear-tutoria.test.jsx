@@ -141,6 +141,8 @@ function MateriaPageMock() {
     if (pending) {
       const when = new Date(Date.now() + 60 * 60 * 1000).toISOString();
       await joinAsTutor({ tutoringId: pending.id, tutorId: user.id, scheduledAt: when });
+      navigate("/notificaciones");
+      return;
     }
     navigate(`/tutorias?course=${courseId}`);
   };
@@ -155,6 +157,9 @@ function MateriaPageMock() {
       </div>
     </div>
   );
+}
+function NotificacionesMock() {
+  return <h2>Notificaciones</h2>;
 }
 
 function TutoriasListMock() {
@@ -327,18 +332,26 @@ describe("Flujo de crear Tutorías", () => {
     const rB = renderWithRouter(
       <Routes>
         <Route path="/materias/:courseId" element={<MateriaPageMock />} />
-        <Route path="/tutorias" element={<TutoriasListMock />} />
+        <Route path="/notificaciones" element={<NotificacionesMock />} />
       </Routes>,
       "/materias/1"
     );
     await act(async () => {
       fireEvent.click(within(rB.container).getByRole("button", { name: /Brindar tutoría/i }));
     });
-    await within(rB.container).findByText(/Tutorías disponibles/i);
-    card = await awaitTutorCardIn(rB.container, 1);
+    await within(rB.container).findByText(/Notificaciones/i);
+    rB.unmount();
+    const rBList = renderWithRouter(
+      <Routes>
+        <Route path="/tutorias" element={<TutoriasListMock />} />
+      </Routes>,
+    "/tutorias?course=1"
+    );
+    await within(rBList.container).findByText(/Tutorías disponibles/i);
+    card = await awaitTutorCardIn(rBList.container, 1);
     expectTutorIn(card, 1, "201");
     expectCuposIn(card, 1, "1/2");
-    rB.unmount();
+    rBList.unmount();
 
     __setUser({ id: 301, name: "Estudiante C" });
     const rC = renderWithRouter(
