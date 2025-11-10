@@ -107,7 +107,8 @@ module Api
               enrolled_students: t.users.map do |user|
                 {
                   id: user.id,
-                  photo_url: user.profile_photo.attached? ? Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
+                  photo_url: user.profile_photo.attached? ?
+                    Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
                 }
               end,
               created_by_id: t.created_by_id,
@@ -171,17 +172,20 @@ module Api
           enrolled_students: @tutoring.users.map do |user|
             {
               id: user.id,
-              photo_url: user.profile_photo.attached? ? Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
+              photo_url: user.profile_photo.attached? ?
+                Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
             }
           end,
           enrolled_users: @tutoring.users.map do |user|
             {
               id: user.id,
-              photo_url: user.profile_photo.attached? ? Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
+              photo_url: user.profile_photo.attached? ?
+                Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
             }
           end.append(@tutoring.tutor ? [{
                        id: @tutoring.tutor.id,
-                       photo_url: @tutoring.tutor.profile_photo.attached? ? Rails.application.routes.url_helpers.url_for(@tutoring.tutor.profile_photo) : nil
+                       photo_url: @tutoring.tutor.profile_photo.attached? ?
+                        Rails.application.routes.url_helpers.url_for(@tutoring.tutor.profile_photo) : nil
                      }] : [])
         }
       end
