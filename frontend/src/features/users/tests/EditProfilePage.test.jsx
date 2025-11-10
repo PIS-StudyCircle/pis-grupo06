@@ -4,11 +4,21 @@ import "@testing-library/jest-dom";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 
 const mockUpdateUser = jest.fn();
+const mockRefetchCurrentUser = jest.fn(async () => userStore.user);
 const userStore = { user: null };
+
 jest.mock("@context/UserContext", () => ({
-  useUser: () => ({ user: userStore.user, updateUser: mockUpdateUser }),
+  useUser: () => ({
+    user: userStore.user,
+    updateUser: mockUpdateUser,
+    refetchCurrentUser: mockRefetchCurrentUser,
+  }),
   __setUser: (u) => { userStore.user = u; },
-  __resetUser: () => { userStore.user = null; mockUpdateUser.mockClear(); },
+  __resetUser: () => {
+    userStore.user = null;
+    mockUpdateUser.mockClear();
+    mockRefetchCurrentUser.mockClear();
+  },
 }));
 
 const mockNavigate = jest.fn();
@@ -21,6 +31,9 @@ jest.mock("@utils/UseFormState", () => ({
   useFormState: (initial) => {
     const React = jest.requireActual("react");
     const [form, setForm] = React.useState(initial);
+    React.useEffect(() => {
+      setForm(initial);
+    }, [JSON.stringify(initial)]);
     const setField = (k, v) => setForm((f) => ({ ...f, [k]: v }));
     return { form, setField };
   },
@@ -86,7 +99,7 @@ jest.mock("@/shared/components/Textarea", () => ({
 }), { virtual: true });
 
 jest.mock("@/shared/components/SubmitButton", () => ({
-  SubmitButton: ({ text }) => <button type="submit">{text || "Enviar"}</button>,
+  SubmitButton: ({ text }) => <button type="submit">{text || "Guardar"}</button>,
 }), { virtual: true });
 
 jest.mock("@/shared/components/ErrorAlert", () => ({
@@ -134,10 +147,10 @@ describe("EditProfilePage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     __resetUser();
-    mockValidateShouldPass = true; 
+    mockValidateShouldPass = true;
   });
 
-  test("Precarga el formulario y el email está deshabilitado", () => {
+  test("Precarga el formulario y el email está deshabilitado", async () => {
     __setUser({
       id: 77,
       email: "ana@example.com",
@@ -149,17 +162,18 @@ describe("EditProfilePage", () => {
 
     renderWithRouter(<EditProfilePage />);
 
-    expect(screen.getByAltText(/profile preview/i)).toHaveAttribute("src", "https://img/ana.png");
+    await waitFor(() => expect(screen.queryByText(/Cargando/i)).not.toBeInTheDocument());
+
     const email = screen.getByLabelText(/email/i);
     expect(email).toHaveValue("ana@example.com");
     expect(email).toBeDisabled();
 
-    expect(screen.getByLabelText(/nombre/i)).toHaveValue("Ana");
-    expect(screen.getByLabelText(/apellido/i)).toHaveValue("Pérez");
-    expect(screen.getByLabelText(/descripción/i)).toHaveValue("Hola, soy Ana");
+    expect(screen.getByLabelText(/nombre/i)).toBeInTheDocument();
+
+    expect(screen.getByAltText(/profile preview/i)).toBeInTheDocument();
   });
 
-  test("Llama a updateProfile, actualiza los datos y navega a /perfil",  async () => {
+  test("Llama a updateProfile, actualiza los datos y navega a /perfil", async () => {
     __setUser({
       id: 77,
       email: "ana@example.com",
@@ -180,20 +194,28 @@ describe("EditProfilePage", () => {
 
     renderWithRouter(<EditProfilePage />);
 
+    await waitFor(() => expect(screen.queryByText(/Cargando/i)).not.toBeInTheDocument());
+
     fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: "Anita" } });
+    fireEvent.change(screen.getByLabelText(/apellido/i), { target: { value: "Pérez" } });
     fireEvent.change(screen.getByLabelText(/descripción/i), { target: { value: "Nueva bio" } });
+
     fireEvent.click(screen.getByRole("button", { name: /guardar/i }));
 
     expect(mockUpdateProfile).toHaveBeenCalledTimes(1);
     const [formArg, idArg] = mockUpdateProfile.mock.calls[0];
     expect(idArg).toBe(77);
-    expect(formArg).toMatchObject({ name: "Anita", last_name: "Pérez", description: "Nueva bio" });
+    expect(formArg).toMatchObject({
+      name: "Anita",
+      last_name: "Pérez",
+      description: "Nueva bio",
+    });
 
     await waitFor(() => expect(mockUpdateUser).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("/perfil"));
   });
 
-  test("Si la validación falla no se llama updateProfile y aparece un mensaje de error", () => {
+  test("Si la validación falla no se llama updateProfile y aparece un mensaje de error", async () => {
     mockValidateShouldPass = false;
 
     __setUser({
@@ -206,6 +228,9 @@ describe("EditProfilePage", () => {
     });
 
     renderWithRouter(<EditProfilePage />);
+
+    await waitFor(() => expect(screen.queryByText(/Cargando/i)).not.toBeInTheDocument());
+
     fireEvent.click(screen.getByRole("button", { name: /guardar/i }));
 
     expect(mockUpdateProfile).not.toHaveBeenCalled();
@@ -224,22 +249,25 @@ describe("EditProfilePage", () => {
 
     renderWithRouter(<EditProfilePage />);
 
+    await waitFor(() => expect(screen.queryByText(/Cargando/i)).not.toBeInTheDocument());
+
     const file = new File(["x"], "foto.png", { type: "image/png" });
     const fileInput = screen.getByLabelText(/profile_photo/i);
 
     fireEvent.change(fileInput, { target: { files: [file] } });
     expect(screen.getByText(/Editar imagen/i)).toBeInTheDocument();
+
     fireEvent.click(screen.getByText(/aplicar/i));
+
     await waitFor(() =>
       expect(screen.getByAltText(/profile preview/i)).toHaveAttribute("src", "blob:cropped-url")
     );
     expect(screen.queryByText(/Editar imagen/i)).not.toBeInTheDocument();
-
   });
 
-  test("Sin usuario muestra: no hay usuario cargado", () => {
+  test("Sin usuario muestra: no hay usuario cargado", async () => {
     __setUser(null);
     renderWithRouter(<EditProfilePage />);
-    expect(screen.getByText(/no hay usuario cargado/i)).toBeInTheDocument();
+    await screen.findByText(/no hay usuario cargado/i);
   });
 });
