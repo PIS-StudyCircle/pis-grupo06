@@ -72,38 +72,9 @@ class User < ApplicationRecord
   }
 
   def notificar_insignia!(tipo)
-    tipo_label = tipo.to_s.tr("_-", " ")
-
-    count = case tipo.to_sym
-            when :tutorias_dadas
-              respond_to?(:tutorias_dadas_count) ? tutorias_dadas_count : created_tutorings.count
-            when :tutorias_recibidas
-              respond_to?(:tutorias_recibidas_count) ? tutorias_recibidas_count : tutorings.count
-            when :resenas_dadas
-              respond_to?(:resenas_dadas_count) ? resenas_dadas_count : given_reviews.count
-            when :feedback_dado
-              respond_to?(:feedback_dado_count) ? feedback_dado_count : given_feedbacks.count
-            else
-              Rails.logger.warn "Tipo de insignia desconocido: #{tipo.inspect}"
-              return
-            end
-
-    msj = case count
-          when 1 then "Recibiste una insignia de nivel 1 (#{tipo_label})"
-          when 3 then "Recibiste una insignia de nivel 2 (#{tipo_label})"
-          when 6 then "Recibiste una insignia de nivel 3 (#{tipo_label})"
-          end
-
-    return if msj.blank?
-
-    begin
-      ApplicationNotifier.with(
-        title: msj,
-        url: "/perfil"
-      ).deliver(self)
-    rescue => e
-      Rails.logger.error "Error notificando insignia al usuario #{id}: #{e.message}"
-    end
+    InsigniaNotifier.with(tipo: tipo).deliver(self)
+  rescue => e
+    Rails.logger.error "Error notificando insignia al usuario #{id}: #{e.message}"
   end
 
   def self.from_omniauth(auth)
