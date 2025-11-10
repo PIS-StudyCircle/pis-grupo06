@@ -33,7 +33,6 @@ Rails.application.routes.draw do
       end
 
       post "/notification_token", to: "notification_tokens#create"
-      post "/chat_token", to: "chat_tokens#create"
 
       # index y show de UsersController
       resources :users, module: :users, only: [:index, :show]
