@@ -20,6 +20,19 @@ Rails.logger.debug "\n[1/7] Creating University and Faculty..."
 uni = University.find_or_create_by!(name: "Universidad de la República")
 fing = Faculty.find_or_create_by!(name: "Facultad de Ingeniería", university: uni)
 
+Rails.logger.debug "Seeding courses from JSON..."
+file_path = Rails.root.join("db/courses.json")
+json_data = JSON.parse(File.read(file_path))
+
+json_data.each do |entry|
+  Course.find_or_create_by!(
+    name: entry['nombre'],
+    code: entry['codigo'],
+    institute: entry['instituto'],
+    faculty: fing
+  )
+end
+
 # =============================================================================
 # USERS (9 users as specified)
 # =============================================================================
@@ -65,9 +78,9 @@ Rails.logger.debug "[3/7] Creating 10 courses with subjects..."
 
 # Course 1: Programación I (7 subjects)
 course1 = Course.find_or_create_by!(
-  name: "Programación I",
-  code: "PROG1",
-  institute: "Instituto de Computación",
+  name: "Programación 1",
+  code: "1373",
+  institute: "INCO",
   faculty: fing
 )
 
@@ -80,9 +93,7 @@ end
 
 # Course 2: Cálculo Diferencial (5 subjects)
 course2 = Course.find_or_create_by!(
-  name: "Cálculo Diferencial e Integral",
-  code: "CALC1",
-  institute: "Instituto de Matemática",
+  name: "Cálculo Diferencial e Integral en una variable",
   faculty: fing
 )
 
@@ -95,9 +106,8 @@ end
 
 # Course 3: Física I (4 subjects)
 course3 = Course.find_or_create_by!(
-  name: "Física I",
-  code: "FIS1",
-  institute: "Instituto de Física",
+  name: "Física 1",
+  institute: "IF",
   faculty: fing
 )
 
@@ -110,9 +120,8 @@ end
 
 # Course 4: Álgebra Lineal (6 subjects)
 course4 = Course.find_or_create_by!(
-  name: "Álgebra Lineal",
-  code: "ALG1",
-  institute: "Instituto de Matemática",
+  name: "Geometría y Álgebra Lineal 1",
+  institute: "IMERL",
   faculty: fing
 )
 
@@ -140,9 +149,7 @@ end
 
 # Course 6: Bases de Datos (2 subjects)
 course6 = Course.find_or_create_by!(
-  name: "Bases de Datos I",
-  code: "BBDD1",
-  institute: "Instituto de Computación",
+  name: "Bases de Datos 1",
   faculty: fing
 )
 
@@ -156,8 +163,8 @@ end
 # Course 7: Redes de Computadoras (4 subjects)
 course7 = Course.find_or_create_by!(
   name: "Redes de Computadoras",
-  code: "REDES",
-  institute: "Instituto de Computación",
+  code: "1446",
+  institute: "INCO",
   faculty: fing
 )
 
@@ -171,8 +178,8 @@ end
 # Course 8: Sistemas Operativos (no subjects needed for pending tutorings)
 course8 = Course.find_or_create_by!(
   name: "Sistemas Operativos",
-  code: "SOOP",
-  institute: "Instituto de Computación",
+  code: "1537",
+  institute: "INCO",
   faculty: fing
 )
 
@@ -200,9 +207,9 @@ end
 
 # Course 10: Arquitectura de Computadores (no subjects needed)
 course10 = Course.find_or_create_by!(
-  name: "Arquitectura de Computadores",
-  code: "ARQCOMP",
-  institute: "Instituto de Computación",
+  name: "Arquitectura de Computadoras",
+  code: "1466",
+  institute: "INCO",
   faculty: fing
 )
 
