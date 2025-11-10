@@ -14,14 +14,10 @@ class ChatNotifierJob < ApplicationJob
       participant = chat_user.user
 
       # si participante ausente, saltear
-      if participant.blank?
-        next
-      end
+      next if participant.blank?
 
       # si ya leyó este mensaje o después, no notificar
-      if chat_user.last_read_at.present? && chat_user.last_read_at >= message.created_at
-        next
-      end
+      next if chat_user.last_read_at.present? && chat_user.last_read_at >= message.created_at
 
       # si ya tiene una notificación pendiente (no marcó como leída), no notificar de nuevo
       next if chat_user.last_notified_message_id.present?

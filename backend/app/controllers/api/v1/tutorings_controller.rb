@@ -107,6 +107,7 @@ module Api
               enrolled_students: t.users.map do |user|
                 {
                   id: user.id,
+                  photo_url: user.profile_photo.attached? ? Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
                 }
               end,
               created_by_id: t.created_by_id,
@@ -170,18 +171,17 @@ module Api
           enrolled_students: @tutoring.users.map do |user|
             {
               id: user.id,
-              photo_url: UserSerializer.new(user).serializable_hash[:data][:attributes][:profile_photo_url],
+              photo_url: user.profile_photo.attached? ? Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
             }
           end,
           enrolled_users: @tutoring.users.map do |user|
             {
               id: user.id,
-              photo_url: UserSerializer.new(user).serializable_hash[:data][:attributes][:profile_photo_url]
+              photo_url: user.profile_photo.attached? ? Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
             }
           end.append(@tutoring.tutor ? [{
                        id: @tutoring.tutor.id,
-                       photo_url: UserSerializer.new(@tutoring.tutor)
-                            .serializable_hash[:data][:attributes][:profile_photo_url]
+                       photo_url: @tutoring.tutor.profile_photo.attached? ? Rails.application.routes.url_helpers.url_for(@tutoring.tutor.profile_photo) : nil
                      }] : [])
         }
       end
@@ -536,10 +536,7 @@ module Api
             end
 
             # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
-            chat = @tutoring.chat
-            if chat
-              chat.destroy
-            end
+            @tutoring.chat&.destroy
 
             @tutoring.destroy!
             return head :no_content
@@ -572,10 +569,7 @@ module Api
             end
 
             # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
-            chat = @tutoring.chat
-            if chat
-              chat.destroy
-            end
+            @tutoring.chat&.destroy
 
             @tutoring.destroy!
             return head :no_content
@@ -595,10 +589,7 @@ module Api
             end
 
             # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
-            chat = @tutoring.chat
-            if chat
-              chat.destroy
-            end
+            @tutoring.chat&.destroy
 
             @tutoring.destroy!
             return head :no_content
@@ -623,10 +614,7 @@ module Api
             end
 
             # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
-            chat = @tutoring.chat
-            if chat
-              chat.destroy
-            end
+            @tutoring.chat&.destroy
 
             @tutoring.update!(scheduled_at: nil)
             @tutoring.tutoring_availabilities.each { |a| a.update(is_booked: false) }
