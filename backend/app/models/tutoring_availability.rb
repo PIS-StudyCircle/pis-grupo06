@@ -6,6 +6,7 @@ class TutoringAvailability < ApplicationRecord
 
   scope :available, -> { where(is_booked: false) }
   scope :booked, -> { where(is_booked: true) }
+  scope :expired, -> { where(end_time: ...Time.current) }
 
   private
 
