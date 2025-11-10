@@ -122,6 +122,7 @@ import {
   listAvailable,
   __seedFinalizada,
   __resetDb,
+  getById
 } from "../../../features/tutorings/services/tutoringService";
 
 function MateriaPageMock() {
@@ -130,8 +131,8 @@ function MateriaPageMock() {
   const { user } = useUser();
 
   const onRecibir = async () => {
-    await createPendingByStudent({ courseId: Number(courseId), temaId: 10, studentId: user.id });
-    navigate(`/tutorias?course=${courseId}`);
+    const t = await createPendingByStudent({ courseId: Number(courseId), temaId: 10, studentId: user.id });
+    navigate(`/tutoring/${t.id}`);
   };
 
   const onBrindar = async () => {
@@ -216,6 +217,49 @@ function TutoriasListMock() {
     </div>
   );
 }
+function TutoringShowMock() {
+  const { id } = useParams();
+  const { user } = useUser();
+  const [t, setT] = React.useState(null);
+
+  React.useEffect(() => {
+    getById(id).then(setT);
+  }, [id]);
+
+  if (!t) return <p>Cargando tutoría...</p>;
+
+  const cap = t.capacity ?? 2;
+  const cupos = `${t.students.length}/${cap}`;
+  const isTutor = user && t.tutorId === user.id;
+
+  return (
+    <div>
+      <h2>Tutoría de: Administración General para Ingenieros</h2>
+      <p>Modalidad: virtual</p>
+
+
+      <ul>
+        <li
+         aria-label={`tutoria-${t.id}`}
+        style={{ border: "1px solid #ddd", margin: 8, padding: 8 }}
+        >
+      <div data-testid={`cupos-${t.id}`}>
+        {t.tutorId ? `Cupos: ${cupos}` : "Cupos: A definir"}
+      </div>
+      <div data-testid={`tutor-${t.id}`}>
+        {t.tutorId ? `Tutor: ${t.tutorId}` : "Tutor: Sin tutor asignado"}
+      </div>
+      </li>
+      </ul>
+      <div style={{ marginTop: 12 }}>
+        <button style={{ background: "red", color: "white", border: 0, padding: 6 }}>
+          Desuscribirme
+        </button>
+        <button style={{ marginLeft: 8 }}>Volver al listado</button>
+      </div>
+    </div>
+  );
+}
 
 function TemaPageMock() {
   const { courseId, temaId } = useParams();
@@ -267,6 +311,7 @@ describe("Flujo de crear Tutorías", () => {
         <Route path="/materias/:courseId" element={<MateriaPageMock />} />
         <Route path="/materias/:courseId/temas/:temaId" element={<TemaPageMock />} />
         <Route path="/tutorias" element={<TutoriasListMock />} />
+        <Route path="/tutoring/:id" element={<TutoringShowMock />} />
       </Routes>,
       "/materias/1"
     );
@@ -274,10 +319,9 @@ describe("Flujo de crear Tutorías", () => {
     await act(async () => {
       fireEvent.click(within(rA.container).getByRole("button", { name: /Recibir tutoría/i }));
     });
-    await within(rA.container).findByText(/Tutorías disponibles/i);
     let card = await awaitTutorCardIn(rA.container, 1);
-    expectTutorIn(card, 1, "Sin tutor");
-    expect(within(card).getByTestId("cupos-1")).toHaveTextContent("Cupos disponibles: A definir");
+    expectTutorIn(card, 1, "Sin tutor asignado");
+    expect(within(card).getByTestId("cupos-1")).toHaveTextContent("Cupos: A definir");
     rA.unmount();
 
     __setUser({ id: 201, name: "Tutor B" });
