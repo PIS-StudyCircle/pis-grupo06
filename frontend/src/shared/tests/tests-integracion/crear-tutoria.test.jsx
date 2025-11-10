@@ -191,6 +191,7 @@ function TutoriasListMock() {
       <ul>
         {items.map((t) => {
           const isTutor = user && t.tutorId === user.id;
+          const isStudent = user && t.students.includes(user.id);
           const cupos = `${t.students.length}/${t.capacity}`;
           const llena = t.students.length >= t.capacity;
           return (
@@ -205,8 +206,10 @@ function TutoriasListMock() {
               {t.tutorId != null ? `Tutor: ${t.tutorId}` : "Tutor: Sin tutor"}</div>
               <div data-testid={`cupos-${t.id}`}>{t.tutorId ? `Cupos: ${cupos}` : "Cupos disponibles: A definir"}</div>
               <div>Estado: {t.status}</div>
-              {!isTutor && !llena && (
-                <button onClick={() => handleJoin(t.id)}>Unirse</button>
+              {(isTutor || isStudent) ? (
+                <button aria-label={`desuscribirme-${t.id}`}>Desuscribirme</button>
+              ) : (
+                !llena && <button onClick={() => handleJoin(t.id)}>Unirse</button>
               )}
               {isTutor && <span data-testid={`soy-tutor-${t.id}`}>Sos el tutor</span>}
               {llena && <span data-testid={`completa-${t.id}`}>Completa</span>}
@@ -219,7 +222,6 @@ function TutoriasListMock() {
 }
 function TutoringShowMock() {
   const { id } = useParams();
-  const { user } = useUser();
   const [t, setT] = React.useState(null);
 
   React.useEffect(() => {
@@ -413,6 +415,7 @@ describe("Flujo de crear Tutorías", () => {
     const card = await awaitTutorCardIn(r.container, 1);
     expect(within(card).getByTestId("soy-tutor-1")).toBeInTheDocument();
     expect(within(card).queryByRole("button", { name: /Unirse/i })).toBeNull();
+    expect(within(card).getByRole("button", { name: /Desuscribirme/i })).toBeInTheDocument();
   });
 
   test("No se listan tutorías finalizadas", async () => {
