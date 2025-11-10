@@ -55,7 +55,11 @@ function renderProfilePage() {
 
 describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
   beforeEach(() => {
-    useUser.mockReturnValue({ user: { id: 1 } });
+    useUser.mockReturnValue({
+      user: { id: 1 },
+      refetchCurrentUser: jest.fn().mockResolvedValue(),
+      booting: false
+    });
   });
 
   afterEach(() => {
@@ -144,7 +148,11 @@ describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
   });
 
   it("No se muestran botones de favorito cuando no hay usuario", async () => {
-    useUser.mockReturnValue({ user: null });
+    useUser.mockReturnValue({
+      user: null,
+      refetchCurrentUser: jest.fn().mockResolvedValue(),
+      booting: false
+    });
 
     renderCourseCard({ id: 1, name: "Favoriteable", favorite: false });
     expect(screen.queryByRole("button", { name: /Agregar a favoritos/i })).not.toBeInTheDocument();
@@ -247,6 +255,8 @@ describe("Favoritos - CoursePage, CourseCard y CourseDetailPage", () => {
 it("ProfilePage muestra error si getMyFavoriteCourses falla", async () => {
   useUser.mockReturnValue({
     user: { id: 1, name: "Usuario", last_name: "Test", email: "test@test.com" },
+    refetchCurrentUser: jest.fn().mockResolvedValue(),
+    booting: false
   });
 
   courseService.getCourses.mockRejectedValueOnce(new Error("Server error"));
@@ -259,6 +269,8 @@ it("ProfilePage muestra error si getMyFavoriteCourses falla", async () => {
   it("ProfilePage muestra las materias favoritas del usuario", async () => {
     useUser.mockReturnValue({
       user: { id: 1, name: "Usuario", last_name: "Test", email: "test@test.com" },
+      refetchCurrentUser: jest.fn().mockResolvedValue(),
+      booting: false
     });
 
     // ProfilePage espera un objeto con { courses: [...] }
@@ -279,6 +291,8 @@ it("ProfilePage muestra error si getMyFavoriteCourses falla", async () => {
   it("ProfilePage muestra mensaje cuando no hay materias favoritas", async () => {
     useUser.mockReturnValue({
       user: { id: 1, name: "Usuario", last_name: "Test", email: "test@test.com" },
+      refetchCurrentUser: jest.fn().mockResolvedValue(),
+      booting: false
     });
 
     courseService.getCourses.mockResolvedValueOnce({ courses: [] });
