@@ -230,14 +230,11 @@ function TutoringShowMock() {
 
   const cap = t.capacity ?? 2;
   const cupos = `${t.students.length}/${cap}`;
-  const isTutor = user && t.tutorId === user.id;
 
   return (
     <div>
       <h2>Tutoría de: Administración General para Ingenieros</h2>
       <p>Modalidad: virtual</p>
-
-
       <ul>
         <li
          aria-label={`tutoria-${t.id}`}
