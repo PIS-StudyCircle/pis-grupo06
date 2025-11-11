@@ -9,8 +9,8 @@ export default function SessionList({ userId, type = "upcoming" }) {
 
   // UI: título según tipo
   const title =
-    type === "finalized" ? "Sesiones Finalizadas" :
-    type === "upcoming"  ? "Próximas Sesiones"    : "Próximas Sesiones";
+    type === "finalized" ? "Sesiones finalizadas" :
+    type === "upcoming"  ? "Próximas sesiones"    : "Próximas sesiones";
 
   // UI: mensajes vacíos según tipo/ruta
   const isInbox = location.pathname.includes("/notificaciones");
