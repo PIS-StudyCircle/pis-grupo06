@@ -40,7 +40,7 @@ const downloadImage = async (url) => {
   return blob
 }
 
-export const editImage = async (imageUrl, prompt, options = {}) => {
+export const editImage = async (imageUrl, prompt) => {
   const imageBlob = await downloadImage(imageUrl)
   // Crear un File con el tipo correcto
   const imageFile = new File([imageBlob], "avatar.jpg", { type: imageBlob.type || "image/jpeg" })

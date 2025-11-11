@@ -1,8 +1,8 @@
 class Deapi
   class EditionError < StandardError; end
-  
+
   BASE_URL = "https://api.deapi.ai/api/v1/client"
-  MAX_RETRIES = 15
+  MAX_RETRIES = 20
   RETRY_DELAY = 5
   ALLOWED_FORMATS = %w[jpg jpeg png gif bmp webp].freeze
   MAX_FILE_SIZE = 10.megabytes
@@ -13,7 +13,7 @@ class Deapi
 
   def edit(image:, prompt:, **options)
     validate_image!(image)
-    
+
     request_id = create_edition_request(image, prompt, options)
     return nil unless request_id
 
@@ -24,7 +24,7 @@ class Deapi
 
   def validate_image!(image)
     file = image.is_a?(String) ? File.open(image) : image
-    
+
     if file.size > MAX_FILE_SIZE
       raise EditionError, "Image size exceeds #{MAX_FILE_SIZE / 1.megabyte}MB limit"
     end
@@ -37,22 +37,22 @@ class Deapi
 
   def create_edition_request(image, prompt, options)
     uri = URI("#{BASE_URL}/img2img")
-    
+
     Rails.logger.info "🔄 Creando request de edición..."
-    
+
     begin
       form_data = build_form_data(image, prompt, options)
       Rails.logger.info "✅ Form data construido"
-      
+
       request = build_multipart_request(uri, form_data)
       Rails.logger.info "✅ Request multipart construido"
-      
+
       Rails.logger.info "📤 Enviando request a Deapi..."
       response = execute_request(uri, request)
-      
+
       Rails.logger.info "📥 Respuesta recibida - Status: #{response.code}"
       Rails.logger.info "📥 Body: #{response.body[0..500]}"
-      
+
       parsed = JSON.parse(response.body) rescue nil
 
       if parsed.nil?
@@ -62,7 +62,7 @@ class Deapi
 
       request_id = parsed&.dig("data", "request_id")
       Rails.logger.info "✅ Request ID obtenido: #{request_id}"
-      
+
       request_id
     rescue => e
       Rails.logger.error "❌ Error en create_edition_request: #{e.class} - #{e.message}"
@@ -73,34 +73,35 @@ class Deapi
 
   def build_form_data(image, prompt, options)
     Rails.logger.info "📦 Construyendo form data..."
-    
+
     # Leer el contenido del archivo ANTES de construir el array
-    file_content = if image.is_a?(String)
-      File.read(image)
-    else
-      image.tempfile.rewind
-      content = image.tempfile.read
-      image.tempfile.rewind
-      content
-    end
-    
+    file_content =
+      if image.is_a?(String)
+        File.read(image)
+      else
+        image.tempfile.rewind
+        content = image.tempfile.read
+        image.tempfile.rewind
+        content
+      end
+
     filename = if image.respond_to?(:original_filename)
-      image.original_filename
-    elsif image.is_a?(String)
-      File.basename(image)
-    else
-      'image.jpg'
-    end
-    
+                 image.original_filename
+               elsif image.is_a?(String)
+                 File.basename(image)
+               else
+                 'image.jpg'
+               end
+
     Rails.logger.info "📦 Archivo: #{filename} (#{file_content.bytesize} bytes)"
-    
+
     [
       ['prompt', prompt],
       ['negative_prompt', options[:negative_prompt] || 'blur, distortion, darkness, noise, artifacts'],
       ['image_content', file_content, { filename: filename }],
       ['model', options[:model] || 'stable-diffusion-v1-5'],
       ['guidance', options[:guidance] || 7.5],
-      ['steps', options[:steps] || 20],
+      ['steps', options[:steps] || 10],
       ['seed', options[:seed] || rand(1000..9999)]
     ].tap do |data|
       if options[:loras].present?
@@ -113,13 +114,13 @@ class Deapi
     request = Net::HTTP::Post.new(uri)
     request["Authorization"] = "Bearer #{@api_key}"
     request["Accept"] = "application/json"
-    
+
     boundary = "----WebKitFormBoundary#{SecureRandom.hex(16)}"
     request["Content-Type"] = "multipart/form-data; boundary=#{boundary}"
-    
+
     body = build_multipart_body(form_data, boundary)
     request.body = body
-    
+
     request
   end
 
@@ -151,21 +152,20 @@ class Deapi
 
   def build_file_part_from_content(field_name, content, boundary, options = {})
     filename = options[:filename] || 'image.jpg'
-    
+
     # Detectar MIME type desde el contenido
     content_type = begin
       Marcel::MimeType.for(StringIO.new(content), name: filename)
     rescue
       # Fallback: detectar por extensión
       case File.extname(filename).downcase
-      when '.jpg', '.jpeg' then 'image/jpeg'
-      when '.png' then 'image/png'
-      when '.gif' then 'image/gif'
+      when '.png'  then 'image/png'
+      when '.gif'  then 'image/gif'
       when '.webp' then 'image/webp'
       else 'image/jpeg'
       end
     end
-    
+
     # ✅ Construir parte del archivo con encoding binario
     part = ""
     part << "--#{boundary}\r\n"
@@ -181,9 +181,9 @@ class Deapi
   def build_file_part(field_name, file, boundary, options = {})
     filename = options[:filename] || 'image.png'
     content_type = Marcel::MimeType.for(file, name: filename) || 'application/octet-stream'
-    
+
     content = file.read.force_encoding('BINARY')
-    
+
     part = ""
     part << "--#{boundary}\r\n"
     part << "Content-Disposition: form-data; name=\"#{field_name}\"; filename=\"#{filename}\"\r\n"
@@ -204,7 +204,7 @@ class Deapi
       parsed = JSON.parse(response.body) rescue {}
 
       status = parsed.dig("data", "status")
-      
+
       case status
       when "done"
         return parsed.dig("data", "result_url")
