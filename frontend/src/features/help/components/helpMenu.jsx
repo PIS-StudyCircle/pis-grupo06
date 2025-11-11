@@ -133,16 +133,6 @@ export default function HelpMenu() {
     const totalHelpLines = helpText.length;
     const hasPrevHelp = helpIndex > 0;
     const hasNextHelp = helpIndex < totalHelpLines - 1;
-    const goPrevHelp = () => {
-        if (hasPrevHelp) {
-        setHelpIndex(helpIndex - 1);
-        }
-    };
-    const goNextHelp = () => {
-        if (hasNextHelp) {
-        setHelpIndex(helpIndex + 1);
-        }
-    };
 
     return (
         <div className="relative">
