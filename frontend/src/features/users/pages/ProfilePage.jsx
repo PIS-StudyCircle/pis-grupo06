@@ -151,20 +151,22 @@ export default function Profile() {
 
             {/* Col 3: Rating promedio (solo si hay ratings) */}
             <div className="flex md:justify-end justify-center">
-              {feedbackLoading ? (
-                <div className="text-sm bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3">
-                  Calculando rating…
-                </div>
-              ) : feedbackError ? null : totalFeedbacks === 0 ? null : (
-                <div className="bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3 flex items-center gap-3">
-                  <StarRow value={averageRating} />
-                  <div className="text-sm leading-tight">
-                    <span className="font-semibold">{averageRating.toFixed(1)}</span>
-                    <span className="opacity-80"> / 5</span>
-                    <span className="opacity-80"> · {totalFeedbacks} voto{totalFeedbacks !== 1 ? "s" : ""}</span>
+             <div className="min-h-[56px] flex items-center justify-center">
+                {feedbackLoading ? (
+                  <p className="text-sm text-white/90">Calculando rating…</p>
+                ) : feedbackError ? null : totalFeedbacks === 0 ? (
+                  <p className="text-sm text-white/70 italic">Sin ratings</p>
+                ) : (
+                  <div className="bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3 flex items-center gap-3">
+                    <StarRow value={averageRating} />
+                    <div className="text-sm leading-tight">
+                      <span className="font-semibold">{averageRating.toFixed(1)}</span>
+                      <span className="opacity-80"> / 5</span>
+                      <span className="opacity-80"> · {totalFeedbacks} voto{totalFeedbacks !== 1 ? "s" : ""}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
