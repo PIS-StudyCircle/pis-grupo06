@@ -77,18 +77,14 @@ export default function Profile() {
     async function loadProfile() {
       // Fetch user data - use fresh fetch for current user to avoid cached masked email
       await refetchCurrentUser();
+      if (user) {
+        fetchFavorites();
+        fetchFeedbacks();
+      }
     }
-
     loadProfile();
   }, [refetchCurrentUser]);
 
-  // Load favorites and feedbacks when user is available
-  useEffect(() => {
-    if (!user) return;
-
-    fetchFavorites();
-    fetchFeedbacks();
-  }, [user, fetchFavorites, fetchFeedbacks]);
 
   // StarRow component for displaying rating stars
   const StarRow = ({ value }) => {
