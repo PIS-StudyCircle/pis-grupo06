@@ -500,6 +500,7 @@ module Api
             id: t.id,
             subject: t.course&.name,
             tutor: t.tutor&.name || "Sin asignar",
+            tutor_id: t.tutor_id,
             date: t.scheduled_at,
             duration: t.duration_mins,
             location: t.location.presence || "Virtual",
