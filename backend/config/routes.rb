@@ -51,6 +51,13 @@ Rails.application.routes.draw do
         delete "unsubscribe", on: :member
       end
 
+      # chat de tutoria
+      resources :chats, only: [:index, :create, :show, :destroy] do
+        post :mark_read, on: :member
+
+        resources :messages, only: [:index, :create]
+      end
+
       resource :calendar, only: [] do
         post   "sessions",          to: "calendar#create"
         post   "sessions/:id/join", to: "calendar#join"

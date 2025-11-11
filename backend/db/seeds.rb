@@ -265,6 +265,20 @@ def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_c
     )
   end
 
+  # Create chat and welcome message
+  tutoring.create_chat! unless tutoring.chat
+
+  tutoring.chat.users << tutor unless tutoring.chat.users.exists?(tutor.id)
+  attendees.each do |u|
+    tutoring.chat.users << u unless tutoring.chat.users.exists?(u.id)
+  end
+
+  if tutoring.chat.messages.count.zero?
+    tutoring.chat.messages.create!(
+      user: creator,
+      content: "Bienvenidos al chat de la tutoría. Cualquier duda escriban aquí."
+    )
+  end
   tutoring
 end
 
