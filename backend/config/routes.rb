@@ -28,6 +28,7 @@ Rails.application.routes.draw do
           collection do
             get :check
             get :top_rated
+            get :mejores_tutores_por_mes
           end
         end
       end

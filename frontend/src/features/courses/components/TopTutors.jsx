@@ -1,13 +1,65 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUser } from "@context/UserContext";
-import { getTopRatedTutors } from "@/features/users/services/feedbackServices";
+import { getTopRatedTutors, getMonthlyRanking } from "@/features/users/services/feedbackServices";
 import TutorCard from "./TutorCard";
 import TutorSkeleton from "./TutorSkeleton";
+import Pagination from "@components/Pagination";
+
+/** === Histórico con tu componente <Pagination /> === */
+function MonthlyPager({ items = [] }) {
+  const [page, setPage] = useState(1); // 1-indexed para <Pagination />
+  const totalPages = Math.max(items.length, 1);
+
+  if (!items.length) {
+    return (
+      <li className="py-6 text-center text-gray-500">
+        No hay rankings históricos disponibles.
+      </li>
+    );
+  }
+
+  const month = items[page - 1]; // page es 1..N
+
+  return (
+    <li className="py-3">
+      <div className="flex flex-col items-center">
+        {/* Encabezado del mes */}
+        <div className="text-sm text-gray-700 font-medium mb-3 select-none">
+          {month.mes_nombre}
+        </div>
+
+        {/* Lista de tutores del mes */}
+        <div className="w-full space-y-2 mb-4">
+          {month.top_tutores.slice(0, 3).map((t) => ( 
+            <TutorCard
+              key={t.tutor.id}
+              tutor={{
+                id: t.tutor.id,
+                name: t.tutor.name,
+                last_name: t.tutor.last_name,
+                average_rating: t.average_rating,
+                total_feedbacks: t.total_feedbacks,
+              }}
+              index={t.rank - 1}
+            />
+          ))}
+        </div>
+
+        {/* Tu paginador estándar */}
+        <Pagination page={page} setPage={setPage} totalPages={totalPages} />
+      </div>
+    </li>
+  );
+}
 
 export default function TopTutors() {
-  const [tutors, setTutors] = useState([]);
+  const [activeTab, setActiveTab] = useState("current"); // 'current' | 'monthly'
+  const [tutors, setTutors] = useState([]);              // cache "current"
+  const [monthlyRankings, setMonthlyRankings] = useState([]); // cache "monthly"
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const abortRef = useRef(null);
+
   const { user } = useUser();
 
   useEffect(() => {
@@ -16,60 +68,122 @@ export default function TopTutors() {
       return;
     }
 
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     const fetchData = async () => {
+      const hasCache =
+        (activeTab === "current" && tutors.length > 0) ||
+        (activeTab === "monthly" && monthlyRankings.length > 0);
+
+      if (!hasCache) setLoading(true);
+      setError(null);
+
       try {
-        const data = await getTopRatedTutors();
-        setTutors(data);
+        if (activeTab === "current") {
+          const data = await getTopRatedTutors({ signal: controller.signal });
+          setTutors(Array.isArray(data) ? data : []);
+        } else {
+          const data = await getMonthlyRanking();
+          const rankings = Array.isArray(data) ? data : (data?.rankings_mensuales || []);
+          setMonthlyRankings(Array.isArray(rankings) ? rankings : []);
+        }
       } catch (err) {
-        setError(err.message);
+        if (controller.signal.aborted) return;
+        setError(err?.message ?? "Ocurrió un error inesperado");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
-    fetchData();
-  }, [user]);
 
-  // 🔹 Si NO hay usuario logueado:
+    fetchData();
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, activeTab]);
+
   if (!user) {
     return (
       <div className="bg-white rounded-xl shadow-md p-4 mt-8 w-full max-w-md text-center">
-        <h2 className="text-lg font-semibold mb-3">
-          🏆 Tutores destacados
-        </h2>
-        <p className="text-gray-700">
-          Iniciá sesión para conocer a los tutores destacados!
-        </p>
+        <h2 className="text-lg font-semibold mb-3">🏆 Tutores Destacados</h2>
+        <p className="text-gray-700">Iniciá sesión para conocer a los tutores destacados.</p>
       </div>
     );
   }
 
-  // 🔹 Si hay usuario logueado:
+  const onRetry = () => {
+    setError(null);
+    setLoading(true);
+    setActiveTab((t) => (t === "current" ? "current" : "monthly"));
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-md p-4 mt-8 w-full max-w-md">
-      <h2 className="text-lg font-semibold mb-3 text-center text-black">
-        🏆 Tutores destacados
-      </h2>
+      <h2 className="text-lg font-semibold mb-3 text-center text-black">🏆 Tutores Destacados</h2>
+
+      {/* Tabs */}
+      <div className="flex mb-4 bg-gray-100 rounded-lg p-1" role="tablist" aria-label="Ranking de tutores">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "current"}
+          className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
+            activeTab === "current" ? "bg-white text-blue-600 shadow-sm" : "text-gray-700 hover:text-gray-900"
+          }`}
+          onClick={() => setActiveTab("current")}
+        >
+          Top del mes
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "monthly"}
+          className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
+            activeTab === "monthly" ? "bg-white text-blue-600 shadow-sm" : "text-gray-700 hover:text-gray-900"
+          }`}
+          onClick={() => setActiveTab("monthly")}
+        >
+          Histórico
+        </button>
+      </div>
 
       <ul className="divide-y divide-gray-200">
-        {loading && Array.from({ length: 5 }).map((_, i) => (
-          <TutorSkeleton key={i} />
-        ))}
+        {/* Loading */}
+        {loading && Array.from({ length: 5 }).map((_, i) => <TutorSkeleton key={`sk-${i}`} />)}
 
+        {/* Error */}
         {!loading && error && (
-          <li className="py-6 text-center text-red-500">{error}</li>
-        )}
-
-        {!loading && !error && tutors.length === 0 && (
-          <li className="py-6 text-center text-gray-500">
-            Todavía no hay tutores puntuados.
+          <li className="py-6 text-center">
+            <p className="text-red-600 mb-2">{error}</p>
+            <button
+              type="button"
+              onClick={onRetry}
+              className="inline-flex items-center px-3 py-1.5 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Reintentar
+            </button>
           </li>
         )}
 
-        {!loading &&
-          !error &&
-          tutors.map((tutor, index) => (
-            <TutorCard key={tutor.id} tutor={tutor} index={index} />
-          ))}
+        {/* Tab: Mes actual */}
+        {!loading && !error && activeTab === "current" && (
+          <>
+            {tutors.length === 0 ? (
+              <li className="py-6 text-center text-gray-500">Todavía no hay tutores puntuados este mes.</li>
+            ) : (
+              tutors.map((tutor, index) => (
+                <li key={tutor.id} className="py-3">
+                  <TutorCard tutor={tutor} index={index} />
+                </li>
+              ))
+            )}
+          </>
+        )}
+
+        {/* Tab: Histórico (usa tu <Pagination />) */}
+        {!loading && !error && activeTab === "monthly" && (
+          <MonthlyPager items={monthlyRankings} />
+        )}
       </ul>
     </div>
   );

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_03_172549) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_08_184454) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -41,6 +41,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_172549) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "chat_users", force: :cascade do |t|
+    t.bigint "chat_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_id"], name: "index_chat_users_on_chat_id"
+    t.index ["user_id"], name: "index_chat_users_on_user_id"
+  end
+
+  create_table "chats", force: :cascade do |t|
+    t.bigint "tutoring_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tutoring_id"], name: "index_chats_on_tutoring_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -83,6 +99,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_172549) do
     t.index ["tutoring_id"], name: "index_feedbacks_on_tutoring_id"
   end
 
+  create_table "messages", force: :cascade do |t|
+    t.bigint "chat_id", null: false
+    t.bigint "user_id", null: false
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_id"], name: "index_messages_on_chat_id"
+    t.index ["user_id"], name: "index_messages_on_user_id"
+  end
+
   create_table "noticed_events", force: :cascade do |t|
     t.string "type"
     t.string "record_type"
@@ -109,6 +135,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_172549) do
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_noticed_notifications_on_event_id"
     t.index ["recipient_type", "recipient_id"], name: "index_noticed_notifications_on_recipient"
+  end
+
+  create_table "ranking_months", force: :cascade do |t|
+    t.date "periodo", null: false
+    t.bigint "tutor_id", null: false
+    t.decimal "average_rating", precision: 4, scale: 2, default: "0.0", null: false
+    t.integer "total_feedbacks", default: 0, null: false
+    t.integer "rank", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["periodo", "rank"], name: "index_ranking_months_on_periodo_and_rank"
+    t.index ["periodo", "tutor_id"], name: "index_ranking_months_on_periodo_and_tutor_id", unique: true
+    t.index ["tutor_id"], name: "index_ranking_months_on_tutor_id"
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|
@@ -352,6 +391,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_172549) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "chat_users", "chats"
+  add_foreign_key "chat_users", "users"
+  add_foreign_key "chats", "tutorings"
   add_foreign_key "courses", "faculties"
   add_foreign_key "faculties", "universities"
   add_foreign_key "favorite_courses", "courses"
@@ -359,6 +401,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_172549) do
   add_foreign_key "feedbacks", "tutorings"
   add_foreign_key "feedbacks", "users", column: "student_id"
   add_foreign_key "feedbacks", "users", column: "tutor_id"
+  add_foreign_key "messages", "chats"
+  add_foreign_key "messages", "users"
+  add_foreign_key "ranking_months", "users", column: "tutor_id"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
