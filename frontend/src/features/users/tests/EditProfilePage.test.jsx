@@ -4,20 +4,27 @@ import "@testing-library/jest-dom";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 
 const mockUpdateUser = jest.fn();
-const mockRefetchCurrentUser = jest.fn(async () => userStore.user);
+const mockRefetchCurrentUser = jest.fn();
 const userStore = { user: null };
+
+// Configure refetchCurrentUser to return the current user in userStore
+mockRefetchCurrentUser.mockImplementation(async () => {
+  return userStore.user;
+});
 
 jest.mock("@context/UserContext", () => ({
   useUser: () => ({
     user: userStore.user,
     updateUser: mockUpdateUser,
     refetchCurrentUser: mockRefetchCurrentUser,
+    booting: false,
   }),
   __setUser: (u) => { userStore.user = u; },
   __resetUser: () => {
     userStore.user = null;
     mockUpdateUser.mockClear();
     mockRefetchCurrentUser.mockClear();
+    mockRefetchCurrentUser.mockImplementation(async () => userStore.user);
   },
 }));
 

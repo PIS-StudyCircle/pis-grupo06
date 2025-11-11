@@ -1,4 +1,10 @@
-jest.mock("@context/UserContext", () => ({ useUser: jest.fn() }));
+jest.mock("@context/UserContext", () => ({
+  useUser: jest.fn(() => ({
+    user: null,
+    refetchCurrentUser: jest.fn().mockResolvedValue(),
+    booting: false
+  }))
+}));
 
 jest.mock("../services/courseService", () => ({
   favoriteCourse: jest.fn(),
