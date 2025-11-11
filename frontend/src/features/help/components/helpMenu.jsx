@@ -130,9 +130,6 @@ export default function HelpMenu() {
     };
 
     const helpText = helpTextByRoute(location.pathname);
-    const totalHelpLines = helpText.length;
-    const hasPrevHelp = helpIndex > 0;
-    const hasNextHelp = helpIndex < totalHelpLines - 1;
 
     return (
         <div className="relative">
