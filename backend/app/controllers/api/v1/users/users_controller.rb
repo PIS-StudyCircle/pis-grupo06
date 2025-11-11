@@ -44,6 +44,7 @@ module Api
           end
         end
 
+<<<<<<< HEAD
         def update_profile_photo
           if params[:profile_photo].present?
             current_user.profile_photo.attach(params[:profile_photo])
@@ -66,6 +67,29 @@ module Api
           else
             head :not_found
           end
+        end
+        def update
+          if current_user.update(user_params)
+            if params[:user][:profile_photo].present?
+              current_user.profile_photo.attach(params[:user][:profile_photo])
+            end
+            success_response(
+              message: "Perfil actualizado exitosamente",
+              data: { user: UserSerializer.new(current_user).serializable_hash[:data][:attributes] }
+            )
+          else
+            error_response(
+              message: "No se pudo actualizar el perfil",
+              errors: current_user.errors.as_json(full_messages: true),
+              status: :unprocessable_entity
+            )
+          end
+        end
+
+        private
+
+        def user_params
+          params.expect(user: [:name, :last_name, :description])
         end
       end
     end

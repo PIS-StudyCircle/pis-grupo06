@@ -16,11 +16,21 @@ class Tutoring < ApplicationRecord
 
   enum :state, { pending: 0, active: 1, finished: 2, canceled: 3 }, default: :pending
 
+  has_one :chat, dependent: :destroy
+
   # Tutorías en las que un usuario está inscripto
   scope :enrolled_by, ->(user) {
     return none if user.blank?
 
     joins(:user_tutorings).where(user_tutorings: { user_id: user.id })
+  }
+
+  # Tutorías en las que un usuario está inscripto como estudiante o tutor
+  scope :enrolled_or_tutor_by, ->(user) {
+    return none if user.blank?
+
+    enrolled_ids = UserTutoring.select(:tutoring_id).where(user_id: user.id)
+    where(tutor_id: user.id).or(where(id: enrolled_ids)).distinct
   }
 
   # Tutorías filtradas por id de materia (course_id)
