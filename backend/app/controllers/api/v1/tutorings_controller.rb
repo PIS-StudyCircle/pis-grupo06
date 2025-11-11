@@ -131,12 +131,6 @@ module Api
       end
 
       def show
-        def set_photo_url(user)
-          if user.profile_photo.attached?
-            Rails.application.routes.url_helpers.url_for(user.profile_photo)
-          end
-        end
-
         render json: {
           id: @tutoring.id,
           scheduled_at: @tutoring.scheduled_at,
@@ -178,17 +172,17 @@ module Api
           enrolled_students: @tutoring.users.map do |user|
             {
               id: user.id,
-              photo_url: set_photo_url(user)
+              photo_url: photo_url_for(user)
             }
           end,
           enrolled_users: @tutoring.users.map do |user|
             {
               id: user.id,
-              photo_url: set_photo_url(user)
+              photo_url: photo_url_for(user)
             }
           end.append(@tutoring.tutor ? [{
                        id: @tutoring.tutor.id,
-                       photo_url: set_photo_url(@tutoring.tutor)
+                       photo_url: photo_url_for(@tutoring.tutor)
                      }] : [])
         }
       end
@@ -855,6 +849,12 @@ module Api
 
           # Buscar si hay tutorías que se solapen con esta availability
           check_overlapping_tutorings(start_time, end_time, user_id).any?
+        end
+      end
+
+      def photo_url_for(user)
+        if user.profile_photo.attached?
+          Rails.application.routes.url_helpers.url_for(user.profile_photo)
         end
       end
     end
