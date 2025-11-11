@@ -24,7 +24,7 @@ module Api
             " deformaciones, realismo fotográfico, texto, marcas de agua",
           model: "QwenImageEdit_Plus_NF4",
           guidance: 7.5,
-          steps: 20,
+          steps: 10,
           seed: rand(1000..9999),
         )
 

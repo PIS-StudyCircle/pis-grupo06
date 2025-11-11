@@ -2,7 +2,7 @@ class Deapi
   class EditionError < StandardError; end
 
   BASE_URL = "https://api.deapi.ai/api/v1/client"
-  MAX_RETRIES = 15
+  MAX_RETRIES = 20
   RETRY_DELAY = 5
   ALLOWED_FORMATS = %w[jpg jpeg png gif bmp webp].freeze
   MAX_FILE_SIZE = 10.megabytes
@@ -101,7 +101,7 @@ class Deapi
       ['image_content', file_content, { filename: filename }],
       ['model', options[:model] || 'stable-diffusion-v1-5'],
       ['guidance', options[:guidance] || 7.5],
-      ['steps', options[:steps] || 20],
+      ['steps', options[:steps] || 10],
       ['seed', options[:seed] || rand(1000..9999)]
     ].tap do |data|
       if options[:loras].present?

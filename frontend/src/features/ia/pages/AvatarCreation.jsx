@@ -3,8 +3,9 @@ import { Check, Edit3, Sparkles } from "lucide-react"
 import ImagePreview from "../components/ImagePreview"
 import PromptInput from "../components/PromptInput"
 import { generateAvatar } from "../services/avatarService";
+import { updateProfilePhoto } from "../services/UpdateProfilePhoto";
 
-export default function CreateScreen({ onBack }) {
+export default function CreateScreen() {
   const [prompt, setPrompt] = useState("")
   const [generatedImage, setGeneratedImage] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -27,11 +28,21 @@ export default function CreateScreen({ onBack }) {
     }
   };
 
-  const handleSaveAsProfile = () => {
-    console.log("Guardando como foto de perfil:", generatedImage)
-    alert("¡Imagen guardada como foto de perfil!")
-    onBack()
-  }
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveAsProfile = async () => {
+    try {
+      if (!generatedImage) return;
+      setIsSaving(true);
+      await updateProfilePhoto(generatedImage);
+      alert("✅ Foto de perfil actualizada correctamente");
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error al guardar la foto de perfil");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleEditImage = () => {
     console.log("Editando imagen:", generatedImage)
@@ -72,10 +83,11 @@ export default function CreateScreen({ onBack }) {
 
                 <button
                   onClick={handleSaveAsProfile}
-                  className="w-full px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-sm"
+                  disabled={isLoading || isSaving}
+                  className="w-full px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Check className="w-4 h-4" />
-                  Guardar como Foto de Perfil
+                  {isSaving ? "Guardando..." : "Guardar como Foto de Perfil"}
                 </button>
 
                 <button
@@ -99,25 +111,7 @@ export default function CreateScreen({ onBack }) {
 
           {/* Panel Derecho */}
           <div className="flex items-center justify-center">
-            <div className="flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-xl bg-gray-50 text-center p-6 min-h-[350px] w-full">
-              {isLoading ? (
-                <>
-                  <Sparkles className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
-                  <p className="text-sm text-gray-600">Generando tu imagen... Esto puede tardar unos segundos</p>
-                </>
-              ) : generatedImage ? (
-                <img
-                  src={generatedImage}
-                  alt="Avatar generado"
-                  className="rounded-full w-48 h-48 object-cover shadow-md"
-                />
-              ) : (
-                <>
-                  <Sparkles className="w-8 h-8 text-gray-400 mb-3" />
-                  <p className="text-sm text-gray-500">Tu imagen aparecerá aquí</p>
-                </>
-              )}
-            </div>
+            <ImagePreview image={generatedImage} isLoading={isLoading} />
           </div>
         </div>
       </div>
