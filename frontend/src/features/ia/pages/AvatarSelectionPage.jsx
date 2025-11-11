@@ -8,6 +8,7 @@ import avatar6 from "@/assets/Avatar6.png"
 import avatar7 from "@/assets/Avatar7.png"
 import avatar8 from "@/assets/Avatar8.png"
 import { useNavigate } from "react-router-dom"
+import { useUser } from '@context/UserContext';
 
 
 // Mock avatar data - reemplaza con tus datos reales
@@ -57,6 +58,8 @@ const SAMPLE_AVATARS = [
 
 export default function AvatarSelector({ onBack }) {
     const navigate = useNavigate()
+    const { user } = useUser();
+    
     const handleSelectAvatar = (avatarUrl) => {
         // Navegar a EditScreen pasando la imagen
         navigate('/avatar/editar', { 
@@ -66,10 +69,20 @@ export default function AvatarSelector({ onBack }) {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-6 pt-8 pb-6">
+      <div className="max-w-7xl mx-auto px-6 pt-8 pb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-[#0f3f62]">
           Selecciona un Avatar
         </h1>
+
+        {/* Botón para editar avatar existente */}
+        {user?.profile_photo_url && (
+          <button
+            onClick={() => navigate('/avatar/editar', { state: { initialImage: user.profile_photo_url } })}
+            className="px-4 py-2 bg-[#0f3f62] text-white rounded-lg font-semibold hover:bg-[#0a2f4a] transition-colors shadow-md text-sm"
+          >
+            Editar mi avatar
+          </button>
+        )}
       </div>
 
       {/* Content */}

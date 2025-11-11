@@ -36,7 +36,7 @@ module Api
           negative_prompt: "imagen completamente diferente, cara distinta, fondo cambiado, baja resolución, deformaciones, realismo fotográfico, texto, marcas de agua",
           model: "QwenImageEdit_Plus_NF4",
           guidance: 7.5,
-          steps: 20,
+          steps: 10,
           seed: rand(1000..9999),
         )
 

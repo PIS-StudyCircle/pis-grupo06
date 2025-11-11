@@ -56,6 +56,17 @@ module Api
             render json: { error: "No se envió ninguna imagen" }, status: :bad_request
           end
         end
+
+        # GET /api/v1/users/:id/profile_photo
+        def profile_photo
+          user = User.find(params[:id])
+          if user.profile_photo.attached?
+            # redirige al blob de ActiveStorage
+            redirect_to rails_blob_url(user.profile_photo, disposition: "attachment")
+          else
+            head :not_found
+          end
+        end
       end
       
     end
