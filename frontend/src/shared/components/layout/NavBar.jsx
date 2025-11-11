@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useUser } from "@context/UserContext";
-import { ChevronDown, LogOut, User } from "lucide-react";
+import { ChevronDown, LogOut, User, Edit } from "lucide-react";
 import { DEFAULT_PHOTO } from "@/shared/config";
 import { Bell } from "@/features/notifications/components/Bell";
 import HelpMenu from "@/features/help/components/helpMenu";
@@ -89,6 +89,14 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
                         >
                           <User className="w-4 h-4 mr-3" />
                           Ver perfil
+                        </Link>
+                        <Link
+                          to="/editar-perfil"
+                          className="dropdown-item"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <Edit className="w-4 h-4 mr-3" />
+                          Editar perfil
                         </Link>
                         <button
                           onClick={handleLogout}

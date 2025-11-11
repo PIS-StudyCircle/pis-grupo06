@@ -2,39 +2,39 @@ import { useUser } from "@context/UserContext";
 import { DEFAULT_PHOTO } from "@/shared/config";
 import { useUserReviews } from "../hooks/useUserReviews";
 import ReviewsList from "../components/ReviewsList";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getCourses } from "../../courses/services/courseService";
 import { getFeedbacks } from "../services/feedbackServices";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 
 export default function Profile() {
-  const { user, loading, error } = useUser();
+  // Get user context
+  const { user, refetchCurrentUser, booting } = useUser();
+
+  // Reviews hook - only call after user is available
   const {
     reviews,
     loading: reviewsLoading,
     error: reviewsError,
   } = useUserReviews(user?.id);
 
+  // State for favorites
   const [favorites, setFavorites] = useState([]);
   const [favLoading, setFavLoading] = useState(false);
   const [favError, setFavError] = useState("");
 
-  // NEW: rating promedio y total
+  // State for rating promedio y total
   const [averageRating, setAverageRating] = useState(0);
   const [totalFeedbacks, setTotalFeedbacks] = useState(0);
 
+  // State for feedbacks
   const [, setFeedbacks] = useState([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState("");
 
-  useEffect(() => {
-    if (!user) return;
-    fetchFavorites();
-    fetchFeedbacks();
-  }, [user]);
-
-  async function fetchFavorites() {
+  // Fetch favorites - wrapped in useCallback to be used in useEffect dependencies
+  const fetchFavorites = useCallback(async () => {
     try {
       setFavLoading(true);
       const data = await getCourses(1, 50, "", true);
@@ -44,9 +44,10 @@ export default function Profile() {
     } finally {
       setFavLoading(false);
     }
-  }
+  }, []);
 
-  async function fetchFeedbacks() {
+  // Fetch feedbacks - wrapped in useCallback to be used in useEffect dependencies
+  const fetchFeedbacks = useCallback(async () => {
     try {
       setFeedbackError("");
       setFeedbackLoading(true);
@@ -69,15 +70,23 @@ export default function Profile() {
     } finally {
       setFeedbackLoading(false);
     }
-  }
+  }, []);
 
-  if (loading) return <p className="text-center mt-10">Cargando...</p>;
-  if (error) return <p className="text-center mt-10">Error al cargar perfil.</p>;
-  if (!user) return <p className="text-center mt-10">No hay usuario cargado.</p>;
+  // Load profile data on mount and when user changes
+  useEffect(() => {
+    async function loadProfile() {
+      // Fetch user data - use fresh fetch for current user to avoid cached masked email
+      await refetchCurrentUser();
+      if (user) {
+        fetchFavorites();
+        fetchFeedbacks();
+      }
+    }
+    loadProfile();
+  }, [refetchCurrentUser]);
 
-  const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
 
-  // Estrellas con medias (visual del promedio)
+  // StarRow component for displaying rating stars
   const StarRow = ({ value }) => {
     const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1))); // 0..1
     return (
@@ -101,6 +110,12 @@ export default function Profile() {
       </div>
     );
   };
+
+  // Loading and error states
+  if (booting) return <p className="text-center mt-10">Cargando...</p>;
+  if (!user) return <p className="text-center mt-10">No hay usuario cargado.</p>;
+
+  const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -136,20 +151,22 @@ export default function Profile() {
 
             {/* Col 3: Rating promedio (solo si hay ratings) */}
             <div className="flex md:justify-end justify-center">
-              {feedbackLoading ? (
-                <div className="text-sm bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3">
-                  Calculando rating…
-                </div>
-              ) : feedbackError ? null : totalFeedbacks === 0 ? null : (
-                <div className="bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3 flex items-center gap-3">
-                  <StarRow value={averageRating} />
-                  <div className="text-sm leading-tight">
-                    <span className="font-semibold">{averageRating.toFixed(1)}</span>
-                    <span className="opacity-80"> / 5</span>
-                    <span className="opacity-80"> · {totalFeedbacks} voto{totalFeedbacks !== 1 ? "s" : ""}</span>
+             <div className="min-h-[56px] flex items-center justify-center">
+                {feedbackLoading ? (
+                  <p className="text-sm text-white/90">Calculando rating…</p>
+                ) : feedbackError ? null : totalFeedbacks === 0 ? (
+                  <p className="text-sm text-white/70 italic">Sin ratings</p>
+                ) : (
+                  <div className="bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3 flex items-center gap-3">
+                    <StarRow value={averageRating} />
+                    <div className="text-sm leading-tight">
+                      <span className="font-semibold">{averageRating.toFixed(1)}</span>
+                      <span className="opacity-80"> / 5</span>
+                      <span className="opacity-80"> · {totalFeedbacks} voto{totalFeedbacks !== 1 ? "s" : ""}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

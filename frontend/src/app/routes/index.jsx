@@ -13,6 +13,7 @@ import {
   UserProfilePage,
   SessionsPage,
 } from "@/features/users";
+import EditProfilePage from "@/features/users/pages/EditProfilePage";
 import { SubjectPage } from "@/features/subjects";
 import SubjectDetailPage from "@/features/subjects/pages/SubjectDetailPage";
 import { RequireGuestRoute } from "./RequireGuestRoute";
@@ -41,6 +42,7 @@ export function AppRoutes() {
           element={<TutoringPage filters={{}} mode="" />}
         />
         <Route path="/perfil" element={<ProfilePage />} />
+        <Route path="/editar-perfil" element={<EditProfilePage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
         <Route path="/notificaciones" element={<SessionsPage />} />
 

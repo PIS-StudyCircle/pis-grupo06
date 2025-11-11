@@ -7,5 +7,5 @@ export function useFormState(init) {
     setForm((s) => ({ ...s, [k]: v }));
   }
 
-  return { form, setField };
+  return { form, setField, setForm };
 }

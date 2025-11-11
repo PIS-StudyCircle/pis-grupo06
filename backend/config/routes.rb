@@ -35,7 +35,7 @@ Rails.application.routes.draw do
       post "/notification_token", to: "notification_tokens#create"
 
       # index y show de UsersController
-      resources :users, module: :users, only: [:index, :show]
+      resources :users, module: :users, only: [:index, :show, :update]
 
       resources :courses do
         resources :subjects
@@ -49,6 +49,13 @@ Rails.application.routes.draw do
         post "join_tutoring", on: :member
         get "exists_user_tutoring", on: :member
         delete "unsubscribe", on: :member
+      end
+
+      # chat de tutoria
+      resources :chats, only: [:index, :create, :show, :destroy] do
+        post :mark_read, on: :member
+
+        resources :messages, only: [:index, :create]
       end
 
       resource :calendar, only: [] do
