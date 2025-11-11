@@ -6,7 +6,9 @@ module ApplicationCable
       token = request.params[:notif_token]
       user_id = Rails.application.message_verifier(:notif).verify(token)
       self.current_user = User.find(user_id)
-    rescue
+      Rails.logger.info "✅ AC connected as user_id=#{current_user.id}"
+    rescue => e
+      Rails.logger.warn "❌ AC reject: #{e.class} - #{e.message}"
       reject_unauthorized_connection
     end
   end

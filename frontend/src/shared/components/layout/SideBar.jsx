@@ -11,6 +11,7 @@ import {
   LogOut,
   SquareUser,
   Inbox,
+  Edit,
 } from "lucide-react";
 
 const Sidebar = ({
@@ -41,13 +42,19 @@ const Sidebar = ({
   const getMobileMenuItems = () => {
     if (!user) return menuItems;
 
-    // Crear una copia y insertar "Ver perfil" después del primer elemento
+    // Crear una copia y insertar "Ver perfil" y "Editar perfil" después del primer elemento
     const items = [...menuItems];
     items.splice(1, 0, {
       title: "Ver perfil",
       path: "/perfil",
       Icon: UserIcon,
       id: "perfil", // ID único para este item
+    });
+    items.splice(2, 0, {
+      title: "Editar perfil",
+      path: "/editar-perfil",
+      Icon: Edit,
+      id: "editar-perfil", // ID único para este item
     });
     return items;
   };

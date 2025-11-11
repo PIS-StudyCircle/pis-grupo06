@@ -34,7 +34,7 @@ export default function TopTutors() {
     return (
       <div className="bg-white rounded-xl shadow-md p-4 mt-8 w-full max-w-md text-center">
         <h2 className="text-lg font-semibold mb-3">
-          🏆 Tutores Destacados
+          🏆 Tutores destacados
         </h2>
         <p className="text-gray-700">
           Iniciá sesión para conocer a los tutores destacados!
@@ -47,7 +47,7 @@ export default function TopTutors() {
   return (
     <div className="bg-white rounded-xl shadow-md p-4 mt-8 w-full max-w-md">
       <h2 className="text-lg font-semibold mb-3 text-center text-black">
-        🏆 Tutores Destacados
+        🏆 Tutores destacados
       </h2>
 
       <ul className="divide-y divide-gray-200">
