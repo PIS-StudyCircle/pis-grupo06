@@ -131,6 +131,12 @@ module Api
       end
 
       def show
+        def set_photo_url(user)
+          if user.profile_photo.attached?
+            Rails.application.routes.url_helpers.url_for(user.profile_photo)
+          end
+        end
+
         render json: {
           id: @tutoring.id,
           scheduled_at: @tutoring.scheduled_at,
@@ -172,20 +178,17 @@ module Api
           enrolled_students: @tutoring.users.map do |user|
             {
               id: user.id,
-              photo_url: user.profile_photo.attached? ?
-                Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
+              photo_url: set_photo_url(user)
             }
           end,
           enrolled_users: @tutoring.users.map do |user|
             {
               id: user.id,
-              photo_url: user.profile_photo.attached? ?
-                Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
+              photo_url: set_photo_url(user)
             }
           end.append(@tutoring.tutor ? [{
                        id: @tutoring.tutor.id,
-                       photo_url: @tutoring.tutor.profile_photo.attached? ?
-                        Rails.application.routes.url_helpers.url_for(@tutoring.tutor.profile_photo) : nil
+                       photo_url: set_photo_url(@tutoring.tutor)
                      }] : [])
         }
       end

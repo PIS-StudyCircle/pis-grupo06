@@ -111,10 +111,21 @@ export default function ChatModal({ chatId, token, tutoringUsers, onClose }) {
 
             return messages.map((msg, idx) => {
               const msgDate = new Date(msg.created_at);
-              const prevDate = idx > 0 ? new Date(messages[idx - 1].created_at) : null;
-              const nextDate = idx < messages.length - 1 ? new Date(messages[idx + 1].created_at) : null;
+              const prev = idx > 0 ? messages[idx - 1] : null;
+              const next = idx < messages.length - 1 ? messages[idx + 1] : null;
+              const prevDate = prev ? new Date(prev.created_at) : null;
+              const nextDate = next ? new Date(next.created_at) : null;
+
               const showDateHeader = !prevDate || !isSameDay(msgDate, prevDate);
               const isSelf = msg.user_id === user.id;
+
+              const showSenderInfo = !isSelf && (
+                !prev ||
+                prev.user_id !== msg.user_id ||
+                !isSameMinute(prevDate, msgDate)
+              );
+
+              const showTimestamp = !nextDate || !isSameMinute(msgDate, nextDate) || next.user_id !== msg.user_id;
 
               let headerLabel = msgDate.toLocaleDateString("es-ES", {
                 day: "2-digit",
@@ -133,36 +144,44 @@ export default function ChatModal({ chatId, token, tutoringUsers, onClose }) {
                   )}
 
                   <div className={`flex items-start gap-2 ${isSelf ? "justify-end" : "justify-start"}`}>
-                    {!isSelf && (
-                      userPhotos[msg.user_id] ? (
-                        <img
-                          src={userPhotos[msg.user_id]}
-                          alt={`${msg.user_name} ${msg.user_last_name}`.trim()}
-                          className="w-8 h-8 rounded-full object-cover shrink-0"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold text-white shrink-0">
-                          {(
-                            (msg.user_name?.charAt(0) || "") +
-                            (msg.user_last_name?.charAt(0) || "")
-                          )}
-                        </div>
+                    {/* Avatar / placeholder */}
+                    {showSenderInfo ? (
+                      !isSelf && (
+                        userPhotos[msg.user_id] ? (
+                          <img
+                            src={userPhotos[msg.user_id]}
+                            alt={`${msg.user_name} ${msg.user_last_name}`.trim()}
+                            className="w-8 h-8 rounded-full object-cover shrink-0"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold text-white shrink-0">
+                            {(
+                              (msg.user_name?.charAt(0) || "") +
+                              (msg.user_last_name?.charAt(0) || "")
+                            )}
+                          </div>
+                        )
                       )
+                    ) : (
+                      <div className="w-8 h-8 shrink-0" />
                     )}
 
                     <div className={`flex flex-col ${isSelf ? "items-end" : "items-start"} max-w-[80%] min-w-0`}>
-                      {!isSelf && (
+                      {/* Nombre del remitente (solo al inicio del grupo) */}
+                      {!isSelf && showSenderInfo && (
                         <span className="font-medium text-sm text-gray-700 mb-1">
                           {`${msg.user_name || ""} ${msg.user_last_name || ""}`.trim()}
                         </span>
                       )}
+
                       <div
                         className={`p-2 rounded whitespace-pre-wrap break-words break-all ${isSelf ? "bg-blue-100 text-right" : "bg-gray-200 text-left"}`}
                         style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
                       >
                         {msg.content}
                       </div>
-                      {!isSameMinute(msgDate, nextDate) && (
+
+                      {showTimestamp && (
                         <span className="text-xs text-gray-400 mt-0.1">
                           {msgDate.toLocaleTimeString("es-ES", {
                             hour: "2-digit",
