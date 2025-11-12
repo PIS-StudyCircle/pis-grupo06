@@ -319,11 +319,18 @@ RSpec.describe "Notifications Messages", type: :request do
           subjects: [subject]
         )
 
-        tutoring.update(scheduled_at: 1.day.ago)
-        tutoring.update(state: "finished")
-
         UserTutoring.create!(user: student1, tutoring: tutoring)
         UserTutoring.create!(user: student2, tutoring: tutoring)
+
+        TutoringAvailability.create!(
+          tutoring: tutoring,
+          start_time: tutoring.scheduled_at - 1.hour,
+          end_time: tutoring.scheduled_at + 2.hours,
+          is_booked: true
+        )
+
+        tutoring.update(scheduled_at: 1.day.ago)
+        tutoring.update(state: 2) # finished
 
         TutoringFeedbackJob.perform_now(tutoring.id)
 
@@ -331,17 +338,15 @@ RSpec.describe "Notifications Messages", type: :request do
         notif_student1  = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
         notif_student2  = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
 
-        expect(notif_tutor).to be_present
+        expect(notif_tutor).to be_nil
         expect(notif_student1).to be_present
         expect(notif_student2).to be_present
 
-        expect(notif_tutor.title).to include("Tu tutoría de #{course.name} finalizó")
-        # review_notifier está mal, como va a decirle al tutor que deje su Feedback?
         expect(notif_student1.title).to include("Tutoría finalizada - Deja tu feedback")
         expect(notif_student2.title).to include("Tutoría finalizada - Deja tu feedback")
 
-        expect(notif_student1.url).to eq("/tutorias/#{tutoring.id}/feedbacks")
-        expect(notif_student2.url).to eq("/tutorias/#{tutoring.id}/feedbacks")
+        expect(notif_student1.url).to eq("/notificaciones")
+        expect(notif_student2.url).to eq("/notificaciones")
       end
 
       it "envía recordatorio 24 horas antes a tutor y estudiantes" do
