@@ -5,6 +5,8 @@ import ImagePreview from "../components/ImagePreview"
 import PromptInput from "../components/PromptInput"
 import { generateAvatar } from "../services/avatarService";
 import { updateProfilePhoto } from "../services/UpdateProfilePhoto";
+import { ErrorAlert } from "@/shared/components/ErrorAlert";
+import { showSuccess } from "@/shared/utils/toastService";
 
 export default function CreateScreen() {
   const navigate = useNavigate()
@@ -12,6 +14,7 @@ export default function CreateScreen() {
   const [generatedImage, setGeneratedImage] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
+  const [error, setError] = useState(null)
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -20,10 +23,11 @@ export default function CreateScreen() {
     setShowOptions(false);
 
     try {
+      setError(null);
       const imageUrl = await generateAvatar(prompt);
       setGeneratedImage(imageUrl);
     } catch {
-      alert("Hubo un problema generando la imagen. Intenta de nuevo en unos segundos.");
+      setError("Hubo un problema generando la imagen. Intenta de nuevo en unos segundos.");
     } finally {
       setIsLoading(false);
       setShowOptions(true);
@@ -36,11 +40,12 @@ export default function CreateScreen() {
     try {
       if (!generatedImage) return;
       setIsSaving(true);
+      setError(null);
       await updateProfilePhoto(generatedImage);
-      alert("✅ Foto de perfil actualizada correctamente");
+      showSuccess("Foto de perfil actualizada correctamente");
     } catch (err) {
       console.error(err);
-      alert("❌ Error al guardar la foto de perfil");
+      setError("Error al guardar la foto de perfil");
     } finally {
       setIsSaving(false);
     }
@@ -70,6 +75,7 @@ export default function CreateScreen() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 bg-white">
           {/* Panel Izquierdo */}
           <div className="space-y-6">
+            {error && <ErrorAlert>{error}</ErrorAlert>}
             <PromptInput
               prompt={prompt}
               onChange={setPrompt}
