@@ -234,7 +234,8 @@ Rails.logger.debug "[4/7] Creating 12 active tutorings..."
 
 # Helper method to create a tutoring with attendees and availability
 def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_count:, users_pool:)
-  subjects = course.subjects.sample(subjects_count)
+  subjects_available = course.subjects.to_a
+  subjects = subjects_available.sample([subjects_count, subjects_available.size].min)
 
   tutoring = Tutoring.create!(
     course: course,
@@ -250,11 +251,19 @@ def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_c
   # Link subjects
   subjects.each { |subject| SubjectTutoring.create!(subject: subject, tutoring: tutoring) }
 
-  # Create UserTutoring for attendees (NOT for tutor)
-  attendees = users_pool.reject { |u| u.id == tutor.id }.sample(num_attendees)
+  pool = users_pool.reject { |u| u.id == tutoring.tutor_id }
+
+  # Si el creador no es el tutor, lo agregamos como asistente y reducimos la cuenta
+  if creator.id != tutor.id
+    UserTutoring.create!(user: creator, tutoring: tutoring)
+    pool = pool.reject { |u| u.id == creator.id }
+  end
+
+  # Create UserTutoring para los demás asistentes
+  attendees = pool.sample(num_attendees)
   attendees.each { |attendee| UserTutoring.create!(user: attendee, tutoring: tutoring) }
 
-  # Create TutoringAvailability (one booked, rest unbooked)
+  # Create TutoringAvailability
   num_availabilities = rand(1..3)
   num_availabilities.times do |i|
     TutoringAvailability.create!(
@@ -269,6 +278,9 @@ def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_c
   tutoring.create_chat! unless tutoring.chat
 
   tutoring.chat.users << tutor unless tutoring.chat.users.exists?(tutor.id)
+  if creator.id != tutor.id
+    tutoring.chat.users << creator unless tutoring.chat.users.exists?(creator.id)
+  end
   attendees.each do |u|
     tutoring.chat.users << u unless tutoring.chat.users.exists?(u.id)
   end
@@ -279,6 +291,7 @@ def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_c
       content: "Bienvenidos al chat de la tutoría. Cualquier duda escriban aquí."
     )
   end
+
   tutoring
 end
 
@@ -487,30 +500,24 @@ Rails.logger.debug "[7/7] Creating 3 reviews and 5 feedbacks..."
 # Review 1: Between tutor and attendee of t1
 tutor_t1 = t1.tutor
 attendee_t1 = t1.user_tutorings.first.user
-UserReview.create!(
-  reviewer: attendee_t1,
-  reviewed: tutor_t1,
-  review: "Excelente tutor, explicó muy bien los conceptos de SQL y normalización."
-)
-
-# Review 2: Between two attendees of t3
-attendees_t3 = t3.user_tutorings.limit(2).map(&:user)
-if attendees_t3.size >= 2
-  UserReview.create!(
-    reviewer: attendees_t3[0],
-    reviewed: attendees_t3[1],
-    review: "Gran compañero de estudio, muy colaborativo durante la tutoría."
-  )
+UserReview.find_or_create_by!(reviewer: attendee_t1, reviewed: tutor_t1) do |ur|
+  ur.review = "Excelente tutor, explicó muy bien los conceptos de SQL y normalización."
 end
-
-# Review 3: Between tutor and attendee of t7
-tutor_t7 = t7.tutor
-attendee_t7 = t7.user_tutorings.first.user
-UserReview.create!(
-  reviewer: attendee_t7,
-  reviewed: tutor_t7,
-  review: "Muy clara la explicación sobre requerimientos y testing. Recomendado."
-)
+ 
+ # Review 2: Between two attendees of t3
+ attendees_t3 = t3.user_tutorings.limit(2).map(&:user)
+ if attendees_t3.size >= 2
+   UserReview.find_or_create_by!(reviewer: attendees_t3[0], reviewed: attendees_t3[1]) do |ur|
+     ur.review = "Gran compañero de estudio, muy colaborativo durante la tutoría."
+   end
+ end
+ 
+ # Review 3: Between tutor and attendee of t7
+ tutor_t7 = t7.tutor
+ attendee_t7 = t7.user_tutorings.first.user
+ UserReview.find_or_create_by!(reviewer: attendee_t7, reviewed: tutor_t7) do |ur|
+   ur.review = "Muy clara la explicación sobre requerimientos y testing. Recomendado."
+ end
 
 Rails.logger.debug "  Created 3 reviews"
 
