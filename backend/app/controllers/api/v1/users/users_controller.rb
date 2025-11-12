@@ -54,11 +54,12 @@ module Api
             head :not_found
           end
         end
+
         def update
           # Si viene un archivo directo (PUT /users/upload_photo)
           if params[:profile_photo].present?
             current_user.profile_photo.attach(params[:profile_photo])
-        
+
             if current_user.save
               return success_response(
                 message: "Foto de perfil actualizada exitosamente",
@@ -72,13 +73,13 @@ module Api
               )
             end
           end
-        
+
           # Caso normal (PUT /users/:id)
           if current_user.update(user_params)
             if params[:user] && params[:user][:profile_photo].present?
               current_user.profile_photo.attach(params[:user][:profile_photo])
             end
-        
+
             success_response(
               message: "Perfil actualizado exitosamente",
               data: { user: UserSerializer.new(current_user).serializable_hash[:data][:attributes] }
@@ -91,7 +92,7 @@ module Api
             )
           end
         end
-        
+
 
         private
 

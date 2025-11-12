@@ -45,7 +45,7 @@ module Api
           render json: { image_url: image_url }, status: :ok
         rescue Deapi::EditionError => e
           render json: { error: e.message }, status: :unprocessable_entity
-        rescue StandardError => e
+        rescue StandardError
           render json: { error: "Error generando imagen" }, status: :internal_server_error
         end
       end
