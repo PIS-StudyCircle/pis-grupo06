@@ -40,7 +40,6 @@ Rails.application.routes.draw do
       put "/users/upload_photo", to: "users/users#update_profile_photo"
       get "/users/:id/profile_photo", to: "users/users#profile_photo"
 
-
       resources :courses do
         resources :subjects
         resource :favorite, only: [:create, :destroy], controller: 'course_favorites'
