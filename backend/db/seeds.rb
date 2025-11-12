@@ -234,8 +234,7 @@ Rails.logger.debug "[4/7] Creating 12 active tutorings..."
 
 # Helper method to create a tutoring with attendees and availability
 def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_count:, users_pool:)
-  subjects_available = course.subjects.to_a
-  subjects = subjects_available.sample([subjects_count, subjects_available.size].min)
+  subjects = course.subjects.sample(subjects_count)
 
   tutoring = Tutoring.create!(
     course: course,
@@ -257,13 +256,14 @@ def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_c
   if creator.id != tutor.id
     UserTutoring.create!(user: creator, tutoring: tutoring)
     pool = pool.reject { |u| u.id == creator.id }
+    num_attendees -= 1
   end
 
   # Create UserTutoring para los demás asistentes
   attendees = pool.sample(num_attendees)
   attendees.each { |attendee| UserTutoring.create!(user: attendee, tutoring: tutoring) }
 
-  # Create TutoringAvailability
+  # Create TutoringAvailability (one booked, rest unbooked)
   num_availabilities = rand(1..3)
   num_availabilities.times do |i|
     TutoringAvailability.create!(
