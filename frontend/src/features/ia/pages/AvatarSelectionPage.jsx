@@ -80,7 +80,7 @@ export default function AvatarSelector({ onBack }) {
             onClick={() => navigate('/avatar/editar', { state: { initialImage: user.profile_photo_url } })}
             className="px-4 py-2 bg-[#0f3f62] text-white rounded-lg font-semibold hover:bg-[#0a2f4a] transition-colors shadow-md text-sm"
           >
-            Editar mi avatar
+            Editar mi foto de perfil
           </button>
         )}
       </div>

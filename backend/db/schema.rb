@@ -48,8 +48,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_08_183314) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "last_read_at"
     t.bigint "last_notified_message_id"
+    t.datetime "last_read_at"
     t.index ["chat_id"], name: "index_chat_users_on_chat_id"
     t.index ["last_notified_message_id"], name: "index_chat_users_on_last_notified_message_id"
     t.index ["last_read_at"], name: "index_chat_users_on_last_read_at"

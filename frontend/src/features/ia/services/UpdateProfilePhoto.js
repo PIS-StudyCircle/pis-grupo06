@@ -13,7 +13,7 @@ export async function updateProfilePhoto(imageUrl) {
     formData.append("profile_photo", file)
 
     // 3️⃣ Hacemos la petición al backend
-    const res = await fetch(`${API_BASE}/users/profile_photo`, {
+    const res = await fetch(`${API_BASE}/users/upload_photo`, {
       method: "PUT",
       body: formData,
       credentials: "include", // importante si usás Devise

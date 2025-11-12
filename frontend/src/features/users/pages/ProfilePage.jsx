@@ -9,15 +9,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { Star, Camera } from "lucide-react";
 
 export default function Profile() {
-<<<<<<< HEAD
-  const { user, loading, error } = useUser();
+
   const navigate = useNavigate();
-=======
   // Get user context
   const { user, refetchCurrentUser, booting } = useUser();
-
   // Reviews hook - only call after user is available
->>>>>>> dev
+
   const {
     reviews,
     loading: reviewsLoading,
@@ -29,10 +26,7 @@ export default function Profile() {
   const [favLoading, setFavLoading] = useState(false);
   const [favError, setFavError] = useState("");
 
-<<<<<<< HEAD
-=======
   // State for rating promedio y total
->>>>>>> dev
   const [averageRating, setAverageRating] = useState(0);
   const [totalFeedbacks, setTotalFeedbacks] = useState(0);
 
@@ -41,20 +35,9 @@ export default function Profile() {
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState("");
 
-<<<<<<< HEAD
-  const [hovered, setHovered] = useState(false); // 👈 para mostrar overlay en desktop
 
-  useEffect(() => {
-    if (!user) return;
-    fetchFavorites();
-    fetchFeedbacks();
-  }, [user]);
-
-  async function fetchFavorites() {
-=======
   // Fetch favorites - wrapped in useCallback to be used in useEffect dependencies
   const fetchFavorites = useCallback(async () => {
->>>>>>> dev
     try {
       setFavLoading(true);
       const data = await getCourses(1, 50, "", true);
@@ -103,7 +86,7 @@ export default function Profile() {
       }
     }
     loadProfile();
-  }, [refetchCurrentUser]);
+  }, [refetchCurrentUser, user, fetchFavorites, fetchFeedbacks]);
 
 
 
@@ -147,42 +130,24 @@ export default function Profile() {
             {/* Col 1: Imagen + datos */}
             <div className="flex items-center gap-6">
               {/* Contenedor con overlay al hacer hover */}
-              <div
-                className="relative w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden cursor-pointer group"
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
-              >
-                <img
-                  src={photoUrl}
-                  alt="avatar"
-                  className="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
-                />
-
-                {/* Overlay visible en hover (desktop) o fijo en mobile */}
+              <div className="flex flex-col items-center gap-3">
                 <div
-                  className={`absolute inset-0 bg-black/50 flex items-center justify-center rounded-full transition-opacity duration-200 ${
-                    hovered ? "opacity-100" : "opacity-0 md:opacity-0"
-                  } md:group-hover:opacity-100 md:bg-black/50`}
+                  className="relative w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden cursor-pointer group"
                 >
-                  <button
-                    onClick={() => navigate("/avatar/elegir_tipo", { state: { initialImage: photoUrl } })}
-                    className="flex items-center gap-1 text-white text-xs font-medium bg-[#001F54]/80 px-2.5 py-1.5 rounded-full hover:bg-[#001F54]"
-                  >
-                    <Camera className="w-4 h-4" />
-                    Editar
-                  </button>
+                  <img
+                    src={photoUrl}
+                    alt="avatar"
+                    className="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
+                  />
                 </div>
-
-                {/* Botón fijo para mobile (sin hover) */}
-                <div className="absolute bottom-0 left-0 right-0 md:hidden bg-black/40 text-white text-center py-1 text-xs">
-                  <button
-                    onClick={() => navigate("/avatar/elegir_tipo", { state: { initialImage: photoUrl } })}
-                    className="flex items-center justify-center gap-1 w-full"
-                  >
-                    
-                    Editar 
-                  </button>
-                </div>
+                
+                <button
+                  onClick={() => navigate("/avatar/elegir_tipo")}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm rounded-full transition-colors duration-200 border border-white/30"
+                >
+                  <Camera className="w-4 h-4" />
+                  Editar con IA
+                </button>
               </div>
 
               <div>
@@ -269,4 +234,3 @@ export default function Profile() {
     </div>
   );
 }
-

@@ -37,7 +37,7 @@ Rails.application.routes.draw do
       # index y show de UsersController
 
       resources :users, module: :users, only: [:index, :show, :update]
-      put "/users/profile_photo", to: "users/users#update_profile_photo"
+      put "/users/upload_photo", to: "users/users#update_profile_photo"
       get "/users/:id/profile_photo", to: "users/users#profile_photo"
 
 
