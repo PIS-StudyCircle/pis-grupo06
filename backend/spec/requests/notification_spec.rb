@@ -331,6 +331,7 @@ RSpec.describe "Notifications Messages", type: :request do
         )
 
         tutoring.update(scheduled_at: 1.day.ago)
+        tutoring.save!(validate: false) # saltar validaciones de estado/tiempo
 
         # Ejecutar la job y procesar las jobs encoladas; luego comprobamos notificaciones
         perform_enqueued_jobs do
