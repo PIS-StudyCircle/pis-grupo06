@@ -2,7 +2,7 @@ class Deapi
   class EditionError < StandardError; end
 
   BASE_URL = "https://api.deapi.ai/api/v1/client"
-  MAX_RETRIES = 20
+  MAX_RETRIES = 40
   RETRY_DELAY = 5
   ALLOWED_FORMATS = %w[jpg jpeg png gif bmp webp].freeze
   MAX_FILE_SIZE = 10.megabytes

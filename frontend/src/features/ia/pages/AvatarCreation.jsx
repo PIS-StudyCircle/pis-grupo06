@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { Check, Edit3, Sparkles } from "lucide-react"
 import ImagePreview from "../components/ImagePreview"
@@ -6,6 +7,7 @@ import { generateAvatar } from "../services/avatarService";
 import { updateProfilePhoto } from "../services/UpdateProfilePhoto";
 
 export default function CreateScreen() {
+  const navigate = useNavigate()
   const [prompt, setPrompt] = useState("")
   const [generatedImage, setGeneratedImage] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -45,8 +47,10 @@ export default function CreateScreen() {
   };
 
   const handleEditImage = () => {
-    console.log("Editando imagen:", generatedImage)
-    alert("Pasando al editor... (implementar navegación)")
+    if (!generatedImage) return
+    navigate("/avatar/editar", {
+      state: { initialImage: generatedImage }
+    })
   }
 
   const handleTryAgain = () => {
