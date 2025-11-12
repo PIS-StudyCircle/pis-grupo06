@@ -4,15 +4,25 @@ class Tutorings::MarkFinishedTutoringsJob < ApplicationJob
   def perform
     # Encuentra todas las tutorías activas que deberían marcarse como finalizadas
     # Una tutoría está finalizada cuando: scheduled_at + duration_mins < Time.current
-    finished_tutorings = Tutoring.active.where(
-      "scheduled_at + (duration_mins * interval '1 minute') < ?", Time.current
-    )
+    # implementación DB específica (Postgres) puede estar aquí y no funcionar en tests
+    # Buscar en Ruby para ser compatible entre DBs (Postgres/SQLite) y evitar SQL específico
+    finished = []
+
+    Tutoring.where(state: :active).where.not(scheduled_at: nil).find_each do |t|
+      dur = (t.duration_mins || 0).to_i
+      # si no tiene duración, ignorar (o cambiar política según necesidad)
+      next if dur <= 0
+
+      if t.scheduled_at + dur.minutes < Time.current
+        finished << t
+      end
+    end
 
     # Encuentra tutorías donde TODAS las tutoring_availabilities asociadas tienen start_time < Time.current
     expired_pending_tutorings = find_expired_pending_tutorings
 
     # Actualiza todas las tutorías finalizadas
-    update_tutorings_state(finished_tutorings)
+    update_tutorings_state(finished)
 
     # Elimina tutorías vencidas pending/active que cumplan los criterios
     destroy_expired_tutorings(expired_pending_tutorings)
@@ -25,11 +35,19 @@ class Tutorings::MarkFinishedTutoringsJob < ApplicationJob
       # Camino normal: intenta actualizar con validaciones
       # Si no se hace este camino no se puede chequear en el test cuando ocurre un error en el proceso
       t.update!(state: :finished)
+
+      # Encolar job que notifica a participantes para dejar feedback
+      TutoringFeedbackJob.perform_later(t.id)
+
     rescue ActiveRecord::RecordInvalid => e
       # Si no pasa las validaciones, forzar el cambio sin validar
       Rails.logger.warn "[MarkFinishedTutoringsJob] Tutoring##{t.id} invalid: #{e.message} — forcing state"
       t.state = :finished # Obs "t.update(state: :finished, validate: false)" no funciona correctamente con enums
       t.save(validate: false)
+
+      # Encolar igualmente el job de feedback aun cuando forzamos el cambio
+      TutoringFeedbackJob.perform_later(t.id)
+
     rescue => e
       # Cualquier otro error (por ejemplo el “Fallo controlado” del spec)
       Rails.logger.error "[MarkFinishedTutoringsJob] Tutoring##{t.id} #{e.class}: #{e.message}"

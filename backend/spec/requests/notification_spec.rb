@@ -6,12 +6,8 @@ RSpec.describe "Notifications Messages", type: :request do
   include Devise::Test::IntegrationHelpers
 
   # Ejecutar jobs en línea para que las notificaciones creadas por jobs estén disponibles
-  before(:all) do
+  before(:each) do
     ActiveJob::Base.queue_adapter = :test
-  end
-
-  around(:each) do |example|
-    perform_enqueued_jobs { example.run }
   end
 
   # Evita llamadas externas (Google Calendar) durante las specs
@@ -64,7 +60,7 @@ RSpec.describe "Notifications Messages", type: :request do
   let!(:course) { Course.create!(name: "Álgebra", faculty: facultad) }
   let!(:subject) { Subject.create!(name: "Matrices", course: course) }
 
-  describe "Notificaciones (Exitosas) relacionadas con tutorías" do
+  describe "Notificaciones relacionadas con tutorías" do
     context "Notificaciones dirigidas a tutores" do
       it "envía notificación al tutor cuando un estudiante se une a la tutoría" do
         tutoring = Tutoring.create!(
@@ -136,9 +132,11 @@ RSpec.describe "Notifications Messages", type: :request do
         UserTutoring.create!(user: student1, tutoring: tutoring)
         UserTutoring.create!(user: student2, tutoring: tutoring)
 
-        sign_in tutor
-        delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe"
-        expect(response).to have_http_status(:ok).or have_http_status(:no_content)
+        perform_enqueued_jobs do
+          sign_in tutor
+          delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe"
+          expect(response).to have_http_status(:ok).or have_http_status(:no_content)
+        end
 
         notif_to_s1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
         expect(notif_to_s1).to be_present
@@ -165,9 +163,11 @@ RSpec.describe "Notifications Messages", type: :request do
         )
         UserTutoring.create!(user: student1, tutoring: tutoring)
 
-        sign_in student1
-        delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe"
-        expect(response).to have_http_status(:ok).or have_http_status(:no_content)
+        perform_enqueued_jobs do
+          sign_in student1
+          delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe"
+          expect(response).to have_http_status(:ok).or have_http_status(:no_content)
+        end
         expect(Tutoring.find_by(id: tutoring.id)).to be_nil
 
         notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
@@ -311,6 +311,7 @@ RSpec.describe "Notifications Messages", type: :request do
           tutor: tutor,
           course: course,
           scheduled_at: 2.days.from_now.change(hour: 15, min: 0, sec: 0),
+          duration_mins: 120,
           created_by_id: tutor.id,
           modality: "virtual",
           capacity: 5,
@@ -325,14 +326,18 @@ RSpec.describe "Notifications Messages", type: :request do
         TutoringAvailability.create!(
           tutoring: tutoring,
           start_time: tutoring.scheduled_at - 1.hour,
-          end_time: tutoring.scheduled_at + 2.hours,
+          end_time: tutoring.scheduled_at + 1.hour,
           is_booked: true
         )
 
         tutoring.update(scheduled_at: 1.day.ago)
-        tutoring.update(state: 2) # finished
 
-        TutoringFeedbackJob.perform_now(tutoring.id)
+        # Ejecutar la job y procesar las jobs encoladas; luego comprobamos notificaciones
+        perform_enqueued_jobs do
+          Tutorings::MarkFinishedTutoringsJob.perform_now
+        end
+
+        expect(tutoring.reload.state).to eq("finished")
 
         notif_tutor     = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
         notif_student1  = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
