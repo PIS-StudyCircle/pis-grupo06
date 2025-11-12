@@ -500,25 +500,30 @@ Rails.logger.debug "[7/7] Creating 3 reviews and 5 feedbacks..."
 # Review 1: Between tutor and attendee of t1
 tutor_t1 = t1.tutor
 attendee_t1 = t1.user_tutorings.first.user
-UserReview.find_or_create_by!(reviewer: attendee_t1, reviewed: tutor_t1) do |ur|
-  ur.review = "Excelente tutor, explicó muy bien los conceptos de SQL y normalización."
-end
- 
- # Review 2: Between two attendees of t3
- attendees_t3 = t3.user_tutorings.limit(2).map(&:user)
- if attendees_t3.size >= 2
-   UserReview.find_or_create_by!(reviewer: attendees_t3[0], reviewed: attendees_t3[1]) do |ur|
-     ur.review = "Gran compañero de estudio, muy colaborativo durante la tutoría."
-   end
- end
- 
- # Review 3: Between tutor and attendee of t7
- tutor_t7 = t7.tutor
- attendee_t7 = t7.user_tutorings.first.user
- UserReview.find_or_create_by!(reviewer: attendee_t7, reviewed: tutor_t7) do |ur|
-   ur.review = "Muy clara la explicación sobre requerimientos y testing. Recomendado."
- end
+UserReview.create!(
+  reviewer: attendee_t1,
+  reviewed: tutor_t1,
+  review: "Excelente tutor, explicó muy bien los conceptos de SQL y normalización."
+)
 
+# Review 2: Between two attendees of t3
+attendees_t3 = t3.user_tutorings.limit(2).map(&:user)
+if attendees_t3.size >= 2
+  UserReview.create!(
+    reviewer: attendees_t3[0],
+    reviewed: attendees_t3[1],
+    review: "Gran compañero de estudio, muy colaborativo durante la tutoría."
+  )
+end
+
+# Review 3: Between tutor and attendee of t7
+tutor_t7 = t7.tutor
+attendee_t7 = t7.user_tutorings.first.user
+UserReview.create!(
+  reviewer: attendee_t7,
+  reviewed: tutor_t7,
+  review: "Muy clara la explicación sobre requerimientos y testing. Recomendado."
+)
 Rails.logger.debug "  Created 3 reviews"
 
 # =============================================================================
