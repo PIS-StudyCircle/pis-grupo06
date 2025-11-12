@@ -43,6 +43,7 @@ export default function CreateScreen() {
       setError(null);
       await updateProfilePhoto(generatedImage);
       showSuccess("Foto de perfil actualizada correctamente");
+      navigate("/perfil");
     } catch (err) {
       console.error(err);
       setError("Error al guardar la foto de perfil");

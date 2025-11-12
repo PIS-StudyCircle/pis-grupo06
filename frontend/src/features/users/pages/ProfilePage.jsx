@@ -78,7 +78,6 @@ export default function Profile() {
   // Load profile data on mount and when user changes
   useEffect(() => {
     async function loadProfile() {
-      // Fetch user data - use fresh fetch for current user to avoid cached masked email
       await refetchCurrentUser();
       if (user) {
         fetchFavorites();
@@ -86,7 +85,7 @@ export default function Profile() {
       }
     }
     loadProfile();
-  }, [refetchCurrentUser, user, fetchFavorites, fetchFeedbacks]);
+  }, [refetchCurrentUser]);
 
 
 

@@ -53,7 +53,7 @@ export default function AvatarEditorPage() {
       setSaveError(null)
       await updateProfilePhoto(currentImage)
       showSuccess("Foto de perfil actualizada correctamente")
-      navigate(-1)
+      navigate("/perfil")
     } catch (err) {
       console.error(err)
       setSaveError("Error al guardar la foto de perfil")
