@@ -391,6 +391,9 @@ module Api
           @tutoring.users.each do |user|
             @tutoring.chat.users << user unless @tutoring.chat.users.exists?(user.id)
           end
+
+          # Agregar al tutor al chat
+          @tutoring.chat.users << @tutoring.tutor unless @tutoring.chat.users.exists?(@tutoring.tutor.id)
         end
 
         # Programar notificaciones automáticas
