@@ -25,14 +25,16 @@ export default function HelpMenu() {
                 "En Mis clases: organiza tus próximas tutorías y las que ya tuviste.",
                 "En Usuarios: buscá otros usuarios y mirá sus reseñas.",
                 "Desde el icono de perfil podés acceder a tu información personal, editarla o cerrar sesión.",
+                "Desde la campana podés ver tus notificaciones sobre tus actividades.",
             ];
         }
         // /materias/:id
         if (/^\/materias\/\d+$/i.test(pure)) {
             return [
                 "En esta página ves la información general de la materia y los temas asociados.",
-                "Podés elegir entre “Recibir tutoría” para pedir una tutoría como estudiante o “Brindar tutoría” para ofrecerte como tutor. Al hacerlo podés crear nuevos temas si no está el que querés.",
-                "También podés consultar las tutorías disponibles sobre un tema clickeando en este.",
+                "Podés elegir entre “Recibir tutoría” para pedir una tutoría como estudiante o “Brindar tutoría” para ofrecer una tutoría en la que serás tutor de algún tema de la materia.",
+                "Al crear una tutoría podés crear nuevos temas si no están los que querés.",
+                "También podés consultar las tutorías disponibles sobre un tema clickeando en el mismo.",
             ];
         }
         // /materias/:id/temas/:id
@@ -46,14 +48,15 @@ export default function HelpMenu() {
         if (pure === "/tutorias") {
             return [
                 "Aquí podés encontrar todas las tutorías brindadas y solicitadas. Podés buscar por materia o tema, y filtrar por aquellas que no tienen tutor asignado.",
-                "Podés unirte como tutor apretando en “ser tutor” o como estudiante apretando en “unirme”.",
+                "Clickeando en una tutoría podés ver más detalles sobre esta.",
+                "Podés unirte como tutor haciendo click en “ser tutor” o como estudiante en “unirme”.",
             ];
         }
         // /tutorias/:id
         if (/^\/tutorias\/\d+$/i.test(pure)) {
             return [
                 "En esta página podés ver toda la información de la tutoría.",
-                "Una vez haya un tutor y al menos un estudiante, tendrán disponible un chat para coordinar los detalles. Este chat ya no será accesible una vez finalizada la tutoría.",
+                "Una vez haya un tutor y al menos un estudiante, tendrán disponible un chat para coordinar los detalles entre los participantes. Este chat ya no será accesible una vez finalizada la tutoría.",
             ];
         }
         // /tutorias/:id/elegir_horario_estudiante
@@ -95,7 +98,7 @@ export default function HelpMenu() {
         if (/^\/tutorias\/crear\/\d+$/i.test(pure)) {
             return [
                 "Seleccioná la modalidad, los cupos y tus horarios disponibles para la tutoría.",
-                "Quienes quieran participar elegirán entre estos horarios.",
+                "El primer estudiante que se una elegirá entre estos horarios para definir el horario final.",
             ];
         }
         // /tutorias/solicitar/:id
@@ -109,7 +112,7 @@ export default function HelpMenu() {
         if (pure === "/notificaciones") {
             return [
                 "En esta pantalla podés ver tus próximas tutorías, pudiendo desuscribirte de una si ya no podés asistir.",
-                "También podés ver las tutorías en las que ya participaste y dejar una clasificación al tutor.",
+                "También podés ver las tutorías en las que ya participaste y dejar un feedback al tutor.",
             ];
         }
         // /usuarios
@@ -121,14 +124,13 @@ export default function HelpMenu() {
         // /perfil
         if (pure === "/perfil") {
             return [
-                "En tu perfil se muestran tus materias favoritas y las reseñas que recibiste.",
-                "Podés cambiar tu foto, nombre, apellido y descripción desde 'Editar perfil' en el menú.",
+                "En tu perfil se muestran tus materias favoritas, las reseñas y el promedio de puntuaciones que recibiste.",
             ];
         }
         // /usuarios/:id
         if (/^\/usuarios\/\d+$/i.test(pure)) {
             return [
-                "Estás viendo el perfil de otra persona, podés leer las reseñas que recibió y, si compartieron una tutoría, dejarle una nueva.",
+                "Estás viendo el perfil de otra persona, podés leer las reseñas que recibió y, si compartieron una tutoría, dejarle una nueva si aún no lo hiciste. Si ya dejaste una reseña, podés editarla o eliminarla.",
             ];
         }
         // /editar-perfil
