@@ -80,7 +80,7 @@ Rails.application.routes.draw do
           post :mark_as_read
         end
       end
-      resources :avatars, only: [:create]
+      post 'avatars/create', to: 'avatars#create'
       post 'avatars/edit', to: 'avatars#edit'
     end
   end

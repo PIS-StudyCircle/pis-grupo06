@@ -3,7 +3,7 @@ import { useState } from "react"
 import { Check, Edit3, Sparkles } from "lucide-react"
 import ImagePreview from "../components/ImagePreview"
 import PromptInput from "../components/PromptInput"
-import { generateAvatar } from "../services/avatarService";
+import { useAvatarEdit } from "../hooks/useAvatarEdit";
 import { updateProfilePhoto } from "../services/UpdateProfilePhoto";
 import { ErrorAlert } from "@/shared/components/ErrorAlert";
 import { showSuccess } from "@/shared/utils/toastService";
@@ -12,25 +12,23 @@ export default function CreateScreen() {
   const navigate = useNavigate()
   const [prompt, setPrompt] = useState("")
   const [generatedImage, setGeneratedImage] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [error, setError] = useState(null)
+
+  const { generateAvatar, isProcessing } = useAvatarEdit()
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
 
-    setIsLoading(true);
     setShowOptions(false);
 
     try {
       setError(null);
       const imageUrl = await generateAvatar(prompt);
       setGeneratedImage(imageUrl);
-    } catch {
-      setError("Hubo un problema generando la imagen. Intenta de nuevo en unos segundos.");
-    } finally {
-      setIsLoading(false);
       setShowOptions(true);
+    } catch (err) {
+      setError(err.message || "Hubo un problema generando la imagen. Intenta de nuevo en unos segundos.");
     }
   };
 
@@ -81,7 +79,7 @@ export default function CreateScreen() {
               prompt={prompt}
               onChange={setPrompt}
               onSubmit={handleGenerate}
-              isLoading={isLoading}
+              isLoading={isProcessing}
               disabled={false}
               placeholder="Ej: Un avatar realista, fondo claro, sonrisa suave..."
             />
@@ -94,7 +92,7 @@ export default function CreateScreen() {
 
                 <button
                   onClick={handleSaveAsProfile}
-                  disabled={isLoading || isSaving}
+                  disabled={isProcessing || isSaving}
                   className="w-full px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Check className="w-4 h-4" />
@@ -122,7 +120,7 @@ export default function CreateScreen() {
 
           {/* Panel Derecho */}
           <div className="flex items-center justify-center">
-            <ImagePreview image={generatedImage} isLoading={isLoading} />
+            <ImagePreview image={generatedImage} isLoading={isProcessing} />
           </div>
         </div>
       </div>

@@ -21,6 +21,12 @@ class Deapi
   end
 
   def generate(prompt:, **options)
+    request_id = create_generation_request(prompt, options)
+    fetch_result(request_id)
+  end
+
+  # Método público para obtener request_id de generación
+  def create_generation_request(prompt, options = {})
     uri = URI("#{BASE_URL}/txt2img")
 
     body = {
@@ -47,24 +53,10 @@ class Deapi
       raise EditionError, "No se pudo obtener el request_id para la generación de imagen"
     end
 
-    fetch_result(request_id)
+    request_id
   end
 
-  private
-
-  def validate_image!(image)
-    file = image.is_a?(String) ? File.open(image) : image
-
-    if file.size > MAX_FILE_SIZE
-      raise EditionError, "Image size exceeds #{MAX_FILE_SIZE / 1.megabyte}MB limit"
-    end
-
-    extension = File.extname(file.path).delete('.').downcase
-    unless ALLOWED_FORMATS.include?(extension)
-      raise EditionError, "Invalid format. Allowed: #{ALLOWED_FORMATS.join(', ')}"
-    end
-  end
-
+  # Métodos públicos para uso en jobs
   def create_edition_request(image, prompt, options)
     uri = URI("#{BASE_URL}/img2img")
 
@@ -98,6 +90,51 @@ class Deapi
       Rails.logger.error "❌ Error en create_edition_request: #{e.class} - #{e.message}"
       Rails.logger.error e.backtrace.first(5).join("\n")
       raise
+    end
+  end
+
+  def fetch_status(request_id)
+    uri = URI("#{BASE_URL}/request-status/#{request_id}")
+    request = build_get_request(uri)
+    response = execute_request(uri, request)
+    JSON.parse(response.body) rescue {}
+  end
+
+  def fetch_result(request_id)
+    uri = URI("#{BASE_URL}/request-status/#{request_id}")
+
+    MAX_RETRIES.times do
+      request = build_get_request(uri)
+      response = execute_request(uri, request)
+      parsed = JSON.parse(response.body) rescue {}
+
+      status = parsed.dig("data", "status")
+
+      case status
+      when "done"
+        return parsed.dig("data", "result_url")
+      when "failed", "error"
+        raise EditionError, "Image edition failed: #{parsed.dig('data', 'error')}"
+      end
+
+      sleep RETRY_DELAY
+    end
+
+    raise EditionError, "Timeout waiting for image edition"
+  end
+
+  private
+
+  def validate_image!(image)
+    file = image.is_a?(String) ? File.open(image) : image
+
+    if file.size > MAX_FILE_SIZE
+      raise EditionError, "Image size exceeds #{MAX_FILE_SIZE / 1.megabyte}MB limit"
+    end
+
+    extension = File.extname(file.path).delete('.').downcase
+    unless ALLOWED_FORMATS.include?(extension)
+      raise EditionError, "Invalid format. Allowed: #{ALLOWED_FORMATS.join(', ')}"
     end
   end
 
@@ -223,29 +260,6 @@ class Deapi
     part << content
     part << "\r\n".force_encoding('BINARY')
     part
-  end
-
-  def fetch_result(request_id)
-    uri = URI("#{BASE_URL}/request-status/#{request_id}")
-
-    MAX_RETRIES.times do
-      request = build_get_request(uri)
-      response = execute_request(uri, request)
-      parsed = JSON.parse(response.body) rescue {}
-
-      status = parsed.dig("data", "status")
-
-      case status
-      when "done"
-        return parsed.dig("data", "result_url")
-      when "failed", "error"
-        raise EditionError, "Image edition failed: #{parsed.dig('data', 'error')}"
-      end
-
-      sleep RETRY_DELAY
-    end
-
-    raise EditionError, "Timeout waiting for image edition"
   end
 
   def build_get_request(uri)

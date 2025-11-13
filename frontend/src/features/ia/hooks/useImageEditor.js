@@ -1,35 +1,24 @@
 // src/hooks/useImageEditor.js
 import { useState, useCallback } from 'react'
-import { editImage } from '../services/avatarService'
+import { useAvatarEdit } from './useAvatarEdit'
 
 export function useImageEditor(initialImage) {
   const [currentImage, setCurrentImage] = useState(initialImage)
   const [originalImage] = useState(initialImage)
   const [history, setHistory] = useState([])
   const [historyIndex, setHistoryIndex] = useState(-1)
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [hasChanges, setHasChanges] = useState(false)
+
+  const { editAvatar, isProcessing } = useAvatarEdit()
 
   const handleEditImage = useCallback(async (prompt, options = {}) => {
     if (!prompt.trim()) return
 
-    setIsLoading(true)
     setError(null)
 
     try {
-      const response = await editImage(
-        currentImage, 
-        prompt,
-        {
-          negative_prompt: options.negative_prompt || 'blur, distortion, darkness, noise',
-          steps: options.steps || 20,
-          guidance: options.guidance || 7.5,
-          ...options
-        }
-      )
-
-      const newImage = response.image_url
+      const newImage = await editAvatar(currentImage, prompt)
 
       const newHistory = [...history.slice(0, historyIndex + 1), { 
         image: newImage, 
@@ -45,10 +34,8 @@ export function useImageEditor(initialImage) {
     } catch (err) {
       setError(err.message)
       throw err
-    } finally {
-      setIsLoading(false)
     }
-  }, [currentImage, history, historyIndex])
+  }, [currentImage, history, historyIndex, editAvatar])
 
   const undo = useCallback(() => {
     if (historyIndex > 0) {
@@ -78,7 +65,7 @@ export function useImageEditor(initialImage) {
     originalImage,
     history,
     historyIndex,
-    isLoading,
+    isLoading: isProcessing,
     error,
     hasChanges,
     canUndo,
