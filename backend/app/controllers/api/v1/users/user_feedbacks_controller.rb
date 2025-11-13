@@ -151,7 +151,7 @@ module Api
           }
         end
 
-        def mejores_tutores_por_mes
+        def best_tutors_by_month
           # Parámetros opcionales para filtrar por año o mes específico
           year = params[:year]&.to_i
           month = params[:month]&.to_i
@@ -161,29 +161,28 @@ module Api
           # Filtrar por año si se proporciona
           if year.present?
             if month.present?
-              # Mes específico
-              periodo = Date.new(year, month, 1)
-              query = query.where(periodo: periodo)
+              # Specific month
+              period = Date.new(year, month, 1)
+              query = query.where(period: period)
             else
               # Todo el año
               start_date = Date.new(year, 1, 1)
               end_date = Date.new(year, 12, 1)
-              query = query.where(periodo: start_date..end_date)
+              query = query.where(period: start_date..end_date)
             end
           end
 
-          rankings = query.order(:periodo, :rank)
+          rankings = query.order(period: :desc, rank: :asc)
+          # Group by month
+          rankings_by_month = rankings.group_by(&:period)
 
-          # Agrupar por mes
-          rankings_por_mes = rankings.group_by(&:periodo)
-
-          result = rankings_por_mes.map do |periodo, tutores|
+          result = rankings_by_month.map do |period, tutors|
             {
-              periodo: periodo.strftime("%Y-%m"),
-              year: periodo.year,
-              month: periodo.month,
-              mes_nombre: I18n.l(periodo, format: "%B %Y"),
-              top_tutores: tutores.map do |ranking|
+              period: period.strftime("%Y-%m"),
+              year: period.year,
+              month: period.month,
+              month_name: I18n.l(period, format: "%B %Y"),
+              top_tutors: tutors.map do |ranking|
                 {
                   rank: ranking.rank,
                   tutor: {
@@ -200,7 +199,7 @@ module Api
           end
 
           render json: {
-            rankings_mensuales: result.sort_by { |r| r[:periodo] }.reverse
+            monthly_rankings: result
           }, status: :ok
         end
 

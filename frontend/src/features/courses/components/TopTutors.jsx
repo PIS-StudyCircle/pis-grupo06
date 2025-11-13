@@ -5,9 +5,8 @@ import TutorCard from "./TutorCard";
 import TutorSkeleton from "./TutorSkeleton";
 import Pagination from "@components/Pagination";
 
-/** === Histórico con tu componente <Pagination /> === */
 function MonthlyPager({ items = [] }) {
-  const [page, setPage] = useState(1); // 1-indexed para <Pagination />
+  const [page, setPage] = useState(1);
   const totalPages = Math.max(items.length, 1);
 
   if (!items.length) {
@@ -18,19 +17,19 @@ function MonthlyPager({ items = [] }) {
     );
   }
 
-  const month = items[page - 1]; // page es 1..N
+  const month = items[page - 1];
 
   return (
     <li className="py-3">
       <div className="flex flex-col items-center">
         {/* Encabezado del mes */}
         <div className="text-sm text-gray-700 font-medium mb-3 select-none">
-          {month.mes_nombre}
+          {month.month_name}
         </div>
 
         {/* Lista de tutores del mes */}
         <div className="w-full space-y-2 mb-4">
-          {month.top_tutores.slice(0, 3).map((t) => ( 
+          {month.top_tutors.slice(0, 3).map((t) => (
             <TutorCard
               key={t.tutor.id}
               tutor={{
@@ -45,7 +44,6 @@ function MonthlyPager({ items = [] }) {
           ))}
         </div>
 
-        {/* Tu paginador estándar */}
         <Pagination page={page} setPage={setPage} totalPages={totalPages} />
       </div>
     </li>
@@ -53,9 +51,9 @@ function MonthlyPager({ items = [] }) {
 }
 
 export default function TopTutors() {
-  const [activeTab, setActiveTab] = useState("current"); // 'current' | 'monthly'
-  const [tutors, setTutors] = useState([]);              // cache "current"
-  const [monthlyRankings, setMonthlyRankings] = useState([]); // cache "monthly"
+  const [activeTab, setActiveTab] = useState("current");
+  const [tutors, setTutors] = useState([]);
+  const [monthlyRankings, setMonthlyRankings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const abortRef = useRef(null);
@@ -86,7 +84,7 @@ export default function TopTutors() {
           setTutors(Array.isArray(data) ? data : []);
         } else {
           const data = await getMonthlyRanking();
-          const rankings = Array.isArray(data) ? data : (data?.rankings_mensuales || []);
+          const rankings = Array.isArray(data) ? data : (data?.monthly_rankings || []);
           setMonthlyRankings(Array.isArray(rankings) ? rankings : []);
         }
       } catch (err) {
@@ -99,7 +97,6 @@ export default function TopTutors() {
 
     fetchData();
     return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, activeTab]);
 
   if (!user) {
@@ -112,16 +109,18 @@ export default function TopTutors() {
   }
 
   const onRetry = () => {
-    setError(null);
-    setLoading(true);
-    setActiveTab((t) => (t === "current" ? "current" : "monthly"));
+    setError(null);  //  Limpia el error
+    if (activeTab === "current") {
+      setTutors([]);  //  Limpia cache para forzar nueva petición
+    } else {
+      setMonthlyRankings([]);  //  Limpia cache para forzar nueva petición
+    }
   };
 
   return (
     <div className="bg-white rounded-xl shadow-md p-4 mt-8 w-full max-w-md">
       <h2 className="text-lg font-semibold mb-3 text-center text-black">🏆 Tutores Destacados</h2>
 
-      {/* Tabs */}
       <div className="flex mb-4 bg-gray-100 rounded-lg p-1" role="tablist" aria-label="Ranking de tutores">
         <button
           type="button"
@@ -148,7 +147,6 @@ export default function TopTutors() {
       </div>
 
       <ul className="divide-y divide-gray-200">
-        {/* Loading */}
         {loading && Array.from({ length: 5 }).map((_, i) => <TutorSkeleton key={`sk-${i}`} />)}
 
         {/* Error */}
@@ -180,7 +178,7 @@ export default function TopTutors() {
           </>
         )}
 
-        {/* Tab: Histórico (usa tu <Pagination />) */}
+        {/* Tab: Histórico */}
         {!loading && !error && activeTab === "monthly" && (
           <MonthlyPager items={monthlyRankings} />
         )}

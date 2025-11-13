@@ -43,7 +43,7 @@ export async function getTopRatedTutors() {
 
 export async function getMonthlyRanking(year = null, month = null) {
   try {
-    let url = `${API_URL}/mejores_tutores_por_mes`;
+    let url = `${API_URL}/best_tutors_by_month`;
     
     // Agregar parámetros de año/mes si se proporcionan
     const params = new URLSearchParams();
@@ -68,7 +68,7 @@ export async function getMonthlyRanking(year = null, month = null) {
       throw new Error(data.error || "Error al obtener ranking mensual");
     }
 
-    return data.rankings_mensuales || [];
+    return data.monthly_rankings || [];
   } catch (error) {
     console.error("Error al obtener ranking mensual:", error);
     throw error;

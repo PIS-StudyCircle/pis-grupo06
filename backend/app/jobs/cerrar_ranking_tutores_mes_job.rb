@@ -4,15 +4,15 @@ class CerrarRankingTutoresMesJob < ApplicationJob
   TOP_N = 5
 
   # Por defecto cierra el mes anterior (si hoy es 2025-11-08 → calcula 2025-10)
-  def perform(periodo = (Time.zone.today.beginning_of_month - 1.day).beginning_of_month, force: false)
+  def perform(period = (Time.zone.today.beginning_of_month - 1.day).beginning_of_month, force: false)
     # Guardia: si ya hay filas para ese periodo y no se forzó, no recalcula
-    if already_closed?(periodo) && !force
-      Rails.logger.info("CerrarRankingTutoresMesJob: ranking ya cerrado para #{periodo} (skip)")
+    if already_closed?(period) && !force
+      Rails.logger.info("CerrarRankingTutoresMesJob: ranking ya cerrado para #{period} (skip)")
       return
     end
 
-    desde = periodo.beginning_of_month
-    hasta = periodo.end_of_month.end_of_day
+    start_date = period.beginning_of_month
+    end_date = period.end_of_month.end_of_day
 
     sql = <<~SQL.squish
       WITH base AS (
@@ -40,8 +40,8 @@ class CerrarRankingTutoresMesJob < ApplicationJob
     SQL
 
     binds = [
-      ActiveRecord::Relation::QueryAttribute.new("desde", desde, ActiveRecord::Type::DateTime.new),
-      ActiveRecord::Relation::QueryAttribute.new("hasta", hasta, ActiveRecord::Type::DateTime.new),
+      ActiveRecord::Relation::QueryAttribute.new("start_date", start_date, ActiveRecord::Type::DateTime.new),
+      ActiveRecord::Relation::QueryAttribute.new("end_date", end_date, ActiveRecord::Type::DateTime.new),
       ActiveRecord::Relation::QueryAttribute.new("topn",  TOP_N, ActiveRecord::Type::Integer.new),
     ]
 
@@ -52,7 +52,7 @@ class CerrarRankingTutoresMesJob < ApplicationJob
 
       rows.each do |r|
         record = RankingMonth.find_or_initialize_by(
-          periodo: periodo,
+          period: period,
           tutor_id: r["tutor_id"]
         )
 
@@ -67,10 +67,10 @@ class CerrarRankingTutoresMesJob < ApplicationJob
       end
 
       # Prune: eliminar cualquier fila del mismo mes que no esté en el top N
-      RankingMonth.where(periodo: periodo).where.not(tutor_id: top_ids).delete_all
+      RankingMonth.where(period: period).where.not(tutor_id: top_ids).delete_all
     end
 
-    Rails.logger.info "CerrarRankingTutoresMesJob: cerrado #{periodo} (#{rows.count} tutores, top #{TOP_N})"
+    Rails.logger.info "CerrarRankingTutoresMesJob: cerrado #{period} (#{rows.count} tutores, top #{TOP_N})"
   rescue => e
     Rails.logger.error "CerrarRankingTutoresMesJob ERROR: #{e.class} - #{e.message}"
     raise
@@ -78,7 +78,7 @@ class CerrarRankingTutoresMesJob < ApplicationJob
 
   private
 
-  def already_closed?(periodo)
-    RankingMonth.exists?(periodo: periodo)
+  def already_closed?(period)
+    RankingMonth.exists?(period: period)
   end
 end
