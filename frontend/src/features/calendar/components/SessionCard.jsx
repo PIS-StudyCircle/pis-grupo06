@@ -272,3 +272,5 @@ export default function SessionCard({ session, type = "all", refresh }) {
     </>
   );
 }
+
+

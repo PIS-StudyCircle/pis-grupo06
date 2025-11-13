@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut } from "./services/auth.api";
+import { useEffect, useState, useCallback } from "react";
+import { signIn as apiSignIn, signup as apiSignup, signOut as apiSignOut, resetPassword as apiResetPassword } from "./services/auth.api";
 import { getItem, saveItem, removeItem } from "@/shared/utils/storage";
 import { API_BASE } from "@/shared/config";
 import { Ctx } from "@context/UserContext";
-import { resetPassword as apiResetPassword } from "./services/auth.api";
 
 export default function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -11,28 +10,43 @@ export default function UserProvider({ children }) {
 
   useEffect(() => { hydrate(); }, []);
 
-  async function hydrate() {
-    const cached = getItem("user", null);
-    if (cached) setUser(cached);
-
+  const getCurrentUser = async () => {
     try {
       const res = await fetch(`${API_BASE}/users/me`, { credentials: "include" });
       if (res.ok) {
         const { user: fetchedUser } = await res.json();
         setUser(fetchedUser);
         saveItem("user", fetchedUser);
+        return fetchedUser;
       } else {
         setUser(null);
         removeItem("user");
+        return null;
       }
     } catch (err) {
       console.error("Error al obtener el usuario:", err);
       setUser(null);
       removeItem("user");
+      return null;
     } finally {
       setBooting(false);
     }
+  };
+
+  async function hydrate() {
+    const cached = getItem("user", null);
+    if (cached) {
+      setUser(cached);
+      setBooting(false);
+    } else {
+      await getCurrentUser();
+    }
   }
+
+  const refetchCurrentUser = useCallback(async () => {
+    const fetchedUser = await getCurrentUser();
+    return fetchedUser;
+  }, []);
 
   async function handleAuth(fn, ...args) {
     const u = await fn(...args);
@@ -76,9 +90,14 @@ export default function UserProvider({ children }) {
     saveItem("user", unpackedUser);
     saveItem("token", data.token);
   };
-  
+
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    saveItem("user", updatedUser);
+  };
+
   return (
-    <Ctx.Provider value={{ user, booting, signIn, signup, signOut, forgotPassword, resetPassword }}>
+    <Ctx.Provider value={{ user, booting, signIn, signup, signOut, forgotPassword, resetPassword, updateUser, refetchCurrentUser }}>
       {children}
     </Ctx.Provider>
   );
