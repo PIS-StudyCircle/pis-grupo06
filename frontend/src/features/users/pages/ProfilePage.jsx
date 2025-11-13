@@ -10,7 +10,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Star, Camera } from "lucide-react";
 
 export default function Profile() {
-
   const navigate = useNavigate();
   // Get user context
   const { user, refetchCurrentUser, booting } = useUser();
@@ -36,7 +35,6 @@ export default function Profile() {
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState("");
 
-
   // Fetch favorites - wrapped in useCallback to be used in useEffect dependencies
   const fetchFavorites = useCallback(async () => {
     try {
@@ -59,8 +57,12 @@ export default function Profile() {
 
       if (Array.isArray(data)) {
         setFeedbacks(data);
-        const ratings = data.map((f) => Number(f?.rating)).filter((x) => !Number.isNaN(x));
-        const avg = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+        const ratings = data
+          .map((f) => Number(f?.rating))
+          .filter((x) => !Number.isNaN(x));
+        const avg = ratings.length
+          ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+          : 0;
         setAverageRating(Number(avg.toFixed(2)));
         setTotalFeedbacks(ratings.length);
       } else {
@@ -76,15 +78,21 @@ export default function Profile() {
     } finally {
       setFeedbackLoading(false);
     }
-  }
+  }, []);
 
-  if (loading) return <p className="text-center mt-10">Cargando...</p>;
-  if (error) return <p className="text-center mt-10">Error al cargar perfil.</p>;
-  if (!user) return <p className="text-center mt-10">No hay usuario cargado.</p>;
+  // Load profile data on mount and when user changes
+  useEffect(() => {
+    async function loadProfile() {
+      await refetchCurrentUser();
+      if (user) {
+        fetchFavorites();
+        fetchFeedbacks();
+      }
+    }
+    loadProfile();
+  }, [refetchCurrentUser]);
 
-  const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
-
-  // Estrellas con medias (visual del promedio)
+  // StarRow component for displaying rating stars
   const StarRow = ({ value }) => {
     const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1)));
     return (
@@ -123,11 +131,25 @@ export default function Profile() {
     );
   };
 
+  const counts = user?.counts ?? {};
+  const insignas = useBadges(counts);
+
   // Loading and error states
   if (booting) return <p className="text-center mt-10">Cargando...</p>;
-  if (!user) return <p className="text-center mt-10">No hay usuario cargado.</p>;
+  if (!user)
+    return <p className="text-center mt-10">No hay usuario cargado.</p>;
 
   const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
+
+  const BADGE_TUTORIAS_DADAS = insignas.tutorias_dadas;
+  const BADGE_TUTORIAS_RECIBIDAS = insignas.tutorias_recibidas;
+  const BADGE_RESENAS_DADAS = insignas.resenas_dadas;
+  const BADGE_FEEDBACK_DADO = insignas.feedback_dado;
+
+  const tutorias_dadas = counts.tutorias_dadas || 0;
+  const tutorias_recibidas = counts.tutorias_recibidas || 0;
+  const resenas_dadas = counts.resenas_dadas || 0;
+  const feedback_dado = counts.feedback_dado || 0;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -139,16 +161,14 @@ export default function Profile() {
             <div className="flex items-center gap-6">
               {/* Contenedor con overlay al hacer hover */}
               <div className="flex flex-col items-center gap-3">
-                <div
-                  className="relative w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden cursor-pointer group"
-                >
+                <div className="relative w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden cursor-pointer group">
                   <img
                     src={photoUrl}
                     alt="avatar"
                     className="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
-                
+
                 <button
                   onClick={() => navigate("/avatar/elegir_tipo")}
                   className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm rounded-full transition-colors duration-200 border border-white/30"
@@ -181,7 +201,7 @@ export default function Profile() {
 
             {/* Col 3: Rating */}
             <div className="flex md:justify-end justify-center">
-             <div className="min-h-[56px] flex items-center justify-center">
+              <div className="min-h-[56px] flex items-center justify-center">
                 {feedbackLoading ? (
                   <p className="text-sm text-white/90">Calculando rating…</p>
                 ) : feedbackError ? null : totalFeedbacks === 0 ? (
@@ -190,18 +210,21 @@ export default function Profile() {
                   <div className="bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3 flex items-center gap-3">
                     <StarRow value={averageRating} />
                     <div className="text-sm leading-tight">
-                      <span className="font-semibold">{averageRating.toFixed(1)}</span>
+                      <span className="font-semibold">
+                        {averageRating.toFixed(1)}
+                      </span>
                       <span className="opacity-80"> / 5</span>
-                      <span className="opacity-80"> · {totalFeedbacks} voto{totalFeedbacks !== 1 ? "s" : ""}</span>
+                      <span className="opacity-80">
+                        {" "}
+                        · {totalFeedbacks} voto{totalFeedbacks !== 1 ? "s" : ""}
+                      </span>
                     </div>
                   </div>
                 )}
               </div>
             </div>
           </div>
-
-          {/* Segunda fila: Insignias */}
-          <div className="mt-8">
+          <div className="mt-10 flex flex-col items-center">
             <h2 className="text-lg font-semibold text-center mb-4">
               Insignias
             </h2>
@@ -357,7 +380,9 @@ export default function Profile() {
               <p className="text-center text-gray-500">Cargando reseñas...</p>
             )}
             {reviewsError && (
-              <p className="text-center text-red-500">Error al cargar reseñas.</p>
+              <p className="text-center text-red-500">
+                Error al cargar reseñas.
+              </p>
             )}
             {!reviewsLoading && !reviewsError && (
               <ReviewsList reviews={reviews} />
