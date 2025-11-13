@@ -161,9 +161,10 @@ export default function CreateTutoringByStudent() {
       }
       
     } catch (err) {
-      showError("Error al crear la solicitud: " + err.message)
       console.error("Error creating tutoring request:", err)
-      setSubmitError([err.message || "Error desconocido"])
+      const message = err?.error || err?.message || "Error desconocido al crear la tutoría";
+      setSubmitError([message])
+      showError("Error al crear la solicitud: " + message)
     }
   }
 
