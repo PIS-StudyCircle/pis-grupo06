@@ -3,38 +3,42 @@ import { DEFAULT_PHOTO } from "@/shared/config";
 import { useBadges } from "../hooks/useInsignas";
 import { useUserReviews } from "../hooks/useUserReviews";
 import ReviewsList from "../components/ReviewsList";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getCourses } from "../../courses/services/courseService";
 import { getFeedbacks } from "../services/feedbackServices";
-import { Link } from "react-router-dom";
-import { Star } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Star, Camera } from "lucide-react";
 
 export default function Profile() {
-  const { user, loading, error } = useUser();
+
+  const navigate = useNavigate();
+  // Get user context
+  const { user, refetchCurrentUser, booting } = useUser();
+  // Reviews hook - only call after user is available
+
   const {
     reviews,
     loading: reviewsLoading,
     error: reviewsError,
   } = useUserReviews(user?.id);
 
+  // State for favorites
   const [favorites, setFavorites] = useState([]);
   const [favLoading, setFavLoading] = useState(false);
   const [favError, setFavError] = useState("");
 
+  // State for rating promedio y total
   const [averageRating, setAverageRating] = useState(0);
   const [totalFeedbacks, setTotalFeedbacks] = useState(0);
 
+  // State for feedbacks
   const [, setFeedbacks] = useState([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState("");
 
-  useEffect(() => {
-    if (!user) return;
-    fetchFavorites();
-    fetchFeedbacks();
-  }, [user]);
 
-  async function fetchFavorites() {
+  // Fetch favorites - wrapped in useCallback to be used in useEffect dependencies
+  const fetchFavorites = useCallback(async () => {
     try {
       setFavLoading(true);
       const data = await getCourses(1, 50, "", true);
@@ -44,9 +48,10 @@ export default function Profile() {
     } finally {
       setFavLoading(false);
     }
-  }
+  }, []);
 
-  async function fetchFeedbacks() {
+  // Fetch feedbacks - wrapped in useCallback to be used in useEffect dependencies
+  const fetchFeedbacks = useCallback(async () => {
     try {
       setFeedbackError("");
       setFeedbackLoading(true);
@@ -54,12 +59,8 @@ export default function Profile() {
 
       if (Array.isArray(data)) {
         setFeedbacks(data);
-        const ratings = data
-          .map((f) => Number(f?.rating))
-          .filter((x) => !Number.isNaN(x));
-        const avg = ratings.length
-          ? ratings.reduce((a, b) => a + b, 0) / ratings.length
-          : 0;
+        const ratings = data.map((f) => Number(f?.rating)).filter((x) => !Number.isNaN(x));
+        const avg = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
         setAverageRating(Number(avg.toFixed(2)));
         setTotalFeedbacks(ratings.length);
       } else {
@@ -77,30 +78,15 @@ export default function Profile() {
     }
   }
 
-  const counts = user?.counts ?? {};
-  const insignas = useBadges(counts);
-
   if (loading) return <p className="text-center mt-10">Cargando...</p>;
-  if (error)
-    return <p className="text-center mt-10">Error al cargar perfil.</p>;
-  if (!user)
-    return <p className="text-center mt-10">No hay usuario cargado.</p>;
+  if (error) return <p className="text-center mt-10">Error al cargar perfil.</p>;
+  if (!user) return <p className="text-center mt-10">No hay usuario cargado.</p>;
 
   const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
 
-  const BADGE_TUTORIAS_DADAS = insignas.tutorias_dadas;
-  const BADGE_TUTORIAS_RECIBIDAS = insignas.tutorias_recibidas;
-  const BADGE_RESENAS_DADAS = insignas.resenas_dadas;
-  const BADGE_FEEDBACK_DADO = insignas.feedback_dado;
-
-  const tutorias_dadas = counts.tutorias_dadas || 0;
-  const tutorias_recibidas = counts.tutorias_recibidas || 0;
-  const resenas_dadas = counts.resenas_dadas || 0;
-  const feedback_dado = counts.feedback_dado || 0;
-
   // Estrellas con medias (visual del promedio)
   const StarRow = ({ value }) => {
-    const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1))); // 0..1
+    const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1)));
     return (
       <div
         className="flex items-center gap-1"
@@ -137,19 +123,41 @@ export default function Profile() {
     );
   };
 
+  // Loading and error states
+  if (booting) return <p className="text-center mt-10">Cargando...</p>;
+  if (!user) return <p className="text-center mt-10">No hay usuario cargado.</p>;
+
+  const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="mx-auto max-w-6xl p-6 space-y-8">
-        {/* Panel superior del perfil - 3 columnas */}
+        {/* Panel superior del perfil */}
         <div className="bg-[#001F54] text-white rounded-3xl shadow-lg p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            {/* Col 1: Perfil + datos */}
+            {/* Col 1: Imagen + datos */}
             <div className="flex items-center gap-6">
-              <img
-                src={photoUrl}
-                alt="avatar"
-                className="w-24 h-24 rounded-full border-4 border-white shadow-md"
-              />
+              {/* Contenedor con overlay al hacer hover */}
+              <div className="flex flex-col items-center gap-3">
+                <div
+                  className="relative w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden cursor-pointer group"
+                >
+                  <img
+                    src={photoUrl}
+                    alt="avatar"
+                    className="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                
+                <button
+                  onClick={() => navigate("/avatar/elegir_tipo")}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm rounded-full transition-colors duration-200 border border-white/30"
+                >
+                  <Camera className="w-4 h-4" />
+                  Editar con IA
+                </button>
+              </div>
+
               <div>
                 <h1 className="text-2xl font-semibold">
                   {user.name} {user.last_name}
@@ -171,27 +179,24 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Col 3: Rating promedio (solo si hay ratings) */}
+            {/* Col 3: Rating */}
             <div className="flex md:justify-end justify-center">
-              {feedbackLoading ? (
-                <div className="text-sm bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3">
-                  Calculando rating…
-                </div>
-              ) : feedbackError ? null : totalFeedbacks === 0 ? null : (
-                <div className="bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3 flex items-center gap-3">
-                  <StarRow value={averageRating} />
-                  <div className="text-sm leading-tight">
-                    <span className="font-semibold">
-                      {averageRating.toFixed(1)}
-                    </span>
-                    <span className="opacity-80"> / 5</span>
-                    <span className="opacity-80">
-                      {" "}
-                      · {totalFeedbacks} voto{totalFeedbacks !== 1 ? "s" : ""}
-                    </span>
+             <div className="min-h-[56px] flex items-center justify-center">
+                {feedbackLoading ? (
+                  <p className="text-sm text-white/90">Calculando rating…</p>
+                ) : feedbackError ? null : totalFeedbacks === 0 ? (
+                  <p className="text-sm text-white/70 italic">Sin ratings</p>
+                ) : (
+                  <div className="bg-white/20 text-white/90 rounded-xl shadow-inner px-4 py-3 flex items-center gap-3">
+                    <StarRow value={averageRating} />
+                    <div className="text-sm leading-tight">
+                      <span className="font-semibold">{averageRating.toFixed(1)}</span>
+                      <span className="opacity-80"> / 5</span>
+                      <span className="opacity-80"> · {totalFeedbacks} voto{totalFeedbacks !== 1 ? "s" : ""}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
@@ -352,9 +357,7 @@ export default function Profile() {
               <p className="text-center text-gray-500">Cargando reseñas...</p>
             )}
             {reviewsError && (
-              <p className="text-center text-red-500">
-                Error al cargar reseñas.
-              </p>
+              <p className="text-center text-red-500">Error al cargar reseñas.</p>
             )}
             {!reviewsLoading && !reviewsError && (
               <ReviewsList reviews={reviews} />

@@ -250,8 +250,17 @@ def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_c
   # Link subjects
   subjects.each { |subject| SubjectTutoring.create!(subject: subject, tutoring: tutoring) }
 
-  # Create UserTutoring for attendees (NOT for tutor)
-  attendees = users_pool.reject { |u| u.id == tutor.id }.sample(num_attendees)
+  pool = users_pool.reject { |u| u.id == tutoring.tutor_id }
+
+  # Si el creador no es el tutor, lo agregamos como asistente y reducimos la cuenta
+  if creator.id != tutor.id
+    UserTutoring.create!(user: creator, tutoring: tutoring)
+    pool = pool.reject { |u| u.id == creator.id }
+    num_attendees -= 1
+  end
+
+  # Create UserTutoring para los demás asistentes
+  attendees = pool.sample(num_attendees)
   attendees.each { |attendee| UserTutoring.create!(user: attendee, tutoring: tutoring) }
 
   # Create TutoringAvailability (one booked, rest unbooked)
@@ -262,6 +271,24 @@ def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_c
       start_time: tutoring.scheduled_at + i.hours,
       end_time: tutoring.scheduled_at + i.hours + tutoring.duration_mins.minutes,
       is_booked: (i == 0) # First one is booked
+    )
+  end
+
+  # Create chat and welcome message
+  tutoring.create_chat! unless tutoring.chat
+
+  tutoring.chat.users << tutor unless tutoring.chat.users.exists?(tutor.id)
+  if creator.id != tutor.id
+    tutoring.chat.users << creator unless tutoring.chat.users.exists?(creator.id)
+  end
+  attendees.each do |u|
+    tutoring.chat.users << u unless tutoring.chat.users.exists?(u.id)
+  end
+
+  if tutoring.chat.messages.count.zero?
+    tutoring.chat.messages.create!(
+      user: creator,
+      content: "Bienvenidos al chat de la tutoría. Cualquier duda escriban aquí."
     )
   end
 
@@ -316,32 +343,57 @@ Rails.logger.debug "[5/7] Creating 10 pending tutorings..."
 def create_pending_tutoring(course:, creator:, is_tutor_creator:)
   subjects = course.subjects.sample(rand(1..3))
 
-  tutoring = Tutoring.create!(
-    course: course,
-    tutor: is_tutor_creator ? creator : nil,
-    created_by_id: creator.id,
-    state: :pending,
-    modality: ["virtual", "presencial"].sample,
-    duration_mins: [60, 90, 120].sample,
-    scheduled_at: (15 + rand(30)).days.from_now
-  )
+  if is_tutor_creator
+    tutoring = Tutoring.create!(
+      course: course,
+      tutor: creator,
+      created_by_id: creator.id,
+      state: :pending,
+      modality: ["virtual", "presencial"].sample,
+      duration_mins: [60, 90, 120].sample,
+      scheduled_at: (15 + rand(30)).days.from_now,
+      capacity: 2,
+    )
+
+    # Create TutoringAvailability (one booked, rest unbooked)
+    num_availabilities = rand(1..3)
+    num_availabilities.times do |i|
+      TutoringAvailability.create!(
+        tutoring: tutoring,
+        start_time: tutoring.scheduled_at + i.hours,
+        end_time: tutoring.scheduled_at + i.hours + tutoring.duration_mins.minutes,
+        is_booked: (i == 0) # First one is booked
+      )
+    end
+  else
+    tutoring = Tutoring.create!(
+      course: course,
+      tutor: nil,
+      created_by_id: creator.id,
+      state: :pending,
+      modality: ["virtual", "presencial"].sample,
+      duration_mins: 1,
+    )
+    # If created by student, they get a UserTutoring
+    UserTutoring.create!(user: creator, tutoring: tutoring) unless is_tutor_creator
+
+    # Create TutoringAvailability (all unbooked)
+    num_availabilities = rand(1..3)
+    num_availabilities.times do |i|
+      start_time = Time.current.beginning_of_day + (i + 1).days      # mañana + i días
+      end_time = start_time + 16.hours                               # hasta las 16:00
+
+      TutoringAvailability.create!(
+        tutoring: tutoring,
+        start_time: start_time,
+        end_time: end_time,
+        is_booked: false
+      )
+    end
+  end
 
   # Link subjects
   subjects.each { |subject| SubjectTutoring.create!(subject: subject, tutoring: tutoring) }
-
-  # If created by student, they get a UserTutoring
-  UserTutoring.create!(user: creator, tutoring: tutoring) unless is_tutor_creator
-
-  # Create TutoringAvailability (all unbooked)
-  num_availabilities = rand(1..3)
-  num_availabilities.times do |i|
-    TutoringAvailability.create!(
-      tutoring: tutoring,
-      start_time: tutoring.scheduled_at + i.hours,
-      end_time: tutoring.scheduled_at + i.hours + tutoring.duration_mins.minutes,
-      is_booked: false
-    )
-  end
 
   tutoring
 end

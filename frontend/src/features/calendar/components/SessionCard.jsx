@@ -2,14 +2,14 @@ import { Calendar, Clock, User, MapPin, Users, Star } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Agregar esta importación
 import FeedbackModal from "./FeedbackModal";
-import { hasFeedback } from "../hooks/useFeedback"; 
+import { hasFeedback } from "../hooks/useFeedback";
 import { useUser } from "@context/UserContext";
 import { handleCancel } from "@/features/calendar/hooks/useCancelSession";
 
 export default function SessionCard({ session, type = "all", refresh }) {
   const [showAttendees, setShowAttendees] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [userRating, setUserRating] = useState(null); 
+  const [userRating, setUserRating] = useState(null);
   const [loadingFeedback, setLoadingFeedback] = useState(false);
 
   const { user } = useUser();
@@ -21,7 +21,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
         try {
           setLoadingFeedback(true);
           const res = await hasFeedback(user.id, session.id);
-          if (res.has_feedback) setUserRating(Number(res.rating)); 
+          if (res.has_feedback) setUserRating(Number(res.rating));
         } catch (err) {
           console.error("Error al verificar feedback:", err);
         } finally {
@@ -31,6 +31,8 @@ export default function SessionCard({ session, type = "all", refresh }) {
       checkFeedback();
     }
   }, [session.id, session.tutor_id, type, user?.id]);
+
+  const esTutor = user?.id === session?.tutor_id;
 
   const formatDate = (date) =>
     date.toLocaleDateString("es-ES", {
@@ -72,7 +74,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
     }
     if (value == null) return;
     setShowFeedbackModal(false);
-    setUserRating(Number(value)); 
+    setUserRating(Number(value));
   };
 
   // Nuevo manejador para redirigir a la show page
@@ -95,15 +97,26 @@ export default function SessionCard({ session, type = "all", refresh }) {
         {[1, 2, 3, 4, 5].map((i) => {
           const fill = fillFor(i);
           return (
-            <span key={i} className="relative inline-block w-5 h-5 align-middle">
+            <span
+              key={i}
+              className="relative inline-block w-5 h-5 align-middle"
+            >
               <span className="absolute inset-0 text-gray-300">
-                <Star className="w-5 h-5" style={{ fill: "transparent" }} color="currentColor" />
+                <Star
+                  className="w-5 h-5"
+                  style={{ fill: "transparent" }}
+                  color="currentColor"
+                />
               </span>
               <span
                 className="absolute inset-0 text-yellow-500 overflow-hidden pointer-events-none"
                 style={{ width: `${fill * 100}%` }}
               >
-                <Star className="w-5 h-5" style={{ fill: "currentColor" }} color="currentColor" />
+                <Star
+                  className="w-5 h-5"
+                  style={{ fill: "currentColor" }}
+                  color="currentColor"
+                />
               </span>
             </span>
           );
@@ -114,7 +127,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
 
   return (
     <>
-      <div 
+      <div
         className="bg-white border border-gray-300 rounded-xl p-6 shadow-lg hover:shadow-xl hover:scale-[1.01] transition transform cursor-pointer"
         onClick={handleCardClick}
       >
@@ -167,7 +180,9 @@ export default function SessionCard({ session, type = "all", refresh }) {
           <>
             <div className="mt-4">
               <button
-                onClick={(e) => handleButtonClick(e, () => setShowAttendees(!showAttendees))}
+                onClick={(e) =>
+                  handleButtonClick(e, () => setShowAttendees(!showAttendees))
+                }
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
               >
                 <Users className="w-4 h-4" />
@@ -181,7 +196,9 @@ export default function SessionCard({ session, type = "all", refresh }) {
                       key={idx}
                       className="flex justify-between items-center bg-gray-50 px-3 py-1 rounded"
                     >
-                      <span className="text-gray-700">{attendee.id === user?.id ? "Tú" : attendee.email}</span>
+                      <span className="text-gray-700">
+                        {attendee.id === user?.id ? "Tú" : attendee.email}
+                      </span>
                       <span
                         className={
                           attendee.status === "confirmada"
@@ -221,16 +238,22 @@ export default function SessionCard({ session, type = "all", refresh }) {
             ) : userRating != null && Number.isFinite(Number(userRating)) ? (
               <div className="flex items-center gap-2 text-gray-700">
                 <StarRow value={Number(userRating)} />
-                <span className="text-sm">({Number(userRating).toFixed(1)}/5)</span>
+                <span className="text-sm">
+                  ({Number(userRating).toFixed(1)}/5)
+                </span>
               </div>
             ) : (
-              <button
-                onClick={(e) => handleButtonClick(e, () => setShowFeedbackModal(true))}
-                className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800"
-              >
-                <Star className="w-4 h-4" />
-                Dejar feedback
-              </button>
+              !esTutor && (
+                <button
+                  onClick={(e) =>
+                    handleButtonClick(e, () => setShowFeedbackModal(true))
+                  }
+                  className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800"
+                >
+                  <Star className="w-4 h-4" />
+                  Dejar feedback
+                </button>
+              )
             )}
           </div>
         )}
@@ -249,3 +272,5 @@ export default function SessionCard({ session, type = "all", refresh }) {
     </>
   );
 }
+
+
