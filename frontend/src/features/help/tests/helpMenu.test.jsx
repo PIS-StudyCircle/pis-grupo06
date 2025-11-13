@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Routes, Route, useNavigate } from "react-router-dom";
-import HelpMenu from "../components/HelpMenu";
+import HelpMenu from "../components/helpMenu";
 
 describe("<HelpMenu />", () => {
   const renderWithRoute = (route = "/") => {
