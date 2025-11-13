@@ -146,12 +146,24 @@ export default function EditProfilePage() {
                 />
               </div>
 
-              <Input
-                id="profile_photo"
-                type="file"
-                onChange={handleFileChange}
-                accept="image/*"
-              />
+              <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+                <Input
+                  id="profile_photo"
+                  type="file"
+                  onChange={handleFileChange}
+                  accept="image/*"
+                />
+                
+                <button
+                  type="button"
+                  onClick={() => navigate("/avatar/elegir_tipo")}
+                  className="flex items-center gap-2 cursor-pointer border border-gray-300 rounded-md px-3 py-2 hover:bg-gray-50 transition"
+                >
+                  <span className="text-sm text-gray-600">
+                    Crear con IA
+                  </span>
+                </button>
+              </div>
             </div>
 
             {/* Email (disabled) */}
