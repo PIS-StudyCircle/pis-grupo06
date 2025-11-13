@@ -35,7 +35,10 @@ Rails.application.routes.draw do
       post "/notification_token", to: "notification_tokens#create"
 
       # index y show de UsersController
+
       resources :users, module: :users, only: [:index, :show, :update]
+      put "/users/upload_photo", to: "users/users#update_profile_photo"
+      get "/users/:id/profile_photo", to: "users/users#profile_photo"
 
       resources :courses do
         resources :subjects
@@ -77,6 +80,8 @@ Rails.application.routes.draw do
           post :mark_as_read
         end
       end
+      resources :avatars, only: [:create]
+      post 'avatars/edit', to: 'avatars#edit'
     end
   end
 end

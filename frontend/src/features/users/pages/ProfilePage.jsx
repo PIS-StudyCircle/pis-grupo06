@@ -5,14 +5,16 @@ import ReviewsList from "../components/ReviewsList";
 import { useState, useEffect, useCallback } from "react";
 import { getCourses } from "../../courses/services/courseService";
 import { getFeedbacks } from "../services/feedbackServices";
-import { Link } from "react-router-dom";
-import { Star } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Star, Camera } from "lucide-react";
 
 export default function Profile() {
+
+  const navigate = useNavigate();
   // Get user context
   const { user, refetchCurrentUser, booting } = useUser();
-
   // Reviews hook - only call after user is available
+
   const {
     reviews,
     loading: reviewsLoading,
@@ -32,6 +34,7 @@ export default function Profile() {
   const [, setFeedbacks] = useState([]);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState("");
+
 
   // Fetch favorites - wrapped in useCallback to be used in useEffect dependencies
   const fetchFavorites = useCallback(async () => {
@@ -55,7 +58,7 @@ export default function Profile() {
 
       if (Array.isArray(data)) {
         setFeedbacks(data);
-        const ratings = data.map(f => Number(f?.rating)).filter(x => !Number.isNaN(x));
+        const ratings = data.map((f) => Number(f?.rating)).filter((x) => !Number.isNaN(x));
         const avg = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
         setAverageRating(Number(avg.toFixed(2)));
         setTotalFeedbacks(ratings.length);
@@ -75,7 +78,6 @@ export default function Profile() {
   // Load profile data on mount and when user changes
   useEffect(() => {
     async function loadProfile() {
-      // Fetch user data - use fresh fetch for current user to avoid cached masked email
       await refetchCurrentUser();
       if (user) {
         fetchFavorites();
@@ -86,9 +88,10 @@ export default function Profile() {
   }, [refetchCurrentUser]);
 
 
+
   // StarRow component for displaying rating stars
   const StarRow = ({ value }) => {
-    const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1))); // 0..1
+    const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1)));
     return (
       <div className="flex items-center gap-1" aria-label={`Calificación promedio ${value.toFixed(1)} de 5`}>
         {[1, 2, 3, 4, 5].map((i) => {
@@ -120,16 +123,32 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="mx-auto max-w-6xl p-6 space-y-8">
-        {/* Panel superior del perfil - 3 columnas */}
+        {/* Panel superior del perfil */}
         <div className="bg-[#001F54] text-white rounded-3xl shadow-lg p-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            {/* Col 1: Perfil + datos */}
+            {/* Col 1: Imagen + datos */}
             <div className="flex items-center gap-6">
-              <img
-                src={photoUrl}
-                alt="avatar"
-                className="w-24 h-24 rounded-full border-4 border-white shadow-md"
-              />
+              {/* Contenedor con overlay al hacer hover */}
+              <div className="flex flex-col items-center gap-3">
+                <div
+                  className="relative w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden cursor-pointer group"
+                >
+                  <img
+                    src={photoUrl}
+                    alt="avatar"
+                    className="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                
+                <button
+                  onClick={() => navigate("/avatar/elegir_tipo")}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm rounded-full transition-colors duration-200 border border-white/30"
+                >
+                  <Camera className="w-4 h-4" />
+                  Editar con IA
+                </button>
+              </div>
+
               <div>
                 <h1 className="text-2xl font-semibold">
                   {user.name} {user.last_name}
@@ -149,7 +168,7 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Col 3: Rating promedio (solo si hay ratings) */}
+            {/* Col 3: Rating */}
             <div className="flex md:justify-end justify-center">
              <div className="min-h-[56px] flex items-center justify-center">
                 {feedbackLoading ? (
@@ -205,15 +224,9 @@ export default function Profile() {
             <h3 className="text-xl font-semibold mb-3 text-center text-[#001F54]">
               Mis reseñas
             </h3>
-            {reviewsLoading && (
-              <p className="text-center text-gray-500">Cargando reseñas...</p>
-            )}
-            {reviewsError && (
-              <p className="text-center text-red-500">Error al cargar reseñas.</p>
-            )}
-            {!reviewsLoading && !reviewsError && (
-              <ReviewsList reviews={reviews} />
-            )}
+            {reviewsLoading && <p className="text-center text-gray-500">Cargando reseñas...</p>}
+            {reviewsError && <p className="text-center text-red-500">Error al cargar reseñas.</p>}
+            {!reviewsLoading && !reviewsError && <ReviewsList reviews={reviews} />}
           </div>
         </div>
       </div>
