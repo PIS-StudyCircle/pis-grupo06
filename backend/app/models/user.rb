@@ -71,12 +71,6 @@ class User < ApplicationRecord
     where(id: Tutoring.select(:tutor_id).distinct)
   }
 
-  def notificar_insignia!(tipo)
-    InsigniaNotifier.with(tipo: tipo).deliver(self)
-  rescue => e
-    Rails.logger.error "Error notificando insignia al usuario #{id}: #{e.message}"
-  end
-
   def self.from_omniauth(auth)
     user = find_by(provider: auth.provider, uid: auth.uid) || find_by(email: auth.info.email)
 

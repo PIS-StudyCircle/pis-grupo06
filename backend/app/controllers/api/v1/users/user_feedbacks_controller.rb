@@ -96,7 +96,11 @@ module Api
             current_user.increment(:feedback_dado_count)
             current_user.save!
 
-            current_user.notificar_insignia!(:feedback_dado)
+            begin
+              InsigniaNotifier.with(tipo: :feedback_dado).deliver(current_user)
+            rescue => e
+              Rails.logger.error "Error notificando insignia al usuario #{current_user.id}: #{e.message}"
+            end
 
             # promedio actualizado del tutor
             avg = Feedback.where(tutor_id: tutor_id).average(:rating)

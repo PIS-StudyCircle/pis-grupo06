@@ -136,7 +136,11 @@ class Tutoring < ApplicationRecord
           tutor.increment(:tutorias_dadas_count)
           tutor.save!
 
-          tutor.notificar_insignia!(:tutorias_dadas)
+          begin
+            InsigniaNotifier.with(tipo: :tutorias_dadas).deliver(tutor)
+          rescue => e
+            Rails.logger.error "Error notificando insignia al usuario #{tutor.id}: #{e.message}"
+          end
         end
       end
 
@@ -145,7 +149,11 @@ class Tutoring < ApplicationRecord
           u.increment(:tutorias_recibidas_count)
           u.save!
 
-          u.notificar_insignia!(:tutorias_recibidas)
+          begin
+            InsigniaNotifier.with(tipo: :tutorias_recibidas).deliver(u)
+          rescue => e
+            Rails.logger.error "Error notificando insignia al usuario #{u.id}: #{e.message}"
+          end
         end
       end
     end
