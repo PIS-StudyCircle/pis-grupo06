@@ -81,7 +81,6 @@ Rails.application.routes.draw do
         end
       end
       resources :avatars, only: [:create]
-      post 'avatars/edit', to: 'avatars#edit'
     end
   end
 end
