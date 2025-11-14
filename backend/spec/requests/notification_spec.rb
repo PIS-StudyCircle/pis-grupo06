@@ -306,7 +306,7 @@ RSpec.describe "Notifications Messages", type: :request do
         expect(notif.url).to eq("/usuarios/#{student1.id}")
       end
 
-      it "notifica a participantes que la tutoría finalizó y pueden dejar feedback" do
+      it "notifica a participantes que la tutoría finalizó y pueden dejar feedback e insignias" do
         tutoring = Tutoring.create!(
           tutor: tutor,
           course: course,
@@ -340,18 +340,29 @@ RSpec.describe "Notifications Messages", type: :request do
 
         expect(tutoring.reload.state).to eq("finished")
 
-        notif_tutor     = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
-        notif_student1  = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
-        notif_student2  = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
+        notif_tutor = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
+        expect(notif_tutor).to be_present
+        expect(notif_tutor.title).to include("Recibiste una insignia de nivel 1 (tutorias dadas)")
+        expect(notif_tutor.url).to eq("/perfil")
 
-        expect(notif_tutor).to be_nil
+        insignia_student1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
+        expect(insignia_student1).to be_present
+        expect(insignia_student1.title).to include("Recibiste una insignia de nivel 1 (tutorias recibidas)")
+        expect(insignia_student1.url).to eq("/perfil")
+
+        notif_student1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).second
         expect(notif_student1).to be_present
-        expect(notif_student2).to be_present
-
         expect(notif_student1.title).to include("Tutoría finalizada - Deja tu feedback")
-        expect(notif_student2.title).to include("Tutoría finalizada - Deja tu feedback")
-
         expect(notif_student1.url).to eq("/notificaciones")
+
+        insignia_student2 = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
+        expect(insignia_student2).to be_present
+        expect(insignia_student2.title).to include("Recibiste una insignia de nivel 1 (tutorias recibidas)")
+        expect(insignia_student2.url).to eq("/perfil")
+
+        notif_student2 = Noticed::Notification.where(recipient: student2).order(created_at: :desc).second
+        expect(notif_student2).to be_present
+        expect(notif_student2.title).to include("Tutoría finalizada - Deja tu feedback")
         expect(notif_student2.url).to eq("/notificaciones")
       end
 
