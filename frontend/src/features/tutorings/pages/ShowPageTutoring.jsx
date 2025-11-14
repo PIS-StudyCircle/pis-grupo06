@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useUser } from "@context/UserContext";
 import { formatDateTime } from "@shared/utils/FormatDate";
@@ -22,11 +22,9 @@ export default function ShowPageTutoring() {
   const [saving, setSaving] = useState(false);
   const [showChat, setShowChat] = useState(false);
 
-  useEffect(() => {
-    if (error || (!tutoring && !loading)) {
-      navigate('/404', { replace: true });
-    }
-  }, [error, tutoring, loading, navigate]);
+  if (error || (!tutoring && !loading)) {
+    navigate('/404', { replace: true });
+  }
 
 
   const soyEstudiante = tutoring?.user_enrolled || false;
