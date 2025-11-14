@@ -4,12 +4,12 @@ import { useUser } from "@context/UserContext";
 import { ChevronDown, LogOut, User, Edit } from "lucide-react";
 import { DEFAULT_PHOTO } from "@/shared/config";
 import { Bell } from "@/features/notifications/components/Bell";
+import HelpMenu from "@/features/help/components/helpMenu";
 
 const NavBar = ({ toggleSidebar = () => {} }) => {
   const { user, signOut } = useUser();
   const nav = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const toggleDropdown = () => setIsDropdownOpen((v) => !v);
 
   async function handleLogout() {
@@ -47,9 +47,15 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
           <div className="auth-wrap">
             {user ? (
               <div className="relative flex items-center gap-3">
+
+                <div className="relative">
+                  <HelpMenu />
+                </div>
+
                 <div className="relative">
                   <Bell />
                 </div>
+
                 <div className="relative">
                   <button
                     onClick={toggleDropdown}
@@ -147,7 +153,9 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
                 style={{ width: 48, height: 48 }}
               />
             </Link>
-            <div className="ml-auto pr-2">
+            
+            <div className="ml-auto items-center gap-3 inline-flex">
+              <HelpMenu />
               <Bell />
             </div>
           </div>
