@@ -125,7 +125,7 @@ export default function HelpMenu() {
         if (pure === "/perfil") {
             return [
                 "En tu perfil se muestran tus materias favoritas, las reseñas y el promedio de puntuaciones que recibiste.",
-                "Podés generar un avatar o editar el que ya tenes con IA haciendo click en \"Editar con IA\".",
+                "Podés generar un avatar con IA haciendo click en \"Editar con IA\".",
             ];
         }
         // /usuarios/:id
@@ -138,34 +138,20 @@ export default function HelpMenu() {
         if (pure === "/editar-perfil") {
             return [
                 "Desde esta página podés editar tu información personal: nombre, apellido, descripción y foto de perfil.",
-                "Podés generar un avatar o editar el que ya tenes con IA haciendo click en \"Crear con IA\".",
+                "Podés generar un avatar con IA haciendo click en \"Crear con IA\".",
             ];
         }
         // /avatar/elegir_tipo
         if (pure === "/avatar/elegir_tipo") {
             return [
-                "Elegí si generar un avatar o partir de uno ya creado (o el que ya tenés) para editarlo con IA.",
-            ];
-        }
-        // /avatar/elegir_avatar
-        if (pure === "/avatar/elegir_avatar") {
-            return [
-                "Elegí uno de estos avatar para editar con IA. También podés elegir el que ya tenés actualmente desde \"Editar mi foto de perfil\".",
-            ];
-        }
-        // /avatar/editar
-        if (pure === "/avatar/editar") {
-            return [
-                "Escribí una descripción para editar tu avatar con IA. Por ejemplo: 'Agrega un fondo azul y un sombrero rojo'.",
-                "Podés hacer múltiples ediciones hasta que quedes satisfecho con el resultado y también deshacer los cambios que no te gusten.",
-                "Cuando termines, guardá los cambios para actualizar tu avatar o descartá los cambios si no te gustaron.",
+                "Generá un avatar desde cero con IA.",
             ];
         }
         // /avatar/crear
         if (pure === "/avatar/crear") {
             return [
                 "Escribí una descripción para generar un avatar con IA.",
-                "Una vez generado, podés hacer ediciones adicionales clickeando \"Editar imagen\", generar una nueva o guardar el avatar si te gustó.",
+                "Una vez generado, podés hacer una nueva o guardar el avatar si te gustó.",
             ];
         }
         return [
