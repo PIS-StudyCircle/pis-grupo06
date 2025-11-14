@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
-import { Check, Edit3, Sparkles } from "lucide-react"
+import { Check, Sparkles } from "lucide-react"
 import ImagePreview from "../components/ImagePreview"
 import PromptInput from "../components/PromptInput"
 import { generateAvatar } from "../services/avatarService";
@@ -52,12 +52,6 @@ export default function CreateScreen() {
     }
   };
 
-  const handleEditImage = () => {
-    if (!generatedImage) return
-    navigate("/avatar/editar", {
-      state: { initialImage: generatedImage }
-    })
-  }
 
   const handleTryAgain = () => {
     setShowOptions(false)
@@ -99,14 +93,6 @@ export default function CreateScreen() {
                 >
                   <Check className="w-4 h-4" />
                   {isSaving ? "Guardando..." : "Guardar como Foto de Perfil"}
-                </button>
-
-                <button
-                  onClick={handleEditImage}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Edit3 className="w-4 h-4" />
-                  Editar Imagen
                 </button>
 
                 <button
