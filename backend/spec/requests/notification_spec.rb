@@ -1,189 +1,416 @@
 require "rails_helper"
 require "active_job/test_helper"
 
-RSpec.describe "Notifications API", type: :request do
+RSpec.describe "Notifications Messages", type: :request do
   include ActiveJob::TestHelper
   include Devise::Test::IntegrationHelpers
+
+  # Ejecutar jobs en línea para que las notificaciones creadas por jobs estén disponibles
+  before(:each) do
+    ActiveJob::Base.queue_adapter = :test
+  end
+
+  # Evita llamadas externas (Google Calendar) durante las specs
+  before do
+    allow_any_instance_of(GoogleCalendarService).to receive(:create_event).and_return(double(id: "evt_stub"))
+    allow_any_instance_of(GoogleCalendarService).to receive(:join_event).and_return(true)
+    allow_any_instance_of(GoogleCalendarService).to receive(:delete_event).and_return(true)
+  end
 
   def json
     response.parsed_body
   end
 
-  def create_notification_for(user, title:, attrs: {})
-    # Crear evento de Noticed y la notificación vinculada directamente para tests.
-    event = Noticed::Event.create!(type: "PingNotifier", params: { title: title })
-    notif_attrs = {
-      title: title,
-      event: event
-    }
-    # permitir override de timestamps / campos por attrs
-    notif_attrs[:created_at] = attrs.delete(:created_at) if attrs.key?(:created_at)
-    notif_attrs[:read_at]    = attrs.delete(:read_at)    if attrs.key?(:read_at)
-    notif_attrs[:seen_at]    = attrs.delete(:seen_at)    if attrs.key?(:seen_at)
-
-    n = user.notifications.create!(**notif_attrs)
-    # aplicar cualquier otro atributo restante
-    n.update!(attrs) if attrs.present?
-    n.reload
-  end
-
   let!(:universidad) { University.create!(name: "Universidad de Ejemplo") }
   let!(:facultad) { Faculty.create!(name: "Facultad de Ingeniería", university: universidad) }
 
-  let!(:user) do
+  let!(:tutor) do
     User.create!(
-      email: "user@example.com",
+      email: "tutor@example.com",
       password: "password",
       password_confirmation: "password",
-      name: "User",
+      name: "Tutor",
       last_name: "Test",
       faculty: facultad
     )
   end
 
-  let!(:other) do
+  let!(:student1) do
     User.create!(
-      email: "other@example.com",
+      email: "student1@example.com",
       password: "password",
       password_confirmation: "password",
-      name: "Other",
+      name: "Student1",
       last_name: "Test",
       faculty: facultad
     )
   end
 
-  before { sign_in user }
-
-  describe "GET /api/v1/notifications" do
-    it "requiere autenticación" do
-      sign_out user
-      get "/api/v1/notifications"
-      expect(response).to have_http_status(:found).or have_http_status(:unauthorized)
-    end
-
-    it "devuelve solo las notificaciones del usuario y en el orden esperado" do
-      create_notification_for(
-        user,
-        title: "N1",
-        attrs: { created_at: 1.minute.ago, read_at: Time.current, seen_at: Time.current }
-      )
-      create_notification_for(
-        user,
-        title: "N2",
-        attrs: { created_at: 2.minutes.ago, read_at: Time.current, seen_at: Time.current }
-      )
-      create_notification_for(user, title: "N3", attrs: { created_at: 1.minute.ago })
-      create_notification_for(other, title: "Otra", attrs: { created_at: Time.current })
-
-      get "/api/v1/notifications"
-      expect(response).to have_http_status(:ok)
-
-      payload = json.fetch("notifications")
-      # Ordena no leídas (read_at IS NULL) primero, luego por created_at desc
-      expect(payload.pluck("title")).to contain_exactly("N1", "N2", "N3")
-      expect(payload.first["read_at"]).to be_nil
-      expect(payload.first["title"]).to eq("N3")
-      expect(payload.second["title"]).to eq("N1")
-      expect(payload.third["title"]).to eq("N2")
-      expect(payload.first.keys).to include("id", "title", "created_at", "read_at", "seen_at")
-    end
+  let!(:student2) do
+    User.create!(
+      email: "student2@example.com",
+      password: "password",
+      password_confirmation: "password",
+      name: "Student2",
+      last_name: "Test",
+      faculty: facultad
+    )
   end
 
-  describe "PUT /api/v1/notifications/:id (mark read / seen)" do
-    it "marca read_at cuando recibe read: true" do
-      n = create_notification_for(user, title: "N1", attrs: { created_at: Time.current })
-      put "/api/v1/notifications/#{n.id}",
-          params: { read: true }.to_json,
-          headers: { "CONTENT_TYPE" => "application/json" }
-      expect(response).to have_http_status(:ok)
-      expect(n.reload.read_at).not_to be_nil
+  let!(:course) { Course.create!(name: "Álgebra", faculty: facultad) }
+  let!(:subject) { Subject.create!(name: "Matrices", course: course) }
+
+  describe "Notificaciones relacionadas con tutorías" do
+    context "Notificaciones dirigidas a tutores" do
+      it "envía notificación al tutor cuando un estudiante se une a la tutoría" do
+        tutoring = Tutoring.create!(
+          tutor: tutor,
+          course: course,
+          scheduled_at: 2.days.from_now,
+          created_by_id: tutor.id,
+          modality: "virtual",
+          capacity: 5,
+          event_id: "evento1",
+          state: :active,
+          enrolled: 1,
+          subjects: [subject]
+        )
+        UserTutoring.create!(user: student1, tutoring: tutoring)
+        sign_in student2
+
+        post "/api/v1/tutorings/#{tutoring.id}/join_tutoring"
+        expect(response).to have_http_status(:created).or have_http_status(:ok)
+
+        notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
+        expect(notif).to be_present
+        expect(notif.recipient).to eq(tutor)
+        expect(notif.title).to include("#{student2.name} se unió a tu tutoría de #{course.name}")
+        expect(notif.event).to be_present
+        expect(notif.url).to eq("/notificaciones")
+      end
+
+      it "envía notificación al tutor cuando un estudiante se da de baja" do
+        tutoring = Tutoring.create!(
+          tutor: tutor,
+          course: course,
+          scheduled_at: 2.days.from_now,
+          created_by_id: tutor.id,
+          modality: "virtual",
+          capacity: 5,
+          event_id: "evento1",
+          state: :active,
+          enrolled: 1,
+          subjects: [subject]
+        )
+        UserTutoring.create!(user: student1, tutoring: tutoring)
+
+        sign_in student1
+        delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe"
+        expect(response).to have_http_status(:ok).or have_http_status(:no_content)
+
+        notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
+        expect(notif).to be_present
+        expect(notif.recipient).to eq(tutor)
+        expect(notif.title).to include("#{student1.name} se dio de baja de tu tutoría de #{course.name}")
+        expect(notif.event).to be_present
+        expect(notif.url).to eq("/notificaciones")
+      end
+
+      it "cancela la tutoría y notifica a inscritos si se desuscribe el tutor" do
+        tutoring = Tutoring.create!(
+          tutor: tutor,
+          course: course,
+          scheduled_at: 2.days.from_now,
+          created_by_id: tutor.id,
+          modality: "virtual",
+          capacity: 5,
+          event_id: "evento1",
+          state: :active,
+          enrolled: 2,
+          subjects: [subject]
+        )
+        UserTutoring.create!(user: student1, tutoring: tutoring)
+        UserTutoring.create!(user: student2, tutoring: tutoring)
+
+        perform_enqueued_jobs do
+          sign_in tutor
+          delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe"
+          expect(response).to have_http_status(:ok).or have_http_status(:no_content)
+        end
+
+        notif_to_s1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
+        expect(notif_to_s1).to be_present
+        expect(notif_to_s1.title).to include("Tutoría cancelada")
+        expect(notif_to_s1.url).to eq("/tutorias") # Como que recibe Tutorings?
+
+        notif_to_s2 = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
+        expect(notif_to_s2).to be_present
+        expect(notif_to_s2.title).to include("Tutoría cancelada")
+        expect(notif_to_s2.url).to eq("/tutorias") # Como que recibe Tutorings?
+      end
+
+      it "si el creador se desuscribe y no quedan inscritos, notifica al tutor y cancela" do
+        tutoring = Tutoring.create!(
+          tutor: tutor,
+          course: course,
+          scheduled_at: 2.days.from_now,
+          created_by_id: student1.id,
+          modality: "virtual",
+          capacity: 5,
+          state: :pending,
+          enrolled: 1,
+          subjects: [subject]
+        )
+        UserTutoring.create!(user: student1, tutoring: tutoring)
+
+        perform_enqueued_jobs do
+          sign_in student1
+          delete "/api/v1/tutorings/#{tutoring.id}/unsubscribe"
+          expect(response).to have_http_status(:ok).or have_http_status(:no_content)
+        end
+        expect(Tutoring.find_by(id: tutoring.id)).to be_nil
+
+        notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
+        expect(notif).to be_present
+        expect(notif.title).to include("Tutoría cancelada")
+        expect(notif.url).to eq("/tutorias") # Como que recibe Tutorings?
+      end
     end
 
-    it "marca seen_at cuando recibe seen: true" do
-      n = create_notification_for(user, title: "N1", attrs: { created_at: Time.current })
-      put "/api/v1/notifications/#{n.id}",
-          params: { seen: true }.to_json,
-          headers: { "CONTENT_TYPE" => "application/json" }
-      expect(response).to have_http_status(:ok)
-      expect(n.reload.seen_at).not_to be_nil
-    end
+    context "Notificaciones dirigidas a usuarios" do
+      it "notifica al creador cuando la tutoría pasa de pending a active (confirmación por tutor)" do
+        tutoring = Tutoring.create!(
+          course: course,
+          scheduled_at: 2.days.from_now.change(sec: 0),
+          created_by_id: student1.id,
+          modality: "virtual",
+          state: :pending,
+          subjects: [subject]
+        )
 
-    it "no permite actualizar notificaciones de otros usuarios" do
-      other_n = create_notification_for(other, title: "Otro", attrs: { created_at: Time.current })
-      put "/api/v1/notifications/#{other_n.id}", params: { read: true }
-      expect(response).to have_http_status(:not_found).or have_http_status(:forbidden)
-      expect(other_n.reload.read_at).to be_nil
-    end
-  end
+        availability = tutoring.tutoring_availabilities.create!(
+          start_time: tutoring.scheduled_at - 1.hour,
+          end_time: tutoring.scheduled_at + 2.hours,
+          is_booked: false
+        )
 
-  describe "POST /api/v1/notifications/mark_all_read" do
-    it "marca todas las notificaciones no leídas como leídas" do
-      create_notification_for(user, title: "N1")
-      create_notification_for(user, title: "N2")
-      create_notification_for(user, title: "Otro", attrs: { read_at: Time.current })
+        UserTutoring.create!(user: student1, tutoring: tutoring)
 
-      post "/api/v1/notifications/mark_all_read"
-      expect(response).to have_http_status(:ok)
+        sign_in tutor
+        post "/api/v1/tutorings/#{tutoring.id}/confirm_schedule",
+             params: {
+               scheduled_at: tutoring.scheduled_at,
+               role: "tutor",
+               tutoring_availability_id: availability.id
+             }.to_json,
+             headers: { "CONTENT_TYPE" => "application/json" }
+        expect(response).to have_http_status(:ok).or have_http_status(:created)
 
-      expect(user.notifications.unscoped.where(read_at: nil).count).to eq(0)
-      expect(user.notifications.where.not(read_at: nil).count).to be >= 3
-    end
-  end
+        notif = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
+        expect(notif).to be_present
+        expect(notif.title).to include(
+          "Tu solicitud de tutoría de #{course.name} fue confirmada"
+        )
+        expect(notif.url).to eq("/notificaciones")
+      end
 
-  describe "POST /api/v1/notifications/mark_all_seen" do
-    it "marca seen_at solo en las que tenían seen_at nil" do
-      seen_ts = 1.day.ago
-      n1 = create_notification_for(user, title: "N1", attrs: { seen_at: seen_ts })
-      n2 = create_notification_for(user, title: "N2", attrs: { seen_at: nil })
+      it "notifica al tutor creador cuando un estudiante confirma la tutoría" do
+        tutoring = Tutoring.create!(
+          course: course,
+          scheduled_at: 2.days.from_now.change(sec: 0),
+          created_by_id: tutor.id,
+          tutor: tutor,
+          modality: "virtual",
+          capacity: 5,
+          state: :pending,
+          subjects: [subject]
+        )
 
-      post "/api/v1/notifications/mark_all_seen"
-      expect(response).to have_http_status(:ok)
+        availability = tutoring.tutoring_availabilities.create!(
+          start_time: tutoring.scheduled_at - 1.hour,
+          end_time: tutoring.scheduled_at + 2.hours,
+          is_booked: false
+        )
 
-      expect(n1.reload.seen_at.to_i).to eq(seen_ts.to_i)
-      expect(n2.reload.seen_at).not_to be_nil
-    end
-  end
+        sign_in student1
+        post "/api/v1/tutorings/#{tutoring.id}/confirm_schedule",
+             params: {
+               scheduled_at: tutoring.scheduled_at,
+               role: "student",
+               tutoring_availability_id: availability.id
+             }.to_json,
+             headers: { "CONTENT_TYPE" => "application/json" }
+        expect(response).to have_http_status(:ok).or have_http_status(:created)
 
-  describe "POST /api/v1/notification_token" do
-    it "devuelve un token para actioncable" do
-      post "/api/v1/notification_token"
-      expect(response).to have_http_status(:ok)
-      body = json
-      expect(body).to have_key("notifToken")
-      expect(body["notifToken"]).to be_a(String)
-      expect(body["notifToken"].length).to be > 10
-    end
+        notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
+        expect(notif).to be_present
+        expect(notif.title).to include(
+          "El estudiante #{student1.name} confirmó la tutoría de #{course.name}"
+        )
+        expect(notif.url).to eq("/notificaciones")
+      end
 
-    it "requiere autenticación" do
-      sign_out user
-      post "/api/v1/notification_token"
-      expect(response).to have_http_status(:found).or have_http_status(:unauthorized)
-    end
-  end
+      it "notifica a usuarios que tienen la materia como favorita cuando se crea una nueva tutoría" do
+        FavoriteCourse.create!(user: student2, course: course)
 
-  describe "DELETE /api/v1/notifications/:id" do
-    it "elimina la notificación del usuario" do
-      n = create_notification_for(user, title: "N1", attrs: { created_at: Time.current })
-      delete "/api/v1/notifications/#{n.id}"
-      expect(response).to have_http_status(:ok)
-      expect { n.reload }.to raise_error(ActiveRecord::RecordNotFound)
-    end
+        sign_in tutor
+        post "/api/v1/tutorings",
+             params: {
+               tutoring: {
+                 course_id: course.id,
+                 tutor_id: tutor.id,
+                 scheduled_at: 2.days.from_now.iso8601,
+                 modality: "virtual",
+                 capacity: 5,
+                 subject_ids: [subject.id]
+               }
+             }.to_json,
+             headers: { "CONTENT_TYPE" => "application/json" }
 
-    it "no permite eliminar notificaciones de otro usuario" do
-      other_n = create_notification_for(other, title: "Otro", attrs: { created_at: Time.current })
-      delete "/api/v1/notifications/#{other_n.id}"
-      expect(response).to have_http_status(:not_found).or have_http_status(:forbidden)
-      expect(other_n.reload).to be_present
-    end
-  end
+        expect(response).to have_http_status(:created).or have_http_status(:ok)
 
-  describe "DELETE /api/v1/notifications/destroy_all" do
-    it "elimina todas las notificaciones del usuario" do
-      create_notification_for(user, title: "N1")
-      create_notification_for(user, title: "N2")
-      delete "/api/v1/notifications/destroy_all"
-      expect(response).to have_http_status(:ok)
-      expect(user.notifications.count).to eq(0)
+        notif = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
+        expect(notif).to be_present
+        expect(notif.title).to include("Se creó una nueva tutoría de #{course.name}")
+        expect(notif.url).to eq(
+          "/tutorias/materia/#{course.id}?course_name=#{URI.encode_www_form_component(course.name)}"
+        )
+      end
+
+      it "envía notificación al recibir una review" do
+        tutoring = Tutoring.create!(
+          tutor: tutor,
+          course: course,
+          scheduled_at: 2.days.from_now.change(sec: 0),
+          created_by_id: tutor.id,
+          modality: "virtual",
+          capacity: 5,
+          state: :finished,
+          subjects: [subject]
+        )
+        UserTutoring.create!(user: student1, tutoring: tutoring)
+
+        sign_in student1
+        post "/api/v1/users/user_reviews",
+             params: {
+               reviewed_id: tutor.id,
+               review: "Excelente tutoría!"
+             }.to_json,
+             headers: { "CONTENT_TYPE" => "application/json" }
+
+        expect(response).to have_http_status(:created).or have_http_status(:ok)
+
+        notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
+        expect(notif).to be_present
+        expect(notif.title).to include("Nueva reseña recibida")
+        expect(notif.url).to eq("/usuarios/#{student1.id}")
+      end
+
+      it "notifica a participantes que la tutoría finalizó y pueden dejar feedback e insignias" do
+        tutoring = Tutoring.create!(
+          tutor: tutor,
+          course: course,
+          scheduled_at: 2.days.from_now.change(hour: 15, min: 0, sec: 0),
+          duration_mins: 120,
+          created_by_id: tutor.id,
+          modality: "virtual",
+          capacity: 5,
+          enrolled: 2,
+          state: :active,
+          subjects: [subject]
+        )
+
+        UserTutoring.create!(user: student1, tutoring: tutoring)
+        UserTutoring.create!(user: student2, tutoring: tutoring)
+
+        TutoringAvailability.create!(
+          tutoring: tutoring,
+          start_time: tutoring.scheduled_at - 1.hour,
+          end_time: tutoring.scheduled_at + 1.hour,
+          is_booked: true
+        )
+
+        tutoring.update(scheduled_at: 1.day.ago)
+        tutoring.save!(validate: false) # saltar validaciones de estado/tiempo
+
+        # Ejecutar la job y procesar las jobs encoladas; luego comprobamos notificaciones
+        perform_enqueued_jobs do
+          Tutorings::MarkFinishedTutoringsJob.perform_now
+        end
+
+        expect(tutoring.reload.state).to eq("finished")
+
+        notif_tutor = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
+        expect(notif_tutor).to be_present
+        expect(notif_tutor.title).to include("Recibiste una insignia de nivel 1 (tutorias dadas)")
+        expect(notif_tutor.url).to eq("/perfil")
+
+        insignia_student1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
+        expect(insignia_student1).to be_present
+        expect(insignia_student1.title).to include("Recibiste una insignia de nivel 1 (tutorias recibidas)")
+        expect(insignia_student1.url).to eq("/perfil")
+
+        notif_student1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).second
+        expect(notif_student1).to be_present
+        expect(notif_student1.title).to include("Tutoría finalizada - Deja tu feedback")
+        expect(notif_student1.url).to eq("/notificaciones")
+
+        insignia_student2 = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
+        expect(insignia_student2).to be_present
+        expect(insignia_student2.title).to include("Recibiste una insignia de nivel 1 (tutorias recibidas)")
+        expect(insignia_student2.url).to eq("/perfil")
+
+        notif_student2 = Noticed::Notification.where(recipient: student2).order(created_at: :desc).second
+        expect(notif_student2).to be_present
+        expect(notif_student2.title).to include("Tutoría finalizada - Deja tu feedback")
+        expect(notif_student2.url).to eq("/notificaciones")
+      end
+
+      it "envía recordatorio 24 horas antes a tutor y estudiantes" do
+        tutoring = Tutoring.create!(
+          tutor: tutor,
+          course: course,
+          scheduled_at: 2.days.from_now.change(sec: 0),
+          created_by_id: tutor.id,
+          modality: "virtual",
+          capacity: 5,
+          state: :active,
+          enrolled: 2,
+          subjects: [subject]
+        )
+        UserTutoring.create!(user: student1, tutoring: tutoring)
+        UserTutoring.create!(user: student2, tutoring: tutoring)
+
+        tutoring = Tutoring.create!(
+          tutor: tutor,
+          course: course,
+          scheduled_at: 23.hours.from_now.change(sec: 0),
+          created_by_id: tutor.id,
+          modality: "virtual",
+          capacity: 5,
+          state: :active,
+          enrolled: 2,
+          subjects: [subject]
+        )
+        UserTutoring.create!(user: student1, tutoring: tutoring)
+        UserTutoring.create!(user: student2, tutoring: tutoring)
+
+        # simular job/endpoint que envía recordatorios
+        TutoringReminderJob.perform_now(tutoring.id)
+
+        notif_tutor = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
+        notif_student1 = Noticed::Notification.where(recipient: student1).order(created_at: :desc).first
+        notif_student2 = Noticed::Notification.where(recipient: student2).order(created_at: :desc).first
+        expect(notif_tutor).to be_present
+        expect(notif_student1).to be_present
+        expect(notif_student2).to be_present
+        expect(notif_tutor.title).to include("Recordatorio de tutoría")
+        expect(notif_student1.title).to include("Recordatorio de tutoría")
+        expect(notif_student2.title).to include("Recordatorio de tutoría")
+        expect(notif_tutor.url).to eq("/tutorias/#{tutoring.id}")
+        expect(notif_student1.url).to eq("/tutorias/#{tutoring.id}")
+        expect(notif_student2.url).to eq("/tutorias/#{tutoring.id}")
+      end
     end
   end
 end

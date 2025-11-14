@@ -476,12 +476,21 @@ def create_finished_tutoring(course:, tutor:, creator:, num_attendees:, subjects
   tutoring.scheduled_at = past_date
   tutoring.save!(validate: false)
 
+  tutor.increment(:tutorias_dadas_count)
+  tutor.save!
+
+  for user in users_pool
+    user.increment(:tutorias_recibidas_count)
+    user.save!
+  end
+
   tutoring
 end
 
 # Course 6: 2 finished (1 by tutor, 1 by student)
 t1 = create_finished_tutoring(course: course6, tutor: user5, creator: user5, num_attendees: 3, subjects_count: 2,
                               users_pool: users)
+
 t2 = create_finished_tutoring(course: course6, tutor: user6, creator: user7, num_attendees: 2, subjects_count: 2,
                               users_pool: users)
 
@@ -531,6 +540,9 @@ UserReview.create!(
   review: "Excelente tutor, explicó muy bien los conceptos de SQL y normalización."
 )
 
+attendee_t1.increment(:resenas_dadas_count)
+attendee_t1.save!
+
 # Review 2: Between two attendees of t3
 attendees_t3 = t3.user_tutorings.limit(2).map(&:user)
 if attendees_t3.size >= 2
@@ -541,6 +553,9 @@ if attendees_t3.size >= 2
   )
 end
 
+attendees_t3[0].increment(:resenas_dadas_count)
+attendees_t3[0].save!
+
 # Review 3: Between tutor and attendee of t7
 tutor_t7 = t7.tutor
 attendee_t7 = t7.user_tutorings.first.user
@@ -549,6 +564,10 @@ UserReview.create!(
   reviewed: tutor_t7,
   review: "Muy clara la explicación sobre requerimientos y testing. Recomendado."
 )
+
+attendee_t7.increment(:resenas_dadas_count)
+attendee_t7.save!
+
 Rails.logger.debug "  Created 3 reviews"
 
 # =============================================================================
@@ -565,6 +584,9 @@ Feedback.create!(
   rating: 5.0
 )
 
+t1.user_tutorings.first.user.increment(:feedback_dado_count)
+t1.user_tutorings.first.user.save!
+
 # Feedback 2: From attendee to tutor of t2
 Feedback.create!(
   student: t2.user_tutorings.first.user,
@@ -572,6 +594,9 @@ Feedback.create!(
   tutoring: t2,
   rating: 4.5
 )
+
+t2.user_tutorings.first.user.increment(:feedback_dado_count)
+t2.user_tutorings.first.user.save!
 
 # Feedback 3: From attendee to tutor of t4
 Feedback.create!(
@@ -581,6 +606,9 @@ Feedback.create!(
   rating: 4.0
 )
 
+t4.user_tutorings.first.user.increment(:feedback_dado_count)
+t4.user_tutorings.first.user.save!
+
 # Feedback 4: From attendee to tutor of t6
 Feedback.create!(
   student: t6.user_tutorings.first.user,
@@ -589,6 +617,9 @@ Feedback.create!(
   rating: 5.0
 )
 
+t6.user_tutorings.first.user.increment(:feedback_dado_count)
+t6.user_tutorings.first.user.save!
+
 # Feedback 5: From attendee to tutor of t9
 Feedback.create!(
   student: t9.user_tutorings.first.user,
@@ -596,6 +627,9 @@ Feedback.create!(
   tutoring: t9,
   rating: 3.5
 )
+
+t9.user_tutorings.first.user.increment(:feedback_dado_count)
+t9.user_tutorings.first.user.save!
 
 Rails.logger.debug "  Created 5 feedbacks"
 

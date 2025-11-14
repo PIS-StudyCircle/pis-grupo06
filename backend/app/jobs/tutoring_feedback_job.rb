@@ -13,9 +13,6 @@ class TutoringFeedbackJob < ApplicationJob
     # Obtener todos los participantes (tutor y estudiantes)
     participants = []
 
-    # Agregar el tutor
-    participants << tutoring.tutor if tutoring.tutor.present?
-
     # Agregar el creador si es diferente al tutor
     participants << tutoring.creator if tutoring.creator.present? && tutoring.creator != tutoring.tutor
 
@@ -29,7 +26,7 @@ class TutoringFeedbackJob < ApplicationJob
     participants.each do |user|
       TutoringFeedbackNotifier.with(
         title: "Tutoría finalizada - Deja tu feedback",
-        url: "/tutorings/#{tutoring.id}/feedback",
+        url: "/notificaciones", # tutorias/#{tutoring.id}/feedback" no existe
         course_name: tutoring.course&.name || "Tutoría",
         tutoring_id: tutoring.id
       ).deliver_later(user)

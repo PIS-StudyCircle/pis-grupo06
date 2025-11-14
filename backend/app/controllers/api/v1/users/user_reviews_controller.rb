@@ -37,6 +37,16 @@ module Api
           )
 
           if review.save
+            # Incrementar contador de reseñas dadas
+            current_user.increment(:resenas_dadas_count)
+            current_user.save!
+
+            begin
+              InsigniaNotifier.with(tipo: :resenas_dadas).deliver(current_user)
+            rescue => e
+              Rails.logger.error "Error notificando insignia al usuario #{current_user.id}: #{e.message}"
+            end
+
             # Enviar notificación al usuario que recibió la review
             ReviewReceivedNotifier.with(
               title: "Nueva reseña recibida",
