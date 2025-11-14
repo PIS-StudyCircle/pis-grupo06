@@ -2,7 +2,6 @@ import { Calendar } from "lucide-react";
 import SessionCard from "../components/SessionCard";
 import { useSessions } from "../hooks/useSessions";
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
 
 export default function SessionList({ userId, type = "upcoming",  isBlockingPage, setIsBlockingPage }) {
   const { sessions = [], loading, refresh } = useSessions(userId, type);

@@ -94,7 +94,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
               <button
                 type="button"
                 className="btn"
-                onClick={(e) => {
+                onClick={() => {
                   if (isBlockingPage) return;
                   handleNavigateToTopics();
                 }}
