@@ -611,9 +611,9 @@ module Api
 
           # Si queda tutor pero ya no quedan estudiantes (enrolled == 0), limpiar el horario y eliminar chat
           if had_tutor && new_enrolled.zero?
-            
-            # Sacar schedule_at de la tutoria, volverla a state pending, y desmarcar el tutoring_availability          
-            @tutoring.scheduled_at = nil 
+
+            # Sacar schedule_at de la tutoria, volverla a state pending, y desmarcar el tutoring_availability
+            @tutoring.scheduled_at = nil
             @tutoring.state = 'pending'
             @tutoring.duration_mins = 1 # duracion por defecto
             @tutoring.tutoring_availabilities.each { |a| a.update(is_booked: false) }
