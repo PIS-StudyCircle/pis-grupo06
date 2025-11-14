@@ -8,6 +8,7 @@ export default function TutoringSearchBar({
     { value: "subject", label: "Tema" },
   ],
   placeholder = "Buscar...",
+  disabled = false,
 }) {
   return (
     <div className="w-full mb-4">
@@ -18,6 +19,7 @@ export default function TutoringSearchBar({
           value={searchBy}
           onChange={(e) => onSearchByChange?.(e.target.value)}
           className="rounded-l-full px-3 py-2 bg-gray-50 text-gray-700 border-r border-gray-300 focus:outline-none"
+          disabled={disabled} 
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -48,6 +50,7 @@ export default function TutoringSearchBar({
             onChange={onQueryChange}
             placeholder={placeholder}
             className="w-full pl-10 pr-4 py-2 rounded-r-full focus:outline-none"
+            disabled={disabled}
           />
         </div>
       </div>

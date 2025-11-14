@@ -2,8 +2,9 @@ import { Calendar } from "lucide-react";
 import SessionCard from "../components/SessionCard";
 import { useSessions } from "../hooks/useSessions";
 import { useLocation } from "react-router-dom";
+import { useState } from "react";
 
-export default function SessionList({ userId, type = "upcoming" }) {
+export default function SessionList({ userId, type = "upcoming",  isBlockingPage, setIsBlockingPage }) {
   const { sessions = [], loading, refresh } = useSessions(userId, type);
   const location = useLocation();
 
@@ -63,9 +64,10 @@ export default function SessionList({ userId, type = "upcoming" }) {
         <h2 className="text-xl font-bold text-gray-800">{title}</h2>
       </div>
 
-      <div className="space-y-4 w-full">
+      <div className={`space-y-4 w-full ${isBlockingPage ? "pointer-events-none opacity-50" : ""}`}>
         {sessions.map((session) => (
-          <SessionCard key={session.id} session={session} type={type} refresh={refresh} />
+          <SessionCard key={session.id} session={session} type={type} refresh={refresh}  isBlockingPage={isBlockingPage}
+            setIsBlockingPage={setIsBlockingPage} />
         ))}
       </div>
     </div>

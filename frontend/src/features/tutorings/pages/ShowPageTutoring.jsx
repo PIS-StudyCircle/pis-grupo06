@@ -66,10 +66,10 @@ export default function ShowPageTutoring() {
 
   const handleDesuscribirme = async () => {
     if (!tutoring) return;
+    setSaving(true);
 
     showConfirm("¿Seguro que querés desuscribirte de la tutoría?", async () => {
       try {
-        setSaving(true);
         await onDesuscribirse(tutoring.id);
         showSuccess("Te desuscribiste correctamente.");
         navigate(-1);
@@ -79,7 +79,11 @@ export default function ShowPageTutoring() {
       } finally {
         setSaving(false);
       }
-    });
+    },
+      () => {
+        setSaving(false);
+      }
+    );
   };
 
   const mode = useMemo(() => {
@@ -103,7 +107,7 @@ export default function ShowPageTutoring() {
     if (loading) return <ShowTutoringSkeleton />;
 
   return (
-    <div className="max-w-5xl mx-auto p-4 min-h-screen">
+    <div className={`max-w-5xl mx-auto p-4 min-h-screen ${saving ? "pointer-events-none opacity-50" : ""}`}>
       {/* Encabezado */}
       <div className="rounded-2xl bg-white shadow overflow-hidden">
         <div className="px-6 py-5 border-b bg-gradient-to-r from-blue-50 to-indigo-50">

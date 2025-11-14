@@ -33,22 +33,30 @@ export default function TutoringActions({
           {mode === "serTutor" && (
             <button
               type="button"
-              className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+              className={`btn w-full font-semibold transition ${
+                  saving
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+                    : "bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white"
+                }`}
               onClick={onSerTutor}
               disabled={saving}
             >
-              Ser tutor
+              {saving ? "Uniéndote a la tutoría como tutor..." : "Ser Tutor"}
             </button>
           )}
 
           {mode === "serEstudiante" && (
             <button
               type="button"
-              className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+              className={`btn w-full font-semibold transition ${
+                  saving
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+                    : "bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white"
+                }`}
               onClick={onUnirme}
               disabled={saving}
             >
-              Unirme
+              {saving ? "Uniéndote a la tutoría..." : "Unirme"}
             </button>
           )}
 
@@ -64,11 +72,15 @@ export default function TutoringActions({
               </button>
               <button
                 type="button"
-                className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+                className={`btn w-full font-semibold transition ${
+                  saving
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+                    : "bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white"
+                }`}
                 onClick={onUnirme}
                 disabled={saving}
               >
-                Unirme
+                {saving ? "Uniéndote a la tutoría..." : "Unirme"}
               </button>
             </>
           )}
@@ -80,17 +92,22 @@ export default function TutoringActions({
                   type="button"
                   onClick={onOpenChat}
                   className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+                  disabled={saving}
                 >
                   Abrir chat
                 </button>
               )}
               <button
                 type="button"
-                className="btn w-full bg-red-500 hover:bg-red-600 text-white"
+                className={`btn w-full font-semibold transition ${
+                    saving
+                      ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+                      : "bg-red-500 hover:bg-red-600 active:scale-[0.98] text-white"
+                  }`}
                 onClick={onDesuscribirme}
                 disabled={saving}
               >
-                Desuscribirme
+                {saving ? "Desuscribiéndote a la tutoría..." : "Desuscribirme"}
               </button>
             </div>
           )}
@@ -106,8 +123,11 @@ export default function TutoringActions({
           )}
 
           <Link
-            to="/tutorias"
-            className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            to={saving ? "#" : "/tutorias"}
+            onClick={(e) => saving && e.preventDefault()}
+            className={`inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm font-medium 
+              ${saving ? "bg-gray-200 text-gray-400 cursor-not-allowed pointer-events-none" : "bg-white hover:bg-gray-50 text-gray-700"}
+            `}
           >
             Volver al listado
           </Link>

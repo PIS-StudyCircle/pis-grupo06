@@ -1,8 +1,10 @@
 import { useUser } from "@context/UserContext";
 import { SessionListPage } from "@/features/calendar";
+import { useState } from "react";
 
 export default function Sessions() {
   const { user, loading, error } = useUser();
+   const [isBlockingPage, setIsBlockingPage] = useState(false);
 
   if (loading) return <p className="text-center mt-10">Cargando...</p>;
   
@@ -21,12 +23,16 @@ export default function Sessions() {
           <SessionListPage
             userId={user.id}
             type="upcoming"
+            isBlockingPage={isBlockingPage}
+            setIsBlockingPage={setIsBlockingPage}
           />
         </div>
         <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg w-full border border-gray-200">
           <SessionListPage
             userId={user.id}
             type="finalized"
+            isBlockingPage={isBlockingPage}
+            setIsBlockingPage={setIsBlockingPage}
           />
         </div>
       </div>
