@@ -131,6 +131,36 @@ class Tutoring < ApplicationRecord
     user_tutorings.where.not(user_id: tutor_id).count
   end
 
+  def incrementar_contadores_insignas
+    with_lock do
+      if tutor
+        tutor.with_lock do
+          tutor.increment(:tutorias_dadas_count)
+          tutor.save!
+
+          begin
+            InsigniaNotifier.with(tipo: :tutorias_dadas).deliver(tutor)
+          rescue => e
+            Rails.logger.error "Error notificando insignia al usuario #{tutor.id}: #{e.message}"
+          end
+        end
+      end
+
+      users.where.not(id: tutor_id).find_each do |u|
+        u.with_lock do
+          u.increment(:tutorias_recibidas_count)
+          u.save!
+
+          begin
+            InsigniaNotifier.with(tipo: :tutorias_recibidas).deliver(u)
+          rescue => e
+            Rails.logger.error "Error notificando insignia al usuario #{u.id}: #{e.message}"
+          end
+        end
+      end
+    end
+  end
+
   private
 
   def scheduled_at_cannot_be_in_past

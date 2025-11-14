@@ -373,6 +373,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_08_183314) do
     t.string "google_refresh_token"
     t.datetime "google_expires_at"
     t.string "calendar_id"
+    t.integer "tutorias_dadas_count", default: 0, null: false
+    t.integer "tutorias_recibidas_count", default: 0, null: false
+    t.integer "resenas_dadas_count", default: 0, null: false
+    t.integer "feedback_dado_count", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true

@@ -25,6 +25,7 @@ class Tutorings::MarkFinishedTutoringsJob < ApplicationJob
       # Camino normal: intenta actualizar con validaciones
       # Si no se hace este camino no se puede chequear en el test cuando ocurre un error en el proceso
       t.update!(state: :finished)
+      t.incrementar_contadores_insignas
 
       # Encolar job que notifica a participantes para dejar feedback
       TutoringFeedbackJob.perform_later(t.id)
@@ -33,6 +34,7 @@ class Tutorings::MarkFinishedTutoringsJob < ApplicationJob
       Rails.logger.warn "[MarkFinishedTutoringsJob] Tutoring##{t.id} invalid: #{e.message} — forcing state"
       t.state = :finished # Obs "t.update(state: :finished, validate: false)" no funciona correctamente con enums
       t.save(validate: false)
+      t.incrementar_contadores_insignas
       # Encolar igualmente el job de feedback aun cuando forzamos el cambio
       TutoringFeedbackJob.perform_later(t.id)
     rescue => e
