@@ -4,25 +4,15 @@ class Tutorings::MarkFinishedTutoringsJob < ApplicationJob
   def perform
     # Encuentra todas las tutorías activas que deberían marcarse como finalizadas
     # Una tutoría está finalizada cuando: scheduled_at + duration_mins < Time.current
-    # implementación DB específica (Postgres) puede estar aquí y no funcionar en tests
-    # Buscar en Ruby para ser compatible entre DBs (Postgres/SQLite) y evitar SQL específico
-    finished = []
-
-    Tutoring.where(state: :active).where.not(scheduled_at: nil).find_each do |t|
-      dur = (t.duration_mins || 0).to_i
-      # si no tiene duración, ignorar (o cambiar política según necesidad)
-      next if dur <= 0
-
-      if t.scheduled_at + dur.minutes < Time.current
-        finished << t
-      end
-    end
+    finished_tutorings = Tutoring.active.where(
+      "scheduled_at + (duration_mins * interval '1 minute') < ?", Time.current
+    )
 
     # Encuentra tutorías donde TODAS las tutoring_availabilities asociadas tienen start_time < Time.current
     expired_pending_tutorings = find_expired_pending_tutorings
 
     # Actualiza todas las tutorías finalizadas
-    update_tutorings_state(finished)
+    update_tutorings_state(finished_tutorings)
 
     # Elimina tutorías vencidas pending/active que cumplan los criterios
     destroy_expired_tutorings(expired_pending_tutorings)

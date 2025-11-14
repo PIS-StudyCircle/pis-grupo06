@@ -312,14 +312,6 @@ module Api
           ).deliver_later(@tutoring.tutor)
         end
 
-        # Notificar al tutor que un nuevo estudiante se unió
-        if @tutoring.tutor.present?
-          ApplicationNotifier.with(
-            title: "#{current_user.name} se unió a tu tutoría de #{@tutoring.course.name}.",
-            url: "/notificaciones"
-          ).deliver_later(@tutoring.tutor)
-        end
-
         render json: {
           ok: true,
           enrolled: @tutoring.reload.enrolled,
