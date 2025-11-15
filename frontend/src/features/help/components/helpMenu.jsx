@@ -112,7 +112,7 @@ export default function HelpMenu() {
         if (pure === "/notificaciones") {
             return [
                 "En esta pantalla podés ver tus próximas tutorías, pudiendo desuscribirte de una si ya no podés asistir.",
-                "También podés ver las tutorías en las que ya participaste y dejar un feedback al tutor.",
+                "También podés ver las tutorías en las que ya participaste y dejar un feedback al tutor, o las que creaste y aún están pendientes de confirmación. De estas últimas, también te podes desuscribir.",
             ];
         }
         // /usuarios

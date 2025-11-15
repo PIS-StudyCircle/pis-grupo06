@@ -475,13 +475,13 @@ module Api
           {
             id: t.id,
             subject: t.course&.name,
-            tutor: t.tutor&.name || "Sin asignar",
+            tutor: t.tutor ? "#{t.tutor.name} #{t.tutor.last_name}" : "Sin asignar",
             date: t.scheduled_at,
             duration: t.duration_mins,
             location: t.location.presence || "Virtual",
             status: t.state,
             role: is_tutor ? "tutor" : "student",
-            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "active" } },
+            attendees: t.users.map { |u| { id: u.id, email: u.email_masked } },
             url: nil,
             chat_id: t.chat&.id
           }
@@ -502,15 +502,39 @@ module Api
           {
             id: t.id,
             subject: t.course&.name,
-            tutor: t.tutor&.name || "Sin asignar",
+            tutor: t.tutor ? "#{t.tutor.name} #{t.tutor.last_name}" : "Sin asignar",
             tutor_id: t.tutor_id,
             date: t.scheduled_at,
             duration: t.duration_mins,
             location: t.location.presence || "Virtual",
             status: t.state,
             role: is_tutor ? "tutor" : "student",
-            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "finished" } },
+            attendees: t.users.map { |u| { id: u.id, email: u.email_masked } },
             url: nil
+          }
+        }
+      end
+
+      # obtengo mis tutorías pendientes
+      def my_pendings
+        user = User.find(params[:user_id])
+
+        tutorings = Tutoring
+                    .enrolled_or_tutor_by(user)
+                    .where(state: :pending)
+                    .includes(:tutor, :course, :chat)
+                    .order(:id)
+
+        render json: tutorings.map { |t|
+          is_tutor = t.tutor_id == user.id
+          {
+            id: t.id,
+            subject: t.course&.name,
+            tutor: t.tutor&.name || "Sin asignar",
+            location: t.location.presence || "Virtual",
+            status: t.state,
+            role: is_tutor ? "tutor" : "student",
+            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "active" } },
           }
         }
       end
