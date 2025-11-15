@@ -7,7 +7,9 @@ export default function TutoringList({
   loading,
   error,
   mode = "",
-  onDesuscribirse
+  onDesuscribirse,
+  isBlockingPage,
+  setIsBlockingPage,
 }) {
   if (loading)  return (
       <div className="flex flex-col">
@@ -33,9 +35,10 @@ export default function TutoringList({
     );
 
   return (
-    <div className="flex flex-col">
+    <div className={`flex flex-col ${isBlockingPage ? "pointer-events-none opacity-50" : ""}`}>
       {tutorings.map((tutoring) => (
-        <TutoringCard key={tutoring.id} tutoring={tutoring} mode={mode} onDesuscribirse={onDesuscribirse} />
+        <TutoringCard key={tutoring.id} tutoring={tutoring} onDesuscribirse={onDesuscribirse} isBlockingPage={isBlockingPage}
+          setIsBlockingPage={setIsBlockingPage} />
       ))}
     </div>
   );

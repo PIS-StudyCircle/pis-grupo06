@@ -225,7 +225,7 @@ export default function UserProfile() {
           {user.description && (
             <div>
               <p className="text-sm text-gray-300">Descripción</p>
-              <p className="w-full rounded-lg px-3 py-2 text-black bg-white opacity-80">
+              <p className="w-full rounded-lg px-3 py-2 text-black bg-white opacity-80 max-h-40 overflow-y-auto break-words">
                 {user.description}
               </p>
             </div>
