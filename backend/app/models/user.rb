@@ -114,15 +114,16 @@ class User < ApplicationRecord
   def email_masked
     return "" if email.blank?
 
-    nombre, dominio = email.split('@')
+    nombre, dominio = email.split('@', 2)
+    return email if nombre.blank? || dominio.blank?
 
-    if nombre.length < 4
-      ofuscado = '*' * nombre.length
-    else
-      visibles = nombre[0, 4]
-      ofuscado = visibles + ('*' * (nombre.length - 4))
-    end
+    # Mostrar hasta los primeros 3 caracteres del nombre
+    visible = nombre[0,3]  # si el nombre tiene menos de 3, toma lo que haya
 
-    "#{ofuscado}@#{dominio}"
+    masked_nombre = visible + "******"  # cantidad fija de asteriscos
+
+    "#{masked_nombre}@#{dominio}"
   end
+
+
 end

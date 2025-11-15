@@ -16,6 +16,9 @@ module Api
         # Filtro de búsqueda por id de curso
         subjects = subjects.where(course_id: params[:course_id]) if params[:course_id].present?
 
+        # No devuelvo los temas vencidos siempre
+        subjects = subjects.where("due_date >= ?", Date.today)  
+
         @pagy, @subjects = pagy(subjects, items: params[:per_page] || 20)
 
         render json: {
