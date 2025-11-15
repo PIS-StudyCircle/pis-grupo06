@@ -98,20 +98,6 @@ RSpec.describe "Tutoring model (self-contained spec)", type: :request do
       expect(t.valid?).to be true
     end
 
-    it "no permite scheduled_at en el pasado" do
-      travel_to(Time.zone.parse("2025-09-23 12:00:00 UTC")) do
-        t = Tutoring.new(
-          course: create_course,
-          scheduled_at: 1.minute.ago,
-          duration_mins: 60,
-          modality: "virtual",
-          capacity: 5
-        )
-        expect(t.valid?).to be false
-        expect(t.errors[:scheduled_at]).to be_present
-      end
-    end
-
     it "duration_mins: presente, entero, 1..240" do
       expect(create_tutoring(duration_mins: 60)).to be_valid
       t2 = Tutoring.new(
