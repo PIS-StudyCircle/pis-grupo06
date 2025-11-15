@@ -196,12 +196,12 @@ module Api
         if tutoring.tutor_id.nil? && tutoring.capacity.nil?
           tutoring.capacity = nil # Valor por defecto para solicitudes pendientes
         end
-
         # Validar overlapping con las availabilities antes de crearlas
         if params[:tutoring][:availabilities_attributes].present?
           if availability_overlaps?(params[:tutoring][:availabilities_attributes], current_user.id)
             render json: {
-              error: "Ya tienes una tutoría programada en esa fecha y horario"
+              error: "Ya tienes una tutoría programada en esa fecha y horario,
+              o una tutoría pendiente con una disponibilidad que se solapa."
             }, status: :unprocessable_entity
             return
           end
@@ -232,11 +232,16 @@ module Api
 
             course_name = tutoring.course&.name || Course.find(tutoring.course_id).name
             encoded_name = URI.encode_www_form_component(course_name)
+            if tutoring.tutor_id.present?
+              url = "/tutorias/materia/#{tutoring.course_id}?course_name=#{encoded_name}"
+            else
+              url = "/tutorias/ser_tutor/#{tutoring.course_id}?course_name=#{encoded_name}"
+            end
             if favoriters.exists?
               favoriters.find_each do |user|
                 ApplicationNotifier.with(
                   title: "Se creó una nueva tutoría de #{course_name}!",
-                  url: "/tutorias/materia/#{tutoring.course_id}?course_name=#{encoded_name}"
+                  url: url
                 ).deliver_later(user)
               end
             end
@@ -824,18 +829,40 @@ module Api
       def check_overlapping_tutorings(start_time, end_time, user_id)
         # Buscar tutorías donde el usuario está involucrado (como tutor, creador o estudiante)
         # que se solapen con el horario especificado
-        Tutoring.joins(:user_tutorings)
-                .where.not(id: @tutoring&.id) # Excluir la tutoría actual si existe
-                .where(
-                  "(scheduled_at < ? AND (scheduled_at + INTERVAL '1 minute' * duration_mins) > ?) OR " +
-                  "(scheduled_at >= ? AND scheduled_at < ?)",
-                  end_time, start_time, start_time, end_time
+        existing_tutorings = Tutoring.joins(:user_tutorings)
+                                     .where.not(id: @tutoring&.id)
+                                     .where(
+                                       "(scheduled_at < ? AND (scheduled_at + " \
+                                       "INTERVAL '1 minute' * duration_mins) > ?) OR " \
+                                       "(scheduled_at >= ? AND scheduled_at < ?)",
+                                       end_time, start_time, start_time, end_time
+                                     )
+                                     .where(
+                                       "user_tutorings.user_id = ? OR tutor_id = ? OR created_by_id = ?",
+                                       user_id, user_id, user_id
+                                     )
+                                     .distinct
+
+        pending_tutorings = Tutoring.joins(:tutoring_availabilities)
+                                    .where(
+                                      tutorings: {
+                                        state: 'pending',
+                                        created_by_id: user_id
+                                      }
+                                    )
+                                    .where(
+                                      "(tutoring_availabilities.start_time < ? AND " \
+                                      "tutoring_availabilities.end_time > ?) OR " \
+                                      "(tutoring_availabilities.start_time >= ? AND " \
+                                      "tutoring_availabilities.start_time < ?)",
+                                      end_time, start_time, start_time, end_time
+                                    )
+                                    .distinct
+
+        Tutoring.where(id: existing_tutorings.select(:id))
+                .or(
+                  Tutoring.where(id: pending_tutorings.select(:id))
                 )
-                .where(
-                  "user_tutorings.user_id = ? OR tutor_id = ? OR created_by_id = ?",
-                  user_id, user_id, user_id
-                )
-                .distinct
       end
 
       def capture_tutoring_data(tutoring)
