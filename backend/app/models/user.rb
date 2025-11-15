@@ -118,12 +118,10 @@ class User < ApplicationRecord
     return email if nombre.blank? || dominio.blank?
 
     # Mostrar hasta los primeros 3 caracteres del nombre
-    visible = nombre[0,3]  # si el nombre tiene menos de 3, toma lo que haya
+    visible = nombre[0, 3] # si el nombre tiene menos de 3, toma lo que haya
 
-    masked_nombre = visible + "******"  # cantidad fija de asteriscos
+    masked_nombre = visible + "******" # cantidad fija de asteriscos
 
     "#{masked_nombre}@#{dominio}"
   end
-
-
 end

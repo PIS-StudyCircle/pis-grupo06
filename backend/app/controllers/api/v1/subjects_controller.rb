@@ -17,7 +17,7 @@ module Api
         subjects = subjects.where(course_id: params[:course_id]) if params[:course_id].present?
 
         # No devuelvo los temas vencidos siempre
-        subjects = subjects.where("due_date >= ?", Date.today)  
+        subjects = subjects.where(due_date: Time.zone.today..)
 
         @pagy, @subjects = pagy(subjects, items: params[:per_page] || 20)
 
