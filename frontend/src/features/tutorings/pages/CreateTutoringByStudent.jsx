@@ -29,6 +29,7 @@ export default function CreateTutoringByStudent() {
 
   const [availabilities, setAvailabilities] = useState([{ date: "", startTime: "", endTime: "" }])
   const [submitError, setSubmitError] = useState([])
+  const [loading, setLoading] = useState(false);
 
   if (userLoading) return <p className="text-center mt-10">Cargando usuario...</p>
   if (userError) return <p className="text-center mt-10">Error al cargar perfil.</p>
@@ -126,9 +127,11 @@ export default function CreateTutoringByStudent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true);
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setField("_errors", errs);
+      setLoading(false);
       return;
     }
 
@@ -165,6 +168,8 @@ export default function CreateTutoringByStudent() {
       const message = err?.error || err?.message || "Error desconocido al crear la tutoría";
       setSubmitError([message])
       showError("Error al crear la solicitud: " + message)
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -356,7 +361,7 @@ export default function CreateTutoringByStudent() {
           </ErrorAlert>
         )}
 
-        <SubmitButton text="Enviar solicitud" />
+        <SubmitButton text={loading ? "Procesando..." : "Enviar solicitud"}  disabled={loading} />
       </form>
     </AuthLayout>
   )

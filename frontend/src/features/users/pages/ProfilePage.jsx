@@ -189,7 +189,7 @@ export default function Profile() {
             {/* Col 2: Descripción */}
             <div className="flex justify-center">
               {user.description ? (
-                <p className="text-sm bg-white/20 text-white/90 p-4 rounded-xl shadow-inner max-w-lg text-center">
+                <p className="text-sm bg-white/20 text-white/90 p-4 rounded-xl shadow-inner max-w-lg text-center max-h-40 overflow-y-auto break-words">
                   {user.description}
                 </p>
               ) : (

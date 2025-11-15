@@ -5,6 +5,7 @@ import { SessionListPage } from "@/features/calendar";
 
 export default function Sessions() {
   const { user, loading, error } = useUser();
+   const [isBlockingPage, setIsBlockingPage] = useState(false);
 
   const [open, setOpen] = useState({
     upcoming: true,
@@ -61,12 +62,12 @@ export default function Sessions() {
               }`}
             >
               <div className="p-4 max-h-[600px] overflow-y-auto">
-                <SessionListPage userId={user.id} type={type} />
+                <SessionListPage userId={user.id} type={type} isBlockingPage={isBlockingPage}
+                setIsBlockingPage={setIsBlockingPage} />
               </div>
             </div>
           </div>
         ))}
-
       </div>
     </div>
   );

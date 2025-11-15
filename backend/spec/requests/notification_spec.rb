@@ -303,7 +303,7 @@ RSpec.describe "Notifications Messages", type: :request do
         notif = Noticed::Notification.where(recipient: tutor).order(created_at: :desc).first
         expect(notif).to be_present
         expect(notif.title).to include("Nueva reseña recibida")
-        expect(notif.url).to eq("/usuarios/#{student1.id}")
+        expect(notif.url).to eq("/usuarios/#{tutor.id}")
       end
 
       it "notifica a participantes que la tutoría finalizó y pueden dejar feedback e insignias" do

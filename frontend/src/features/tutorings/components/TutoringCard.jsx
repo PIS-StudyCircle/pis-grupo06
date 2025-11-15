@@ -6,16 +6,25 @@ import {
   showError,
   showConfirm,
 } from "@shared/utils/toastService";
+import { useState } from "react";
 
 export default function TutoringCard({
   tutoring,
   mode: externalMode,
   onDesuscribirse,
+  isBlockingPage,
+  setIsBlockingPage
 }) {
   const { user } = useUser();
+  const [loadingUnirme, setLoadingUnirme] = useState(false);
+  const [loadingDesuscribirme, setLoadingDesuscribirme] = useState(false);
 
   const handleUnirmeClick = async (tutoring) => {
     if (!tutoring) return;
+
+    if (loadingUnirme) return;
+    setLoadingUnirme(true);
+    setIsBlockingPage(true);
 
     const primerEstudiante = tutoring.enrolled === 0;
 
@@ -24,6 +33,7 @@ export default function TutoringCard({
       navigate(`/tutorias/${tutoring.id}/elegir_horario_estudiante`, {
         state: { tutoring },
       });
+      setLoadingUnirme(false);
       return;
     }
 
@@ -42,6 +52,7 @@ export default function TutoringCard({
       );
       if (res.ok) {
         showSuccess("Te uniste a la tutoría con éxito");
+        navigate(`/notificaciones`)
       } else {
         const data = await res.json().catch(() => ({}));
         showError(data.error || "No se pudo unir a la tutoría");
@@ -49,27 +60,38 @@ export default function TutoringCard({
     } catch (error) {
       console.error(error);
       showError("Error en la conexion con el servidor");
-    }
+    }finally{
+      setIsBlockingPage(false);
+      setLoadingUnirme(false);
+    };
   };
 
   //let mode;
 
   const handleDesuscribirmeClick = async (tutoring) => {
     if (!tutoring) return;
+    
+    if (loadingDesuscribirme) return;
 
-    showConfirm(
+    setIsBlockingPage(true);
+    showConfirm(      
       `¿Seguro que querés desuscribirte de la tutoría?`,
       async () => {
         try {
+          setLoadingDesuscribirme(true);
           if (onDesuscribirse) await onDesuscribirse(tutoring.id);
           showSuccess("Te desuscribiste correctamente.");
+          navigate(`/notificaciones`)
         } catch (error) {
           console.error(error);
           showError("Ocurrió un error al intentar desuscribirte.");
+        } finally {
+          setLoadingDesuscribirme(false);
+          setIsBlockingPage(false);
         }
       },
       () => {
-        console.log("Usuario canceló la desuscripción");
+        setIsBlockingPage(false);
       }
     );
   };
@@ -108,7 +130,10 @@ export default function TutoringCard({
     className="w-full bg-white rounded-lg shadow p-4 my-4 cursor-pointer hover:shadow-md transition-shadow"
     role="button"
     tabIndex={0}
-    onClick={() => navigate(`/tutorias/${tutoring.id}`)}
+    onClick={() => {
+      if (loadingUnirme) return;
+      navigate(`/tutorias/${tutoring.id}`);
+      }}
     onKeyDown={(e) => {
       if (e.key === "Enter" || e.key === " ") {
         navigate(`/tutorias/${tutoring.id}`);
@@ -180,28 +205,40 @@ export default function TutoringCard({
             {mode === "serTutor" && (
               <button
                 type="button"
-                className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+                className={`btn w-full font-semibold transition ${
+                  loadingUnirme
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+                    : "bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white"
+                }`}
                 onClick={(e) => {
                   e.stopPropagation(); // para que no se dispare el onClick del card
+                  if (isBlockingPage) return;
                   navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
                     state: { tutoring },
                   });
                 }}
+                disabled={isBlockingPage}
               >
-                Ser tutor
+                {loadingUnirme ? "Uniéndote a la tutoría como tutor..." : "Ser Tutor"}
               </button>
             )}
 
             {mode === "serEstudiante" && (
               <button
                 type="button"
-                className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+                className={`btn w-full font-semibold transition ${
+                  loadingUnirme
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+                    : "bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white"
+                }`}
                 onClick={(e) => {
                   e.stopPropagation(); // para que no se dispare el onClick del card
+                   if (isBlockingPage) return;
                   handleUnirmeClick(tutoring);
                 }}
+                disabled={isBlockingPage}
               >
-                Unirme
+                {loadingUnirme ? "Uniéndote a la tutoría..." : "Unirme"}
               </button>
             )}
 
@@ -212,7 +249,8 @@ export default function TutoringCard({
                   className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
                   onClick={(e) => {
                     e.stopPropagation(); // para que no se dispare el onClick del card
-                    navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
+                      if (isBlockingPage) return;
+                      navigate(`/tutorias/${tutoring.id}/elegir_horario_tutor`, {
                       state: { tutoring },
                     });
                   }}
@@ -221,13 +259,19 @@ export default function TutoringCard({
                 </button>
                 <button
                   type="button"
-                  className="btn w-full bg-blue-500 hover:bg-blue-600 text-white"
+                  className={`btn w-full font-semibold transition ${
+                    loadingUnirme
+                      ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+                      : "bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white"
+                  }`}
                   onClick={(e) => {
                     e.stopPropagation(); // para que no se dispare el onClick del card
+                     if (isBlockingPage) return;
                     handleUnirmeClick(tutoring);
                   }}
+                  disabled={isBlockingPage}
                 >
-                  Unirme
+                  {loadingUnirme ? "Uniéndote a la tutoría..." : "Unirme"}
                 </button>
               </>
             )}
@@ -235,13 +279,19 @@ export default function TutoringCard({
             {mode === "misTutorias" && (
               <button
                 type="button"
-                className="btn w-full bg-red-500 hover:bg-red-600 text-white"
+                className={`btn w-full font-semibold transition ${
+                    loadingDesuscribirme
+                      ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+                      : "bg-red-500 hover:bg-red-600 active:scale-[0.98] text-white"
+                  }`}
                 onClick={(e) => {
                   e.stopPropagation(); // para que no se dispare el onClick del card
+                   if (isBlockingPage) return;
                   handleDesuscribirmeClick(tutoring);
                 }}
+                disabled={isBlockingPage}
               >
-                Desuscribirme
+                {loadingDesuscribirme ? "Desuscribiéndote a la tutoría..." : "Desuscribirme"}
               </button>
             )}
 

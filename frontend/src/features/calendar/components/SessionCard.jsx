@@ -6,12 +6,18 @@ import { hasFeedback } from "../hooks/useFeedback";
 import { useUser } from "@context/UserContext";
 import { handleCancel } from "@/features/calendar/hooks/useCancelSession";
 import { EstadoBadge } from "@shared/utils/showTutorings"
+import {
+  showSuccess,
+  showError,
+  showConfirm,
+} from "@shared/utils/toastService";
 
-export default function SessionCard({ session, type = "all", refresh }) {
+export default function SessionCard({ session, type = "all", refresh,  isBlockingPage, setIsBlockingPage }) {
   const [showAttendees, setShowAttendees] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [userRating, setUserRating] = useState(null);
   const [loadingFeedback, setLoadingFeedback] = useState(false);
+  const [loadingDesuscribirme, setLoadingDesuscribirme] = useState(false);
 
   const { user } = useUser();
   const navigate = useNavigate(); // Agregar esta línea
@@ -50,9 +56,34 @@ export default function SessionCard({ session, type = "all", refresh }) {
     });
 
   const handleDesuscribirmeClick = (session, e) => {
-    if (e) e.stopPropagation(); // Evitar propagación del evento
+    if (e) e.stopPropagation();
     if (!session) return;
-    handleCancel(session.id, refresh);
+    if (loadingDesuscribirme) return;
+
+    // Activamos bloqueo solo cuando abrimos la confirmación
+    setIsBlockingPage(true);
+
+    showConfirm(      
+      `¿Seguro que querés desuscribirte de la tutoría?`,
+      async () => {
+        try {
+          setLoadingDesuscribirme(true);
+          await handleCancel(session.id);
+          showSuccess("Te desuscribiste correctamente.");
+          if(refresh) refresh();
+          navigate(`/notificaciones`);
+        } catch (error) {
+          console.error(error);
+          showError("Ocurrió un error al intentar desuscribirte.");
+        } finally {
+          setLoadingDesuscribirme(false);
+          setIsBlockingPage(false);
+        }
+      },
+      () => {
+        setIsBlockingPage(false);
+      }
+    );
   };
 
   const handleSubmitReview = (rating) => {
@@ -75,6 +106,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
   // Manejador para evitar propagación en botones específicos
   const handleButtonClick = (e, callback) => {
     e.stopPropagation();
+    if(isBlockingPage) return;
     if (callback) callback();
   };
 
@@ -117,7 +149,10 @@ export default function SessionCard({ session, type = "all", refresh }) {
     <>
       <div
         className="bg-white border border-gray-300 rounded-xl p-6 shadow-lg hover:shadow-xl hover:scale-[1.01] transition transform cursor-pointer"
-        onClick={handleCardClick}
+        onClick={() => {
+          if (isBlockingPage || loadingDesuscribirme) return;
+          handleCardClick();
+        }}
       >
         <div className="flex items-start justify-between mb-4">
           <div>
@@ -168,6 +203,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
                   handleButtonClick(e, () => setShowAttendees(!showAttendees))
                 }
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
+                disabled={isBlockingPage}
               >
                 <Users className="w-4 h-4" />
                 {showAttendees ? "Ocultar participantes" : "Ver participantes"}
@@ -191,10 +227,15 @@ export default function SessionCard({ session, type = "all", refresh }) {
             {type !== "finalized" && (
               <button
                 type="button"
-                className="btn w-full bg-red-500 hover:bg-red-600 text-white mt-3"
+                className={`btn w-full font-semibold transition ${
+                  loadingDesuscribirme
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+                    : "bg-red-500 hover:bg-red-600 active:scale-[0.98] text-white"
+                }`}
                 onClick={(e) => handleDesuscribirmeClick(session, e)}
+                disabled={isBlockingPage}
               >
-                Desuscribirme
+                {loadingDesuscribirme ? "Desuscribiéndote a la tutoría..." : "Desuscribirme"}
               </button>
             )}
           </>
@@ -214,10 +255,12 @@ export default function SessionCard({ session, type = "all", refresh }) {
             ) : (
               !esTutor && (
                 <button
-                  onClick={(e) =>
+                  onClick={(e) =>{
+                    if(isBlockingPage)return;
                     handleButtonClick(e, () => setShowFeedbackModal(true))
-                  }
+                  }}
                   className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800"
+                  disabled={isBlockingPage}
                 >
                   <Star className="w-4 h-4" />
                   Dejar feedback

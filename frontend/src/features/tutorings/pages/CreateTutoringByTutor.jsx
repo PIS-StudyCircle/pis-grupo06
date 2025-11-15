@@ -37,6 +37,7 @@ export default function CreateTutoringByTutor() {
 
   const { errors, validate } = useValidation(validators)
   const [submitError, setSubmitError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const addAvailability = () => {
     setAvailabilities([...availabilities, { date: "", startTime: "", endTime: "" }])
@@ -121,9 +122,11 @@ export default function CreateTutoringByTutor() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true);
 
     // Validar campos básicos del formulario
     if (!validate(form)) {
+      setLoading(false);
       return
     }
 
@@ -131,6 +134,7 @@ export default function CreateTutoringByTutor() {
     const availabilityErrors = validateAvailabilities();
     if (availabilityErrors) {
       setAvailabilityError(availabilityErrors); // array
+      setLoading(false);
       return;
     }
     setAvailabilityError(null);
@@ -175,7 +179,9 @@ export default function CreateTutoringByTutor() {
       console.error("Error creating tutoring sessions:", err)
       const message = err?.error || err?.message || "Error desconocido al crear la tutoría";
       setSubmitError(message);
-    }
+    } finally {
+      setLoading(false);
+    } 
   }
 
   return (
@@ -236,6 +242,7 @@ export default function CreateTutoringByTutor() {
             error={errors.limit}
             className="flex-1"
             autoComplete="off"
+            maxLength={3}
           />
         </div>
 
@@ -346,7 +353,7 @@ export default function CreateTutoringByTutor() {
           <ErrorAlert>{submitError}</ErrorAlert>
         )}
 
-        <SubmitButton text="Confirmar" />
+        <SubmitButton text={loading ? "Procesando..." : "Confirmar"}  disabled={loading} />
       </form>
     </AuthLayout>
   )
