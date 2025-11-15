@@ -236,6 +236,7 @@ export default function CreateTutoringByTutor() {
             error={errors.limit}
             className="flex-1"
             autoComplete="off"
+            maxLength={3}
           />
         </div>
 
