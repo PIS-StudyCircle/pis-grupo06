@@ -1,5 +1,5 @@
 import { Calendar, Clock, User, MapPin, Users, Star } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom"; // Agregar esta importación
 import FeedbackModal from "./FeedbackModal";
 import { hasFeedback } from "../hooks/useFeedback";
@@ -18,6 +18,7 @@ export default function SessionCard({ session, type = "all", refresh,  isBlockin
   const [userRating, setUserRating] = useState(null);
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [loadingDesuscribirme, setLoadingDesuscribirme] = useState(false);
+  const isDesubscribingRef = useRef(false);
 
   const { user } = useUser();
   const navigate = useNavigate(); // Agregar esta línea
@@ -66,6 +67,8 @@ export default function SessionCard({ session, type = "all", refresh,  isBlockin
     showConfirm(      
       `¿Seguro que querés desuscribirte de la tutoría?`,
       async () => {
+        if (isDesubscribingRef.current) return; // evita reentradas por doble click
+        isDesubscribingRef.current = true;
         try {
           setLoadingDesuscribirme(true);
           await handleCancel(session.id);
@@ -78,6 +81,7 @@ export default function SessionCard({ session, type = "all", refresh,  isBlockin
         } finally {
           setLoadingDesuscribirme(false);
           setIsBlockingPage(false);
+          isDesubscribingRef.current = false;
         }
       },
       () => {

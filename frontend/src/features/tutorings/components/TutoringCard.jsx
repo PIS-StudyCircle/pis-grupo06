@@ -6,7 +6,7 @@ import {
   showError,
   showConfirm,
 } from "@shared/utils/toastService";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function TutoringCard({
   tutoring,
@@ -18,6 +18,7 @@ export default function TutoringCard({
   const { user } = useUser();
   const [loadingUnirme, setLoadingUnirme] = useState(false);
   const [loadingDesuscribirme, setLoadingDesuscribirme] = useState(false);
+  const isDesubscribingRef = useRef(false);
 
   const handleUnirmeClick = async (tutoring) => {
     if (!tutoring) return;
@@ -70,13 +71,14 @@ export default function TutoringCard({
 
   const handleDesuscribirmeClick = async (tutoring) => {
     if (!tutoring) return;
-    
     if (loadingDesuscribirme) return;
 
     setIsBlockingPage(true);
     showConfirm(      
       `¿Seguro que querés desuscribirte de la tutoría?`,
       async () => {
+        if (isDesubscribingRef.current) return;
+        isDesubscribingRef.current = true;
         try {
           setLoadingDesuscribirme(true);
           if (onDesuscribirse) await onDesuscribirse(tutoring.id);
@@ -88,6 +90,7 @@ export default function TutoringCard({
         } finally {
           setLoadingDesuscribirme(false);
           setIsBlockingPage(false);
+          isDesubscribingRef.current = false;
         }
       },
       () => {
@@ -100,7 +103,7 @@ export default function TutoringCard({
   const cuposDisponibles =
     tutoring.capacity != null && tutoring.capacity > tutoring.enrolled;
   const soyTutor = tutoring.tutor_id === user?.id;
-  const esCreador = tutoring.created_by_id === user?.id;
+  const esCreador = tutoring.created_by_id === user?.id && tutoring.user_enrolled;
   const soyEstudiante = tutoring.user_enrolled;
 
 

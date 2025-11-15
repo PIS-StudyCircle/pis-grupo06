@@ -1,5 +1,5 @@
 import { Star, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createFeedback } from "../hooks/useFeedback";
 import { showSuccess, showError } from "@/shared/utils/toastService";
 
@@ -12,12 +12,17 @@ export default function FeedbackModal({
 }) {
   const [rating, setRating] = useState(0);       
   const [tempRating, setTempRating] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
   const stars = [1, 2, 3, 4, 5];
 
   const current = tempRating || rating;
 
   const handleSubmit = async () => {
     if (rating <= 0) return;
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
     try {
       const result = await createFeedback(sessionId, rating);
       showSuccess("¡Calificación enviada con éxito!");
@@ -26,6 +31,9 @@ export default function FeedbackModal({
       onClose();
     } catch (error) {
       showError(error?.message ?? "No se pudo enviar la calificación");
+    } finally {
+      setIsSubmitting(false);
+      isSubmittingRef.current = false;
     }
   };
 
@@ -128,14 +136,14 @@ export default function FeedbackModal({
           </button>
           <button
             onClick={handleSubmit}
-            disabled={rating <= 0}
+            disabled={rating <= 0 || isSubmitting}
             className={`px-5 py-2 rounded-lg text-sm font-medium text-white transition ${
               rating <= 0
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
-            Enviar
+            {isSubmitting ? "Enviando..." : "Enviar"}
           </button>
         </div>
       </div>
