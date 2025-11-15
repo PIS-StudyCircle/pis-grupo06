@@ -72,7 +72,7 @@ export default function ShowPageTutoring() {
       try {
         await onDesuscribirse(tutoring.id);
         showSuccess("Te desuscribiste correctamente.");
-        navigate(-1);
+        navigate('/notificaciones');
       } catch (e) {
         console.error(e);
         showError(e.message || "Ocurrió un error al intentar desuscribirte.");
