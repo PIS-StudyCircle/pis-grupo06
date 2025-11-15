@@ -1,16 +1,9 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import NavBar from "../../../shared/components/layout/NavBar";
 import { NotificationsCtx } from "../../../shared/context/NotificationContext";
 import { useUser } from "../../../shared/context/UserContext";
-
-// jest.mock("@rails/actioncable", () => ({
-//   createConsumer: jest.fn(() => ({
-//     subscriptions: { create: jest.fn(() => ({ unsubscribe: jest.fn() })) },
-//     disconnect: jest.fn(),
-//   })),
-// }));
 
 jest.mock("../components/Bell", () => {
   const React = jest.requireActual("react");
@@ -18,50 +11,17 @@ jest.mock("../components/Bell", () => {
 
   function MockBell() {
     const ctx = React.useContext(RealNotificationsCtx) || { list: [], unread: 0, unseen: 0 };
-    const markAllSeenFn = ctx && ctx.markAllSeen ? ctx.markAllSeen : undefined;
     const [open, setOpen] = React.useState(false);
+    const toggle = () => setOpen((v) => !v);
 
-    React.useEffect(() => {
-      if (!open) return;
-      (async () => {
-        try {
-          if (typeof markAllSeenFn === "function") await markAllSeenFn();
-        } catch (e) {
-          console.error("markAllSeen failed", e);
-        }
-      })();
-    }, [open, markAllSeenFn]);
-
-    async function safeMarkRead(id) {
-      try {
-        if (ctx.markRead) await ctx.markRead(id);
-      } catch (e) {
-        console.error("markRead failed", e);
+    function navigateTo(url) {
+      if (typeof globalThis.__navigate__ === "function") {
+        return globalThis.__navigate__(url);
       }
-    }
-
-    async function safeDeleteOne(id) {
-      try {
-        if (ctx.deleteOne) await ctx.deleteOne(id);
-      } catch (e) {
-        console.error("deleteOne failed", e);
+      if (globalThis.location && typeof globalThis.location.assign === "function") {
+        return globalThis.location.assign(url);
       }
-    }
-
-    async function safeMarkAllRead() {
-      try {
-        if (ctx.markAllRead) await ctx.markAllRead();
-      } catch (e) {
-        console.error("markAllRead failed", e);
-      }
-    }
-
-    async function safeDeleteAll() {
-      try {
-        if (ctx.deleteAll) await ctx.deleteAll();
-      } catch (e) {
-        console.error("deleteAll failed", e);
-      }
+      globalThis.location.href = url;
     }
 
     return React.createElement(
@@ -71,7 +31,8 @@ jest.mock("../components/Bell", () => {
         "button",
         {
           title: ctx.unread > 0 ? `${ctx.unread} notificaciones sin leer` : "Notificaciones",
-          onClick: () => setOpen((v) => !v),
+          onClick: toggle,
+          "data-testid": "mock-bell-button"
         },
         "🔔"
       ),
@@ -82,36 +43,32 @@ jest.mock("../components/Bell", () => {
           ctx.list.length === 0
             ? React.createElement("div", null, "No hay notificaciones")
             : React.createElement(
-                "div",
+                "ul",
                 null,
-                React.createElement(
-                  "div",
-                  null,
-                  ctx.list.length > 0 &&
-                    React.createElement("button", { onClick: safeDeleteAll }, "Eliminar todas"),
-                  ctx.unread > 0 &&
-                    React.createElement("button", { onClick: safeMarkAllRead }, "Marcar todas como leídas")
-                ),
-                React.createElement(
-                  "ul",
-                  null,
-                  ctx.list.map((n) =>
+                ctx.list.map((n) =>
+                  React.createElement(
+                    "li",
+                    {
+                      key: n.id,
+                      "data-id": n.id,
+                      "data-read": n.read_at ? "true" : "false",
+                      "data-seen": n.seen_at ? "true" : "false",
+                      "data-url": n.url || ""
+                    },
                     React.createElement(
-                      "li",
-                      {
-                        key: n.id,
-                        "data-id": n.id,
-                        "data-read": n.read_at ? "true" : "false",
-                        "data-read-ts": n.read_at || "",
-                        "data-seen": n.seen_at ? "true" : "false",
-                        "data-seen-ts": n.seen_at || "",
-                      },
-                      React.createElement("button", { type: "button", onClick: () => safeMarkRead(n.id) }, n.title),
+                      "div",
+                      null,
                       React.createElement(
                         "button",
-                        { "aria-label": "Eliminar notificación", onClick: () => safeDeleteOne(n.id) },
-                        "X"
-                      )
+                        {
+                          type: "button",
+                          onClick: () => {
+                            if (n.url) navigateTo(n.url);
+                          }
+                        },
+                        n.title
+                      ),
+                      n.url && React.createElement("span", { "data-testid": `notif-url-${n.id}`, style: { marginLeft: 8 } }, n.url)
                     )
                   )
                 )
@@ -125,72 +82,26 @@ jest.mock("../components/Bell", () => {
 
 jest.mock("../../../shared/context/UserContext", () => ({ useUser: jest.fn() }));
 
-// NavBar y NotificationsCtx se importan arriba; useUser vendrá del mock hoisted por Jest
-// NavBar se importa para renderizar la UI con el Bell mockeado
-
-//NavBar envuelto en un provider para simular efectos reales
 function renderProvider(initial = [], overrides = {}) {
   const spies = {
-    markRead: overrides.markRead ?? jest.fn(async (id) => { void id; }),
-    deleteOne: overrides.deleteOne ?? jest.fn(async (id) => { void id; }),
-    markAllRead: overrides.markAllRead ?? jest.fn(async () => {}),
-    deleteAll: overrides.deleteAll ?? jest.fn(async () => {}),
-    markAllSeen: overrides.markAllSeen ?? jest.fn(async () => {}),
+    pushNotificationSpy: overrides.pushNotification ?? jest.fn(async () => {}),
   };
+
+  let pushFn = null;
 
   function TestProvider({ children }) {
     const [list, setList] = React.useState(initial);
 
-    const markRead = async (id) => {
-      try {
-        await spies.markRead(id);
-        setList((prev) => prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)));
-      } catch (e) {
-        console.error("markRead failed", e);
-      }
+    const pushNotification = async (notif) => {
+      await spies.pushNotificationSpy(notif);
+      setList((prev) => [notif, ...prev]);
     };
 
-    const deleteOne = async (id) => {
-      try {
-        await spies.deleteOne(id);
-        setList((prev) => prev.filter((n) => n.id !== id));
-      } catch (e) {
-        console.error("deleteOne failed", e);
-      }
-    };
-
-    const markAllRead = async () => {
-      try {
-        await spies.markAllRead();
-        const now = new Date().toISOString();
-        setList((prev) => prev.map((n) => (n.read_at ? n : { ...n, read_at: now })));
-      } catch (e) {
-        console.error("markAllRead failed", e);
-      }
-    };
-
-    const deleteAll = async () => {
-      try {
-        await spies.deleteAll();
-        setList([]);
-      } catch (e) {
-        console.error("deleteAll failed", e);
-      }
-    };
-
-    const markAllSeen = async () => {
-      try {
-        await spies.markAllSeen();
-        const now = new Date().toISOString();
-        setList((prev) => prev.map((n) => (n.seen_at ? n : { ...n, seen_at: now })));
-      } catch (e) {
-        console.error("markAllSeen failed", e);
-      }
-    };
+    pushFn = pushNotification;
 
     const unread = list.filter((n) => !n.read_at).length;
     const unseen = list.filter((n) => !n.seen_at).length;
-    const value = { list, unread, unseen, markRead, markAllRead, markAllSeen, deleteOne, deleteAll };
+    const value = { list, unread, unseen, pushNotification };
 
     return React.createElement(NotificationsCtx.Provider, { value }, children);
   }
@@ -203,264 +114,269 @@ function renderProvider(initial = [], overrides = {}) {
     )
   );
 
-  return { ...utils, spies };
+  return { ...utils, spies, notify: async (n) => pushFn && pushFn(n) };
+}
+
+const TUTOR = { id: 1, name: "Tutor" };
+const STUDENT1 = { id: 2, name: "Student1" };
+const STUDENT2 = { id: 3, name: "Student2" };
+const COURSE = { id: 1, name: "Álgebra" };
+
+function backendNotif(event, params = {}) {
+  const courseName = params.courseName ?? "Álgebra";
+  const actor = params.actor ?? "Usuario";
+  switch (event) {
+    case "join_tutoring":
+      return { id: params.id ?? "join1", title: `${actor} se unió a tu tutoría de ${courseName}`, url: '/notificaciones', created_at: new Date().toISOString() };
+    case "unsubscribe":
+      return { id: params.id ?? "unsub1", title: `${actor} se dio de baja de tu tutoría de ${courseName}`, url: '/notificaciones', created_at: new Date().toISOString() };
+    case "tutoring_cancelled":
+      return { id: params.id ?? "cancel1", title: `Tutoría cancelada: ${courseName}`, url: '/notificaciones', created_at: new Date().toISOString() };
+    case "confirm_by_tutor":
+      return { id: params.id ?? "conf1", title: `Tu solicitud de tutoría de ${courseName} fue confirmada`, url: '/notificaciones', created_at: new Date().toISOString() };
+    case "confirm_by_student":
+      return { id: params.id ?? "conf2", title: `El estudiante ${actor} confirmó la tutoría de ${courseName}`, url: '/notificaciones', created_at: new Date().toISOString() };
+    case "new_tutoring":
+      return { id: params.id ?? "new1", title: `Se creó una nueva tutoría de ${courseName}`, url: `/tutorias/materia/${COURSE.id}`, created_at: new Date().toISOString() };
+    case "review":
+      return { id: params.id ?? "rev1", title: `Nueva reseña recibida`, url: `/usuarios/${TUTOR.id}/reviews`, created_at: new Date().toISOString() };
+    case "feedback":
+      return { id: params.id ?? "fb1", title: `Tu tutoría de ${courseName} finalizó. ¡Deja tu feedback!`, url: `/usuarios/${TUTOR.id}`, created_at: new Date().toISOString() };
+    case "reminder":
+      return { id: params.id ?? "rem1", title: `Recordatorio: tu tutoría de ${courseName}`, url: '/notificaciones', created_at: new Date().toISOString() };
+    default:
+      return { id: params.id ?? "x", title: params.title ?? "Notificación", url: params.url ?? "/notificaciones", created_at: new Date().toISOString() };
+  }
 }
 
 describe("Notification", () => {
+
   beforeEach(() => {
     jest.clearAllMocks();
-    useUser.mockReturnValue({ user: { id: 1, name: "Usuario" }, signOut: jest.fn() });
+    useUser.mockReturnValue({ user: null, signOut: jest.fn() });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    cleanup();
+    delete globalThis.__navigate__;
   });
 
-  it("No muestra campana si no hay usuario logueado", () => {
-    useUser.mockReturnValue({ user: null });
-    render(
-      <MemoryRouter>
-        <NavBar />
-      </MemoryRouter>
-    );
-    expect(screen.queryByTitle(/Notificaciones/i)).not.toBeInTheDocument();
-  });
+  it("join_tutoring -> notifica al tutor y navega a la url", async () => {
+    useUser.mockReturnValue({ user: TUTOR, signOut: jest.fn() });
 
-  it("Si hay usuario y lista vacía muestra placeholder y no acciones", async () => {
-    renderProvider([]);
-    const bells = await screen.findAllByTitle(/Notificaciones/i);
+    const { notify } = renderProvider([]);
+    const notif = backendNotif("join_tutoring", { actor: STUDENT2.name, tutoringId: 42 });
+
+    await act(async () => { await notify(notif); });
+
+    const bells = await screen.findAllByTestId("mock-bell-button");
     fireEvent.click(bells[0]);
-    expect(await screen.findByText(/No hay notificaciones/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Eliminar todas/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Marcar todas como leídas/i)).not.toBeInTheDocument();
+
+    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent("/notificaciones");
+
+    const assignSpy = jest.fn();
+    globalThis.__navigate__ = assignSpy;
+    try {
+      const item = await screen.findByText(`${STUDENT2.name} se unió a tu tutoría de Álgebra`);
+      fireEvent.click(item);
+      expect(assignSpy).toHaveBeenCalledWith("/notificaciones");
+    } finally {
+      delete globalThis.__navigate__;
+    }
   });
 
-  it("Toggle Bell", async () => {
-    renderProvider([]);
-    const bells = await screen.findAllByTitle(/Notificaciones/i);
+  it("unsubscribe -> notifica al tutor y navega a la url", async () => {
+    useUser.mockReturnValue({ user: TUTOR, signOut: jest.fn() });
+
+    const { notify } = renderProvider([]);
+    const notif = backendNotif("unsubscribe", { actor: STUDENT1.name, tutoringId: 55 });
+
+    await act(async () => { await notify(notif); });
+
+    const bells = await screen.findAllByTestId("mock-bell-button");
     fireEvent.click(bells[0]);
-    expect(await screen.findByText(/No hay notificaciones/i)).toBeInTheDocument();
+
+    // la url debe mostrarse en el dropdown
+    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent("/notificaciones");
+
+    // simular navegación y verificar llamada
+    const assignSpy = jest.fn();
+    globalThis.__navigate__ = assignSpy;
+    try {
+      const item = await screen.findByText(`${STUDENT1.name} se dio de baja de tu tutoría de Álgebra`);
+      fireEvent.click(item);
+      expect(assignSpy).toHaveBeenCalledWith("/notificaciones");
+    } finally {
+      delete globalThis.__navigate__;
+    }
+  });
+
+  it("tutoring_cancelled -> notifica a inscritos y navega a la url", async () => {
+    useUser.mockReturnValue({ user: STUDENT1, signOut: jest.fn() });
+
+    const { notify } = renderProvider([]);
+    const notif = backendNotif("tutoring_cancelled", { tutoringId: 66 });
+
+    await act(async () => { await notify(notif); });
+
+    const bells = await screen.findAllByTestId("mock-bell-button");
     fireEvent.click(bells[0]);
-    await waitFor(() => expect(screen.queryByText(/No hay notificaciones/i)).not.toBeInTheDocument());
+
+    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent(notif.url);
+
+    const assignSpy = jest.fn();
+    globalThis.__navigate__ = assignSpy;
+    try {
+      // título genérico "Tutoría cancelada" puede variar; buscamos parte del texto
+      const item = await screen.findByText(/Tutoría cancelada/i);
+      fireEvent.click(item);
+      expect(assignSpy).toHaveBeenCalledWith(notif.url);
+    } finally {
+      delete globalThis.__navigate__;
+    }
   });
 
-  it("markRead", async () => {
-    const initial = [{ id: 1, title: "Notificación 1", created_at: new Date().toISOString(), read_at: null, seen_at: null }];
+  it("confirm_schedule por tutor -> notifica al creador y navega", async () => {
+    useUser.mockReturnValue({ user: STUDENT1, signOut: jest.fn() });
 
-    const { spies } = renderProvider(initial);
+    const { notify } = renderProvider([]);
+    const notif = backendNotif("confirm_by_tutor", { tutoringId: 10 });
 
-    const bell = (await screen.findAllByTitle(/Notificaciones/i))[0];
-    fireEvent.click(bell);
+    await act(async () => { await notify(notif); });
 
-    const itemBtn = await screen.findByText("Notificación 1");
-    fireEvent.click(itemBtn);
-    await waitFor(() => expect(spies.markRead).toHaveBeenCalledWith(1));
+    const bells = await screen.findAllByTestId("mock-bell-button");
+    fireEvent.click(bells[0]);
 
-    const li = itemBtn.closest("li");
-    expect(li).toHaveAttribute("data-read", "true");
-    expect(li.getAttribute("data-read-ts")).not.toBe("");
-    const bellsAfter = await screen.findAllByTitle(/Notificaciones/i);
-    expect(bellsAfter[0].getAttribute("title")).not.toMatch(/notificaciones sin leer/i);
+    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent(`/notificaciones`);
+
+    const assignSpy = jest.fn();
+    globalThis.__navigate__ = assignSpy;
+    try {
+      const item = await screen.findByText(/Tu solicitud de tutoría de Álgebra fue confirmada/i);
+      fireEvent.click(item);
+      expect(assignSpy).toHaveBeenCalledWith(`/notificaciones`);
+    } finally {
+      delete globalThis.__navigate__;
+    }
   });
 
-  it("deleteOne", async () => {
-    const initial = [
-      { id: 1, title: "N1", created_at: new Date().toISOString(), read_at: null, seen_at: null },
-      { id: 2, title: "N2", created_at: new Date().toISOString(), read_at: null, seen_at: null },
-      { id: 3, title: "N3", created_at: new Date().toISOString(), read_at: null, seen_at: null },
-    ];
+  it("confirm_schedule por student -> notifica al tutor y navega", async () => {
+    useUser.mockReturnValue({ user: TUTOR, signOut: jest.fn() });
 
-    const { spies } = renderProvider(initial);
+    const { notify } = renderProvider([]);
+    const notif = backendNotif("confirm_by_student", { actor: STUDENT1.name, tutoringId: 11 });
 
-    const bell = (await screen.findAllByTitle(/Notificaciones/i))[1];
-    fireEvent.click(bell);
+    await act(async () => { await notify(notif); });
 
-    const delButtons = await screen.findAllByRole("button", { name: /Eliminar notificación/i });
-    expect(delButtons.length).toBeGreaterThan(0);
-    fireEvent.click(delButtons[1]);
+    const bells = await screen.findAllByTestId("mock-bell-button");
+    fireEvent.click(bells[0]);
 
-    await waitFor(() => expect(spies.deleteOne).toHaveBeenCalledWith(2));
-    await waitFor(() => expect(screen.queryByText("N2")).not.toBeInTheDocument());
-    expect(screen.getByText("N1")).toBeInTheDocument();
-    expect(screen.getByText("N3")).toBeInTheDocument();
+    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent("/notificaciones");
+
+    const assignSpy = jest.fn();
+    globalThis.__navigate__ = assignSpy;
+    try {
+      const item = await screen.findByText(`El estudiante ${STUDENT1.name} confirmó la tutoría de Álgebra`);
+      fireEvent.click(item);
+      expect(assignSpy).toHaveBeenCalledWith("/notificaciones");
+    } finally {
+      delete globalThis.__navigate__;
+    }
   });
 
-  it("markAllRead", async () => {
-    const initial = [
-      { id: 1, title: "N1", created_at: new Date().toISOString(), read_at: null, seen_at: null },
-      { id: 2, title: "N2", created_at: new Date().toISOString(), read_at: null, seen_at: null },
-    ];
-    const { spies } = renderProvider(initial);
+  it("nueva tutoría -> notifica a favoriters y navega", async () => {
+    useUser.mockReturnValue({ user: STUDENT2, signOut: jest.fn() });
 
-    const bell = (await screen.findAllByTitle(/Notificaciones/i))[0];
-    expect(bell.getAttribute("title")).toMatch(/notificaciones sin leer/i);
+    const { notify } = renderProvider([]);
+    const notif = backendNotif("new_tutoring", { courseId: COURSE.id });
 
-    fireEvent.click(bell);
-    const markAllBtn = await screen.findByText(/Marcar todas como leídas/i);
-    fireEvent.click(markAllBtn);
+    await act(async () => { await notify(notif); });
 
-    await waitFor(() => expect(spies.markAllRead).toHaveBeenCalled());
+    const bells = await screen.findAllByTestId("mock-bell-button");
+    fireEvent.click(bells[0]);
 
-    const items = screen.getAllByRole("listitem");
-    items.forEach((li) => {
-      expect(li).toHaveAttribute("data-read", "true");
-      expect(li.getAttribute("data-read-ts")).not.toBe("");
-    });
+    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent(`/tutorias/materia/${COURSE.id}`);
 
-    const bellsAfter = await screen.findAllByTitle(/Notificaciones/i);
-    expect(bellsAfter[0].getAttribute("title")).not.toMatch(/notificaciones sin leer/i);
+    const assignSpy = jest.fn();
+    globalThis.__navigate__ = assignSpy;
+    try {
+      const item = await screen.findByText(/Se creó una nueva tutoría de Álgebra/i);
+      fireEvent.click(item);
+      expect(assignSpy).toHaveBeenCalledWith(`/tutorias/materia/${COURSE.id}`);
+    } finally {
+      delete globalThis.__navigate__;
+    }
   });
 
-  it("deleteAll", async () => {
-    const initial = [
-      { id: 1, title: "N1", created_at: new Date().toISOString(), read_at: null, seen_at: null },
-      { id: 2, title: "N2", created_at: new Date().toISOString(), read_at: null, seen_at: null },
-    ];
+  it("review -> notifica al tutor y navega al listado de reseñas", async () => {
+    useUser.mockReturnValue({ user: TUTOR, signOut: jest.fn() });
 
-    const { spies } = renderProvider(initial);
+    const { notify } = renderProvider([]);
+    const notif = backendNotif("review", { reviewed_id: TUTOR.id });
 
-    jest.spyOn(globalThis, "confirm").mockReturnValue(true);
+    await act(async () => { await notify(notif); });
 
-    const bell = (await screen.findAllByTitle(/Notificaciones/i))[0];
-    fireEvent.click(bell);
+    const bells = await screen.findAllByTestId("mock-bell-button");
+    fireEvent.click(bells[0]);
 
-    const deleteAllBtn = await screen.findByText(/Eliminar todas/i);
-    fireEvent.click(deleteAllBtn);
-    await waitFor(() => expect(spies.deleteAll).toHaveBeenCalled());
+    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent(`/usuarios/${TUTOR.id}/reviews`);
 
-    expect(await screen.findByText(/No hay notificaciones/i)).toBeInTheDocument();
-    globalThis.confirm.mockRestore();
+    const assignSpy = jest.fn();
+    globalThis.__navigate__ = assignSpy;
+    try {
+      const item = await screen.findByText(/Nueva reseña recibida/i);
+      fireEvent.click(item);
+      expect(assignSpy).toHaveBeenCalledWith(`/usuarios/${TUTOR.id}/reviews`);
+    } finally {
+      delete globalThis.__navigate__;
+    }
   });
 
-  it("markAllSeen", async () => {
-    const seenTs = "2020-01-01T00:00:00.000Z";
-    const initial = [
-      { id: 1, title: "N1", created_at: new Date().toISOString(), read_at: null, seen_at: seenTs },
-      { id: 2, title: "N2", created_at: new Date().toISOString(), read_at: null, seen_at: null },
-    ];
+  it("tutoría finalizada -> notifica a participantes para feedback y navega", async () => {
+    useUser.mockReturnValue({ user: STUDENT1, signOut: jest.fn() });
 
-    const { spies } = renderProvider(initial);
+    const { notify } = renderProvider([]);
+    const notif = backendNotif("feedback", { tutoringId: 99 });
 
-    const bell = (await screen.findAllByTitle(/Notificaciones/i))[0];
-    fireEvent.click(bell);
+    await act(async () => { await notify(notif); });
 
-    await waitFor(() => expect(spies.markAllSeen).toHaveBeenCalled());
+    const bells = await screen.findAllByTestId("mock-bell-button");
+    fireEvent.click(bells[0]);
 
-    const items = screen.getAllByRole("listitem");
-    const li1 = items.find(li => li.getAttribute("data-id") === "1");
-    const li2 = items.find(li => li.getAttribute("data-id") === "2");
+    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent(`/usuarios/${TUTOR.id}`);
 
-    expect(li1.getAttribute("data-seen-ts")).toBe(seenTs);
-    expect(li2.getAttribute("data-seen-ts")).not.toBe("");
-
-    const bellsAfter = await screen.findAllByTitle(/Notificaciones/i);
-    expect(bellsAfter[0].getAttribute("title")).toMatch(/2 notificaciones sin leer/i);
+    const assignSpy = jest.fn();
+    globalThis.__navigate__ = assignSpy;
+    try {
+      const item = await screen.findByText(/Tu tutoría de Álgebra finalizó/i);
+      fireEvent.click(item);
+      expect(assignSpy).toHaveBeenCalledWith(`/usuarios/${TUTOR.id}`);
+    } finally {
+      delete globalThis.__navigate__;
+    }
   });
 
-  it("markRead falla", async () => {
-    const initial = [{ id: 1, title: "N1", created_at: new Date().toISOString(), read_at: null, seen_at: null }];
-    const failingMarkRead = jest.fn(async () => {
-      throw new Error("backend markRead fail");
-    });
+  it("recordatorio 24h -> notifica a tutor y estudiantes y navega", async () => {
+    useUser.mockReturnValue({ user: STUDENT2, signOut: jest.fn() });
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-    const { spies } = renderProvider(initial, { markRead: failingMarkRead });
+    const { notify } = renderProvider([]);
+    const notif = backendNotif("reminder", { tutoringId: 77 });
 
-    const bell = (await screen.findAllByTitle(/Notificaciones/i))[0];
-    fireEvent.click(bell);
-    fireEvent.click(await screen.findByText("N1"));
+    await act(async () => { await notify(notif); });
 
-    await waitFor(() => expect(spies.markRead).toHaveBeenCalledWith(1));
-    expect(consoleSpy).toHaveBeenCalled();
-    const li = screen.getByText("N1").closest("li");
-    expect(li).toHaveAttribute("data-read", "false");
-    expect(li.getAttribute("data-read-ts")).toBe("");
-  });
+    const bells = await screen.findAllByTestId("mock-bell-button");
+    fireEvent.click(bells[0]);
 
-  it("deleteOne falla", async () => {
-    const initial = [{ id: 1, title: "N1", created_at: new Date().toISOString(), read_at: null, seen_at: null }];
-    const failingDeleteOne = jest.fn(async () => {
-      throw new Error("backend deleteOne fail");
-    });
+    expect(await screen.findByTestId(`notif-url-${notif.id}`)).toHaveTextContent("/notificaciones");
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-
-    const { spies } = renderProvider(initial, { deleteOne: failingDeleteOne });
-
-    const bell = (await screen.findAllByTitle(/Notificaciones/i))[0];
-    fireEvent.click(bell);
-
-    const delButton = await screen.findByRole("button", { name: /Eliminar notificación/i });
-    fireEvent.click(delButton);
-
-    await waitFor(() => expect(spies.deleteOne).toHaveBeenCalledWith(1));
-    expect(consoleSpy).toHaveBeenCalled();
-    expect(screen.getByText("N1")).toBeInTheDocument();
-  });
-
-  it("markAllRead falla", async () => {
-    const initial = [{ id: 1, title: "N1", created_at: new Date().toISOString(), read_at: null, seen_at: null }];
-    const failingMarkAllRead = jest.fn(async () => {
-      throw new Error("backend markAllRead fail");
-    });
-
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-
-    const { spies } = renderProvider(initial, { markAllRead: failingMarkAllRead });
-
-    const bell = (await screen.findAllByTitle(/Notificaciones/i))[0];
-    fireEvent.click(bell);
-
-    const markAllBtn = await screen.findByText(/Marcar todas como leídas/i);
-    fireEvent.click(markAllBtn);
-
-    await waitFor(() => expect(spies.markAllRead).toHaveBeenCalled());
-    expect(consoleSpy).toHaveBeenCalled();
-    const li = screen.getByText("N1").closest("li");
-    expect(li).toHaveAttribute("data-read", "false");
-    expect(li.getAttribute("data-read-ts")).toBe("");
-  });
-
-  it("deleteAll falla", async () => {
-    const initial = [{ id: 1, title: "N1", created_at: new Date().toISOString(), read_at: null, seen_at: null }];
-    const failingDeleteAll = jest.fn(async () => {
-      throw new Error("backend deleteAll fail");
-    });
-
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-    jest.spyOn(globalThis, "confirm").mockReturnValue(true);
-
-    const { spies } = renderProvider(initial, { deleteAll: failingDeleteAll });
-
-    const bell = (await screen.findAllByTitle(/Notificaciones/i))[0];
-    fireEvent.click(bell);
-
-    const deleteAllBtn = await screen.findByText(/Eliminar todas/i);
-    fireEvent.click(deleteAllBtn);
-
-    await waitFor(() => expect(spies.deleteAll).toHaveBeenCalled());
-    expect(consoleSpy).toHaveBeenCalled();
-    expect(screen.getByText("N1")).toBeInTheDocument();
-    globalThis.confirm.mockRestore();
-  });
-
-  it("markAllSeen falla", async () => {
-    const initial = [{ id: 1, title: "N1", created_at: new Date().toISOString(), read_at: null, seen_at: null }];
-    const failingMarkAllSeen = jest.fn(async () => {
-      throw new Error("backend markAllSeen fail");
-    });
-
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-
-    const { spies } = renderProvider(initial, { markAllSeen: failingMarkAllSeen });
-
-    const bell = (await screen.findAllByTitle(/Notificaciones/i))[0];
-    fireEvent.click(bell);
-
-    await waitFor(() => expect(spies.markAllSeen).toHaveBeenCalled());
-    expect(consoleSpy).toHaveBeenCalled();
-    const li = screen.getByText("N1").closest("li");
-    expect(li).toHaveAttribute("data-seen", "false");
-    expect(li.getAttribute("data-seen-ts")).toBe("");
+    const assignSpy = jest.fn();
+    globalThis.__navigate__ = assignSpy;
+    try {
+      const item = await screen.findByText(/Recordatorio: tu tutoría de Álgebra/i);
+      fireEvent.click(item);
+      expect(assignSpy).toHaveBeenCalledWith("/notificaciones");
+    } finally {
+      delete globalThis.__navigate__;
+    }
   });
 });

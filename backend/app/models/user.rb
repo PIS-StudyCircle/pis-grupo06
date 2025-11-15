@@ -109,4 +109,20 @@ class User < ApplicationRecord
   def devise_mailer
     UserMailer
   end
+
+  # Devuelve el email ofuscado siempre
+  def email_masked
+    return "" if email.blank?
+
+    nombre, dominio = email.split('@')
+
+    if nombre.length < 4
+      ofuscado = '*' * nombre.length
+    else
+      visibles = nombre[0, 4]
+      ofuscado = visibles + ('*' * (nombre.length - 4))
+    end
+
+    "#{ofuscado}@#{dominio}"
+  end
 end

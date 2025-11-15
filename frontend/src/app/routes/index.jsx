@@ -13,10 +13,12 @@ import {
   UserProfilePage,
   SessionsPage,
 } from "@/features/users";
+import EditProfilePage from "@/features/users/pages/EditProfilePage";
 import { SubjectPage } from "@/features/subjects";
+import { ChooseType, AvatarCreation } from "@/features/ia";
 import SubjectDetailPage from "@/features/subjects/pages/SubjectDetailPage";
 import { RequireGuestRoute } from "./RequireGuestRoute";
-import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent, ChooseScheduleByTutor, ChooseScheduleByStudent} from "@/features/tutorings";
+import { TutoringPage, SelectSubjectsByTutor, CreateTutoringByTutor, CreateTutoringByStudent, ChooseScheduleByTutor, ChooseScheduleByStudent, ShowPageTutoring} from "@/features/tutorings";
 import { Error404Page } from "@components/Error404";
 
 
@@ -41,6 +43,7 @@ export function AppRoutes() {
           element={<TutoringPage filters={{}} mode="" />}
         />
         <Route path="/perfil" element={<ProfilePage />} />
+        <Route path="/editar-perfil" element={<EditProfilePage />} />
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
         <Route path="/notificaciones" element={<SessionsPage />} />
 
@@ -49,6 +52,9 @@ export function AppRoutes() {
         <Route path="/usuarios/:id" element={<UserProfilePage />} />
         <Route path="/tutorias/:tutoringId/elegir_horario_tutor" element={<ChooseScheduleByTutor />} />
         <Route path="/tutorias/:tutoringId/elegir_horario_estudiante" element={<ChooseScheduleByStudent />} />
+
+        <Route path="/avatar/elegir_tipo" element={<ChooseType />} />
+        <Route path="/avatar/crear" element={<AvatarCreation />} />
 
         <Route
           path="/tutorias/ser_tutor/:courseId"
@@ -78,6 +84,7 @@ export function AppRoutes() {
           path="/materias/:courseId/temas/:subjectId"
           element={<SubjectDetailPage />}
         />
+        <Route path="/tutorias/:id" element={<ShowPageTutoring />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/materias" replace />} />

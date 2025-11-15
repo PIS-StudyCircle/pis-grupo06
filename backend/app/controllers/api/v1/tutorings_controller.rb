@@ -107,6 +107,8 @@ module Api
               enrolled_students: t.users.map do |user|
                 {
                   id: user.id,
+                  photo_url: user.profile_photo.attached? ?
+                    Rails.application.routes.url_helpers.url_for(user.profile_photo) : nil
                 }
               end,
               created_by_id: t.created_by_id,
@@ -120,8 +122,8 @@ module Api
               availabilities: t.tutoring_availabilities.map do |a|
                 { id: a.id, start_time: a.start_time, end_time: a.end_time, is_booked: a.is_booked }
               end,
-              tutor_email: t.tutor&.email,
-              user_enrolled: t.users.exists?(id: current_user.id)
+              tutor_email: t.tutor&.email_masked,
+              user_enrolled: t.users.exists?(id: current_user.id) || t.tutor_id == current_user.id
             }
           end,
           pagination: pagy_metadata(@pagy)
@@ -140,6 +142,7 @@ module Api
           request_comment: @tutoring.request_comment,
           request_due_at: @tutoring.request_due_at,
           location: @tutoring.location,
+          chat_id: @tutoring.chat&.id,
           course: {
             id: @tutoring.course.id,
             name: @tutoring.course.name,
@@ -157,6 +160,7 @@ module Api
             name: @tutoring.tutor.name,
             last_name: @tutoring.tutor.last_name
           } : nil,
+          user_enrolled: @tutoring.users.exists?(id: current_user.id) || @tutoring.tutor_id == current_user.id,
           availabilities: @tutoring.tutoring_availabilities.map do |a|
             {
               id: a.id,
@@ -164,17 +168,26 @@ module Api
               end_time: a.end_time,
               is_booked: a.is_booked
             }
-          end
+          end,
+          enrolled_students: @tutoring.users.map do |user|
+            {
+              id: user.id,
+              photo_url: photo_url_for(user)
+            }
+          end,
+          enrolled_users: @tutoring.users.map do |user|
+            {
+              id: user.id,
+              photo_url: photo_url_for(user)
+            }
+          end.append(@tutoring.tutor ? [{
+                       id: @tutoring.tutor.id,
+                       photo_url: photo_url_for(@tutoring.tutor)
+                     }] : [])
         }
       end
 
       def create
-        # if params[:tutoring][:subject_ids].blank?
-        #   render json: { errors: ["No se recibieron correctamente los temas seleccionados. Inténtelo nuevamente."] },
-        #          status: :unprocessable_entity
-        #   return
-        # end
-
         tutoring = Tutoring.new(tutoring_params)
         tutoring.created_by_id = current_user.id
         tutoring.tutor_id      = params.dig(:tutoring, :tutor_id)
@@ -188,7 +201,7 @@ module Api
         if params[:tutoring][:availabilities_attributes].present?
           if availability_overlaps?(params[:tutoring][:availabilities_attributes], current_user.id)
             render json: {
-              errors: ["Ya tienes una tutoría programada en esa fecha y horario"]
+              error: "Ya tienes una tutoría programada en esa fecha y horario"
             }, status: :unprocessable_entity
             return
           end
@@ -209,7 +222,25 @@ module Api
               end
             end
 
-            create_user_tutoring(current_user.id, tutoring.id)
+            create_user_tutoring(current_user.id, tutoring.id) if tutoring.tutor_id.blank?
+
+            # Notificar a usuarios con esta materia (course) como favorita
+            favoriters = User.joins(:favorite_courses)
+                             .where(favorite_courses: { course_id: tutoring.course_id })
+                             .where.not(id: tutoring.created_by_id) # no notificar al creador
+                             .distinct
+
+            course_name = tutoring.course&.name || Course.find(tutoring.course_id).name
+            encoded_name = URI.encode_www_form_component(course_name)
+            if favoriters.exists?
+              favoriters.find_each do |user|
+                ApplicationNotifier.with(
+                  title: "Se creó una nueva tutoría de #{course_name}!",
+                  url: "/tutorias/materia/#{tutoring.course_id}?course_name=#{encoded_name}"
+                ).deliver_later(user)
+              end
+            end
+
             render json: {
               tutoring: tutoring.as_json.merge(
                 availabilities: tutoring.tutoring_availabilities.as_json
@@ -236,6 +267,9 @@ module Api
       end
 
       def destroy
+        # Enviar notificaciones de cancelación antes de eliminar
+        TutoringCancelledJob.perform_later(@tutoring.id, current_user.id, "Tutoría eliminada")
+
         @tutoring.destroy
         head :no_content
       end
@@ -257,6 +291,11 @@ module Api
         # Inscribir al estudiante
         UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
 
+        # Asegurar que exista el chat de la tutoría y agregar al usuario al chat
+        # Garantizar existencia del chat antes de manipular usuarios
+        @tutoring.create_chat! unless @tutoring.chat
+        @tutoring.chat.users << current_user unless @tutoring.chat.users.exists?(current_user.id)
+
         # Incrementar contador de inscritos
         # Sin esto testeando me di cuenta que por alguna razón crea la tutoría igual a pesar de la capacidad habría que
         # cambiarlo por otro chequeo
@@ -264,6 +303,14 @@ module Api
 
         # Si no existe evento, crearlo con el tutor y agregarse
         join_user_calendar(current_user, @tutoring.scheduled_at)
+
+        # Notificar al tutor que un nuevo estudiante se unió
+        if @tutoring.tutor.present?
+          ApplicationNotifier.with(
+            title: "#{current_user.name} se unió a tu tutoría de #{@tutoring.course.name}.",
+            url: "/notificaciones"
+          ).deliver_later(@tutoring.tutor)
+        end
 
         render json: {
           ok: true,
@@ -312,6 +359,9 @@ module Api
           # Confirmar el horario de la tutoría
           @tutoring.update!(scheduled_at: scheduled_time, duration_mins: duration, state: 'active')
 
+          # Crear chat si no existe
+          @tutoring.create_chat! unless @tutoring.chat
+
           # Marcar la disponibilidad como reservada
           availability.update!(is_booked: true)
 
@@ -326,11 +376,8 @@ module Api
             # Asignar el tutor en la tabla tutorings
             @tutoring.update!(tutor_id: current_user.id)
 
-            # Crear registro en user_tutorings para el tutor
-            UserTutoring.create!(user_id: current_user.id, tutoring_id: @tutoring.id)
-
             # Agregar también al estudiante creador si no está registrado aún
-            if @tutoring.created_by_id.present? &&
+            if @tutoring.created_by_id.present? && @tutoring.created_by_id != @tutoring.tutor_id &&
                !UserTutoring.exists?(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
               UserTutoring.create!(user_id: @tutoring.created_by_id, tutoring_id: @tutoring.id)
             end
@@ -339,13 +386,38 @@ module Api
 
             "Fuiste asignado como tutor exitosamente"
           end
+
+          # Agregar los usuarios al chat
+          @tutoring.users.each do |user|
+            @tutoring.chat.users << user unless @tutoring.chat.users.exists?(user.id)
+          end
+
+          # Agregar al tutor al chat
+          @tutoring.chat.users << @tutoring.tutor unless @tutoring.chat.users.exists?(@tutoring.tutor.id)
         end
+
+        # Programar notificaciones automáticas
+        ScheduleTutoringNotificationsJob.perform_later(@tutoring.id)
 
         # Enviar notificaciones según el rol
         if user_role == 'student'
           # TutoringMailer.student_enrolled(@tutoring, current_user).deliver_later
         else
           # TutoringMailer.tutor_assigned(@tutoring, current_user).deliver_later
+        end
+
+        # Notificar al otro usuario (el creador de la tutoría)
+        if @tutoring.creator.present? && @tutoring.creator != current_user
+          title_msg =
+            if user_role == "tutor"
+              "Tu solicitud de tutoría de #{@tutoring.course.name} fue confirmada por el tutor #{current_user.name}."
+            else
+              "El estudiante #{current_user.name} confirmó la tutoría de #{@tutoring.course.name}."
+            end
+          ApplicationNotifier.with(
+            title: title_msg,
+            url: "/notificaciones"
+          ).deliver_later(@tutoring.creator)
         end
 
         render json: {
@@ -392,10 +464,10 @@ module Api
         user = User.find(params[:user_id])
 
         tutorings = Tutoring
-                    .enrolled_by(user)
+                    .enrolled_or_tutor_by(user)
                     .upcoming
                     .where(state: :active)
-                    .includes(:tutor, :course)
+                    .includes(:tutor, :course, :chat)
                     .order(:scheduled_at)
 
         render json: tutorings.map { |t|
@@ -409,8 +481,9 @@ module Api
             location: t.location.presence || "Virtual",
             status: t.state,
             role: is_tutor ? "tutor" : "student",
-            attendees: t.users.map { |u| { email: u.email, status: "confirmada" } },
-            url: nil
+            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "active" } },
+            url: nil,
+            chat_id: t.chat&.id
           }
         }
       end
@@ -419,7 +492,7 @@ module Api
         user = User.find(params[:user_id])
 
         tutorings = Tutoring
-                    .enrolled_by(user)
+                    .enrolled_or_tutor_by(user)
                     .past
                     .includes(:tutor, :course)
                     .order(scheduled_at: :desc)
@@ -430,12 +503,13 @@ module Api
             id: t.id,
             subject: t.course&.name,
             tutor: t.tutor&.name || "Sin asignar",
+            tutor_id: t.tutor_id,
             date: t.scheduled_at,
             duration: t.duration_mins,
             location: t.location.presence || "Virtual",
             status: t.state,
             role: is_tutor ? "tutor" : "student",
-            attendees: t.users.map { |u| { email: u.email, status: "finalizada" } },
+            attendees: t.users.map { |u| { id: u.id, email: u.email_masked, status: "finished" } },
             url: nil
           }
         }
@@ -455,12 +529,19 @@ module Api
 
           # 1) Si el que se va es el tutor -> SIEMPRE borrar tutoría (+ evento si existe)
           if was_tutor
-            # (Comentario futuro) notificar a estudiantes que el tutor canceló
+            # Guardar datos antes de borrar para el job
+            tutoring_data = capture_tutoring_data(@tutoring)
+            # Notificar a estudiantes que el tutor canceló
+            TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Tutor se desuscribió")
+
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
               Rails.logger.error "Calendar delete_event (se va tutor) error: #{e.message}"
             end
+
+            # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
+            @tutoring.chat&.destroy
 
             @tutoring.destroy!
             return head :no_content
@@ -470,16 +551,30 @@ module Api
           user_tutoring = UserTutoring.find_by!(user_id: current_user.id, tutoring_id: @tutoring.id)
           user_tutoring.destroy!
 
+          # Lo elimino del chat de la tutoria
+          # Si existe chat, remover al usuario; proteger contra chat nil en tests
+          if @tutoring.chat
+            @tutoring.chat.users.delete(current_user.id)
+          end
+
           new_enrolled = [prev_enrolled - 1, 0].max
           @tutoring.update!(enrolled: new_enrolled)
 
           # 2.5) Si el que se va es el creador y no quedan estudiantes -> eliminar tutoría
           if current_user.id == @tutoring.created_by_id && new_enrolled.zero?
+            # Guardar datos antes de borrar para el job
+            tutoring_data = capture_tutoring_data(@tutoring)
+            # Notificar a participantes que el creador canceló
+            TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Creador se desuscribió")
+
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
               Rails.logger.error "Calendar delete_event (se va creador y sin estudiantes) error: #{e.message}"
             end
+
+            # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
+            @tutoring.chat&.destroy
 
             @tutoring.destroy!
             return head :no_content
@@ -487,11 +582,19 @@ module Api
 
           # 3) Caso borde: si NO hay tutor y NO quedan estudiantes -> borrar todo
           if !had_tutor && new_enrolled.zero?
+            # Guardar datos antes de borrar para el job
+            tutoring_data = capture_tutoring_data(@tutoring)
+            # Notificar a participantes que la tutoría fue cancelada
+            TutoringCancelledJob.perform_later(tutoring_data, current_user.id, "Sin participantes")
+
             begin
               calendar.delete_event(@tutoring) if event_confirmed
             rescue => e
               Rails.logger.error "Calendar delete_event (no tutor y sin estudiantes) error: #{e.message}"
             end
+
+            # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
+            @tutoring.chat&.destroy
 
             @tutoring.destroy!
             return head :no_content
@@ -506,7 +609,7 @@ module Api
             end
           end
 
-          # Si queda tutor pero ya no quedan estudiantes (enrolled == 0), limpiar el horario
+          # Si queda tutor pero ya no quedan estudiantes (enrolled == 0), limpiar el horario y eliminar chat
           if had_tutor && new_enrolled.zero?
             # Remover el tutor del evento de su propio calendario
             begin
@@ -515,9 +618,20 @@ module Api
               Rails.logger.error "Calendar leave_event (tutor sin estudiantes) error: #{e.message}"
             end
 
+            # Elimino el chat de la tutoria, si lo tenía. Esto elimina tambien los chat_user y los mensajes
+            @tutoring.chat&.destroy
+
             @tutoring.update!(scheduled_at: nil)
             @tutoring.tutoring_availabilities.each { |a| a.update(is_booked: false) }
           end
+        end
+
+        # Notificar al tutor que un estudiante se dio de baja
+        if @tutoring.tutor.present?
+          ApplicationNotifier.with(
+            title: "#{current_user.name} se dio de baja de tu tutoría de #{@tutoring.course.name}.",
+            url: "/notificaciones"
+          ).deliver_later(@tutoring.tutor)
         end
 
         head :no_content
@@ -718,6 +832,18 @@ module Api
                 .distinct
       end
 
+      def capture_tutoring_data(tutoring)
+        {
+          id: tutoring.id,
+          course_name: tutoring.course&.name,
+          tutor_id: tutoring.tutor_id,
+          scheduled_at: tutoring.scheduled_at,
+          enrolled: tutoring.enrolled,
+          created_by_id: tutoring.created_by_id,
+          users: tutoring.users.as_json(only: [:id])
+        }
+      end
+
       def availability_overlaps?(availabilities_params, user_id)
         availabilities_params.any? do |availability_params|
           next if availability_params[:_destroy] == '1' || availability_params[:_destroy] == true
@@ -727,6 +853,12 @@ module Api
 
           # Buscar si hay tutorías que se solapen con esta availability
           check_overlapping_tutorings(start_time, end_time, user_id).any?
+        end
+      end
+
+      def photo_url_for(user)
+        if user.profile_photo.attached?
+          Rails.application.routes.url_helpers.url_for(user.profile_photo)
         end
       end
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_08_183314) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "unaccent"
@@ -41,6 +41,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "chat_users", force: :cascade do |t|
+    t.bigint "chat_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "last_notified_message_id"
+    t.datetime "last_read_at"
+    t.index ["chat_id"], name: "index_chat_users_on_chat_id"
+    t.index ["last_notified_message_id"], name: "index_chat_users_on_last_notified_message_id"
+    t.index ["last_read_at"], name: "index_chat_users_on_last_read_at"
+    t.index ["user_id"], name: "index_chat_users_on_user_id"
+  end
+
+  create_table "chats", force: :cascade do |t|
+    t.bigint "tutoring_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tutoring_id"], name: "index_chats_on_tutoring_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -83,6 +103,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
     t.index ["tutoring_id"], name: "index_feedbacks_on_tutoring_id"
   end
 
+  create_table "messages", force: :cascade do |t|
+    t.bigint "chat_id", null: false
+    t.bigint "user_id", null: false
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_id"], name: "index_messages_on_chat_id"
+    t.index ["user_id"], name: "index_messages_on_user_id"
+  end
+
   create_table "noticed_events", force: :cascade do |t|
     t.string "type"
     t.string "record_type"
@@ -109,6 +139,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_noticed_notifications_on_event_id"
     t.index ["recipient_type", "recipient_id"], name: "index_noticed_notifications_on_recipient"
+  end
+
+  create_table "solid_cable_messages", force: :cascade do |t|
+    t.binary "channel", null: false
+    t.binary "payload", null: false
+    t.datetime "created_at", null: false
+    t.bigint "channel_hash", null: false
+    t.index ["channel"], name: "index_solid_cable_messages_on_channel"
+    t.index ["channel_hash"], name: "index_solid_cable_messages_on_channel_hash"
+    t.index ["created_at"], name: "index_solid_cable_messages_on_created_at"
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
@@ -276,11 +316,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
     t.bigint "tutor_id"
     t.integer "enrolled", default: 0, null: false
     t.bigint "course_id", null: false
+    t.string "event_id"
     t.integer "state", default: 0, null: false
     t.text "request_comment"
     t.datetime "request_due_at"
     t.string "location"
-    t.string "event_id"
     t.index ["course_id"], name: "index_tutorings_on_course_id"
     t.index ["created_by_id"], name: "index_tutorings_on_created_by_id"
     t.index ["state"], name: "index_tutorings_on_state"
@@ -333,6 +373,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
     t.string "google_refresh_token"
     t.datetime "google_expires_at"
     t.string "calendar_id"
+    t.integer "tutorias_dadas_count", default: 0, null: false
+    t.integer "tutorias_recibidas_count", default: 0, null: false
+    t.integer "resenas_dadas_count", default: 0, null: false
+    t.integer "feedback_dado_count", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["jti"], name: "index_users_on_jti", unique: true
@@ -342,6 +386,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "chat_users", "chats"
+  add_foreign_key "chat_users", "users"
+  add_foreign_key "chats", "tutorings"
   add_foreign_key "courses", "faculties"
   add_foreign_key "faculties", "universities"
   add_foreign_key "favorite_courses", "courses"
@@ -349,6 +396,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_24_161211) do
   add_foreign_key "feedbacks", "tutorings"
   add_foreign_key "feedbacks", "users", column: "student_id"
   add_foreign_key "feedbacks", "users", column: "tutor_id"
+  add_foreign_key "messages", "chats"
+  add_foreign_key "messages", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

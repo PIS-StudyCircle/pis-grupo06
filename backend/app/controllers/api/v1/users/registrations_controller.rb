@@ -22,6 +22,7 @@ module Api
             resource.profile_photo.attach(params[:user][:profile_photo])
           end
 
+          sign_up(resource_name, resource)
           respond_with(resource)
         else
           error_response(
@@ -51,7 +52,9 @@ module Api
         if resource.persisted?
           success_response(
             message: 'Signed up successfully.',
-            data: { user: UserSerializer.new(resource).serializable_hash[:data][:attributes] },
+            data: { user: UserSerializer
+            .new(resource, params: { current_user: resource })
+            .serializable_hash[:data][:attributes] },
             status: :created
           )
         else

@@ -16,11 +16,21 @@ class Tutoring < ApplicationRecord
 
   enum :state, { pending: 0, active: 1, finished: 2, canceled: 3 }, default: :pending
 
+  has_one :chat, dependent: :destroy
+
   # Tutorías en las que un usuario está inscripto
   scope :enrolled_by, ->(user) {
     return none if user.blank?
 
     joins(:user_tutorings).where(user_tutorings: { user_id: user.id })
+  }
+
+  # Tutorías en las que un usuario está inscripto como estudiante o tutor
+  scope :enrolled_or_tutor_by, ->(user) {
+    return none if user.blank?
+
+    enrolled_ids = UserTutoring.select(:tutoring_id).where(user_id: user.id)
+    where(tutor_id: user.id).or(where(id: enrolled_ids)).distinct
   }
 
   # Tutorías filtradas por id de materia (course_id)
@@ -48,8 +58,9 @@ class Tutoring < ApplicationRecord
     where("enrolled < capacity and tutor_id IS NOT NULL")
   }
 
-  # Ya pasó (scheduled_at < ahora)
-  scope :past, -> { where(scheduled_at: ...Time.current) }
+  # Ya pasó y tiene estado finalizada
+  # Esto despues habria que cambiarlo para que sea finished y no past, pero lo dejamos asi para la demo.
+  scope :past, -> { where(state: :finished).where(scheduled_at: ...Time.current) }
 
   # Futuras (scheduled_at >= ahora)
   scope :upcoming, -> { where(scheduled_at: Time.current..) }
@@ -118,6 +129,36 @@ class Tutoring < ApplicationRecord
 
   def enrolled
     user_tutorings.where.not(user_id: tutor_id).count
+  end
+
+  def incrementar_contadores_insignas
+    with_lock do
+      if tutor
+        tutor.with_lock do
+          tutor.increment(:tutorias_dadas_count)
+          tutor.save!
+
+          begin
+            InsigniaNotifier.with(tipo: :tutorias_dadas).deliver(tutor)
+          rescue => e
+            Rails.logger.error "Error notificando insignia al usuario #{tutor.id}: #{e.message}"
+          end
+        end
+      end
+
+      users.where.not(id: tutor_id).find_each do |u|
+        u.with_lock do
+          u.increment(:tutorias_recibidas_count)
+          u.save!
+
+          begin
+            InsigniaNotifier.with(tipo: :tutorias_recibidas).deliver(u)
+          rescue => e
+            Rails.logger.error "Error notificando insignia al usuario #{u.id}: #{e.message}"
+          end
+        end
+      end
+    end
   end
 
   private

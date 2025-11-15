@@ -1,8 +1,22 @@
 # db/seeds.rb
-require 'json'
+# =============================================================================
+# SEED FILE - StudyCircle Application
+# =============================================================================
+# This seed file creates a complete testing environment with users, courses,
+# subjects, tutorings (active, pending, finished), reviews, and feedbacks.
+# All data is logically consistent and follows application validations.
+# =============================================================================
+
 require 'securerandom'
 
-# ------ FACULTADES Y CURSOS ------
+Rails.logger.debug "Starting seed process..."
+
+# =============================================================================
+# UNIVERSITY AND FACULTY
+# =============================================================================
+
+Rails.logger.debug "\n[1/7] Creating University and Faculty..."
+
 uni = University.find_or_create_by!(name: "Universidad de la República")
 fing = Faculty.find_or_create_by!(name: "Facultad de Ingeniería", university: uni)
 
@@ -19,1186 +33,622 @@ json_data.each do |entry|
   )
 end
 
-# ------ USUARIOS ------
-students = [
+# =============================================================================
+# USERS (9 users as specified)
+# =============================================================================
+
+Rails.logger.debug "[2/7] Creating 9 users..."
+
+users_data = [
   { name: "Ana", last_name: "Pérez", email: "anaperez@gmail.com" },
   { name: "Luis", last_name: "Gómez", email: "luisgomez@gmail.com" },
   { name: "María", last_name: "Rodríguez", email: "mariarodriguez@gmail.com" },
-  { name: "Juan", last_name: "Pérez", email: "juanperez@gmail.com" },
-  { name: "Marta", last_name: "Da Luz", email: "martadaluz@gmail.com" },
-  { name: "Carlos", last_name: "López", email: "carloslopez@gmail.com" },
-  { name: "Lucía", last_name: "Fernández", email: "luciafernandez@gmail.com" },
-  { name: "Diego", last_name: "Martínez", email: "diegomartinez@gmail.com" },
+  { name: "Juan", last_name: "López", email: "juanlopez@gmail.com" },
   { name: "Sofía", last_name: "García", email: "sofiagarcia@gmail.com" },
-  { name: "Martín", last_name: "Ramírez", email: "martinramirez@gmail.com" },
-
-  { name: "Clara", last_name: "Suárez", email: "clarasuarez@gmail.com" },
-  { name: "Andrés", last_name: "Méndez", email: "andresmendez@gmail.com" },
-  { name: "Paula", last_name: "Castro", email: "paulacastro@gmail.com" },
-  { name: "Jorge", last_name: "Vega", email: "jorgevega@gmail.com" },
-  { name: "Valentina", last_name: "Silva", email: "valentinasilva@gmail.com" },
-  { name: "Rodrigo", last_name: "Torres", email: "rodrigotorres@gmail.com" },
-  { name: "Florencia", last_name: "Pintos", email: "florenciapintos@gmail.com" },
-  { name: "Mateo", last_name: "Ramos", email: "mateoramos@gmail.com" },
-  { name: "Camila", last_name: "Sosa", email: "camilasosa@gmail.com" },
-  { name: "Bruno", last_name: "Acosta", email: "brunoacosta@gmail.com" },
-
-  { name: "Elena", last_name: "Domínguez", email: "elenadominguez@gmail.com" },
-  { name: "Tomás", last_name: "Garrido", email: "tomasgarrido@gmail.com" },
-  { name: "Natalia", last_name: "Guerra", email: "nataliaguerra@gmail.com" },
-  { name: "Sebastián", last_name: "Aguilar", email: "sebastianaguilar@gmail.com" },
-  { name: "Laura", last_name: "Maldonado", email: "lauramaldonado@gmail.com" },
-  { name: "Ignacio", last_name: "Ferrer", email: "ignacioferrer@gmail.com" },
-  { name: "Carolina", last_name: "Bermúdez", email: "carolinabermudez@gmail.com" },
-  { name: "Pablo", last_name: "Villar", email: "pablovillar@gmail.com" },
-  { name: "Agustina", last_name: "Benítez", email: "agustinabenitez@gmail.com" },
-  { name: "Federico", last_name: "Cardozo", email: "federicocardozo@gmail.com" },
-
-  { name: "Verónica", last_name: "Giménez", email: "veronicagimenez@gmail.com" },
-  { name: "Esteban", last_name: "Peralta", email: "estebanperalta@gmail.com" },
-  { name: "Rocío", last_name: "Vázquez", email: "rociovazquez@gmail.com" },
-  { name: "Gabriel", last_name: "Correa", email: "gabrielcorrea@gmail.com" },
-  { name: "Julieta", last_name: "Machado", email: "julietamachado@gmail.com" },
-  { name: "Fernando", last_name: "Núñez", email: "fernandonunez@gmail.com" },
-  { name: "Cecilia", last_name: "Morales", email: "ceciliamorales@gmail.com" },
-  { name: "Ricardo", last_name: "Mujica", email: "ricardomujica@gmail.com" },
-  { name: "Daniela", last_name: "Ruiz", email: "danielaruiz@gmail.com" },
-  { name: "Gustavo", last_name: "Ortega", email: "gustavoortega@gmail.com" }
+  { name: "Diego", last_name: "Martínez", email: "diegomartinez@gmail.com" },
+  { name: "Laura", last_name: "Fernández", email: "laurafernandez@gmail.com" },
+  { name: "Carlos", last_name: "Silva", email: "carlossilva@gmail.com" },
+  { name: "Valentina", last_name: "Torres", email: "valentinatorres@gmail.com" }
 ]
 
-students.each do |student_data|
-  User.find_or_create_by!(email: student_data[:email]) do |user|
-    user.name = student_data[:name]
-    user.last_name = student_data[:last_name]
-    user.faculty = fing
-    user.password = "password123"
-    user.password_confirmation = "password123"
-    user.description = "Estudiante de ejemplo"
-    user.jti = SecureRandom.uuid
+users = []
+users_data.each do |user_data|
+  user = User.find_or_create_by!(email: user_data[:email]) do |u|
+    u.name = user_data[:name]
+    u.last_name = user_data[:last_name]
+    u.faculty = fing
+    u.password = "password123"
+    u.password_confirmation = "password123"
+    u.description = "Estudiante de prueba"
+    u.jti = SecureRandom.uuid
+  end
+  users << user
+end
+
+# Assign to variables for easy reference
+user1, user2, user3, user4, user5, user6, user7, user8, user9 = users
+
+Rails.logger.debug { "  Created #{users.count} users" }
+
+# =============================================================================
+# COURSES AND SUBJECTS (10 courses, first 7 with 2-7 subjects each)
+# =============================================================================
+
+Rails.logger.debug "[3/7] Creating 10 courses with subjects..."
+
+# Course 1: Programación I (7 subjects)
+course1 = Course.find_or_create_by!(
+  name: "Programación 1",
+  code: "1373",
+  institute: "INCO",
+  faculty: fing
+)
+
+%w[Variables Bucles Funciones Arrays Recursión POO Archivos].each do |topic|
+  Subject.find_or_create_by!(name: topic, course: course1) do |s|
+    s.creator = user1
+    s.due_date = 3.months.from_now
   end
 end
 
-# ------ TEMAS DE MATERIAS ------
-
-# Crear subjects para un curso
-# ========================
-course = Course.find_by(id: 443) # PIS
-creator = User.find_by(email: "anaperez@gmail.com") || User.first
-# ========================
-
-Subject.find_or_create_by!(name: "Análisis de Requerimientos", course: course) do |s|
-  s.creator = creator
-  s.due_date = 3.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Gestión de Riesgos", course: course) do |s|
-  s.creator = creator
-  s.due_date = 4.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Casos de Uso", course: course) do |s|
-  s.creator = creator
-  s.due_date = 5.months.from_now
-end
-
-# creo un subject con due_date anterior a hoy para testear el job de eliminación/renovación
-Subject.find_or_create_by!(name: "Pruebas de Software", course: course) do |s|
-  s.creator = creator
-  s.due_date = 2.months.ago
-end
-
-Subject.find_or_create_by!(name: "Modelado UML", course: course) do |s|
-  s.creator = creator
-  s.due_date = 1.month.ago
-end
-
-# ========================
-course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
-creator = User.find_by(email: "martadaluz@gmail.com") || User.first
-# ========================
-
-Subject.find_or_create_by!(name: "Conjuntos", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Derivadas", course: course) do |s|
-  s.creator = creator
-  s.due_date = 3.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Integrales simples", course: course) do |s|
-  s.creator = creator
-  s.due_date = 4.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Axiomas", course: course) do |s|
-  s.creator = creator
-  s.due_date = 5.months.from_now
-end
-
-# ========================
-course = Course.find_by(id: 116) # Electrotécnica I
-creator = User.find_by(email: "martinramirez@gmail.com") || User.first
-# ========================
-# ========================
-Subject.find_or_create_by!(name: "Circuitos Eléctricos Básicos", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Leyes de Ohm y de Kirchhoff", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Potencia y Energía Eléctrica", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Generadores de Corriente Continua", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Motores de Corriente Continua", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Transformadores Eléctricos", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Medidas Eléctricas y Multímetros", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Protecciones y Seguridad Eléctrica", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Corriente Alterna: Magnitudes y Ondas", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Resonancia en Circuitos RLC", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-# ========================
-course = Course.find_by(id: 145) # Física I
-creator = User.find_by(email: "sofiagarcia@gmail.com") || User.first
-# ========================
-
-Subject.find_or_create_by!(name: "MCU", course: course) do |s|
-  s.creator = creator
-  s.due_date = 5.months.from_now
-end
-
-Subject.find_or_create_by!(name: "MRU", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Peso y masa", course: course) do |s|
-  s.creator = creator
-  s.due_date = 3.months.from_now
-end
-
-# ========================
-course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-creator = User.find_by(email: "luciafernandez@gmail.com") || User.first
-# ========================
-
-Subject.find_or_create_by!(name: "Geometría y Álgebra Lineal 1", course: course) do |s|
-  s.creator = creator
-  s.due_date = 4.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Operaciones con vectores", course: course) do |s|
-  s.creator = creator
-  s.due_date = 5.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Matrices y determinantes", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Base y dimensión", course: course) do |s|
-  s.creator = creator
-  s.due_date = 3.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Sistemas de ecuaciones lineales", course: course) do |s|
-  s.creator = creator
-  s.due_date = 4.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Método de Gauss y Gauss-Jordan", course: course) do |s|
-  s.creator = creator
-  s.due_date = 5.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Autovalores y autovectores", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-creator = User.find_by(email: "luciafernandez@gmail.com") || User.first
-
-Subject.find_or_create_by!(name: "Espacios vectoriales", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Subespacios y bases", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Transformaciones lineales", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Núcleo e imagen", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Producto escalar y ortogonalidad", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Diagonalización de matrices", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Formas cuadráticas", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Aplicaciones a geometría", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Eigenespacios", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Cambio de base", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Determinantes avanzados", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Sistemas homogéneos", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Teorema espectral", course: course) do |s|
-  s.creator = creator
-end
-
-Subject.find_or_create_by!(name: "Aplicaciones a física e ingeniería", course: course) do |s|
-  s.creator = creator
-end
-
-# ========================
-course = Course.find_by(id: 3) # Administración de Infraestructuras
-creator = User.find_by(email: "anaperez@gmail.com") || User.first
-# ========================
-
-Subject.find_or_create_by!(name: "Gestión de Servidores", course: course) do |s|
-  s.creator = creator
-  s.due_date = 3.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Redes y Comunicaciones", course: course) do |s|
-  s.creator = creator
-  s.due_date = 4.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Seguridad en Infraestructura", course: course) do |s|
-  s.creator = creator
-  s.due_date = 5.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Monitoreo y Mantenimiento", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-# ========================
-course = Course.find_by(id: 5) # Administración de Operaciones
-creator = User.find_by(email: "luisgomez@gmail.com") || User.first
-# ========================
-
-Subject.find_or_create_by!(name: "Gestión de Procesos", course: course) do |s|
-  s.creator = creator
-  s.due_date = 3.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Planificación de la Producción", course: course) do |s|
-  s.creator = creator
-  s.due_date = 4.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Gestión de la Calidad", course: course) do |s|
-  s.creator = creator
-  s.due_date = 5.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Logística y Cadena de Suministro", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-# ========================
-course = Course.find_by(id: 8) # Agrimensura Legal 1
-creator = User.find_by(email: "luisgomez@gmail.com") || User.first
-# ========================
-
-Subject.find_or_create_by!(name: "Levantamiento Topográfico", course: course) do |s|
-  s.creator = creator
-  s.due_date = 3.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Catastro y Planimetría", course: course) do |s|
-  s.creator = creator
-  s.due_date = 4.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Límites y Propiedad", course: course) do |s|
-  s.creator = creator
-  s.due_date = 5.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Documentación Legal y Escrituras", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-
-# ========================
-course = Course.find_by(id: 13) # Algoritmos Evolutivos
-creator = User.find_by(email: "mariarodriguez@gmail.com") || User.first
-# ========================
-
-Subject.find_or_create_by!(name: "Introducción a Algoritmos Evolutivos", course: course) do |s|
-  s.creator = creator
-  s.due_date = 3.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Algoritmos Genéticos", course: course) do |s|
-  s.creator = creator
-  s.due_date = 4.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Algoritmos de Enjambre", course: course) do |s|
-  s.creator = creator
-  s.due_date = 5.months.from_now
-end
-
-Subject.find_or_create_by!(name: "Optimización Multiobjetivo", course: course) do |s|
-  s.creator = creator
-  s.due_date = 6.months.from_now
-end
-# ------------------ TUTORIAS ------------------ #
-
-# ---- SIN TUTOR ---- #
-# Cuando un estudiante crea una solicitud de tutoría (tutor_id: nil),
-# automáticamente se inscribe en ella (UserTutoring).
-
-# TODO: VER DE ARREGLAR LO DE USER CALENDAR PARA DESCOMENTAR ESTAS TUTORIAS
-
-# # Tutoría 1 creada por estudiante solicitándola, con 3 temas
-# creator = User.find_by!(email: "luisgomez@gmail.com")
-# course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-# subjects = Subject.where(course: course).shuffle.take(rand(1..3))
-
-# tutoring_request = Tutoring.find_or_create_by!(
-#   scheduled_at: 6.days.from_now,
-#   duration_mins: 90,
-#   modality: "virtual",
-#   capacity: 3,
-#   enrolled: 0,
-#   course: course,
-#   created_by_id: creator.id,
-#   tutor_id: nil # user_calendar.id
-# )
-
-# subjects.each do |subject|
-#   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
-# end
-
-# # El creador de la solicitud se inscribe automáticamente
-# UserTutoring.find_or_create_by!(
-#   user: creator,
-#   tutoring: tutoring_request
-# )
-
-# # Crear disponibilidades para esta tutoría
-# TutoringAvailability.find_or_create_by!(
-#   tutoring: tutoring_request,
-#   start_time: 6.days.from_now.change(hour: 14, min: 0),
-#   end_time: 6.days.from_now.change(hour: 15, min: 30),
-#   is_booked: false
-# )
-
-# TutoringAvailability.find_or_create_by!(
-#   tutoring: tutoring_request,
-#   start_time: 6.days.from_now.change(hour: 16, min: 0),
-#   end_time: 6.days.from_now.change(hour: 17, min: 30),
-#   is_booked: false
-# )
-
-# # # Tutoría 2 creada por estudiante solicitándola, con 1 tema
-# # creator = User.find_by!(email: "juanperez@gmail.com")
-# # course = Course.find_by(id: 145) # Física I
-# # subject = course.subjects.sample(1).first
-
-# # tutoring_request = Tutoring.find_or_create_by!(
-# #   scheduled_at: 3.days.from_now,
-# #   duration_mins: 90,
-# #   modality: "virtual",
-# #   capacity: 1,
-# #   enrolled: 0,
-# #   course: course,
-# #   created_by_id: creator.id,
-# #   tutor_id: nil # user_calendar.id
-# # )
-
-# # SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
-# # # create_event_for_tutoring(service, calendar_id, tutoring_request)
-
-# # # El creador de la solicitud se inscribe automáticamente
-# # UserTutoring.find_or_create_by!(
-# #   user: creator,
-# #   tutoring: tutoring_request
-# # )
-
-# # # Crear disponibilidad para esta tutoría
-# # TutoringAvailability.find_or_create_by!(
-# #   tutoring: tutoring_request,
-# #   start_time: 3.days.from_now.change(hour: 10, min: 0),
-# #   end_time: 3.days.from_now.change(hour: 11, min: 30),
-# #   is_booked: false
-# # )
-
-# # Tutoría 3 creada por estudiante solicitándola, con 5 temas
-# creator = User.find_by!(email: "anaperez@gmail.com")
-# course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-# subjects = Subject.where(course: course).shuffle.take(rand(1..5))
-
-# tutoring_request = Tutoring.find_or_create_by!(
-#   scheduled_at: 4.days.from_now,
-#   duration_mins: 90,
-#   modality: "virtual",
-#   capacity: 1,
-#   enrolled: 0,
-#   course: course,
-#   created_by_id: creator.id,
-#   tutor_id: nil # user_calendar.id
-# )
-
-# subjects.each do |subject|
-#   SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
-# end
-
-# # El creador de la solicitud se inscribe automáticamente
-# UserTutoring.find_or_create_by!(
-#   user: creator,
-#   tutoring: tutoring_request
-# )
-
-# # Crear disponibilidades para esta tutoría
-# TutoringAvailability.find_or_create_by!(
-#   tutoring: tutoring_request,
-#   start_time: 4.days.from_now.change(hour: 15, min: 0),
-#   end_time: 4.days.from_now.change(hour: 16, min: 30),
-#   is_booked: false
-# )
-
-# TutoringAvailability.find_or_create_by!(
-#   tutoring: tutoring_request,
-#   start_time: 4.days.from_now.change(hour: 18, min: 0),
-#   end_time: 4.days.from_now.change(hour: 19, min: 30),
-#   is_booked: false
-# )
-
-# Tutoría 3 repetida con 5 temas
-creator = User.find_by!(email: "anaperez@gmail.com")
-course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-subjects = Subject.where(course: course).shuffle.take(rand(1..5))
-
-tutoring_request = Tutoring.find_or_create_by!(
-  scheduled_at: 7.days.from_now,
-  duration_mins: 180,
-  modality: "virtual",
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: nil
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_request)
-end
-
-# El creador de la solicitud se inscribe automáticamente
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_request
-)
-
-# Crear disponibilidad para esta tutoría
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_request,
-  start_time: 7.days.from_now.change(hour: 9, min: 0),
-  end_time: 7.days.from_now.change(hour: 12, min: 0),
-  is_booked: false
-)
-
-# ---- CON TUTOR = USUARIO QUE LA CREA ---- #
-# Cuando un tutor crea una oferta de tutoría (tutor_id: present),
-# también se crea UserTutoring para vincular al tutor con la tutoría.
-
-# Tutoría 4 creada por estudiante dictándola
-creator = User.find_by!(email: "anaperez@gmail.com")
-course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
-subject = course.subjects.sample(1).first
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 5.days.from_now,
-  duration_mins: 60,
-  modality: "presencial",
-  capacity: 2,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id,
-)
-
-SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-
-# El tutor se asocia a su propia tutoría
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-# Crear disponibilidades para esta tutoría
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 5.days.from_now.change(hour: 14, min: 0),
-  end_time: 5.days.from_now.change(hour: 15, min: 0),
-  is_booked: false
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 5.days.from_now.change(hour: 17, min: 0),
-  end_time: 5.days.from_now.change(hour: 18, min: 0),
-  is_booked: false
-)
-
-# Tutoría 5 creada por estudiante dictándola
-creator = User.find_by!(email: "martadaluz@gmail.com")
-course = Course.find_by(id: 116) # Electrotécnica I
-subjects = Subject.where(course: course).shuffle.take(rand(1..7))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 7.days.from_now,
-  duration_mins: 60,
-  modality: "virtual",
-  capacity: 5,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-# El tutor se asocia a su propia tutoría
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-# Crear disponibilidad para esta tutoría
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 7.days.from_now.change(hour: 16, min: 0),
-  end_time: 7.days.from_now.change(hour: 17, min: 0),
-  is_booked: false
-)
-
-# Tutoría 6 creada por estudiante dictándola
-creator = User.find_by!(email: "veronicagimenez@gmail.com")
-course = Course.find_by(id: 116) # Electrotécnica I
-subjects = Subject.where(course: course).shuffle.take(rand(1..2))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 7.days.from_now,
-  duration_mins: 60,
-  modality: "virtual",
-  capacity: 5,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 7.days.from_now.change(hour: 19, min: 0),
-  end_time: 7.days.from_now.change(hour: 20, min: 0),
-  is_booked: false
-)
-
-# Tutoría 7 creada por estudiante dictándola
-creator = User.find_by!(email: "veronicagimenez@gmail.com")
-course = Course.find_by(id: 39) # Cálculo Diferencial e Integral en una variable
-subjects = Subject.where(course: course).shuffle.take(rand(1..3))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 10.days.from_now,
-  duration_mins: 60,
-  modality: "virtual",
-  capacity: 5,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 10.days.from_now.change(hour: 11, min: 0),
-  end_time: 10.days.from_now.change(hour: 12, min: 0),
-  is_booked: false
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 10.days.from_now.change(hour: 15, min: 0),
-  end_time: 10.days.from_now.change(hour: 16, min: 0),
-  is_booked: false
-)
-
-# Tutoría 8 creada por estudiante dictándola
-creator = User.find_by!(email: "rociovazquez@gmail.com")
-course = Course.find_by(id: 443) # PIS
-subjects = Subject.where(course: course).shuffle.take(rand(1..2))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 2.days.from_now,
-  duration_mins: 60,
-  modality: "virtual",
-  capacity: 5,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 2.days.from_now.change(hour: 14, min: 30),
-  end_time: 2.days.from_now.change(hour: 15, min: 30),
-  is_booked: false
-)
-
-# Tutoría 9 creada por estudiante dictándola
-creator = User.find_by!(email: "pablovillar@gmail.com")
-course = Course.find_by(id: 443) # PIS
-subjects = Subject.where(course: course).shuffle.take(rand(1..2))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 5.days.from_now,
-  duration_mins: 60,
-  modality: "presencial",
-  capacity: 14,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 5.days.from_now.change(hour: 10, min: 0),
-  end_time: 5.days.from_now.change(hour: 11, min: 0),
-  is_booked: false
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 5.days.from_now.change(hour: 13, min: 0),
-  end_time: 5.days.from_now.change(hour: 14, min: 0),
-  is_booked: false
-)
-
-# Tutoría 10 creada por estudiante dictándola
-creator = User.find_by!(email: "agustinabenitez@gmail.com")
-course = Course.find_by(id: 145) # Física I
-subjects = Subject.where(course: course).shuffle.take(rand(1..2))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 3.days.from_now,
-  duration_mins: 60,
-  modality: "presencial",
-  capacity: 20,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 3.days.from_now.change(hour: 16, min: 0),
-  end_time: 3.days.from_now.change(hour: 17, min: 0),
-  is_booked: false
-)
-
-# Tutoría 11 creada por estudiante dictándola
-creator = User.find_by!(email: "agustinabenitez@gmail.com")
-course = Course.find_by(id: 145) # Física I
-subjects = Subject.where(course: course).shuffle.take(rand(1..2))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 7.days.from_now,
-  duration_mins: 60,
-  modality: "virtual",
-  capacity: 10,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 7.days.from_now.change(hour: 18, min: 0),
-  end_time: 7.days.from_now.change(hour: 19, min: 0),
-  is_booked: false
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 7.days.from_now.change(hour: 20, min: 0),
-  end_time: 7.days.from_now.change(hour: 21, min: 0),
-  is_booked: false
+# Course 2: Cálculo Diferencial (5 subjects)
+course2 = Course.find_or_create_by!(
+  name: "Cálculo Diferencial e Integral en una variable",
+  faculty: fing
 )
 
-# Tutoría 12 creada por estudiante dictándola
-creator = User.find_by!(email: "tomasgarrido@gmail.com")
-course = Course.find_by(id: 185) # Geometría y Álgebra Lineal 1
-subjects = Subject.where(course: course).shuffle.take(rand(1..3))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 2.days.from_now,
-  duration_mins: 60,
-  modality: "virtual",
-  capacity: 10,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 2.days.from_now.change(hour: 17, min: 0),
-  end_time: 2.days.from_now.change(hour: 18, min: 0),
-  is_booked: false
-)
-
-# Tutoría 13 creada por estudiante dictándola
-creator = User.find_by!(email: "tomasgarrido@gmail.com")
-course = Course.find_by(id: 13) # Algoritmos Evolutivos
-subjects = Subject.where(course: course).shuffle.take(rand(1..4))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 5.days.from_now,
-  duration_mins: 30,
-  modality: "virtual",
-  capacity: 10,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 5.days.from_now.change(hour: 12, min: 0),
-  end_time: 5.days.from_now.change(hour: 12, min: 30),
-  is_booked: false
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 5.days.from_now.change(hour: 14, min: 0),
-  end_time: 5.days.from_now.change(hour: 14, min: 30),
-  is_booked: false
-)
-
-# Tutoría 14 creada por estudiante dictándola
-creator = User.find_by!(email: "lauramaldonado@gmail.com")
-course = Course.find_by(id: 13) # Algoritmos Evolutivos
-subjects = Subject.where(course: course).shuffle.take(rand(1..2))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 7.days.from_now,
-  duration_mins: 60,
-  modality: "presencial",
-  capacity: 10,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 7.days.from_now.change(hour: 13, min: 0),
-  end_time: 7.days.from_now.change(hour: 14, min: 0),
-  is_booked: false
-)
-
-# Tutoría 15 creada por estudiante dictándola
-creator = User.find_by!(email: "lauramaldonado@gmail.com")
-course = Course.find_by(id: 13) # Algoritmos Evolutivos
-subjects = Subject.where(course: course).shuffle.take(rand(1..2))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 5.days.from_now,
-  duration_mins: 45,
-  modality: "presencial",
-  capacity: 10,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 5.days.from_now.change(hour: 9, min: 0),
-  end_time: 5.days.from_now.change(hour: 9, min: 45),
-  is_booked: false
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 5.days.from_now.change(hour: 11, min: 0),
-  end_time: 5.days.from_now.change(hour: 11, min: 45),
-  is_booked: false
-)
-
-# Tutoría 16 creada por estudiante dictándola
-creator = User.find_by!(email: "tomasgarrido@gmail.com")
-course = Course.find_by(id: 13) # Algoritmos Evolutivos
-subjects = Subject.where(course: course).shuffle.take(rand(1..2))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 10.days.from_now,
-  duration_mins: 60,
-  modality: "virtual",
-  capacity: 15,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
-)
-
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+%w[Límites Derivadas Integrales Series Funciones].each do |topic|
+  Subject.find_or_create_by!(name: topic, course: course2) do |s|
+    s.creator = user2
+    s.due_date = 3.months.from_now
+  end
 end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 10.days.from_now.change(hour: 16, min: 30),
-  end_time: 10.days.from_now.change(hour: 17, min: 30),
-  is_booked: false
-)
 
-# Tutoría 17 creada por estudiante dictándola
-creator = User.find_by!(email: "luisgomez@gmail.com")
-course = Course.find_by(id: 13) # Algoritmos Evolutivos
-subjects = Subject.where(course: course).shuffle.take(rand(1..2))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 8.days.from_now,
-  duration_mins: 30,
-  modality: "virtual",
-  capacity: 15,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
+# Course 3: Física I (4 subjects)
+course3 = Course.find_or_create_by!(
+  name: "Física 1",
+  institute: "IF",
+  faculty: fing
 )
 
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+%w[Cinemática Dinámica Energía Momentum].each do |topic|
+  Subject.find_or_create_by!(name: topic, course: course3) do |s|
+    s.creator = user3
+    s.due_date = 3.months.from_now
+  end
 end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 8.days.from_now.change(hour: 10, min: 30),
-  end_time: 8.days.from_now.change(hour: 11, min: 0),
-  is_booked: false
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 8.days.from_now.change(hour: 15, min: 30),
-  end_time: 8.days.from_now.change(hour: 16, min: 0),
-  is_booked: false
-)
 
-# Tutoría 18 creada por estudiante dictándola
-creator = User.find_by!(email: "sofiagarcia@gmail.com")
-course = Course.find_by(id: 8) # Agrimensura Legal 1
-subjects = Subject.where(course: course).shuffle.take(rand(1..2))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 5.days.from_now,
-  duration_mins: 60,
-  modality: "virtual",
-  capacity: 15,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
+# Course 4: Álgebra Lineal (6 subjects)
+course4 = Course.find_or_create_by!(
+  name: "Geometría y Álgebra Lineal 1",
+  institute: "IMERL",
+  faculty: fing
 )
 
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+%w[Matrices Vectores Determinantes Autovalores Diagonalización Espacios].each do |topic|
+  Subject.find_or_create_by!(name: topic, course: course4) do |s|
+    s.creator = user4
+    s.due_date = 3.months.from_now
+  end
 end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 5.days.from_now.change(hour: 19, min: 0),
-  end_time: 5.days.from_now.change(hour: 20, min: 0),
-  is_booked: false
-)
 
-# Tutoría 19 creada por estudiante dictándola
-creator = User.find_by!(email: "paulacastro@gmail.com")
-course = Course.find_by(id: 8) # Agrimensura Legal 1
-subjects = Subject.where(course: course).shuffle.take(rand(1..3))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 3.days.from_now,
-  duration_mins: 60,
-  modality: "presencial",
-  capacity: 10,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
+# Course 5: Estructuras de Datos (3 subjects)
+course5 = Course.find_or_create_by!(
+  name: "Estructuras de Datos",
+  code: "ESTDAT",
+  institute: "Instituto de Computación",
+  faculty: fing
 )
 
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+%w[Listas Árboles Grafos].each do |topic|
+  Subject.find_or_create_by!(name: topic, course: course5) do |s|
+    s.creator = user5
+    s.due_date = 3.months.from_now
+  end
 end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 3.days.from_now.change(hour: 11, min: 0),
-  end_time: 3.days.from_now.change(hour: 12, min: 0),
-  is_booked: false
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 3.days.from_now.change(hour: 14, min: 0),
-  end_time: 3.days.from_now.change(hour: 15, min: 0),
-  is_booked: false
-)
 
-# Tutoría 20 creada por estudiante dictándola
-creator = User.find_by!(email: "martadaluz@gmail.com")
-course = Course.find_by(id: 8) # Agrimensura Legal 1
-subjects = Subject.where(course: course).shuffle.take(rand(1..3))
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 3.days.from_now,
-  duration_mins: 60,
-  modality: "presencial",
-  capacity: 10,
-  enrolled: 0,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id
+# Course 6: Bases de Datos (2 subjects)
+course6 = Course.find_or_create_by!(
+  name: "Bases de Datos 1",
+  faculty: fing
 )
 
-subjects.each do |subject|
-  SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
+%w[SQL Normalización].each do |topic|
+  Subject.find_or_create_by!(name: topic, course: course6) do |s|
+    s.creator = user6
+    s.due_date = 3.months.from_now
+  end
 end
-
-UserTutoring.find_or_create_by!(
-  user: creator,
-  tutoring: tutoring_offered
-)
-
-TutoringAvailability.find_or_create_by!(
-  tutoring: tutoring_offered,
-  start_time: 3.days.from_now.change(hour: 16, min: 30),
-  end_time: 3.days.from_now.change(hour: 17, min: 30),
-  is_booked: false
-)
-
-# Tutoría 21 creada por estudiante dictándola con 2 estudiantes inscritos (ya finalizada)
-creator = User.find_by!(email: "clarasuarez@gmail.com")
-course = Course.find_by(id: 3) # Administración de Infraestructuras
-subject = Subject.find_by!(name: "Gestión de Servidores", course: course)
-
-tutoring_offered = Tutoring.find_or_create_by!(
-  scheduled_at: 1.day.from_now,
-  duration_mins: 60,
-  modality: "presencial",
-  capacity: 3,
-  enrolled: 2,
-  course: course,
-  created_by_id: creator.id,
-  tutor_id: creator.id,
-  state: 1
-)
 
-SubjectTutoring.find_or_create_by!(subject: subject, tutoring: tutoring_offered)
-
-UserTutoring.find_or_create_by!(
-  user: User.find_by!(email: "andresmendez@gmail.com"),
-  tutoring: tutoring_offered
+# Course 7: Redes de Computadoras (4 subjects)
+course7 = Course.find_or_create_by!(
+  name: "Redes de Computadoras",
+  code: "1446",
+  institute: "INCO",
+  faculty: fing
 )
 
-UserTutoring.find_or_create_by!(
-  user: User.find_by!(email: "paulacastro@gmail.com"),
-  tutoring: tutoring_offered
-)
+%w[TCP/IP HTTP DNS Routing].each do |topic|
+  Subject.find_or_create_by!(name: topic, course: course7) do |s|
+    s.creator = user7
+    s.due_date = 3.months.from_now
+  end
+end
 
-tutoring_offered.state = 2
-tutoring_offered.scheduled_at = 10.days.ago
-tutoring_offered.save!(validate: false) # para que me deje poner una fecha del pasado aunque la db no lo permite
+# Course 8: Sistemas Operativos (no subjects needed for pending tutorings)
+course8 = Course.find_or_create_by!(
+  name: "Sistemas Operativos",
+  code: "1537",
+  institute: "INCO",
+  faculty: fing
+)
+
+%w[Procesos Memoria Archivos].each do |topic|
+  Subject.find_or_create_by!(name: topic, course: course8) do |s|
+    s.creator = user8
+    s.due_date = 3.months.from_now
+  end
+end
+
+# Course 9: Ingeniería de Software (no subjects needed)
+course9 = Course.find_or_create_by!(
+  name: "Ingeniería de Software",
+  code: "INGSOFT",
+  institute: "Instituto de Computación",
+  faculty: fing
+)
+
+%w[Requerimientos Testing Arquitectura].each do |topic|
+  Subject.find_or_create_by!(name: topic, course: course9) do |s|
+    s.creator = user9
+    s.due_date = 3.months.from_now
+  end
+end
+
+# Course 10: Arquitectura de Computadores (no subjects needed)
+course10 = Course.find_or_create_by!(
+  name: "Arquitectura de Computadoras",
+  code: "1466",
+  institute: "INCO",
+  faculty: fing
+)
+
+%w[CPU Pipeline Cache].each do |topic|
+  Subject.find_or_create_by!(name: topic, course: course10) do |s|
+    s.creator = user1
+    s.due_date = 3.months.from_now
+  end
+end
+
+Rails.logger.debug "  Created 10 courses with subjects"
+
+# =============================================================================
+# ACTIVE TUTORINGS (12 total: state = 'active')
+# - 2 from course1, 3 from course2, 3 from course3, 2 from course4, 2 from course5
+# - 4 created by tutor, 8 created by student
+# - Each has 2-5 attendees (UserTutoring records)
+# - At least 1 TutoringAvailability (one booked, rest unbooked)
+# =============================================================================
+
+Rails.logger.debug "[4/7] Creating 12 active tutorings..."
+
+# Helper method to create a tutoring with attendees and availability
+def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_count:, users_pool:)
+  subjects = course.subjects.sample(subjects_count)
+
+  tutoring = Tutoring.create!(
+    course: course,
+    tutor: tutor,
+    created_by_id: creator.id,
+    state: :active,
+    modality: ["virtual", "presencial"].sample,
+    duration_mins: [60, 90, 120].sample,
+    capacity: num_attendees + 2,
+    scheduled_at: (15 + rand(30)).days.from_now
+  )
+
+  # Link subjects
+  subjects.each { |subject| SubjectTutoring.create!(subject: subject, tutoring: tutoring) }
+
+  pool = users_pool.reject { |u| u.id == tutoring.tutor_id }
+
+  # Si el creador no es el tutor, lo agregamos como asistente y reducimos la cuenta
+  if creator.id != tutor.id
+    UserTutoring.create!(user: creator, tutoring: tutoring)
+    pool = pool.reject { |u| u.id == creator.id }
+    num_attendees -= 1
+  end
+
+  # Create UserTutoring para los demás asistentes
+  attendees = pool.sample(num_attendees)
+  attendees.each { |attendee| UserTutoring.create!(user: attendee, tutoring: tutoring) }
+
+  # Create TutoringAvailability (one booked, rest unbooked)
+  num_availabilities = rand(1..3)
+  num_availabilities.times do |i|
+    TutoringAvailability.create!(
+      tutoring: tutoring,
+      start_time: tutoring.scheduled_at + i.hours,
+      end_time: tutoring.scheduled_at + i.hours + tutoring.duration_mins.minutes,
+      is_booked: (i == 0) # First one is booked
+    )
+  end
+
+  # Create chat and welcome message
+  tutoring.create_chat! unless tutoring.chat
+
+  tutoring.chat.users << tutor unless tutoring.chat.users.exists?(tutor.id)
+  if creator.id != tutor.id
+    tutoring.chat.users << creator unless tutoring.chat.users.exists?(creator.id)
+  end
+  attendees.each do |u|
+    tutoring.chat.users << u unless tutoring.chat.users.exists?(u.id)
+  end
+
+  if tutoring.chat.messages.count.zero?
+    tutoring.chat.messages.create!(
+      user: creator,
+      content: "Bienvenidos al chat de la tutoría. Cualquier duda escriban aquí."
+    )
+  end
+
+  tutoring
+end
+
+# Course 1: 2 tutorings (1 by tutor, 1 by student)
+create_active_tutoring(course: course1, tutor: user1, creator: user1, num_attendees: 3, subjects_count: 2,
+                       users_pool: users)
+create_active_tutoring(course: course1, tutor: user2, creator: user3, num_attendees: 4, subjects_count: 3,
+                       users_pool: users)
+
+# Course 2: 3 tutorings (1 by tutor, 2 by student)
+create_active_tutoring(course: course2, tutor: user3, creator: user3, num_attendees: 2, subjects_count: 2,
+                       users_pool: users)
+create_active_tutoring(course: course2, tutor: user4, creator: user5, num_attendees: 5, subjects_count: 3,
+                       users_pool: users)
+create_active_tutoring(course: course2, tutor: user5, creator: user6, num_attendees: 3, subjects_count: 2,
+                       users_pool: users)
+
+# Course 3: 3 tutorings (1 by tutor, 2 by student)
+create_active_tutoring(course: course3, tutor: user6, creator: user6, num_attendees: 4, subjects_count: 2,
+                       users_pool: users)
+create_active_tutoring(course: course3, tutor: user7, creator: user8, num_attendees: 3, subjects_count: 3,
+                       users_pool: users)
+create_active_tutoring(course: course3, tutor: user8, creator: user9, num_attendees: 2, subjects_count: 2,
+                       users_pool: users)
+
+# Course 4: 2 tutorings (0 by tutor, 2 by student)
+create_active_tutoring(course: course4, tutor: user9, creator: user1, num_attendees: 5, subjects_count: 3,
+                       users_pool: users)
+create_active_tutoring(course: course4, tutor: user1, creator: user2, num_attendees: 4, subjects_count: 4,
+                       users_pool: users)
+
+# Course 5: 2 tutorings (1 by tutor, 1 by student)
+create_active_tutoring(course: course5, tutor: user2, creator: user2, num_attendees: 3, subjects_count: 2,
+                       users_pool: users)
+create_active_tutoring(course: course5, tutor: user3, creator: user4, num_attendees: 2, subjects_count: 2,
+                       users_pool: users)
+
+Rails.logger.debug "  Created 12 active tutorings"
+
+# =============================================================================
+# PENDING TUTORINGS (10 total: state = 'pending')
+# - 2 from each of course4-course8
+# - 5 created by tutor, 5 created by student
+# - At least 1 TutoringAvailability (all unbooked, all future)
+# =============================================================================
+
+Rails.logger.debug "[5/7] Creating 10 pending tutorings..."
+
+def create_pending_tutoring(course:, creator:, is_tutor_creator:)
+  subjects = course.subjects.sample(rand(1..3))
+
+  if is_tutor_creator
+    tutoring = Tutoring.create!(
+      course: course,
+      tutor: creator,
+      created_by_id: creator.id,
+      state: :pending,
+      modality: ["virtual", "presencial"].sample,
+      duration_mins: [60, 90, 120].sample,
+      scheduled_at: (15 + rand(30)).days.from_now,
+      capacity: 2,
+    )
+
+    # Create TutoringAvailability (one booked, rest unbooked)
+    num_availabilities = rand(1..3)
+    num_availabilities.times do |i|
+      TutoringAvailability.create!(
+        tutoring: tutoring,
+        start_time: tutoring.scheduled_at + i.hours,
+        end_time: tutoring.scheduled_at + i.hours + tutoring.duration_mins.minutes,
+        is_booked: (i == 0) # First one is booked
+      )
+    end
+  else
+    tutoring = Tutoring.create!(
+      course: course,
+      tutor: nil,
+      created_by_id: creator.id,
+      state: :pending,
+      modality: ["virtual", "presencial"].sample,
+      duration_mins: 1,
+    )
+    # If created by student, they get a UserTutoring
+    UserTutoring.create!(user: creator, tutoring: tutoring) unless is_tutor_creator
+
+    # Create TutoringAvailability (all unbooked)
+    num_availabilities = rand(1..3)
+    num_availabilities.times do |i|
+      start_time = Time.current.beginning_of_day + (i + 1).days      # mañana + i días
+      end_time = start_time + 16.hours                               # hasta las 16:00
+
+      TutoringAvailability.create!(
+        tutoring: tutoring,
+        start_time: start_time,
+        end_time: end_time,
+        is_booked: false
+      )
+    end
+  end
+
+  # Link subjects
+  subjects.each { |subject| SubjectTutoring.create!(subject: subject, tutoring: tutoring) }
+
+  tutoring
+end
+
+# Course 4: 2 pending (1 by tutor, 1 by student)
+create_pending_tutoring(course: course4, creator: user4, is_tutor_creator: true)
+create_pending_tutoring(course: course4, creator: user5, is_tutor_creator: false)
+
+# Course 5: 2 pending (1 by tutor, 1 by student)
+create_pending_tutoring(course: course5, creator: user6, is_tutor_creator: true)
+create_pending_tutoring(course: course5, creator: user7, is_tutor_creator: false)
+
+# Course 6: 2 pending (1 by tutor, 1 by student)
+create_pending_tutoring(course: course6, creator: user8, is_tutor_creator: true)
+create_pending_tutoring(course: course6, creator: user9, is_tutor_creator: false)
+
+# Course 7: 2 pending (1 by tutor, 1 by student)
+create_pending_tutoring(course: course7, creator: user1, is_tutor_creator: true)
+create_pending_tutoring(course: course7, creator: user2, is_tutor_creator: false)
+
+# Course 8: 2 pending (1 by tutor, 1 by student)
+create_pending_tutoring(course: course8, creator: user3, is_tutor_creator: true)
+create_pending_tutoring(course: course8, creator: user4, is_tutor_creator: false)
+
+Rails.logger.debug "  Created 10 pending tutorings"
+
+# =============================================================================
+# FINISHED TUTORINGS (10 total: state = 'finished')
+# - 2 from each of course6-course10
+# - 5 created by tutor, 5 created by student
+# - At least 1 TutoringAvailability (one booked in past, rest unbooked)
+# =============================================================================
+
+Rails.logger.debug "[6/7] Creating 10 finished tutorings..."
+
+def create_finished_tutoring(course:, tutor:, creator:, num_attendees:, subjects_count:, users_pool:)
+  subjects = course.subjects.sample(subjects_count)
+
+  # Create with future date first (to pass validation)
+  tutoring = Tutoring.create!(
+    course: course,
+    tutor: tutor,
+    created_by_id: creator.id,
+    state: :active,
+    modality: ["virtual", "presencial"].sample,
+    duration_mins: [60, 90, 120].sample,
+    capacity: num_attendees + 2,
+    scheduled_at: 1.day.from_now
+  )
+
+  # Link subjects
+  subjects.each { |subject| SubjectTutoring.create!(subject: subject, tutoring: tutoring) }
+
+  # Create UserTutoring for attendees (NOT for tutor)
+  attendees = users_pool.reject { |u| u.id == tutor.id }.sample(num_attendees)
+  attendees.each { |attendee| UserTutoring.create!(user: attendee, tutoring: tutoring) }
+
+  # Create TutoringAvailability (one booked in past, rest unbooked)
+  past_date = (15 + rand(30)).days.ago
+
+  TutoringAvailability.create!(
+    tutoring: tutoring,
+    start_time: past_date,
+    end_time: past_date + tutoring.duration_mins.minutes,
+    is_booked: true
+  )
+
+  # Additional unbooked availabilities
+  rand(0..2).times do |i|
+    TutoringAvailability.create!(
+      tutoring: tutoring,
+      start_time: past_date + (i + 1).hours,
+      end_time: past_date + (i + 1).hours + tutoring.duration_mins.minutes,
+      is_booked: false
+    )
+  end
+
+  # Now update to finished state with past date (skip validation)
+  tutoring.state = :finished
+  tutoring.scheduled_at = past_date
+  tutoring.save!(validate: false)
+
+  tutor.increment(:tutorias_dadas_count)
+  tutor.save!
+
+  for user in users_pool
+    user.increment(:tutorias_recibidas_count)
+    user.save!
+  end
+
+  tutoring
+end
+
+# Course 6: 2 finished (1 by tutor, 1 by student)
+t1 = create_finished_tutoring(course: course6, tutor: user5, creator: user5, num_attendees: 3, subjects_count: 2,
+                              users_pool: users)
+
+t2 = create_finished_tutoring(course: course6, tutor: user6, creator: user7, num_attendees: 2, subjects_count: 2,
+                              users_pool: users)
+
+# Course 7: 2 finished (1 by tutor, 1 by student)
+t3 = create_finished_tutoring(course: course7, tutor: user7, creator: user7, num_attendees: 4, subjects_count: 2,
+                              users_pool: users)
+t4 = create_finished_tutoring(course: course7, tutor: user8, creator: user9, num_attendees: 3, subjects_count: 3,
+                              users_pool: users)
+
+# Course 8: 2 finished (1 by tutor, 1 by student)
+t5 = create_finished_tutoring(course: course8, tutor: user9, creator: user9, num_attendees: 2, subjects_count: 2,
+                              users_pool: users)
+t6 = create_finished_tutoring(course: course8, tutor: user1, creator: user2, num_attendees: 3, subjects_count: 2,
+                              users_pool: users)
+
+# Course 9: 2 finished (1 by tutor, 1 by student)
+t7 = create_finished_tutoring(course: course9, tutor: user2, creator: user2, num_attendees: 4, subjects_count: 2,
+                              users_pool: users)
+t8 = create_finished_tutoring(course: course9, tutor: user3, creator: user4, num_attendees: 2, subjects_count: 2,
+                              users_pool: users)
+
+# Course 10: 2 finished (1 by tutor, 1 by student)
+t9 = create_finished_tutoring(course: course10, tutor: user4, creator: user4, num_attendees: 3, subjects_count: 2,
+                              users_pool: users)
+t10 = create_finished_tutoring(course: course10, tutor: user5, creator: user6, num_attendees: 2, subjects_count: 2,
+                               users_pool: users)
+
+# Store finished tutorings for reviews/feedbacks
+[t1, t2, t3, t4, t5, t6, t7, t8, t9, t10]
+
+Rails.logger.debug "  Created 10 finished tutorings"
+
+# =============================================================================
+# REVIEWS (3 total)
+# - Each relates to a finished tutoring
+# - Between tutor and attendee OR between two attendees
+# =============================================================================
+
+Rails.logger.debug "[7/7] Creating 3 reviews and 5 feedbacks..."
+
+# Review 1: Between tutor and attendee of t1
+tutor_t1 = t1.tutor
+attendee_t1 = t1.user_tutorings.first.user
+UserReview.create!(
+  reviewer: attendee_t1,
+  reviewed: tutor_t1,
+  review: "Excelente tutor, explicó muy bien los conceptos de SQL y normalización."
+)
+
+attendee_t1.increment(:resenas_dadas_count)
+attendee_t1.save!
+
+# Review 2: Between two attendees of t3
+attendees_t3 = t3.user_tutorings.limit(2).map(&:user)
+if attendees_t3.size >= 2
+  UserReview.create!(
+    reviewer: attendees_t3[0],
+    reviewed: attendees_t3[1],
+    review: "Gran compañero de estudio, muy colaborativo durante la tutoría."
+  )
+end
+
+attendees_t3[0].increment(:resenas_dadas_count)
+attendees_t3[0].save!
+
+# Review 3: Between tutor and attendee of t7
+tutor_t7 = t7.tutor
+attendee_t7 = t7.user_tutorings.first.user
+UserReview.create!(
+  reviewer: attendee_t7,
+  reviewed: tutor_t7,
+  review: "Muy clara la explicación sobre requerimientos y testing. Recomendado."
+)
+
+attendee_t7.increment(:resenas_dadas_count)
+attendee_t7.save!
+
+Rails.logger.debug "  Created 3 reviews"
+
+# =============================================================================
+# FEEDBACKS (5 total)
+# - Each from student to tutor of a finished tutoring
+# - Student must have UserTutoring for that tutoring
+# =============================================================================
+
+# Feedback 1: From attendee to tutor of t1
+Feedback.create!(
+  student: t1.user_tutorings.first.user,
+  tutor: t1.tutor,
+  tutoring: t1,
+  rating: 5.0
+)
+
+t1.user_tutorings.first.user.increment(:feedback_dado_count)
+t1.user_tutorings.first.user.save!
+
+# Feedback 2: From attendee to tutor of t2
+Feedback.create!(
+  student: t2.user_tutorings.first.user,
+  tutor: t2.tutor,
+  tutoring: t2,
+  rating: 4.5
+)
+
+t2.user_tutorings.first.user.increment(:feedback_dado_count)
+t2.user_tutorings.first.user.save!
+
+# Feedback 3: From attendee to tutor of t4
+Feedback.create!(
+  student: t4.user_tutorings.first.user,
+  tutor: t4.tutor,
+  tutoring: t4,
+  rating: 4.0
+)
+
+t4.user_tutorings.first.user.increment(:feedback_dado_count)
+t4.user_tutorings.first.user.save!
+
+# Feedback 4: From attendee to tutor of t6
+Feedback.create!(
+  student: t6.user_tutorings.first.user,
+  tutor: t6.tutor,
+  tutoring: t6,
+  rating: 5.0
+)
+
+t6.user_tutorings.first.user.increment(:feedback_dado_count)
+t6.user_tutorings.first.user.save!
+
+# Feedback 5: From attendee to tutor of t9
+Feedback.create!(
+  student: t9.user_tutorings.first.user,
+  tutor: t9.tutor,
+  tutoring: t9,
+  rating: 3.5
+)
+
+t9.user_tutorings.first.user.increment(:feedback_dado_count)
+t9.user_tutorings.first.user.save!
+
+Rails.logger.debug "  Created 5 feedbacks"
+
+# =============================================================================
+# SUMMARY
+# =============================================================================
+
+Rails.logger.debug "\n" + ("=" * 80)
+Rails.logger.debug "SEED COMPLETED SUCCESSFULLY!"
+Rails.logger.debug "=" * 80
+Rails.logger.debug { "Users: #{User.count}" }
+Rails.logger.debug { "Courses: #{Course.count}" }
+Rails.logger.debug { "Subjects: #{Subject.count}" }
+Rails.logger.debug "Tutorings:"
+Rails.logger.debug { "  - Active: #{Tutoring.where(state: :active).count}" }
+Rails.logger.debug { "  - Pending: #{Tutoring.where(state: :pending).count}" }
+Rails.logger.debug { "  - Finished: #{Tutoring.where(state: :finished).count}" }
+Rails.logger.debug { "  - Total: #{Tutoring.count}" }
+Rails.logger.debug { "TutoringAvailabilities: #{TutoringAvailability.count}" }
+Rails.logger.debug { "UserTutorings: #{UserTutoring.count}" }
+Rails.logger.debug { "Reviews: #{UserReview.count}" }
+Rails.logger.debug { "Feedbacks: #{Feedback.count}" }

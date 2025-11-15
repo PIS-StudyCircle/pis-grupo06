@@ -27,6 +27,7 @@ Rails.application.routes.draw do
         resources :user_feedbacks, only: [:index, :create, :destroy] do
           collection do
             get :check
+            get :top_rated
           end
         end
       end
@@ -34,7 +35,10 @@ Rails.application.routes.draw do
       post "/notification_token", to: "notification_tokens#create"
 
       # index y show de UsersController
-      resources :users, module: :users, only: [:index, :show]
+
+      resources :users, module: :users, only: [:index, :show, :update]
+      put "/users/upload_photo", to: "users/users#update_profile_photo"
+      get "/users/:id/profile_photo", to: "users/users#profile_photo"
 
       resources :courses do
         resources :subjects
@@ -48,6 +52,13 @@ Rails.application.routes.draw do
         post "join_tutoring", on: :member
         get "exists_user_tutoring", on: :member
         delete "unsubscribe", on: :member
+      end
+
+      # chat de tutoria
+      resources :chats, only: [:index, :create, :show, :destroy] do
+        post :mark_read, on: :member
+
+        resources :messages, only: [:index, :create]
       end
 
       resource :calendar, only: [] do
@@ -69,6 +80,7 @@ Rails.application.routes.draw do
           post :mark_as_read
         end
       end
+      resources :avatars, only: [:create]
     end
   end
 end

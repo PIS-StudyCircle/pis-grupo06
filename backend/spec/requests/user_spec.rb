@@ -1,5 +1,6 @@
 require 'rails_helper'
 require 'devise/jwt/test_helpers'
+include ActiveSupport::Testing::TimeHelpers
 
 RSpec.describe "Api::V1::Users", type: :request do
   let!(:university) { University.create!(name: "Universidad de la República") }
@@ -78,9 +79,16 @@ RSpec.describe "Api::V1::Users", type: :request do
         attrs = json.fetch("user")
 
         expected_attrs =
-          UserSerializer.new(user).serializable_hash[:data][:attributes].as_json
+          UserSerializer.new(user, params: { current_user: user }).serializable_hash[:data][:attributes].as_json
 
-        expect(attrs).to eq(expected_attrs)
+        expect(attrs).to include(expected_attrs)
+
+        expect(json.dig("user", "counts")).to eq(
+          "tutorias_dadas" => 0,
+          "tutorias_recibidas" => 0,
+          "resenas_dadas" => 0,
+          "feedback_dado" => 0
+        )
 
         expect(attrs).not_to include(
           "encrypted_password",
@@ -200,6 +208,91 @@ RSpec.describe "Api::V1::Users", type: :request do
         user.reload
 
         expect(user.google_refresh_token).to eq("keep_me")
+      end
+    end
+
+    context 'cuando el usuario tiene actividad registrada' do
+      it 'devuelve los counts correctos según sus asociaciones' do
+        otro_usuario = User.create!(
+          email: "jane.doe@example.com",
+          password: password,
+          password_confirmation: password,
+          name: "Jane",
+          last_name: "Doe",
+          faculty: faculty
+        )
+
+        course = Course.create!(name: "Matemática I")
+
+        # Helper para crear tutorías activas con usuarios
+        def create_tutoring(tutor:, alumno:, course:)
+          tutoring = Tutoring.create!(
+            tutor: tutor,
+            creator: tutor,
+            course: course,
+            modality: "virtual",
+            duration_mins: 60,
+            capacity: 5,
+            scheduled_at: 1.minute.from_now,
+            state: :active
+          )
+          UserTutoring.create!(user: alumno, tutoring: tutoring)
+          tutoring
+        end
+
+        # Crear 2 tutorías donde el usuario es tutor
+        create_tutoring(tutor: user, alumno: otro_usuario, course: course)
+        create_tutoring(tutor: user, alumno: otro_usuario, course: course)
+
+        # Crear 2 tutorías donde el usuario es alumno
+        tutoring3 = create_tutoring(tutor: otro_usuario, alumno: user, course: course)
+        create_tutoring(tutor: otro_usuario, alumno: user, course: course)
+
+        # Avanzar el tiempo y marcar tutorías como finalizadas
+        travel_to 2.hours.from_now do
+          Tutorings::MarkFinishedTutoringsJob.perform_now
+        end
+
+        headers = Devise::JWT::TestHelpers.auth_headers(base_headers, user)
+
+        # Crear reseña mediante controller (params anidados según strong params)
+        post "/api/v1/users/user_reviews",
+             params: { reviewed_id: otro_usuario.id, review: "Excelente tutor" },
+             headers: headers,
+             as: :json
+
+        expect(response).to have_http_status(:created)
+
+        # Crear feedback mediante controller
+        post "/api/v1/users/user_feedbacks",
+             params: { tutoring_id: tutoring3.id, rating: 5.0 },
+             headers: headers,
+             as: :json
+
+        expect(response).to have_http_status(:created)
+
+        # Recargar usuario para obtener los contadores actualizados
+        user.reload
+
+        # Hacer GET /me autenticado con JWT
+        get "/api/v1/users/me", headers: headers
+        expect(response).to have_http_status(:ok)
+        json  = response.parsed_body
+        attrs = json.fetch("user")
+
+        expected_attrs =
+          UserSerializer.new(user, params: { current_user: user }).serializable_hash[:data][:attributes].as_json
+        expected_attrs.except!("created_at", "updated_at")
+        attrs_to_compare = attrs.except("created_at", "updated_at")
+
+        expect(attrs_to_compare).to include(expected_attrs)
+
+        expect(json.dig("user", "counts")).to eq(
+          "tutorias_dadas" => 2,
+          "tutorias_recibidas" => 2,
+          "resenas_dadas" => 1,
+          "feedback_dado" => 1
+        )
       end
     end
   end

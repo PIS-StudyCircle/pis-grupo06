@@ -11,7 +11,9 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
   const navigate = useNavigate();
 
   const location = useLocation();
-  const courseName = location.state?.courseName || "";
+  const params = new URLSearchParams(location.search);
+  const courseNameFromUrl = params.get("course_name");
+  const courseName = location.state?.courseName || courseNameFromUrl || "";
 
   // selector de búsqueda (por materia/tema) proveniente de origin/dev
   const [searchBy, setSearchBy] = useState("course");
@@ -82,8 +84,8 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
           <PageTitle 
             title={
                 ["serTutor", "serEstudiante"].includes(mode)
-                  ? `Tutorías Disponibles para ${courseName || ""}`
-                  : "Tutorías Disponibles"
+                  ? `Tutorías disponibles para ${courseName || ""}`
+                  : "Tutorías disponibles"
               }
             className={titleClass}>
             {["serTutor", "serEstudiante"].includes(mode) && (

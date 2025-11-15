@@ -1,9 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Bell as BellIcon } from "lucide-react";
+import { showConfirm } from "@utils/toastService";
 import { useNotifications } from "@/shared/context/NotificationContext";
 
 export function Bell() {
-  const { list, unread, unseen, markRead, markAllRead, markAllSeen, deleteOne, deleteAll } = useNotifications();
+  const {
+    list,
+    unread,
+    unseen,
+    markRead,
+    markAllRead,
+    markAllSeen,
+    deleteOne,
+    deleteAll,
+  } = useNotifications();
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
   const popRef = useRef(null);
@@ -15,7 +25,7 @@ export function Bell() {
     function onDocClick(e) {
       if (!open) return;
       if (open) {
-        markAllSeen().catch(err => console.error("markAllSeen failed", err));
+        markAllSeen().catch((err) => console.error("markAllSeen failed", err));
       }
       if (btnRef.current?.contains(e.target)) return;
       if (popRef.current?.contains(e.target)) return;
@@ -23,7 +33,10 @@ export function Bell() {
     }
     function onKey(e) {
       if (e.key === "Escape") close();
-      if ((e.key === "Enter" || e.key === " ") && document.activeElement === btnRef.current) {
+      if (
+        (e.key === "Enter" || e.key === " ") &&
+        document.activeElement === btnRef.current
+      ) {
         e.preventDefault();
         toggle();
       }
@@ -60,18 +73,23 @@ export function Bell() {
 
   async function handleDeleteAll() {
     if (!list.length) return;
-    const ok = window.confirm("¿Eliminar TODAS las notificaciones? Esta acción no se puede deshacer.");
-    if (!ok) return;
-    try {
-      if (typeof deleteAll === "function") {
-        await deleteAll();
-        close();
-      } else {
-        console.warn("deleteAll no está disponible en el contexto");
-      }
-    } catch (err) {
-      console.error("deleteAll failed", err);
-    }
+    showConfirm(
+      "¿Eliminar TODAS las notificaciones? Esta acción no se puede deshacer.",
+      async () => {
+        try {
+          if (typeof deleteAll === "function") {
+            await deleteAll();
+            close();
+          } else {
+            console.warn("deleteAll no está disponible en el contexto");
+          }
+        } catch (err) {
+          console.error("deleteAll failed", err);
+        }
+      },
+      
+      () => {}
+    );
   }
 
   return (
@@ -83,9 +101,11 @@ export function Bell() {
         aria-haspopup="menu"
         aria-expanded={open}
         className="relative inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-sky-500"
-        title={unread > 0 ? `${unread} notificaciones sin leer` : "Notificaciones"}
+        title={
+          unread > 0 ? `${unread} notificaciones sin leer` : "Notificaciones"
+        }
       >
-        <span role="img" aria-label="bell" className="text-xl">🔔</span>
+        <BellIcon className="w-5 h-5 text-white" />
 
         {/* Punto azul en la campana si hay no vistas */}
         {unseen > 0 && (
@@ -117,7 +137,9 @@ export function Bell() {
               )}
               {unread > 0 && (
                 <button
-                  onClick={async () => { await markAllRead(); }}
+                  onClick={async () => {
+                    await markAllRead();
+                  }}
                   className="text-xs underline hover:opacity-80"
                 >
                   Marcar todas como leídas
@@ -127,7 +149,9 @@ export function Bell() {
           </div>
 
           {list.length === 0 ? (
-            <div className="px-3 py-6 text-sm opacity-70">No hay notificaciones</div>
+            <div className="px-3 py-6 text-sm opacity-70">
+              No hay notificaciones
+            </div>
           ) : (
             <ul className="py-1">
               {list.map((n) => {
@@ -149,7 +173,7 @@ export function Bell() {
                           <div className="mt-1 h-2 w-2 shrink-0" />
                         )}
                         <div className="min-w-0">
-                          <div className="truncate font-medium">
+                          <div className="font-medium break-words whitespace-normal">
                             {n.title || n.kind || "Notificación"}
                           </div>
                           <div className="text-xs opacity-70">
@@ -174,7 +198,10 @@ export function Bell() {
           )}
 
           <div className="border-t border-white/10 px-3 py-2 text-right">
-            <button onClick={close} className="text-xs underline hover:opacity-80">
+            <button
+              onClick={close}
+              className="text-xs underline hover:opacity-80"
+            >
               Cerrar
             </button>
           </div>

@@ -26,7 +26,7 @@ module Api
             total_feedbacks: feedbacks.size,
             feedbacks: feedbacks.as_json(
               include: {
-                student: { only: [:id, :name, :last_name, :email] },
+                student: { only: [:id] },
                 tutoring: {
                   only: [:id],
                   include: {
@@ -92,6 +92,16 @@ module Api
           )
 
           if feedback.save
+            # Incrementar contador de feedback dado
+            current_user.increment(:feedback_dado_count)
+            current_user.save!
+
+            begin
+              InsigniaNotifier.with(tipo: :feedback_dado).deliver(current_user)
+            rescue => e
+              Rails.logger.error "Error notificando insignia al usuario #{current_user.id}: #{e.message}"
+            end
+
             # promedio actualizado del tutor
             avg = Feedback.where(tutor_id: tutor_id).average(:rating)
             avg = (avg || 0).to_f.round(2)
@@ -125,6 +135,29 @@ module Api
           else
             render json: { ok: false, errors: feedback.errors.full_messages }, status: :unprocessable_entity
           end
+        end
+
+        def top_rated
+          top_tutors = User
+                       .joins("INNER JOIN feedbacks ON feedbacks.tutor_id = users.id")
+                       .select(
+                         "users.*, " \
+                         "AVG(feedbacks.rating) AS average_rating, " \
+                         "COUNT(feedbacks.id) AS total_feedbacks"
+                       )
+                       .group("users.id")
+                       .order(average_rating: :desc, total_feedbacks: :desc)
+                       .limit(5)
+
+          render json: top_tutors.map { |t|
+            {
+              id: t.id,
+              name: t.name,
+              last_name: t.last_name,
+              average_rating: t.average_rating.to_f.round(1),
+              total_feedbacks: t.total_feedbacks
+            }
+          }
         end
 
         private

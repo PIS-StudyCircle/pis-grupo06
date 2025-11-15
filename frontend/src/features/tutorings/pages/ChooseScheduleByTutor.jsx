@@ -111,7 +111,7 @@ export default function ChooseScheduleByTutor() {
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 text-center space-y-1">
           {requestComment && (
             <p className="text-gray-700">
-              <strong>Preferencia de cupos:</strong> {requestComment}
+              <strong>Comentario del estudiante:</strong> {requestComment}
             </p>
           )}
           {tutoring?.modality === "presencial" && tutoring?.location && (
