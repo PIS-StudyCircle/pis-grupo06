@@ -50,7 +50,7 @@ module Api
             # Enviar notificación al usuario que recibió la review
             ReviewReceivedNotifier.with(
               title: "Nueva reseña recibida",
-              url: "/usuarios/#{current_user.id}",
+              url: "/usuarios/#{params[:reviewed_id]}",
               reviewer_name: "#{current_user.name} #{current_user.last_name}",
               review_id: review.id,
               reviewer_id: current_user.id
