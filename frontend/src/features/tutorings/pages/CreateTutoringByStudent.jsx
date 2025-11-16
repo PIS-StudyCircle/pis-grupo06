@@ -93,8 +93,14 @@ export default function CreateTutoringByStudent() {
       }
 
       const start = toDate(av.date, av.startTime);
-      if (start && start < now) {
-        availMsgs.push(`${label}: la fecha/hora de inicio no puede ser en el pasado.`);
+      if (start) {
+        if (start < now){
+          availMsgs.push(`${label}: la fecha/hora de inicio no puede ser en el pasado.`)
+        }
+        const diffMs = start.getTime() - now.getTime();
+        if (diffMs < 10800000) { // 3 horas en ms
+          availMsgs.push(`${label}: la tutoría debe tener al menos 3 horas de anticipación.`);
+        }
       }
     });
 
