@@ -154,7 +154,7 @@ describe("ChooseScheduleByStudent", () => {
 
     const [start, end] = screen.getAllByTestId("time-input");
     fireEvent.change(start, { target: { value: "10:15" } });
-    fireEvent.change(end, { target: { value: "11:00" } });
+    fireEvent.change(end, { target: { value: "11:15" } });
 
     fireEvent.click(screen.getByText(/Confirmar/i));
 
@@ -194,7 +194,7 @@ describe("ChooseScheduleByStudent", () => {
 
     const [start, end] = screen.getAllByTestId("time-input");
     fireEvent.change(start, { target: { value: "10:15" } });
-    fireEvent.change(end, { target: { value: "11:00" } });
+    fireEvent.change(end, { target: { value: "11:15" } });
 
     fireEvent.click(screen.getByText(/Confirmar/i));
 

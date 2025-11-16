@@ -81,6 +81,18 @@ export default function ChooseScheduleByTutor() {
       return;
     }
 
+    if (endTime - startTime < 3600000) { // 1 hora
+      setError("La duración mínima de la tutoría es de 1 hora.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (endTime - startTime > 14400000) { // 4 horas
+      setError("La duración máxima de la tutoría es de 4 horas.");
+      setSubmitting(false);
+      return;
+    }
+
     try {
       await confirmSchedule(tutoringId, {
         scheduled_at: fullStart,

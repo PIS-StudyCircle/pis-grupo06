@@ -34,7 +34,7 @@ class InsigniaNotifier < ApplicationNotifier
       when 3 then "Recibiste una insignia de nivel 2 (#{tipo_label})"
       when 6 then "Recibiste una insignia de nivel 3 (#{tipo_label})"
       else
-        nil
+        "Progreso de insignia (#{tipo_label})"
       end
     end
 
