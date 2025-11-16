@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useUser } from "@context/UserContext";
 import { formatDateTime } from "@shared/utils/FormatDate";
@@ -8,6 +8,7 @@ import {unsubscribeFromTutoring, joinTutoring} from "../services/tutoringService
 import { DEFAULT_PHOTO } from "@/shared/config";
 import { EstadoBadge, ShowTutoringSkeleton } from "@shared/utils/showTutorings"
 import TutoringActions from "../components/TutoringActions";
+import ChatModal from "../../tutorings/components/ChatModal";
 /**
  * SHOW PAGE DE TUTORÍA (ampliada)
  */
@@ -19,20 +20,19 @@ export default function ShowPageTutoring() {
   const { data: tutoring, loading, error, refetch } = useTutoring(null, tutoringId);
   const onDesuscribirse = (tid) => unsubscribeFromTutoring(tid);
   const [saving, setSaving] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
-  useEffect(() => {
-    if (error || (!tutoring && !loading)) {
-      navigate('/404', { replace: true });
-    }
-  }, [error, tutoring, loading, navigate]);
+  if (error || (!tutoring && !loading)) {
+    navigate('/404', { replace: true });
+  }
 
 
   const soyEstudiante = tutoring?.user_enrolled || false;
   const noTieneTutor = !(tutoring?.tutor?.id);
- const cuposDisponibles = useMemo(() => {
-  if (!tutoring) return false;
-  return tutoring.capacity != null && tutoring.capacity > (tutoring.enrolled ?? 0);
-}, [tutoring]);
+  const cuposDisponibles = useMemo(() => {
+    if (!tutoring) return false;
+    return tutoring.capacity != null && tutoring.capacity > (tutoring.enrolled ?? 0);
+  }, [tutoring]);
   const soyTutor = tutoring?.tutor_id === user?.id;
   const esCreador = tutoring?.created_by_id === user?.id;
 
@@ -66,20 +66,24 @@ export default function ShowPageTutoring() {
 
   const handleDesuscribirme = async () => {
     if (!tutoring) return;
+    setSaving(true);
 
     showConfirm("¿Seguro que querés desuscribirte de la tutoría?", async () => {
       try {
-        setSaving(true);
         await onDesuscribirse(tutoring.id);
         showSuccess("Te desuscribiste correctamente.");
-        navigate(-1);
+        navigate('/notificaciones');
       } catch (e) {
         console.error(e);
         showError(e.message || "Ocurrió un error al intentar desuscribirte.");
       } finally {
         setSaving(false);
       }
-    });
+    },
+      () => {
+        setSaving(false);
+      }
+    );
   };
 
   const mode = useMemo(() => {
@@ -93,11 +97,6 @@ export default function ShowPageTutoring() {
     return "default";
   }, [tutoring, soyTutor, soyEstudiante, esCreador, noTieneTutor, cuposDisponibles]);
 
-  const tutoriaYaPaso = useMemo(() => {
-     return tutoring?.state === "finished";
-  }, [tutoring?.state]);
-
-
   const estudiantesAsistieron = useMemo(() => {
   if (!tutoring) return 0;
   let total = tutoring.enrolled ?? 0;
@@ -108,7 +107,7 @@ export default function ShowPageTutoring() {
     if (loading) return <ShowTutoringSkeleton />;
 
   return (
-    <div className="max-w-5xl mx-auto p-4 min-h-screen">
+    <div className={`max-w-5xl mx-auto p-4 min-h-screen ${saving ? "pointer-events-none opacity-50" : ""}`}>
       {/* Encabezado */}
       <div className="rounded-2xl bg-white shadow overflow-hidden">
         <div className="px-6 py-5 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
@@ -119,7 +118,7 @@ export default function ShowPageTutoring() {
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 <b>Modalidad:</b> {tutoring.modality}
-                {tutoring.state === "active" && tutoring.duration_mins ? (
+                {tutoring?.state === "active" && tutoring.duration_mins ? (
                   <>
                     {" · "} <b>Duración:</b> {tutoring.duration_mins} min
                   </>
@@ -133,7 +132,7 @@ export default function ShowPageTutoring() {
             </div>
             <div className="flex items-center gap-2">
                <EstadoBadge state={tutoring.state} />
-              {!tutoriaYaPaso && (
+              {tutoring?.state !== "finished" && (
               <span className="text-sm text-gray-700 bg-white border rounded-full px-3 py-1">
                   Cupos:{" "}
                   {tutoring.capacity == null
@@ -141,7 +140,7 @@ export default function ShowPageTutoring() {
                     : `${Math.max((tutoring.capacity ?? 0) - (tutoring.enrolled ?? 0), 0)} disp.`}
                 </span>
               )}
-             {tutoriaYaPaso && (
+             {tutoring?.state === "finished" && (
               <span className="text-sm text-gray-700 bg-green-100 border border-green-200 rounded-full px-3 py-1">
                 📊 {(() => {
                   if (estudiantesAsistieron === 0) return 'No asistió ningún estudiante';
@@ -246,11 +245,20 @@ export default function ShowPageTutoring() {
               onSerTutor={handleSerTutor}
               onUnirme={handleUnirme}
               onDesuscribirme={handleDesuscribirme}
-              isFinished={tutoriaYaPaso}
+              onOpenChat={() => { setShowChat(true); }}
+              tutoringState={tutoring?.state}
             />
           </div>
         </div>
       </div>
+      {showChat && (
+        <ChatModal
+          chatId={tutoring.chat_id}
+          token={user.token}
+          tutoringUsers={tutoring.enrolled_users || []}
+          onClose={() => setShowChat(false)}
+        />
+      )}
     </div>
   );
 }

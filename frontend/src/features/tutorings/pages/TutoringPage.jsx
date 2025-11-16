@@ -15,6 +15,8 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
   const courseNameFromUrl = params.get("course_name");
   const courseName = location.state?.courseName || courseNameFromUrl || "";
 
+  const [isBlockingPage, setIsBlockingPage] = useState(false);
+
   // selector de búsqueda (por materia/tema) proveniente de origin/dev
   const [searchBy, setSearchBy] = useState("course");
   const [showWithoutTutor, setShowWithoutTutor] = useState(false);
@@ -84,15 +86,19 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
           <PageTitle 
             title={
                 ["serTutor", "serEstudiante"].includes(mode)
-                  ? `Tutorías Disponibles para ${courseName || ""}`
-                  : "Tutorías Disponibles"
+                  ? `Tutorías disponibles para ${courseName || ""}`
+                  : "Tutorías disponibles"
               }
             className={titleClass}>
             {["serTutor", "serEstudiante"].includes(mode) && (
               <button
                 type="button"
                 className="btn"
-                onClick={handleNavigateToTopics}
+                onClick={() => {
+                  if (isBlockingPage) return;
+                  handleNavigateToTopics();
+                }}
+                disabled={isBlockingPage}
               >
                 {mode === "serTutor"
                   ? "Crear nueva tutoría"
@@ -103,6 +109,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
 
           {showSearchBar && (
             <TutoringSearchBar
+              disabled={isBlockingPage}
               query={query}
               onQueryChange={(e) => setQuery(e.target.value)}
               searchBy={forceSubjectSearch ? "subject" : searchBy}
@@ -134,6 +141,7 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
                   setPage(1);
                 }}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                disabled={isBlockingPage}
               />
               <span className="text-gray-700">Solo sin tutor</span>
             </label>
@@ -146,6 +154,8 @@ export default function TutoringPage({ filters = {}, mode = "", titleClass = "ti
             loading={loading}
             error={error}
             onDesuscribirse={onDesuscribirse}
+            isBlockingPage={isBlockingPage}
+            setIsBlockingPage={setIsBlockingPage}
           />
 
           <Pagination page={page} setPage={setPage} totalPages={totalPages} />

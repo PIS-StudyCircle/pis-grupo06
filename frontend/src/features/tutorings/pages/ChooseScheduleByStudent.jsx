@@ -20,6 +20,7 @@ export default function ChooseScheduleByStudent() {
   const [capacity, setCapacity] = useState(1);
   const [customTimes, setCustomTimes] = useState({});
   const [selectedScheduleId, setSelectedScheduleId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!data) return;
@@ -40,12 +41,14 @@ export default function ChooseScheduleByStudent() {
   const handleConfirm = async () => {
     setMessage(null);
     setError(null);
+    setSubmitting(true);
 
     const custom = customTimes[selectedScheduleId];
 
     // Validaciones
     if (!selectedScheduleId || !custom?.start || !custom?.end) {
       setError("Debes especificar una hora de inicio y fin.");
+      setSubmitting(false);
       return;
     }
 
@@ -66,10 +69,12 @@ export default function ChooseScheduleByStudent() {
 
     if (endTime <= startTime) {
       setError("La hora de fin debe ser posterior a la hora de inicio.");
+      setSubmitting(false);
       return;
     }
     if (startTime < scheduleStart || endTime > scheduleEnd) {
       setError("El horario elegido no está dentro de las disponibilidades ofrecidas.");
+      setSubmitting(false);
       return;
     }
 
@@ -86,6 +91,8 @@ export default function ChooseScheduleByStudent() {
       console.error(e);
       const msg = e instanceof Error ? e.message : String(e);
       showError(msg || "Error en la conexión con el servidor.");
+    }finally{
+      setSubmitting(false);
     }
   };
 
@@ -131,7 +138,7 @@ export default function ChooseScheduleByStudent() {
                 key={schedule.id}
                 className="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <label className="font-medium text-gray-800 block mb-2">
+                <label className="font-medium text-gray-800 block mb-2" htmlFor={`s-${schedule.id}`}>
                   {sameDay
                     ? `${formatDateTime(schedule.start)} – ${new Date(
                         schedule.end
@@ -159,6 +166,7 @@ export default function ChooseScheduleByStudent() {
                   <div className="flex gap-2 items-center">
                     <input
                       type="time"
+                      data-testid="time-input"
                       value={customStart}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -176,6 +184,7 @@ export default function ChooseScheduleByStudent() {
 
                     <input
                       type="time"
+                      data-testid="time-input"
                       value={customEnd}
                       onChange={(e) => {
                         const value = e.target.value;
@@ -197,15 +206,17 @@ export default function ChooseScheduleByStudent() {
       )}
 
       <button
-        className={`w-full py-3 rounded-lg font-semibold shadow-md transition-transform ${
-          availableSchedules.length === 0
+        className={`w-full py-3 rounded-lg font-semibold shadow-md transition ${
+          submitting
+            ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+            : availableSchedules.length === 0
             ? "bg-gray-300 text-gray-600 cursor-not-allowed"
             : "bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white"
         }`}
         onClick={handleConfirm}
-        disabled={availableSchedules.length === 0}
+        disabled={submitting || availableSchedules.length === 0}
       >
-        Confirmar
+        {submitting ? "Confirmando..." : "Confirmar"}
       </button>
     </div>
   );

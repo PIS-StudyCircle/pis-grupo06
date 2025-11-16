@@ -48,7 +48,7 @@ class TutoringReminderJob < ApplicationJob
     participants.each_with_index do |user, _index|
       TutoringReminderNotifier.with(
         title: "Recordatorio de tutoría",
-        url: "/tutorings/#{tutoring.id}",
+        url: "/tutorias/#{tutoring.id}",
         course_name: tutoring.course&.name || "Tutoría",
         scheduled_at: tutoring.scheduled_at.iso8601,
         tutoring_id: tutoring.id

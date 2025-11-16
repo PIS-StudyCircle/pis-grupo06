@@ -1,16 +1,24 @@
 import { Calendar, Clock, User, MapPin, Users, Star } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom"; // Agregar esta importación
 import FeedbackModal from "./FeedbackModal";
-import { hasFeedback } from "../hooks/useFeedback"; 
+import { hasFeedback } from "../hooks/useFeedback";
 import { useUser } from "@context/UserContext";
 import { handleCancel } from "@/features/calendar/hooks/useCancelSession";
+import { EstadoBadge } from "@shared/utils/showTutorings"
+import {
+  showSuccess,
+  showError,
+  showConfirm,
+} from "@shared/utils/toastService";
 
-export default function SessionCard({ session, type = "all", refresh }) {
+export default function SessionCard({ session, type = "all", refresh,  isBlockingPage, setIsBlockingPage }) {
   const [showAttendees, setShowAttendees] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [userRating, setUserRating] = useState(null); 
+  const [userRating, setUserRating] = useState(null);
   const [loadingFeedback, setLoadingFeedback] = useState(false);
+  const [loadingDesuscribirme, setLoadingDesuscribirme] = useState(false);
+  const isDesubscribingRef = useRef(false);
 
   const { user } = useUser();
   const navigate = useNavigate(); // Agregar esta línea
@@ -21,7 +29,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
         try {
           setLoadingFeedback(true);
           const res = await hasFeedback(user.id, session.id);
-          if (res.has_feedback) setUserRating(Number(res.rating)); 
+          if (res.has_feedback) setUserRating(Number(res.rating));
         } catch (err) {
           console.error("Error al verificar feedback:", err);
         } finally {
@@ -31,6 +39,8 @@ export default function SessionCard({ session, type = "all", refresh }) {
       checkFeedback();
     }
   }, [session.id, session.tutor_id, type, user?.id]);
+
+  const esTutor = user?.id === session?.tutor_id;
 
   const formatDate = (date) =>
     date.toLocaleDateString("es-ES", {
@@ -46,23 +56,38 @@ export default function SessionCard({ session, type = "all", refresh }) {
       minute: "2-digit",
     });
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "confirmada":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "pendiente":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "cancelada":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
   const handleDesuscribirmeClick = (session, e) => {
-    if (e) e.stopPropagation(); // Evitar propagación del evento
+    if (e) e.stopPropagation();
     if (!session) return;
-    handleCancel(session.id, refresh);
+    if (loadingDesuscribirme) return;
+
+    // Activamos bloqueo solo cuando abrimos la confirmación
+    setIsBlockingPage(true);
+
+    showConfirm(      
+      `¿Seguro que querés desuscribirte de la tutoría?`,
+      async () => {
+        if (isDesubscribingRef.current) return; // evita reentradas por doble click
+        isDesubscribingRef.current = true;
+        try {
+          setLoadingDesuscribirme(true);
+          await handleCancel(session.id);
+          showSuccess("Te desuscribiste correctamente.");
+          if(refresh) refresh();
+          navigate(`/notificaciones`);
+        } catch (error) {
+          console.error(error);
+          showError("Ocurrió un error al intentar desuscribirte.");
+        } finally {
+          setLoadingDesuscribirme(false);
+          setIsBlockingPage(false);
+          isDesubscribingRef.current = false;
+        }
+      },
+      () => {
+        setIsBlockingPage(false);
+      }
+    );
   };
 
   const handleSubmitReview = (rating) => {
@@ -72,7 +97,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
     }
     if (value == null) return;
     setShowFeedbackModal(false);
-    setUserRating(Number(value)); 
+    setUserRating(Number(value));
   };
 
   // Nuevo manejador para redirigir a la show page
@@ -85,6 +110,7 @@ export default function SessionCard({ session, type = "all", refresh }) {
   // Manejador para evitar propagación en botones específicos
   const handleButtonClick = (e, callback) => {
     e.stopPropagation();
+    if(isBlockingPage) return;
     if (callback) callback();
   };
 
@@ -95,15 +121,26 @@ export default function SessionCard({ session, type = "all", refresh }) {
         {[1, 2, 3, 4, 5].map((i) => {
           const fill = fillFor(i);
           return (
-            <span key={i} className="relative inline-block w-5 h-5 align-middle">
+            <span
+              key={i}
+              className="relative inline-block w-5 h-5 align-middle"
+            >
               <span className="absolute inset-0 text-gray-300">
-                <Star className="w-5 h-5" style={{ fill: "transparent" }} color="currentColor" />
+                <Star
+                  className="w-5 h-5"
+                  style={{ fill: "transparent" }}
+                  color="currentColor"
+                />
               </span>
               <span
                 className="absolute inset-0 text-yellow-500 overflow-hidden pointer-events-none"
                 style={{ width: `${fill * 100}%` }}
               >
-                <Star className="w-5 h-5" style={{ fill: "currentColor" }} color="currentColor" />
+                <Star
+                  className="w-5 h-5"
+                  style={{ fill: "currentColor" }}
+                  color="currentColor"
+                />
               </span>
             </span>
           );
@@ -114,9 +151,12 @@ export default function SessionCard({ session, type = "all", refresh }) {
 
   return (
     <>
-      <div 
+      <div
         className="bg-white border border-gray-300 rounded-xl p-6 shadow-lg hover:shadow-xl hover:scale-[1.01] transition transform cursor-pointer"
-        onClick={handleCardClick}
+        onClick={() => {
+          if (isBlockingPage || loadingDesuscribirme) return;
+          handleCardClick();
+        }}
       >
         <div className="flex items-start justify-between mb-4">
           <div>
@@ -137,38 +177,37 @@ export default function SessionCard({ session, type = "all", refresh }) {
               </span>
             </div>
           </div>
-          <div
-            className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-              session.status
-            )}`}
-          >
-            {session.status}
-          </div>
+          <EstadoBadge state={session.status} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-gray-600">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            <span className="text-sm">{formatDate(session.date)}</span>
+        {type !== "my_pendings" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-gray-600">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              <span className="text-sm">{formatDate(session.date)}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              <span className="text-sm">
+                {formatTime(session.date)} ({session.duration} min)
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
-            <span className="text-sm">
-              {formatTime(session.date)} ({session.duration} min)
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4" />
-            <span className="text-sm">{session.location}</span>
-          </div>
+        )}
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4" />
+          <span className="text-sm">{session.location}</span>
         </div>
 
-        {session.attendees && session.attendees.length > 0 && (
+        {type !== "my_pendings" && session.attendees && session.attendees.length > 0 && (
           <>
             <div className="mt-4">
               <button
-                onClick={(e) => handleButtonClick(e, () => setShowAttendees(!showAttendees))}
+                onClick={(e) =>
+                  handleButtonClick(e, () => setShowAttendees(!showAttendees))
+                }
                 className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
+                disabled={isBlockingPage}
               >
                 <Users className="w-4 h-4" />
                 {showAttendees ? "Ocultar participantes" : "Ver participantes"}
@@ -181,21 +220,8 @@ export default function SessionCard({ session, type = "all", refresh }) {
                       key={idx}
                       className="flex justify-between items-center bg-gray-50 px-3 py-1 rounded"
                     >
-                      <span className="text-gray-700">{attendee.id === user?.id ? "Tú" : attendee.email}</span>
-                      <span
-                        className={
-                          attendee.status === "confirmada"
-                            ? "text-green-600 font-medium"
-                            : attendee.status === "tentativa"
-                            ? "text-yellow-600 font-medium"
-                            : attendee.status === "rechazada"
-                            ? "text-red-600 font-medium"
-                            : attendee.status === "pendiente"
-                            ? "text-gray-500 font-medium"
-                            : "text-gray-400"
-                        }
-                      >
-                        {attendee.status}
+                      <span className="text-gray-700">
+                        {attendee.id === user?.id ? "Tú" : attendee.email}
                       </span>
                     </li>
                   ))}
@@ -205,10 +231,15 @@ export default function SessionCard({ session, type = "all", refresh }) {
             {type !== "finalized" && (
               <button
                 type="button"
-                className="btn w-full bg-red-500 hover:bg-red-600 text-white mt-3"
+                className={`btn w-full font-semibold transition ${
+                  loadingDesuscribirme
+                    ? "bg-gray-400 text-gray-700 cursor-not-allowed opacity-70"
+                    : "bg-red-500 hover:bg-red-600 active:scale-[0.98] text-white"
+                }`}
                 onClick={(e) => handleDesuscribirmeClick(session, e)}
+                disabled={isBlockingPage}
               >
-                Desuscribirme
+                {loadingDesuscribirme ? "Desuscribiéndote a la tutoría..." : "Desuscribirme"}
               </button>
             )}
           </>
@@ -221,18 +252,36 @@ export default function SessionCard({ session, type = "all", refresh }) {
             ) : userRating != null && Number.isFinite(Number(userRating)) ? (
               <div className="flex items-center gap-2 text-gray-700">
                 <StarRow value={Number(userRating)} />
-                <span className="text-sm">({Number(userRating).toFixed(1)}/5)</span>
+                <span className="text-sm">
+                  ({Number(userRating).toFixed(1)}/5)
+                </span>
               </div>
             ) : (
-              <button
-                onClick={(e) => handleButtonClick(e, () => setShowFeedbackModal(true))}
-                className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800"
-              >
-                <Star className="w-4 h-4" />
-                Dejar feedback
-              </button>
+              !esTutor && (
+                <button
+                  onClick={(e) =>{
+                    if(isBlockingPage)return;
+                    handleButtonClick(e, () => setShowFeedbackModal(true))
+                  }}
+                  className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800"
+                  disabled={isBlockingPage}
+                >
+                  <Star className="w-4 h-4" />
+                  Dejar feedback
+                </button>
+              )
             )}
           </div>
+        )}
+        
+        {type === "my_pendings" && (
+          <button
+                type="button"
+                className="btn w-full bg-red-500 hover:bg-red-600 text-white mt-3"
+                onClick={(e) => handleDesuscribirmeClick(session, e)}
+              >
+                Desuscribirme
+          </button>
         )}
       </div>
 
@@ -249,3 +298,5 @@ export default function SessionCard({ session, type = "all", refresh }) {
     </>
   );
 }
+
+

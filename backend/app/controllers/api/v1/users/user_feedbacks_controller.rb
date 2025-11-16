@@ -92,6 +92,16 @@ module Api
           )
 
           if feedback.save
+            # Incrementar contador de feedback dado
+            current_user.increment(:feedback_dado_count)
+            current_user.save!
+
+            begin
+              InsigniaNotifier.with(tipo: :feedback_dado).deliver(current_user)
+            rescue => e
+              Rails.logger.error "Error notificando insignia al usuario #{current_user.id}: #{e.message}"
+            end
+
             # promedio actualizado del tutor
             avg = Feedback.where(tutor_id: tutor_id).average(:rating)
             avg = (avg || 0).to_f.round(2)

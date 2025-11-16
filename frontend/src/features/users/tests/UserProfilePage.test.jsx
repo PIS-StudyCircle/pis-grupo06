@@ -3,6 +3,7 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import UserProfilePage from "../pages/UserProfilePage";
 import { useUser } from "@context/UserContext";
 import { getFeedbacks } from "../services/feedbackServices";
+import { useBadges } from "@features/users/hooks/useInsignas";
 
 // --- Mocks ---
 jest.mock("@context/UserContext");
@@ -19,6 +20,9 @@ jest.mock("../hooks/useUserReviews", () => ({
 }));
 jest.mock("../services/feedbackServices", () => ({
   getFeedbacks: jest.fn(),
+}));
+jest.mock("@/features/users/hooks/useInsignas", () => ({
+  useBadges: jest.fn(),
 }));
 
 // --- Imports reales de los mocks ---
@@ -64,9 +68,19 @@ const setup = async (id = 1) => {
 describe("UserProfilePage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Mock global de useUser
     useUser.mockReturnValue({
       user: { id: 99, name: "Tester" },
       setUser: jest.fn(),
+    });
+
+    // Mock global de useBadges para prevenir undefined
+    useBadges.mockReturnValue({
+      tutorias_dadas: null,
+      tutorias_recibidas: null,
+      resenas_dadas: null,
+      feedback_dado: null,
     });
   });
 
@@ -133,5 +147,74 @@ describe("UserProfilePage", () => {
     await setup(1);
 
     expect(await screen.findByText(/Error: Error de servidor/)).toBeInTheDocument();
+  });
+
+  it("no muestra insignias si todos los valores son 0", async () => {
+    getUserById.mockResolvedValueOnce({
+      ...mockUser,
+      tutorias_dadas: 0,
+      tutorias_recibidas: 0,
+      resenas_dadas: 0,
+      feedback_dado: 0,
+    });
+    useBadges.mockReturnValue({
+      tutorias_dadas: "/badge1.png",
+      tutorias_recibidas: "/badge2.png",
+      resenas_dadas: "/badge3.png",
+      feedback_dado: "/badge4.png",
+    });
+
+    await setup(1);
+
+    expect(screen.queryByAltText("Tutorías dadas")).not.toBeInTheDocument();
+    expect(screen.queryByAltText("Tutorías recibidas")).not.toBeInTheDocument();
+    expect(screen.queryByAltText("Reseñas dadas")).not.toBeInTheDocument();
+    expect(screen.queryByAltText("Feedback dado")).not.toBeInTheDocument();
+  });
+
+  it("muestra las insignias correctas cuando los valores son mayores a 0", async () => {
+    getUserById.mockResolvedValueOnce({
+      ...mockUser,
+      tutorias_dadas: 3,
+      tutorias_recibidas: 1,
+      resenas_dadas: 2,
+      feedback_dado: 4,
+    });
+    useBadges.mockReturnValue({
+      tutorias_dadas: "/tutorias_dadas.png",
+      tutorias_recibidas: "/tutorias_recibidas.png",
+      resenas_dadas: "/resenas_dadas.png",
+      feedback_dado: "/feedback_dado.png",
+    });
+
+    await setup(1);
+
+    expect(screen.getByAltText("Tutorías dadas")).toBeInTheDocument();
+    expect(screen.getByAltText("Tutorías recibidas")).toBeInTheDocument();
+    expect(screen.getByAltText("Reseñas dadas")).toBeInTheDocument();
+    expect(screen.getByAltText("Feedback dado")).toBeInTheDocument();
+  });
+
+  it("solo muestra insignias con valores > 0", async () => {
+    getUserById.mockResolvedValueOnce({
+      ...mockUser,
+      tutorias_dadas: 1,
+      tutorias_recibidas: 0,
+      resenas_dadas: 2,
+      feedback_dado: 0,
+    });
+    useBadges.mockReturnValue({
+      tutorias_dadas: "/tutorias_dadas.png",
+      tutorias_recibidas: "/tutorias_recibidas.png",
+      resenas_dadas: "/resenas_dadas.png",
+      feedback_dado: "/feedback_dado.png",
+    });
+
+    await setup(1);
+
+    expect(screen.getByAltText("Tutorías dadas")).toBeInTheDocument();
+    expect(screen.getByAltText("Reseñas dadas")).toBeInTheDocument();
+    expect(screen.queryByAltText("Tutorías recibidas")).not.toBeInTheDocument();
+    expect(screen.queryByAltText("Feedback dado")).not.toBeInTheDocument();
   });
 });

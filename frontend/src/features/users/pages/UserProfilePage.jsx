@@ -7,11 +7,12 @@ import {
   getReviewsByUser,
 } from "../services/usersServices";
 import { useUserReviews } from "../hooks/useUserReviews";
+import { useBadges } from "../hooks/useInsignas";
 import ReviewsList from "../components/ReviewsList";
 import { DEFAULT_PHOTO } from "@/shared/config";
 import { getFeedbacks } from "../services/feedbackServices";
 import { Star } from "lucide-react";
-import {showError} from '@shared/utils/toastService';
+import { showError } from "@shared/utils/toastService";
 
 export default function UserProfile() {
   const { id } = useParams();
@@ -72,6 +73,18 @@ export default function UserProfile() {
     }
   };
 
+  const tutorias_dadas = user?.tutorias_dadas ?? 0;
+  const tutorias_recibidas = user?.tutorias_recibidas ?? 0;
+  const resenas_dadas = user?.resenas_dadas ?? 0;
+  const feedback_dado = user?.feedback_dado ?? 0;
+
+  const insignas = useBadges({
+    tutorias_dadas,
+    tutorias_recibidas,
+    resenas_dadas,
+    feedback_dado,
+  });
+
   if (loadingUser || reviewsLoading)
     return <p className="text-center mt-10">Cargando...</p>;
 
@@ -81,6 +94,11 @@ export default function UserProfile() {
 
   const photoUrl = user.profile_photo_url || DEFAULT_PHOTO;
 
+  const BADGE_TUTORIAS_DADAS = insignas.tutorias_dadas;
+  const BADGE_TUTORIAS_RECIBIDAS = insignas.tutorias_recibidas;
+  const BADGE_RESENAS_DADAS = insignas.resenas_dadas;
+  const BADGE_FEEDBACK_DADO = insignas.feedback_dado;
+
   const StarRow = ({ value }) => {
     const fillFor = (i) => Math.max(0, Math.min(1, value - (i - 1)));
     return (
@@ -88,15 +106,26 @@ export default function UserProfile() {
         {[1, 2, 3, 4, 5].map((i) => {
           const fill = fillFor(i);
           return (
-            <span key={i} className="relative inline-block w-5 h-5 align-middle">
+            <span
+              key={i}
+              className="relative inline-block w-5 h-5 align-middle"
+            >
               <span className="absolute inset-0 text-gray-300">
-                <Star className="w-5 h-5" style={{ fill: "transparent" }} color="currentColor" />
+                <Star
+                  className="w-5 h-5"
+                  style={{ fill: "transparent" }}
+                  color="currentColor"
+                />
               </span>
               <span
                 className="absolute inset-0 text-yellow-500 overflow-hidden pointer-events-none"
                 style={{ width: `${fill * 100}%` }}
               >
-                <Star className="w-5 h-5" style={{ fill: "currentColor" }} color="currentColor" />
+                <Star
+                  className="w-5 h-5"
+                  style={{ fill: "currentColor" }}
+                  color="currentColor"
+                />
               </span>
             </span>
           );
@@ -119,12 +148,62 @@ export default function UserProfile() {
             {user.name} {user.last_name}
           </p>
 
+          {/* Insignias compactas (solo íconos, sin fondo, por encima de Email) */}
+          {(tutorias_dadas > 0 ||
+            tutorias_recibidas > 0 ||
+            resenas_dadas > 0 ||
+            feedback_dado > 0) && (
+            <div className="mt-3 flex flex-wrap justify-center gap-4">
+              {tutorias_dadas > 0 && BADGE_TUTORIAS_DADAS && (
+                <div className="w-14 h-14 rounded-full ring-2 ring-white/60 shadow-md overflow-hidden bg-white/90">
+                  <img
+                    src={BADGE_TUTORIAS_DADAS}
+                    alt="Tutorías dadas"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+
+              {tutorias_recibidas > 0 && BADGE_TUTORIAS_RECIBIDAS && (
+                <div className="w-14 h-14 rounded-full ring-2 ring-white/60 shadow-md overflow-hidden bg-white/90">
+                  <img
+                    src={BADGE_TUTORIAS_RECIBIDAS}
+                    alt="Tutorías recibidas"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+
+              {resenas_dadas > 0 && BADGE_RESENAS_DADAS && (
+                <div className="w-14 h-14 rounded-full ring-2 ring-white/60 shadow-md overflow-hidden bg-white/90">
+                  <img
+                    src={BADGE_RESENAS_DADAS}
+                    alt="Reseñas dadas"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+
+              {feedback_dado > 0 && BADGE_FEEDBACK_DADO && (
+                <div className="w-14 h-14 rounded-full ring-2 ring-white/60 shadow-md overflow-hidden bg-white/90">
+                  <img
+                    src={BADGE_FEEDBACK_DADO}
+                    alt="Feedback dado"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Rating promedio */}
           {!feedbackLoading && totalFeedbacks > 0 && (
             <div className="flex flex-col items-center mt-2 bg-white/20 px-4 py-2 rounded-lg shadow-inner">
               <StarRow value={averageRating} />
               <p className="text-sm mt-1">
-                <span className="font-semibold">{averageRating.toFixed(1)}</span>
+                <span className="font-semibold">
+                  {averageRating.toFixed(1)}
+                </span>
                 <span className="opacity-80"> / 5</span>
                 <span className="opacity-80">
                   {" "}
@@ -146,7 +225,7 @@ export default function UserProfile() {
           {user.description && (
             <div>
               <p className="text-sm text-gray-300">Descripción</p>
-              <p className="w-full rounded-lg px-3 py-2 text-black bg-white opacity-80">
+              <p className="w-full rounded-lg px-3 py-2 text-black bg-white opacity-80 max-h-40 overflow-y-auto break-words">
                 {user.description}
               </p>
             </div>

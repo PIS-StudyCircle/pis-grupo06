@@ -11,8 +11,7 @@ import { useFormState } from "@utils/UseFormState"
 import { useState } from "react"
 import { validateDate, validateHoursTutoring, validateInteger } from "@utils/validation"
 import { useValidation } from "@hooks/useValidation"
-import { useFormSubmit } from "@utils/UseFormSubmit"
-import {showSuccess, showError} from '@shared/utils/toastService';
+import {showSuccess} from '@shared/utils/toastService';
 
 const validators = {
   limit: (value) => validateInteger(value, "Límite de estudiantes"),
@@ -37,7 +36,8 @@ export default function CreateTutoringByTutor() {
   const [availabilityError, setAvailabilityError] = useState("")
 
   const { errors, validate } = useValidation(validators)
-  const { error} = useFormSubmit(createTutoringByTutor)
+  const [submitError, setSubmitError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const addAvailability = () => {
     setAvailabilities([...availabilities, { date: "", startTime: "", endTime: "" }])
@@ -64,68 +64,81 @@ export default function CreateTutoringByTutor() {
   if (!course) return <p className="text-center mt-10">No hay curso cargado.</p>
 
   const validateAvailabilities = () => {
-    // Validar campos completos y lógica básica
-    const invalidAvailability = availabilities.some((av) => {
-      if (!av.date || !av.startTime || !av.endTime) return true
+    const errors = [];
 
-      const dateError = validateDate(av.date, "Fecha de inicio")
-      if (dateError) return true
+    // helper para construir Date solo si hay datos
+    const toDate = (date, time) =>
+      date && time ? new Date(`${date}T${time}:00`) : null;
 
-      const hoursError = validateHoursTutoring(av.date, av.startTime, av.endTime)
-      if (hoursError) return true
+    // 1) Chequeos por slot (completitud, fecha válida, reglas de horas, pasado)
+    availabilities.forEach((av, i) => {
+      const label = `Disponibilidad ${i + 1}`;
+      const missing = [];
+      if (!av.date)      missing.push("fecha");
+      if (!av.startTime) missing.push("hora de inicio");
+      if (!av.endTime)   missing.push("hora final");
+      if (missing.length) {
+        errors.push(`${label}: completa ${missing.join(", ")}.`);
+        // si faltan campos, no seguimos chequeando este slot
+        return;
+      }
 
-      return false
-    })
+      const dateErr = validateDate(av.date);
+      if (dateErr) {
+        errors.push(`${label}: ${dateErr}.`);
+        // aún así seguimos con reglas de horas para mostrar todo
+      }
 
-    if (invalidAvailability) {
-      return "Por favor completa todas las disponibilidades correctamente. La hora de fin debe ser posterior a la hora de inicio."
-    }
+      const hoursErr = validateHoursTutoring(av.date, av.startTime, av.endTime);
+      if (hoursErr) {
+        // mensajes esperados: "La hora de fin..." o "La sesión debe durar al menos 1 hora"
+        errors.push(`${label}: ${hoursErr}.`);
+      }
+    });
 
-    // Validar fechas en el pasado
-    const now = new Date()
-    const hasPastDate = availabilities.some((av) => {
-      const avDate = new Date(`${av.date}T${av.startTime}:00`)
-      return avDate < now
-    })
-    if (hasPastDate) {
-      return "No puedes seleccionar fechas u horas en el pasado."
-    }
-
-    // Validar solapamientos
+    // 2) Solapamientos entre slots (solo si todos los necesarios tienen campos completos)
     for (let i = 0; i < availabilities.length; i++) {
-      const av1Start = new Date(`${availabilities[i].date}T${availabilities[i].startTime}:00`)
-      const av1End = new Date(`${availabilities[i].date}T${availabilities[i].endTime}:00`)
+      const a = availabilities[i];
+      const aStart = toDate(a.date, a.startTime);
+      const aEnd   = toDate(a.date, a.endTime);
+      if (!aStart || !aEnd) continue;
 
       for (let j = i + 1; j < availabilities.length; j++) {
-        const av2Start = new Date(`${availabilities[j].date}T${availabilities[j].startTime}:00`)
-        const av2End = new Date(`${availabilities[j].date}T${availabilities[j].endTime}:00`)
+        const b = availabilities[j];
+        const bStart = toDate(b.date, b.startTime);
+        const bEnd   = toDate(b.date, b.endTime);
+        if (!bStart || !bEnd) continue;
 
-        // Verificar si hay solapamiento
-        const overlap = av1Start < av2End && av2Start < av1End
+        const sameDay = a.date === b.date;
+        const overlap = sameDay && aStart < bEnd && bStart < aEnd;
         if (overlap) {
-          return `Las disponibilidades ${i + 1} y ${j + 1} se solapan. Por favor ajusta los horarios.`
+          errors.push(`Las disponibilidades ${i + 1} y ${j + 1} se solapan. Ajusta los horarios.`);
         }
       }
     }
 
-    return null // Sin errores
-  }
+    return errors.length ? errors : null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true);
 
     // Validar campos básicos del formulario
     if (!validate(form)) {
+      setLoading(false);
       return
     }
 
     // Validar disponibilidades
-    const availabilityErrors = validateAvailabilities()
+    const availabilityErrors = validateAvailabilities();
     if (availabilityErrors) {
-      setAvailabilityError(availabilityErrors)
-      return
+      setAvailabilityError(availabilityErrors); // array
+      setLoading(false);
+      return;
     }
-    setAvailabilityError("") // Limpiar si está ok
+    setAvailabilityError(null);
+
 
     try {
       // Transformar availabilities al formato esperado por el backend
@@ -163,9 +176,12 @@ export default function CreateTutoringByTutor() {
         navigate("/tutorias")
       }
     } catch (err) {
-      showError("Error al crear la tutoría: " + err.message);
       console.error("Error creating tutoring sessions:", err)
-    }
+      const message = err?.error || err?.message || "Error desconocido al crear la tutoría";
+      setSubmitError(message);
+    } finally {
+      setLoading(false);
+    } 
   }
 
   return (
@@ -226,14 +242,37 @@ export default function CreateTutoringByTutor() {
             error={errors.limit}
             className="flex-1"
             autoComplete="off"
+            maxLength={3}
           />
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label className="text-gray-600 text-sm font-semibold">
-              Disponibilidad <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="text-gray-600 text-sm font-semibold">
+                Disponibilidad <span className="text-gray-500 font-normal">(fecha y rango horario)</span> <span className="text-red-500">*</span>
+              </label>
+
+              {/* Tooltip “?” */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  aria-describedby="disp_help"
+                  className="w-5 h-5 inline-flex items-center justify-center rounded-full border text-[11px] leading-none"
+                >
+                  ?
+                </button>
+                <div
+                  id="disp_help"
+                  role="tooltip"
+                  className="absolute z-10 hidden group-hover:block mt-2 p-2 text-xs bg-gray-900 text-white rounded-md w-72"
+                >
+                  El primer estudiante que se anote podrá elegir un horario <b>dentro del rango</b> que definas para esa fecha.
+                  El rango debe ser de al menos 1 hora.
+                </div>
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={addAvailability}
@@ -301,18 +340,20 @@ export default function CreateTutoringByTutor() {
             </div>
           ))}
 
-          {availabilityError && <span className="text-red-500 text-xs">{availabilityError}</span>}
+          {Array.isArray(availabilityError) && availabilityError.length > 0 && (
+            <div className="text-red-500 text-xs space-y-1">
+              {availabilityError.map((msg, i) => (
+                <p key={i}>• {msg}</p>
+              ))}
+            </div>
+          )}
         </div>
 
-        {error.length > 0 && (
-          <ErrorAlert>
-            {error.map((err, idx) => (
-              <p key={idx}>{err}</p>
-            ))}
-          </ErrorAlert>
+        {submitError && !availabilityError && (
+          <ErrorAlert>{submitError}</ErrorAlert>
         )}
 
-        <SubmitButton text="Confirmar" />
+        <SubmitButton text={loading ? "Procesando..." : "Confirmar"}  disabled={loading} />
       </form>
     </AuthLayout>
   )

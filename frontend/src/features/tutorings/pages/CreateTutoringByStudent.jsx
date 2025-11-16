@@ -29,6 +29,7 @@ export default function CreateTutoringByStudent() {
 
   const [availabilities, setAvailabilities] = useState([{ date: "", startTime: "", endTime: "" }])
   const [submitError, setSubmitError] = useState([])
+  const [loading, setLoading] = useState(false);
 
   if (userLoading) return <p className="text-center mt-10">Cargando usuario...</p>
   if (userError) return <p className="text-center mt-10">Error al cargar perfil.</p>
@@ -52,61 +53,86 @@ export default function CreateTutoringByStudent() {
     const updated = [...availabilities]
     updated[index][field] = value
     setAvailabilities(updated)
+
+    setField("_errors", { ...(form._errors ?? {}), availabilities: undefined });
   }
 
   const validate = () => {
-    const errs = {}
+    const errs = {};
+    const availMsgs = [];
+
     if (form.request_comment.length > MAX_REQUEST_COMMENT)
-      errs.request_comment = `Máximo ${MAX_REQUEST_COMMENT} caracteres.`
-    if (form.location.length > MAX_LOCATION_COMMENT) errs.location = `Máximo ${MAX_LOCATION_COMMENT} caracteres.`
-  
-    // Validar que las disponibilidades estén completas y sean válidas
-    const invalidAvailability = availabilities.some(
-      (av) => !av.date || !av.startTime || !av.endTime || av.startTime >= av.endTime,
-    )
-    if (invalidAvailability) {
-      errs.availabilities = "Completa todas las disponibilidades. La hora final debe ser posterior a la hora de inicio."
-      return errs // Retornar temprano si hay campos vacíos
-    }
-  
-    //  Fechas en el pasado
-    const now = new Date()
-    const hasPastDate = availabilities.some((av) => {
-      const avDate = new Date(`${av.date}T${av.startTime}:00`)
-      return avDate < now
-    })
-    if (hasPastDate) {
-      errs.availabilities = "No puedes seleccionar fechas u horas en el pasado."
-      return errs
-    }
-  
-    // VALIDACIÓN: Solapamientos
+      errs.request_comment = `Máximo ${MAX_REQUEST_COMMENT} caracteres.`;
+    if (form.location.length > MAX_LOCATION_COMMENT)
+      errs.location = `Máximo ${MAX_LOCATION_COMMENT} caracteres.`;
+
+    const toDate = (d, t) => (d && t ? new Date(`${d}T${t}:00`) : null);
+    const now = new Date();
+
+    availabilities.forEach((av, i) => {
+      const label = `Disponibilidad ${i + 1}`;
+
+      const missing = [];
+      if (!av.date) missing.push("fecha");
+      if (!av.startTime) missing.push("hora de inicio");
+      if (!av.endTime) missing.push("hora final");
+      if (missing.length) {
+        availMsgs.push(`${label}: completa ${missing.join(", ")}.`);
+        return;
+      }
+
+      if (av.startTime >= av.endTime) {
+        availMsgs.push(`${label}: la hora final debe ser posterior a la hora de inicio.`);
+      } else {
+        const [sh, sm] = av.startTime.split(":").map(Number);
+        const [eh, em] = av.endTime.split(":").map(Number);
+        const duration = (eh * 60 + em) - (sh * 60 + sm);
+        if (duration < 60) {
+          availMsgs.push(`${label}: el rango horario debe ser de al menos 1 hora.`);
+        }
+      }
+
+      const start = toDate(av.date, av.startTime);
+      if (start && start < now) {
+        availMsgs.push(`${label}: la fecha/hora de inicio no puede ser en el pasado.`);
+      }
+    });
+
     for (let i = 0; i < availabilities.length; i++) {
-      const av1Start = new Date(`${availabilities[i].date}T${availabilities[i].startTime}:00`)
-      const av1End = new Date(`${availabilities[i].date}T${availabilities[i].endTime}:00`)
-  
+      const a = availabilities[i];
+      const aStart = toDate(a.date, a.startTime);
+      const aEnd   = toDate(a.date, a.endTime);
+      if (!aStart || !aEnd) continue;
+
       for (let j = i + 1; j < availabilities.length; j++) {
-        const av2Start = new Date(`${availabilities[j].date}T${availabilities[j].startTime}:00`)
-        const av2End = new Date(`${availabilities[j].date}T${availabilities[j].endTime}:00`)
-  
-        // Verificar si hay solapamiento
-        const overlap = av1Start < av2End && av2Start < av1End
+        const b = availabilities[j];
+        const bStart = toDate(b.date, b.startTime);
+        const bEnd   = toDate(b.date, b.endTime);
+        if (!bStart || !bEnd) continue;
+
+        const sameDay = a.date === b.date;
+        const overlap = sameDay && aStart < bEnd && bStart < aEnd;
         if (overlap) {
-          errs.availabilities = `Las disponibilidades ${i + 1} y ${j + 1} se solapan. Por favor ajusta los horarios.`
-          return errs
+          availMsgs.push(`Las disponibilidades ${i + 1} y ${j + 1} se solapan. Ajusta los horarios.`);
         }
       }
     }
-  
-    return errs
+
+    if (availMsgs.length > 0) {
+      errs.availabilities = availMsgs;
+    }
+
+    return errs;
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const errs = validate()
+    setLoading(true);
+    const errs = validate();
     if (Object.keys(errs).length > 0) {
-      setField("_errors", errs)
-      return
+      setField("_errors", errs);
+      setLoading(false);
+      return;
     }
 
     const selectedSubjects = JSON.parse(localStorage.getItem("selectedSubjects")) || [];
@@ -138,9 +164,12 @@ export default function CreateTutoringByStudent() {
       }
       
     } catch (err) {
-      showError("Error al crear la solicitud: " + err.message)
       console.error("Error creating tutoring request:", err)
-      setSubmitError([err.message || "Error desconocido"])
+      const message = err?.error || err?.message || "Error desconocido al crear la tutoría";
+      setSubmitError([message])
+      showError("Error al crear la solicitud: " + message)
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -161,12 +190,17 @@ export default function CreateTutoringByStudent() {
             value={form.request_comment}
             onChange={(e) => setField("request_comment", e.target.value)}
             className="p-2 border rounded-md text-sm"
-            placeholder="Preferencia de cupos"
+            placeholder="¿Algo que deba saber el tutor?"
           />
-          <div
-            className={`text-xs mt-1 ${form.request_comment.length === MAX_REQUEST_COMMENT ? "text-red-600" : "text-gray-500"}`}
-          >
-            {form.request_comment.length}/{MAX_REQUEST_COMMENT}
+          <div className="flex justify-between">
+            <p id="request_comment_help" className="mt-1 text-[11px] text-gray-500">
+              Ejemplos: preferencia de cupos, objetivos de la tutoría, etc.
+            </p>
+            <div
+              className={`text-xs mt-1 ${form.request_comment.length === MAX_REQUEST_COMMENT ? "text-red-600" : "text-gray-500"}`}
+            >
+              {form.request_comment.length}/{MAX_REQUEST_COMMENT}
+            </div>
           </div>
           {errs.request_comment && <span className="text-red-500 text-xs mt-1">{errs.request_comment}</span>}
         </div>
@@ -218,9 +252,31 @@ export default function CreateTutoringByStudent() {
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label className="text-gray-600 text-sm font-semibold">
-              Disponibilidad <span className="text-red-500">*</span>
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="text-gray-600 text-sm font-semibold">
+                Disponibilidad <span className="text-gray-500 font-normal">(fecha y rango horario)</span> <span className="text-red-500">*</span>
+              </label>
+
+              {/* Tooltip “?” */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  aria-describedby="disp_help"
+                  className="w-5 h-5 inline-flex items-center justify-center rounded-full border text-[11px] leading-none"
+                >
+                  ?
+                </button>
+                <div
+                  id="disp_help"
+                  role="tooltip"
+                  className="absolute z-10 hidden group-hover:block mt-2 p-2 text-xs bg-gray-900 text-white rounded-md w-72"
+                >
+                  El tutor elegirá un horario <b>dentro del rango</b> que definas para esa fecha.
+                  El rango debe ser de al menos 1 hora.
+                </div>
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={addAvailability}
@@ -288,10 +344,16 @@ export default function CreateTutoringByStudent() {
             </div>
           ))}
 
-          {errs.availabilities && <span className="text-red-500 text-xs">{errs.availabilities}</span>}
+          {Array.isArray(errs.availabilities) && errs.availabilities.length > 0 && (
+            <div className="text-red-500 text-xs space-y-1">
+              {errs.availabilities.map((m, idx) => (
+                <p key={idx}>• {m}</p>
+              ))}
+            </div>
+          )}
         </div>
 
-        {submitError.length > 0 && (
+        {submitError.length > 0 && !errs.availabilities && (
           <ErrorAlert>
             {submitError.map((err, idx) => (
               <p key={idx}>{err}</p>
@@ -299,7 +361,7 @@ export default function CreateTutoringByStudent() {
           </ErrorAlert>
         )}
 
-        <SubmitButton text="Enviar solicitud" />
+        <SubmitButton text={loading ? "Procesando..." : "Enviar solicitud"}  disabled={loading} />
       </form>
     </AuthLayout>
   )

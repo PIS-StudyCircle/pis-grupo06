@@ -15,11 +15,15 @@ production:
     schedule: every hour at minute 12
   remove_renew_expired_jobs:
     command: "RenewExpiredJob.remove_expired_jobs"
-    schedule: "weekdays at 3am"
+    schedule: "0 3 * * 1-5"
   mark_finished_tutorings_job:
     class: Tutorings::MarkFinishedTutoringsJob
     queue: default
     schedule: every hour at minute 12
+  remove_expired_availabilities_job:
+    class: RemoveExpiredAvailabilitiesJob
+    queue: default
+    schedule: every day at 4am
 
 staging:
   clear_solid_queue_finished_jobs:
@@ -27,8 +31,12 @@ staging:
     schedule: every hour at minute 12
   remove_renew_expired_jobs:
     command: "RenewExpiredJob.remove_expired_jobs"
-    schedule: "weekdays at 3am"
+    schedule: "0 3 * * 1-5"
   mark_finished_tutorings_job:
     class: Tutorings::MarkFinishedTutoringsJob
     queue: default
     schedule: every hour at minute 12
+  remove_expired_availabilities_job:
+    class: RemoveExpiredAvailabilitiesJob
+    queue: default
+    schedule: every day at 4am

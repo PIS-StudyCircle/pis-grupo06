@@ -22,6 +22,7 @@ module Api
             resource.profile_photo.attach(params[:user][:profile_photo])
           end
 
+          sign_up(resource_name, resource)
           respond_with(resource)
         else
           error_response(
