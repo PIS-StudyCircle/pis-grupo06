@@ -242,7 +242,7 @@ def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_c
     created_by_id: creator.id,
     state: :active,
     modality: ["virtual", "presencial"].sample,
-    duration_mins: [60, 90, 120].sample,
+    duration_mins: 60,
     capacity: num_attendees + 2,
     scheduled_at: (15 + rand(30)).days.from_now
   )
@@ -264,12 +264,13 @@ def create_active_tutoring(course:, tutor:, creator:, num_attendees:, subjects_c
   attendees.each { |attendee| UserTutoring.create!(user: attendee, tutoring: tutoring) }
 
   # Create TutoringAvailability (one booked, rest unbooked)
-  num_availabilities = rand(1..3)
+  num_availabilities = 3
   num_availabilities.times do |i|
+    time = tutoring.scheduled_at + i.hours
     TutoringAvailability.create!(
       tutoring: tutoring,
-      start_time: tutoring.scheduled_at + i.hours,
-      end_time: tutoring.scheduled_at + i.hours + tutoring.duration_mins.minutes,
+      start_time: time,
+      end_time: time + tutoring.duration_mins.minutes,
       is_booked: (i == 0) # First one is booked
     )
   end
