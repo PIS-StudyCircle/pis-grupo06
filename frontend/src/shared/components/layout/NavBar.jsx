@@ -22,8 +22,6 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
     }
   }
 
-  const userInitial = (user?.name?.[0] || "?").toUpperCase();
-
   const photoUrl = user?.profile_photo_url || DEFAULT_PHOTO;
 
   return (
@@ -137,8 +135,12 @@ const NavBar = ({ toggleSidebar = () => {} }) => {
               aria-controls="sidebar"
               className="btn-avatar-mobile"
             >
-              <div className="avatar">
-                <span className="avatar-letter">{userInitial}</span>
+              <div className="avatar w-10 h-10 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center bg-gray-200">
+                <img
+                  src={photoUrl}
+                  alt={user.name || "Avatar"}
+                  className="w-full h-full object-cover"
+                />
               </div>
             </button>
 
