@@ -30,9 +30,9 @@ class InsigniaNotifier < ApplicationNotifier
               end
 
       case count
-      when 1 then "Recibiste una insignia de nivel 1 (#{tipo_label})"
-      when 3 then "Recibiste una insignia de nivel 2 (#{tipo_label})"
-      when 6 then "Recibiste una insignia de nivel 3 (#{tipo_label})"
+      when 1 then title = "Recibiste una insignia de nivel 1 (#{tipo_label})"
+      when 3 then title = "Recibiste una insignia de nivel 2 (#{tipo_label})"
+      when 6 then title = "Recibiste una insignia de nivel 3 (#{tipo_label})"
       else
         nil
       end

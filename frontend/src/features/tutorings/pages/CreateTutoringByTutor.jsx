@@ -14,7 +14,7 @@ import { useValidation } from "@hooks/useValidation"
 import {showSuccess} from '@shared/utils/toastService';
 
 const validators = {
-  limit: (value) => validateInteger(value, "Límite de estudiantes"),
+  limit: (value) => validateInteger(value, "Cupos"),
 }
 
 export default function CreateTutoringByTutor() {
